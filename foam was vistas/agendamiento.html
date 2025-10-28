@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cotización - Foam Wash</title>
+  <link rel="stylesheet" href="css/agendamiento.css">
+  <link rel="stylesheet" href="css/modal.css">
+</head>
+<body>
+  <!-- Encabezado -->
+  <header class="encabezado">
+    <img src="img/ima9.jpg" alt="Fondo encabezado" class="fondo">
+    <div class="nav-bar">
+      <h1 class="logo">FoamWash</h1>
+      <nav>
+        <a href="#">HogarGonzález</a>
+        <a href="#" class="activo">Cotización</a>
+        <a href="#">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Buscador -->
+  <section class="busqueda">
+    <input type="text" placeholder="Buscar servicios...">
+  </section>
+
+  <!-- Título -->
+  <h2 class="titulo">Cotización de servicios</h2>
+
+  <!-- Tarjetas de servicios -->
+  <section class="servicios">
+
+    <div class="tarjeta">
+      <h3>Limpieza de muebles</h3>
+      <img src="img/imag1.jpg" alt="">
+      <button class="btn-cotizar"
+        data-titulo="Limpieza de Muebles"
+        data-img="img/imag1.jpg">
+        Cotizar
+      </button>
+    </div>
+
+    <div class="tarjeta">
+      <h3>Limpieza de sillas de comedor</h3>
+      <img src="img/imag2.jpg" alt="">
+      <button class="btn-cotizar"
+        data-titulo="Limpieza de Sillas de Comedor"
+        data-img="img/imag2.jpg">
+        Cotizar
+      </button>
+    </div>
+
+    <div class="tarjeta">
+      <h3>Limpieza de tapetes decorativos</h3>
+      <img src="img/imag3.jpg" alt="">
+      <button class="btn-cotizar"
+        data-titulo="Limpieza de Tapetes Decorativos"
+        data-img="img/imag3.jpg">
+        Cotizar
+      </button>
+    </div>
+
+    <div class="tarjeta">
+      <h3>Limpieza de alfombras</h3>
+      <img src="img/imag4.jpg" alt="">
+      <button class="btn-cotizar"
+        data-titulo="Limpieza de Alfombras"
+        data-img="img/imag4.jpg">
+        Cotizar
+      </button>
+    </div>
+
+    <div class="tarjeta">
+      <h3>Lavado de colchones</h3>
+      <img src="img/imag6.jpg" alt="">
+      <button class="btn-cotizar"
+        data-titulo="Lavado de Colchones"
+        data-img="img/imag6.jpg">
+        Cotizar
+      </button>
+    </div>
+
+    <div class="tarjeta">
+      <h3>Lavado de vehículos y cojinería</h3>
+      <img src="img/imag5.jpg" alt="">
+      <button class="btn-cotizar"
+        data-titulo="Lavado de Vehículos y Cojinería"
+        data-img="img/imag5.jpg">
+        Cotizar
+      </button>
+    </div>
+
+    <div class="tarjeta">
+      <h3>Lavado de cortinas</h3>
+      <img src="img/imag7.jpg" alt="">
+      <button class="btn-cotizar"
+        data-titulo="Lavado de Cortinas"
+        data-img="img/imag7.jpg">
+        Cotizar
+      </button>
+    </div>
+
+    <div class="tarjeta">
+      <h3>Mantenimiento y pulido de pisos</h3>
+      <img src="img/imag8.jpg" alt="">
+      <button class="btn-cotizar"
+        data-titulo="Mantenimiento y Pulido de Pisos"
+        data-img="img/imag8.jpg">
+        Cotizar
+      </button>
+    </div>
+  </section>
+
+  <!-- ✅ Modal único (se reutiliza para todas las tarjetas) -->
+  <div id="modalCotizar" class="modal">
+    <div class="modal-contenido">
+      <span class="cerrar" onclick="cerrarModal()">&times;</span>
+      <h2 id="modalTitulo">Título dinámico</h2>
+      <img id="modalImg" src="" alt="Servicio seleccionado">
+
+      <form>
+        <label>Tamaño</label>
+        <select>
+          <option>Seleccionar tamaño</option>
+          <option>Pequeño</option>
+          <option>Mediano</option>
+          <option>Grande</option>
+        </select>
+
+        <label>Cantidad</label>
+        <input type="number" placeholder="Escribir cantidad">
+
+        <label>Tipo de Lavado</label>
+        <select>
+          <option>Seleccionar tipo</option>
+          <option>Seco</option>
+          <option>Profundo</option>
+        </select>
+
+        <button type="submit">Cotizar</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="modal.js"></script>
+</body>
+</html>
+
