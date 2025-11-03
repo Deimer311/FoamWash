@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejemplo Checkbox Modal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 40px;
+      text-align: center;
+    }
+
+    /* Checkbox oculto */
+    #abrir-modal {
+      display: none;
+    }
+
+    /* Botón que abre el modal */
+    .btn-abrir {
+      background: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    /* Fondo del modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Contenido del modal */
+    .modal-contenido {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .cerrar {
+      display: inline-block;
+      background: #dc3545;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    /* Mostrar modal cuando el checkbox está activado */
+    #abrir-modal:checked ~ .modal {
+      display: flex;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Checkbox oculto -->
+  <input type="checkbox" id="abrir-modal">
+
+  <!-- Botón que abre el modal -->
+  <label for="abrir-modal" class="btn-abrir">Abrir Ventana</label>
+
+  <!-- Modal -->
+  <div class="modal">
+    <div class="modal-contenido">
+      <h2>Hola 👋</h2>
+      <p>Este es un ejemplo de ventana modal abierta con un checkbox.</p>
+
+      <!-- Botón que cierra el modal -->
+      <label for="abrir-modal" class="cerrar">Cerrar</label>
+    </div>
+  </div>
+
+</body>
+</html>
