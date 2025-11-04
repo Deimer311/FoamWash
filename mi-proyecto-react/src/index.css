@@ -1,0 +1,92 @@
+:root {
+  --white: #ffffff;
+  --accent: #a73aef;
+  --accent-light: #cc80ff;
+  --form-width: 400px;
+}
+
+/* Fondo general */
+body {
+  background: linear-gradient(90deg, #b14cff, #cc80ff);
+  font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+/* === SOLO el primer div del login === */
+body > div {
+  background-color: var(--white);
+  width: var(--form-width);
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  text-align: left;
+}
+
+/* Título */
+h2 {
+  text-align: center;
+  color: var(--accent);
+  margin-bottom: 30px;
+}
+
+/* Etiquetas */
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #530083;
+}
+
+/* Inputs */
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 20px;
+  font-size: 16px;
+  background-color: #f7f7f7;
+}
+
+/* Botones */
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--white);
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #b14cff;
+}
+
+/* Segundo botón dentro del <a> */
+a button {
+  background: #c85eff;
+}
+
+a button:hover {
+  background: #b14cff;
+}
+
+/* Caja donde se muestra el token */
+div div {
+  background: #f7f7f7;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 20px;
+  text-align: center;
+  word-break: break-all;
+}

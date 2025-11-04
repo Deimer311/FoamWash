@@ -1,0 +1,74 @@
+/* Fondo general y tipografía */
+body {
+  background-color: #cc80ff; /* tono rosado suave */
+  font-family: 'Roboto', sans-serif;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+  margin: 0;
+  padding: 40px;
+}
+
+h1 {
+  width: 100%;
+  text-align: center;
+  font-size: 2em;
+  margin-bottom: 40px;
+  color: #ffffff;
+}
+
+/* Estilo de cada tarjeta de prenda */
+form {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  width: 250px;
+  text-align: center;
+  padding: 20px;
+
+}
+
+form:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+/* Imagen del producto */
+form img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Nombre del producto */
+form h2 {
+  font-size: 1.2em;
+  color: #222;
+  margin: 15px 0 10px;
+}
+
+/* Precio simulado (puedes agregarlo dentro del <form> si lo tienes) */
+form p {
+  font-weight: bold;
+  color: #a73aef;
+  margin-bottom: 15px;
+}
+
+/* Botón de acción */
+form input[type="button"] {
+  background-color: transparent;
+  color: #000;
+  border: 2px solid #ccc;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+form input[type="button"]:hover {
+  background-color: #c541e0;
+  
+}
