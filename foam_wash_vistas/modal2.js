@@ -6,8 +6,8 @@ document.getElementById("formCotizacion").addEventListener("submit", function (e
   const tamano = document.getElementById("tamano").value;
   const cantidad = parseInt(document.getElementById("cantidad").value) || 1;
 
-  // Precios base (todo en minúsculas)
-  let precios = {
+  // Precios base
+  const precios = {
     "limpieza de muebles": 70000,
     "limpieza de alfombras": 60000,
     "limpieza de tapetes decorativos": 60000,
@@ -22,28 +22,18 @@ document.getElementById("formCotizacion").addEventListener("submit", function (e
     let precioBase = precios[servicio] || 0;
     let precioFinal = precioBase;
 
-    if (tamano === "Mediano") precioFinal += 30000;
-    else if (tamano === "Grande") precioFinal += 60000;{
-      precioFinal *= cantidad;
+    if (tamano === "Mediano") {
+      precioFinal += 30000;
+    } else if (tamano === "Grande") {
+      precioFinal += 60000;
     }
 
+    precioFinal *= cantidad;
+
+    // Si es sillas de comedor, el cálculo depende de la cantidad
     if (servicio === "limpieza de sillas de comedor") {
       precioFinal *= cantidad;
     }
-
-    let maximos = {
-      "limpieza de muebles": 130000,
-      "limpieza de tapetes decorativos": 120000,
-      "limpieza de alfombras": 120000,
-      "lavado de colchones": 110000,
-      "lavado de cortinas": 120000
-    };
-
-    if (maximos[servicio] && precioFinal > maximos[servicio]) {
-      precioFinal = maximos[servicio];
-    }
-    
-
 
     return precioFinal;
   }
