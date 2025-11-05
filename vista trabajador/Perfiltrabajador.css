@@ -1,0 +1,160 @@
+/* Fondo general con imagen translúcida */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background: url('img/fondo-login.jpg') no-repeat center center/cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 30, 80, 0.45);
+  backdrop-filter: blur(3px);
+  z-index: 0;
+}
+
+/* Contenedor principal */
+.container {
+  position: relative;
+  z-index: 1;
+  width: 90%;
+  max-width: 900px;
+}
+
+/* Tarjeta con efecto vidrio */
+.profile-card {
+  display: flex;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  border-radius: 25px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+/* Lado izquierdo */
+.left {
+  background: rgba(255, 255, 255, 0.85);
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: 25px;
+}
+
+.left h2 {
+  color: #003366;
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.left label {
+  font-weight: bold;
+  color: #003366;
+  margin-top: 10px;
+}
+
+.left input,
+.left select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.left input:focus,
+.left select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+/* Botón */
+.left button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.left button:hover {
+  background-color: #0056b3;
+}
+
+/* Vista previa */
+.preview {
+  text-align: center;
+  margin: 10px 0 20px 0;
+}
+
+.preview img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #007bff;
+}
+
+/* Lado derecho */
+.right {
+  flex: 1;
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.9), rgba(0, 51, 102, 0.9));
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  border-top-right-radius: 25px;
+  border-bottom-right-radius: 25px;
+}
+
+.right h1 {
+  font-size: 30px;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.right p {
+  font-size: 16px;
+  text-align: center;
+  margin: 8px 0;
+}
+
+.right span {
+  font-weight: bold;
+  color: #ffda79;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .profile-card {
+    flex-direction: column;
+  }
+
+  .right {
+    border-radius: 0 0 25px 25px;
+  }
+}
+
+
