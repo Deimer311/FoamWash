@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel de Administración - FoamWash</title>
+  <link rel="stylesheet" href="vistaadmin.css" />
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header>
+    <div class="overlay">
+      <h1>FoamWash <span>Admin</span></h1>
+      <nav>
+        <a href="#" id="usuariosTab" class="active">Usuarios</a>
+        <a href="#" id="empleadosTab">Empleados</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <h2 id="titulo">Usuarios Registrados</h2>
+    <div class="user-list" id="userList"></div>
+  </main>
+
+  <!-- Modal de edición -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <h3>Editar Registro</h3>
+      <form id="editForm">
+        <label>ID:</label>
+        <input type="text" id="editId" disabled>
+
+        <label>Nombre de usuario:</label>
+        <input type="text" id="editUsername">
+
+        <label>Nombre completo:</label>
+        <input type="text" id="editName">
+
+        <label>Correo:</label>
+        <input type="email" id="editEmail">
+
+        <label>Rol:</label>
+        <select id="editRole">
+          <option value="cliente">Cliente</option>
+          <option value="empleado">Empleado</option>
+          <option value="administrador">Administrador</option>
+        </select>
+
+        <div class="modal-buttons">
+          <button type="button" id="cancelEdit">Cancelar</button>
+          <button type="submit">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="vistaadmin.js"></script>
+</body>
+</html>
+
+
+
+
+
