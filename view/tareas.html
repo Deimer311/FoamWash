@@ -11,6 +11,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Tareas - FoamWash Trabajador</title>
     <link rel="stylesheet" href="./css/tareas.css"><!-- hace referencia a los estilos -->
+    <style>
+        /* ==================estilos adicionaales para las etiquetas A============================ */
+        .nav-link {
+            font-size: 15px;
+            padding: 8px 15px;
+            width: 100%;
+            text-align: center;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
 </head>
 <body>
     <!-- ==================== HEADER ==================== -->
@@ -25,6 +36,9 @@
                     <div class="user-name" id="userName">Cargando...</div>
                     <div class="user-role">👷 Trabajador</div>
                 </div>
+                <nav>
+                    <a href="./Perfiltrabajador.html">Perfil</a>
+                </nav>
                 <button class="btn-logout" onclick="cerrarSesionTrabajador()">
                     🚪 Cerrar Sesión
                 </button>

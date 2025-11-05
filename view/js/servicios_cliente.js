@@ -1,3 +1,6 @@
+// codigo para el sistema de carrito de servicios de limpieza
+//el codigo termina en codigo carrito fin.
+
 // DATOS DE SERVICIOS
         const SERVICIOS = [
             {
@@ -40,7 +43,7 @@
                 id: 5,
                 nombre: "Lavado de colchones",
                 precio: 90000,
-                imagen: "https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=500&h=300&fit=crop",
+                imagen: "../img/serv_colchones.jpg",
                 duracion: "2-3 horas",
                 tamanos: ["Sencillo", "Semi-doble", "Doble", "Queen", "King"],
                 tiposLavado: ["Básico", "Profundo", "Sanitización"]
@@ -193,7 +196,7 @@
                     <div class="form-group">
                         <label for="cantidad-${index}">Cantidad *</label>
                         <input type="number" id="cantidad-${index}" min="1" value="${item.cantidad}" 
-                               onchange="actualizarCantidad(${item.id}, parseInt(this.value))" required>
+                                onchange="actualizarCantidad(${item.id}, parseInt(this.value))" required>
                     </div>
                     
                     <div class="form-group">
@@ -324,7 +327,9 @@
                 day: 'numeric'
             });
         }
-
+        //codigo carrito fin.
+        //=================================================================================================
+        // FUNCIONES DE BUSQUEDA Y NOTIFICACIONES
         function configurarBusqueda() {
             const searchInput = document.getElementById('searchInput');
             

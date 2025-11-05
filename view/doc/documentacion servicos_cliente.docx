@@ -735,3 +735,21 @@ Versión del Documento: 1.0
 Autor: Equipo de Desarrollo FoamWash
 Estado: Documentación Completa
 
+        .service-btn { //esta clase hace referencia al los botones de agregar
+            background: #0099ff;//color de fondo del boton
+            color: white;//color del tecto del boton
+            border: none;// borde de los botones
+            padding: 12px 40px;// crear espcio interno entre el texto y los bordes del boton
+            border-radius: 25px;//sirve para redondiar el borde de los botones
+            font-size: 16px;//
+            font-weight: 700;
+            cursor: pointer;//para cambiar el tipo del puntero
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 153, 255, 0.3);
+        }
+
+        .service-btn:hover {
+            background: #0077cc;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 153, 255, 0.4);
+        }

@@ -8,7 +8,7 @@ const USERS_DB = {
         password: "123456", 
         role: "admin", 
         token: "token-admin-12345", 
-        redirect: "./admin/dashboard.html" 
+        redirect: "./reportes.html" 
     },
     "trabajador@gmail.com": { 
         password: "123456", 
