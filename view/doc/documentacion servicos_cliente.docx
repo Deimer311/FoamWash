@@ -1,0 +1,737 @@
+Documentación Técnica: Sistema de Servicios FoamWash
+📋 Índice
+1.	Descripción General del Proyecto
+2.	Arquitectura del Sistema
+3.	Estructura HTML
+4.	Diseño y Estilos CSS
+5.	Lógica JavaScript
+6.	Sistema de Autenticación
+7.	Gestión de Sesiones
+8.	Flujo de Usuario
+9.	Consideraciones Técnicas
+10.	Mejoras Propuestas
+________________________________________
+🎯 Descripción General del Proyecto {#descripción-general}
+Propósito
+FoamWash es una aplicación web para la gestión de servicios de lavandería especializada. El sistema permite a los clientes:
+•	Explorar servicios disponibles
+•	Agregar servicios al carrito de compras
+•	Configurar detalles específicos (tamaño, tipo de lavado)
+•	Agendar servicios con fecha y hora
+•	Gestionar pedidos
+Tecnologías Utilizadas
+•	HTML5: Estructura semántica
+•	CSS3: Diseño moderno con gradientes y animaciones
+•	JavaScript ES6+: Lógica de negocio y gestión de estado
+•	LocalStorage: Persistencia de datos del lado del cliente
+•	SessionStorage: Gestión de sesiones activas
+Roles del Sistema
+1.	Cliente: Acceso a servicios y agendamiento
+2.	Trabajador: Gestión de tareas (no implementado en este archivo)
+3.	Admin: Panel de administración (no implementado en este archivo)
+________________________________________
+🏗️ Arquitectura del Sistema {#arquitectura}
+Estructura de Archivos
+view/
+├── index.html                          # Página de login/registro
+├── servicios_cliente.html              # Página principal (documento actual)
+├── css/
+│   └── estilos_servicios_cliente.css   # Estilos de la página
+└── js/
+    ├── login.js                        # Sistema de autenticación
+    ├── sesiones_activas.js             # Gestión de sesiones
+    └── servicios_cliente.js            # Lógica del carrito y servicios
+Flujo de Datos
+Usuario → Login → Sesión Activa → Servicios → Carrito → Confirmación → LocalStorage
+________________________________________
+📄 Estructura HTML {#estructura-html}
+1. Header con Banner
+<header class="header-banner">
+    <h1 class="logo-header">FoamWash</h1>
+    <nav class="nav-bar">
+        <!-- Enlaces de navegación -->
+    </nav>
+</header>
+Características:
+•	Diseño con overlay de gradiente sobre imagen de fondo
+•	Navegación horizontal con efecto hover
+•	Indicador visual del usuario activo
+•	Botón de cierre de sesión
+2. Sección de Búsqueda
+<section class="search-section">
+    <div class="search-container">
+        <input type="text" id="searchInput" />
+        <button class="search-button">🔍</button>
+    </div>
+</section>
+Funcionalidad:
+•	Búsqueda en tiempo real de servicios
+•	Filtrado por nombre y descripción
+3. Grid de Servicios
+<section class="services-section">
+    <div class="services-grid">
+        <article class="service-card">
+            <!-- Tarjeta de servicio -->
+        </article>
+    </div>
+</section>
+Estructura de Tarjeta:
+•	Imagen del servicio
+•	Título y descripción
+•	Precio destacado
+•	Botón de agregar al carrito
+4. Sistema de Modales
+Modal del Carrito
+•	Vista previa de servicios agregados
+•	Control de cantidad (+/-)
+•	Eliminación de items
+•	Total calculado dinámicamente
+Modal de Confirmación
+•	Formulario de datos del cliente
+•	Selector de fecha y hora
+•	Configuración de detalles del servicio
+•	Resumen del pedido
+5. Componentes Auxiliares
+Botón Flotante del Carrito
+<button class="btn-carrito-flotante">
+    <span class="carrito-icono">🛒</span>
+    <span id="carritoBadge" class="carrito-badge-flotante">0</span>
+</button>
+Características:
+•	Animación flotante continua
+•	Badge con contador de items
+•	Efecto de pulso en el anillo exterior
+Contenedor de Notificaciones
+<div id="notificacionContainer"></div>
+Muestra mensajes temporales al usuario con animaciones de entrada/salida.
+________________________________________
+🎨 Diseño y Estilos CSS {#diseño-css}
+1. Sistema de Colores
+/* Paleta Principal */
+--primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+--success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+--danger-color: #ff4757;
+--info-color: #0099ff;
+2. Tipografía y Espaciado
+Fuentes:
+•	Sistema: Arial, Segoe UI, sans-serif
+•	Pesos: 600 (semi-bold), 700 (bold), 800-900 (extra-bold)
+Espaciado:
+•	Padding estándar: 20-35px
+•	Gaps en grids: 40px
+•	Border radius: 12-30px (diseño suave)
+3. Animaciones Clave
+Animación Flotante
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+}
+Efecto de Pulso
+@keyframes pulse-ring {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.3;
+    }
+}
+Entrada de Modal
+@keyframes slideUp {
+    from {
+        transform: translateY(100px) scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+4. Sistema de Grid
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 40px;
+}
+Características:
+•	Diseño responsivo automático
+•	Mínimo de 280px por tarjeta
+•	Distribución equitativa del espacio
+5. Efectos Interactivos
+Hover en Tarjetas:
+.service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+Efecto Shine:
+@keyframes shine {
+    0% { left: -100%; opacity: 0; }
+    50% { opacity: 1; }
+    100% { left: 150%; opacity: 0; }
+}
+6. Diseño Responsivo
+Breakpoints:
+•	1024px: Reducción de gaps, ajuste de navegación
+•	768px: Layout móvil, navegación vertical, modales fullscreen
+________________________________________
+⚙️ Lógica JavaScript {#lógica-javascript}
+1. Estructura de Datos
+Servicio
+{
+    id: 1,
+    nombre: "Lavado de muebles",
+    precio: 90000,
+    imagen: "url",
+    duracion: "2-3 horas",
+    tamanos: ["Pequeño", "Mediano", "Grande"],
+    tiposLavado: ["Básico", "Profundo", "Premium"]
+}
+Item del Carrito
+{
+    ...servicio,
+    cantidad: 1,
+    tamano: "",
+    tipoLavado: ""
+}
+Pedido
+{
+    id: "PED-timestamp",
+    servicios: [...items],
+    direccion: "",
+    ciudad: "",
+    telefono: "",
+    fecha: "",
+    hora: "",
+    observaciones: "",
+    total: 0,
+    estado: "Pendiente",
+    fechaCreacion: "ISO-8601"
+}
+2. Funciones Principales
+Gestión del Carrito
+agregarAlCarrito(servicioId)
+•	Busca el servicio por ID
+•	Verifica si ya existe en el carrito
+•	Incrementa cantidad o agrega nuevo item
+•	Actualiza UI y muestra notificación
+function agregarAlCarrito(servicioId) {
+    const servicio = SERVICIOS.find(s => s.id === servicioId);
+    const servicioExistente = carrito.find(item => item.id === servicioId);
+    
+    if (servicioExistente) {
+        servicioExistente.cantidad++;
+    } else {
+        carrito.push({...servicio, cantidad: 1, tamano: '', tipoLavado: ''});
+    }
+    
+    actualizarCarrito();
+    mostrarNotificacion(`${servicio.nombre} agregado al carrito`);
+}
+actualizarCantidad(servicioId, nuevaCantidad)
+•	Modifica la cantidad de un item
+•	Elimina si cantidad es 0 o negativa
+•	Recalcula totales
+calcularTotal()
+•	Suma precio × cantidad de todos los items
+•	Retorna valor numérico
+Gestión de Modales
+abrirModalCarrito()
+•	Agrega clase 'show' al overlay
+•	Actualiza contenido del carrito
+•	Renderiza items dinámicamente
+cerrarModalCarrito()
+•	Remueve clase 'show'
+•	Mantiene estado del carrito
+abrirModalConfirmacion()
+•	Genera formulario dinámico por servicio
+•	Configura fecha mínima (mañana)
+•	Renderiza selectores de tamaño y tipo
+Procesamiento de Pedidos
+confirmarPedido()
+1.	Valida formulario completo
+2.	Verifica detalles de servicios
+3.	Crea objeto pedido
+4.	Guarda en localStorage
+5.	Muestra confirmación
+6.	Limpia carrito
+function confirmarPedido() {
+    const form = document.getElementById('formConfirmacion');
+    
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    const serviciosSinDetalles = carrito.filter(
+        item => !item.tamano || !item.tipoLavado
+    );
+    
+    if (serviciosSinDetalles.length > 0) {
+        mostrarNotificacion('Completa todos los detalles');
+        return;
+    }
+    
+    const pedido = {
+        id: `PED-${Date.now()}`,
+        servicios: carrito,
+        // ... otros datos
+        total: calcularTotal(),
+        estado: 'Pendiente',
+        fechaCreacion: new Date().toISOString()
+    };
+    
+    let pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+    pedidos.push(pedido);
+    localStorage.setItem('pedidos', JSON.stringify(pedidos));
+    
+    mostrarConfirmacionExitosa(pedido);
+}
+3. Sistema de Búsqueda
+function filtrarServicios(termino) {
+    const cards = document.querySelectorAll('.service-card');
+    const terminoLower = termino.toLowerCase();
+    
+    cards.forEach(card => {
+        const titulo = card.querySelector('.service-title').textContent.toLowerCase();
+        const descripcion = card.querySelector('.service-desc').textContent.toLowerCase();
+        
+        if (titulo.includes(terminoLower) || descripcion.includes(terminoLower)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+4. Sistema de Notificaciones
+function mostrarNotificacion(mensaje) {
+    const container = document.getElementById('notificacionContainer');
+    const notificacion = document.createElement('div');
+    notificacion.className = 'notificacion';
+    notificacion.innerHTML = `
+        <span class="notificacion-icono">✓</span>
+        <span class="notificacion-mensaje">${mensaje}</span>
+    `;
+    
+    container.appendChild(notificacion);
+    setTimeout(() => notificacion.classList.add('show'), 10);
+    
+    setTimeout(() => {
+        notificacion.classList.remove('show');
+        setTimeout(() => notificacion.remove(), 400);
+    }, 3000);
+}
+________________________________________
+🔐 Sistema de Autenticación {#autenticación}
+1. Base de Datos Simulada
+const USERS_DB = {
+    "admin@gmail.com": { 
+        password: "123456", 
+        role: "admin", 
+        token: "token-admin-12345", 
+        redirect: "./admin/dashboard.html" 
+    },
+    "trabajador@gmail.com": { 
+        password: "123456", 
+        role: "trabajador", 
+        token: "token-trabajador-67890", 
+        redirect: "./trabajador/tareas.html" 
+    },
+    "cliente@gmail.com": { 
+        password: "123456", 
+        role: "cliente", 
+        token: "token-cliente-abcde", 
+        redirect: "./servicios_cliente.html" 
+    }
+};
+⚠️ IMPORTANTE: Esta es una implementación de demostración. En producción debe usar:
+•	Hash de contraseñas (bcrypt, argon2)
+•	Backend seguro
+•	Tokens JWT
+•	HTTPS obligatorio
+2. Proceso de Login
+function simulateLogin(email, password) {
+    const user = USERS_DB[email];
+    
+    if (!user || user.password !== password) {
+        return { success: false, message: "Credenciales incorrectas" };
+    }
+    
+    return {
+        success: true,
+        message: `¡Bienvenido, ${user.role}!`,
+        role: user.role,
+        token: user.token,
+        redirect: user.redirect,
+        email: email
+    };
+}
+3. Protección de Páginas
+function protectPage(allowedRoles = []) {
+    const session = checkActiveSession();
+    
+    if (!session.isActive) {
+        alert('Debes iniciar sesión');
+        window.location.href = './index.html';
+        return false;
+    }
+    
+    if (allowedRoles.length > 0 && !allowedRoles.includes(session.role)) {
+        alert('Sin permisos');
+        window.location.href = './index.html';
+        return false;
+    }
+    
+    return session;
+}
+Uso en la página:
+const session = protectPage(['cliente']);
+4. Cierre de Sesión
+function logout() {
+    const token = sessionStorage.getItem('authToken');
+    
+    if (token) {
+        eliminarSesionActiva(token);
+    }
+    
+    sessionStorage.clear();
+    window.location.href = './index.html';
+}
+________________________________________
+👥 Gestión de Sesiones {#sesiones}
+1. Estructura de Sesión
+{
+    id: "SESSION-timestamp",
+    email: "usuario@email.com",
+    role: "cliente",
+    token: "token-unico",
+    fechaInicio: "ISO-8601",
+    ultimaActividad: "ISO-8601"
+}
+2. Registro de Sesiones
+function registrarSesionActiva(email, role, token) {
+    const sesion = {
+        id: `SESSION-${Date.now()}`,
+        email, role, token,
+        fechaInicio: new Date().toISOString(),
+        ultimaActividad: new Date().toISOString()
+    };
+    
+    let sesionesActivas = JSON.parse(
+        localStorage.getItem('sesionesActivas') || '[]'
+    );
+    
+    const indiceExistente = sesionesActivas.findIndex(
+        s => s.email === email
+    );
+    
+    if (indiceExistente !== -1) {
+        sesionesActivas[indiceExistente] = sesion;
+    } else {
+        sesionesActivas.push(sesion);
+    }
+    
+    localStorage.setItem('sesionesActivas', JSON.stringify(sesionesActivas));
+    return sesion;
+}
+3. Limpieza de Sesiones Expiradas
+function limpiarSesionesExpiradas() {
+    let sesiones = JSON.parse(
+        localStorage.getItem('sesionesActivas') || '[]'
+    );
+    
+    const ahora = new Date().getTime();
+    const dosHoras = 2 * 60 * 60 * 1000;
+    
+    sesiones = sesiones.filter(sesion => {
+        const ultimaActividad = new Date(sesion.ultimaActividad).getTime();
+        return (ahora - ultimaActividad) < dosHoras;
+    });
+    
+    localStorage.setItem('sesionesActivas', JSON.stringify(sesiones));
+}
+4. Monitoreo en Tiempo Real
+function iniciarMonitoreoSesiones(intervalo = 5000) {
+    actualizarContadorSesiones();
+    
+    setInterval(() => {
+        actualizarContadorSesiones();
+        mostrarListaSesiones();
+        mostrarEstadisticasSesiones();
+    }, intervalo);
+}
+________________________________________
+🔄 Flujo de Usuario {#flujo-usuario}
+1. Diagrama de Flujo
+[Login] → [Verificación] → [Página Servicios]
+                                    ↓
+                          [Explorar Servicios]
+                                    ↓
+                          [Agregar al Carrito] ←→ [Modificar Cantidad]
+                                    ↓
+                          [Abrir Modal Carrito]
+                                    ↓
+                          [Finalizar Compra]
+                                    ↓
+                          [Modal Confirmación]
+                                    ↓
+                    [Configurar Detalles de Servicios]
+                                    ↓
+                    [Ingresar Datos de Contacto]
+                                    ↓
+                    [Seleccionar Fecha/Hora]
+                                    ↓
+                          [Confirmar Pedido]
+                                    ↓
+                    [Guardar en LocalStorage]
+                                    ↓
+                    [Mostrar Confirmación]
+2. Estados del Sistema
+Estado del Carrito:
+•	Vacío: Badge oculto, mensaje en modal
+•	Con items: Badge visible con contador, lista de servicios
+Estado del Pedido:
+•	Pendiente: Recién creado
+•	(Otros estados se gestionarían en backend)
+3. Validaciones Implementadas
+Formulario de Confirmación:
+•	Dirección: Campo requerido
+•	Ciudad: Campo requerido
+•	Teléfono: Campo requerido
+•	Fecha: Mínimo mañana
+•	Hora: Selección de opciones predefinidas
+•	Tamaño: Requerido por servicio
+•	Tipo de lavado: Requerido por servicio
+Carrito:
+•	No permitir finalizar con carrito vacío
+•	Cantidad mínima: 1
+•	Detalles completos antes de confirmar
+________________________________________
+🔧 Consideraciones Técnicas {#consideraciones}
+1. Almacenamiento de Datos
+LocalStorage:
+•	Pedidos confirmados
+•	Sesiones activas del sistema
+SessionStorage:
+•	Token de autenticación
+•	Rol del usuario
+•	Email del usuario
+⚠️ Limitaciones:
+•	Datos no cifrados
+•	Límite de 5-10MB
+•	Solo en el navegador del cliente
+•	No compartido entre pestañas
+2. Seguridad
+Vulnerabilidades Actuales:
+•	Contraseñas en texto plano
+•	Tokens estáticos y predecibles
+•	Sin validación del lado del servidor
+•	Sin cifrado de datos sensibles
+•	Sin protección CSRF
+Recomendaciones:
+•	Implementar backend con API REST
+•	Usar JWT con expiración
+•	Hash de contraseñas con bcrypt
+•	HTTPS obligatorio
+•	Validación en servidor
+3. Rendimiento
+Optimizaciones Implementadas:
+•	Event delegation en algunos casos
+•	Actualización selectiva del DOM
+•	Animaciones CSS (GPU accelerated)
+Posibles Mejoras:
+•	Lazy loading de imágenes
+•	Debounce en búsqueda
+•	Virtual scrolling para listas largas
+•	Service Worker para caché
+4. Accesibilidad
+Implementado:
+•	Etiquetas semánticas (article, section, nav)
+•	Atributos aria-label en inputs
+•	Contraste de colores adecuado
+Pendiente:
+•	Navegación por teclado completa
+•	Lectores de pantalla
+•	Mensajes de error accesibles
+•	Focus visible mejorado
+5. Compatibilidad
+Navegadores Soportados:
+•	Chrome/Edge 90+
+•	Firefox 88+
+•	Safari 14+
+Características ES6+ Utilizadas:
+•	Arrow functions
+•	Template literals
+•	Destructuring
+•	Array methods (map, filter, find)
+•	Async/await (disponible pero no usado)
+________________________________________
+💡 Mejoras Propuestas {#mejoras}
+1. Prioridad Alta
+Backend Real
+// Ejemplo de implementación con API
+async function confirmarPedido() {
+    try {
+        const response = await fetch('/api/pedidos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`
+            },
+            body: JSON.stringify(pedido)
+        });
+        
+        const result = await response.json();
+        mostrarConfirmacionExitosa(result);
+    } catch (error) {
+        mostrarError('Error al procesar pedido');
+    }
+}
+Sistema de Autenticación Robusto
+•	JWT con refresh tokens
+•	Verificación por email
+•	Recuperación de contraseña
+•	2FA opcional
+Persistencia en Base de Datos
+•	PostgreSQL o MongoDB
+•	Relaciones entre usuarios, pedidos, servicios
+•	Histórico de transacciones
+2. Prioridad Media
+Panel de Usuario
+•	Historial de pedidos
+•	Seguimiento de estado
+•	Perfil editable
+•	Notificaciones
+Sistema de Pagos
+•	Integración con pasarelas (PayU, MercadoPago)
+•	Múltiples métodos de pago
+•	Confirmación automática
+Notificaciones Push
+•	Confirmación de pedido
+•	Recordatorio 24h antes
+•	Estado actualizado
+•	Promociones
+3. Prioridad Baja
+Optimizaciones UX
+// Autocompletado de direcciones con Google Places
+const autocomplete = new google.maps.places.Autocomplete(
+    document.getElementById('direccion')
+);
+Sistema de Calificaciones
+•	Valorar servicio completado
+•	Comentarios
+•	Fotos antes/después
+Chat en Vivo
+•	Soporte en tiempo real
+•	WhatsApp Business API
+•	Chatbot básico
+4. Refactorización del Código
+Separación de Responsabilidades
+// Estructura propuesta
+class CarritoService {
+    constructor() {
+        this.items = [];
+    }
+    
+    agregar(servicio) { /* ... */ }
+    eliminar(id) { /* ... */ }
+    calcularTotal() { /* ... */ }
+}
+
+class UIManager {
+    mostrarModal(id) { /* ... */ }
+    cerrarModal(id) { /* ... */ }
+    mostrarNotificacion(mensaje) { /* ... */ }
+}
+
+class PedidosService {
+    async crear(pedido) { /* ... */ }
+    async obtener(id) { /* ... */ }
+    async actualizar(id, datos) { /* ... */ }
+}
+Gestión de Estado
+// Implementar patrón Observer o usar Redux
+const store = {
+    state: {
+        carrito: [],
+        usuario: null,
+        sesion: null
+    },
+    
+    listeners: [],
+    
+    setState(newState) {
+        this.state = { ...this.state, ...newState };
+        this.listeners.forEach(fn => fn(this.state));
+    },
+    
+    subscribe(fn) {
+        this.listeners.push(fn);
+    }
+};
+Testing
+// Ejemplo con Jest
+describe('CarritoService', () => {
+    test('debe agregar servicio al carrito', () => {
+        const carrito = new CarritoService();
+        const servicio = SERVICIOS[0];
+        
+        carrito.agregar(servicio);
+        
+        expect(carrito.items.length).toBe(1);
+        expect(carrito.items[0].cantidad).toBe(1);
+    });
+    
+    test('debe incrementar cantidad si ya existe', () => {
+        const carrito = new CarritoService();
+        const servicio = SERVICIOS[0];
+        
+        carrito.agregar(servicio);
+        carrito.agregar(servicio);
+        
+        expect(carrito.items.length).toBe(1);
+        expect(carrito.items[0].cantidad).toBe(2);
+    });
+});
+________________________________________
+📚 Recursos Adicionales
+Documentación Recomendada
+•	MDN Web Docs - Referencia de HTML, CSS, JS
+•	Web.dev - Mejores prácticas de Google
+•	CSS Tricks - Tutoriales de CSS avanzado
+Herramientas Útiles
+•	Lighthouse: Auditoría de performance y accesibilidad
+•	Chrome DevTools: Debugging y profiling
+•	Postman: Prueba de APIs (para backend futuro)
+•	ESLint: Linting de código JavaScript
+•	Prettier: Formateo automático de código
+Librerías Complementarias
+•	Axios: Cliente HTTP más robusto que fetch
+•	Day.js: Manipulación de fechas (alternativa a Moment.js)
+•	SweetAlert2: Modales y alertas mejoradas
+•	Chart.js: Gráficos para dashboard admin
+________________________________________
+📝 Notas Finales
+Buenas Prácticas Implementadas
+✅ Código comentado y organizado
+✅ Nombres descriptivos de variables y funciones
+✅ Separación de concerns (HTML/CSS/JS)
+✅ Validación de formularios
+✅ Manejo de errores básico
+✅ Responsive design
+✅ Animaciones suaves
+Áreas de Mejora Críticas
+⚠️ Implementar backend seguro
+⚠️ Agregar tests unitarios
+⚠️ Mejorar manejo de errores
+⚠️ Implementar caché inteligente
+⚠️ Optimizar imágenes
+⚠️ Añadir logging estructurado
+Contacto y Soporte
+Para dudas sobre la implementación o sugerencias de mejora, contactar al equipo de desarrollo.
+________________________________________
+Versión del Documento: 1.0
+Última Actualización: 2025
+Autor: Equipo de Desarrollo FoamWash
+Estado: Documentación Completa
+
