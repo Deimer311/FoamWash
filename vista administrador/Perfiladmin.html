@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar Perfil - FoamWash</title>
+  <link rel="stylesheet" href="Perfiladmin.css">
+</head>
+<body>
+  <div class="container">
+    <div class="profile-card">
+
+      <!-- Lado izquierdo: edición -->
+      <div class="left">
+        <h2>Editar Perfil</h2>
+
+        <label for="nombre">Nombre completo</label>
+        <input type="text" id="nombre" placeholder="Tu nombre">
+
+        <label for="correo">Correo electrónico</label>
+        <input type="email" id="correo" placeholder="usuario@email.com">
+
+        <label for="rol">Rol</label>
+        <select id="rol">
+          <option value="cliente">Cliente</option>
+          <option value="empleado">Empleado</option>
+          <option value="administrador">Administrador</option>
+        </select>
+
+        <!-- Subida de imagen -->
+        <label for="foto">Foto de perfil</label>
+        <input type="file" id="foto" accept="image/*">
+
+        <div class="preview">
+          <img id="preview-img" src="img/default-user.png" alt="Vista previa">
+        </div>
+
+        <button id="guardar">Guardar Cambios</button>
+      </div>
+
+      <!-- Lado derecho: información -->
+      <div class="right">
+        <h1>FoamWash</h1>
+        <p>Gestiona tu perfil y actualiza tus datos.</p>
+        <p>Rol actual: <span id="rol-actual">Administrador</span></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="perfiladmin.js"></script>
+</body>
+</html>
