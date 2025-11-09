@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoamWash - Iniciar Sesión / Registrarse</title>
+    <link rel="icon" href="./img/logo_empresa.jpg" type="image/x-icon">
+    <link rel="stylesheet" href="./css/estilos_login.css">
+</head>
+<body>
+    
+    <div class="background"></div>
+
+    <center>
+        <a href="./index.html" style="text-decoration: none;">
+            <h1 class="logo-header">FoamWash</h1>
+        </a>
+    </center>
+
+    <div class="container">
+        
+        <div class="card-wrapper">
+
+            <!-- ==================== LADO DEL FORMULARIO ==================== -->
+            <div class="card-side form-side">
+
+                <!-- Vista de LOGIN -->
+                <div class="form-content login-view">
+                    <h2 class="title">Iniciar sesión</h2>
+
+                    <form class="form" id="loginForm">
+                        <div class="input-group">
+                            <input 
+                                type="email" 
+                                class="input-field" 
+                                placeholder="Correo electrónico" 
+                                required
+                                autocomplete="email"
+                            >
+                        </div>
+
+                        <div class="input-group">
+                            <input 
+                                type="password" 
+                                class="input-field" 
+                                placeholder="Contraseña" 
+                                required
+                                autocomplete="current-password"
+                            >
+                        </div>
+
+                        <div class="forgot-password">
+                            <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+                        </div>
+
+                        <button type="submit" class="submit-button">Iniciar sesión</button>
+                    </form>
+                </div>
+                
+                <!-- Vista de REGISTRO -->
+                <div class="form-content register-view">
+                    <h2 class="title">Regístrate</h2>
+
+                    <form class="form" id="registerForm">
+                        <div class="input-group">
+                            <input 
+                                type="email" 
+                                class="input-field" 
+                                placeholder="Correo electrónico *" 
+                                required
+                                autocomplete="email"
+                            >
+                        </div>
+                        
+                        <div class="input-group">
+                            <input 
+                                type="text" 
+                                class="input-field" 
+                                placeholder="Nombre completo *" 
+                                required
+                                autocomplete="name"
+                            >
+                        </div>
+                        
+                        <div class="input-group">
+                            <input 
+                                type="tel" 
+                                class="input-field" 
+                                placeholder="Teléfono (10 dígitos) *" 
+                                required
+                                pattern="[0-9]{10}"
+                                autocomplete="tel"
+                            >
+                        </div>
+                        
+                        <div class="input-group">
+                            <input 
+                                type="text" 
+                                class="input-field" 
+                                placeholder="Dirección (opcional)" 
+                                autocomplete="street-address"
+                            >
+                        </div>
+                        
+                        <div class="input-group">
+                            <input 
+                                type="password" 
+                                class="input-field" 
+                                placeholder="Contraseña (mín. 6 caracteres) *" 
+                                required
+                                autocomplete="new-password"
+                            >
+                        </div>
+                        
+                        <button type="submit" class="submit-button register-submit">Registrar</button>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- ==================== LADO DEL TOGGLE/MENSAJE ==================== -->
+            <div class="card-side toggle-side">
+
+                <!-- Contenido cuando LOGIN está activo -->
+                <div class="toggle-content login-active-content">
+                    <h2 class="toggle-title">¡Hola amig@!</h2>
+                    
+                    <p class="toggle-text">
+                        Si no tienes una cuenta<br>
+                        puedes crear una nueva
+                    </p>
+                    
+                    <button class="toggle-button" id="switchToRegister">Registrar</button>
+                </div>
+                
+                <!-- Contenido cuando REGISTRO está activo -->
+                <div class="toggle-content register-active-content">
+                    <h2 class="toggle-title">¡Bienvenido de nuevo!</h2>
+                    
+                    <p class="toggle-text">
+                        Si ya tienes una cuenta<br>
+                        puedes iniciar sesión
+                    </p>
+                    
+                    <button class="toggle-button" id="switchToLogin">Iniciar sesión</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Cargar JavaScript -->
+    <script src="./js/login.js"></script>
+</body>
+</html>
+
