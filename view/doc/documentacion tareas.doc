@@ -1,0 +1,3639 @@
+# Documentación Técnica: Panel de Tareas para Trabajadores - FoamWash
+
+## 📋 Índice
+1. [Descripción General](#descripción-general)
+2. [Arquitectura del Sistema](#arquitectura)
+3. [Estructura HTML](#estructura-html)
+4. [Diseño y Estilos CSS](#diseño-css)
+5. [Lógica JavaScript](#lógica-javascript)
+6. [Sistema de Seguridad](#seguridad)
+7. [Flujo de Datos](#flujo-datos)
+8. [Gestión de Estados](#estados)
+9. [Funcionalidades Avanzadas](#funcionalidades)
+10. [Consideraciones Técnicas](#consideraciones)
+11. [Guía de Mantenimiento](#mantenimiento)
+
+---
+
+## 🎯 Descripción General {#descripción-general}
+
+### Propósito del Sistema
+El Panel de Tareas para Trabajadores es una interfaz web diseñada específicamente para empleados de FoamWash que deben gestionar y ejecutar servicios de limpieza asignados. El sistema permite:
+
+- **Visualizar tareas asignadas** con toda la información necesaria
+- **Gestionar el estado** de cada tarea (Pendiente → En Progreso → Completada)
+- **Filtrar y organizar** tareas según criterios específicos
+- **Acceder a detalles completos** de cada servicio
+- **Mantener comunicación** con clientes mediante enlaces directos
+
+### Contexto en el Ecosistema FoamWash
+
+```
+┌─────────────────┐
+│  Cliente Web    │ → Crea pedidos → LocalStorage
+└─────────────────┘
+        ↓
+┌─────────────────┐
+│ Sistema Login   │ → Autentica usuarios
+└─────────────────┘
+        ↓
+┌─────────────────┐
+│ Panel Trabajador│ → Lee pedidos como tareas
+└─────────────────┘
+```
+
+### Tecnologías Utilizadas
+- **HTML5**: Estructura semántica moderna
+- **CSS3**: Diseño responsive con animaciones avanzadas
+- **JavaScript ES6+**: Lógica de negocio y manipulación del DOM
+- **LocalStorage**: Persistencia de datos del lado del cliente
+- **SessionStorage**: Gestión de sesiones de usuario
+
+---
+
+## 🏗️ Arquitectura del Sistema {#arquitectura}
+
+### Estructura de Archivos
+
+```
+proyecto/
+├── trabajador/
+│   └── tareas.html              # Panel principal (este archivo)
+├── js/
+│   ├── login.js                 # Sistema de autenticación
+│   └── sesiones_activas.js      # Gestión de sesiones
+└── view/
+    └── index.html               # Página de login
+```
+
+### Flujo de Carga de Scripts
+
+**Orden crítico de ejecución:**
+
+```javascript
+// 1. PRIMERO: Sistema de autenticación
+<script src="../js/login.js"></script>
+
+// 2. SEGUNDO: Sistema de sesiones
+<script src="../js/sesiones_activas.js"></script>
+
+// 3. TERCERO: Protección de página
+<script>
+    const session = protectPage(['trabajador']);
+</script>
+
+// 4. FINALMENTE: Lógica de tareas
+<script>
+    // Código específico de tareas
+</script>
+```
+
+**⚠️ IMPORTANTE:** El orden es crítico. Si se altera, el sistema de seguridad fallará.
+
+### Diagrama de Componentes
+
+```
+┌──────────────────────────────────────────┐
+│           HEADER (Usuario Info)          │
+└──────────────────────────────────────────┘
+                    ↓
+┌──────────────────────────────────────────┐
+│      PANEL DE ESTADÍSTICAS (4 Cards)     │
+│  [Total] [Pendientes] [Progreso] [Hoy]  │
+└──────────────────────────────────────────┘
+                    ↓
+┌──────────────────────────────────────────┐
+│     FILTROS (Estado + Fecha + Refresh)   │
+└──────────────────────────────────────────┘
+                    ↓
+┌──────────────────────────────────────────┐
+│        LISTA DE TAREAS (Grid Cards)      │
+│  ┌──────────┐  ┌──────────┐             │
+│  │ Tarea 1  │  │ Tarea 2  │  ...        │
+│  └──────────┘  └──────────┘             │
+└──────────────────────────────────────────┘
+                    ↓
+        ┌─────────────────────┐
+        │  MODAL DE DETALLES  │
+        └─────────────────────┘
+```
+
+---
+
+## 📄 Estructura HTML {#estructura-html}
+
+### 1. Header - Navegación Principal
+
+```html
+<header class="header">
+    <div class="header-content">
+        <div class="logo-section">
+            <h1>🧼 FoamWash - Panel Trabajador</h1>
+            <p>Gestión de Tareas y Servicios</p>
+        </div>
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-name" id="userName">Cargando...</div>
+                <div class="user-role">👷 Trabajador</div>
+            </div>
+            <button class="btn-logout" onclick="cerrarSesionTrabajador()">
+                🚪 Cerrar Sesión
+            </button>
+        </div>
+    </div>
+</header>
+```
+
+**Características:**
+- **Sticky positioning**: Permanece visible al hacer scroll
+- **Backdrop blur**: Efecto de vidrio esmerilado
+- **Información dinámica**: El email se carga desde la sesión
+- **Cierre de sesión integrado**: Llama a la función `logout()` de `login.js`
+
+### 2. Panel de Estadísticas
+
+```html
+<div class="stats-panel">
+    <div class="stat-card">
+        <span class="stat-icon">📋</span>
+        <div class="stat-number" id="statTotal">0</div>
+        <div class="stat-label">Total Tareas</div>
+    </div>
+    <!-- 3 cards más... -->
+</div>
+```
+
+**Estructura de Datos:**
+- `statTotal`: Contador total de tareas
+- `statPendientes`: Tareas sin iniciar
+- `statEnProgreso`: Tareas en ejecución
+- `statCompletadas`: Completadas en el día actual
+
+**Actualización:**
+```javascript
+function actualizarEstadisticas() {
+    document.getElementById('statTotal').textContent = tareas.length;
+    document.getElementById('statPendientes').textContent = 
+        tareas.filter(t => t.estado === 'pendiente').length;
+    // ... más contadores
+}
+```
+
+### 3. Sistema de Filtros
+
+```html
+<div class="filters-section">
+    <div class="filter-group">
+        <label>Estado</label>
+        <select class="filter-select" id="filterEstado" onchange="filtrarTareas()">
+            <option value="todos">Todos</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="en-progreso">En Progreso</option>
+            <option value="completada">Completadas</option>
+        </select>
+    </div>
+    <!-- Más filtros... -->
+</div>
+```
+
+**Funcionalidad:**
+- **Filtrado en tiempo real**: Se ejecuta al cambiar selección
+- **Combinación de filtros**: Estado + Fecha simultáneamente
+- **Botón de actualización**: Recarga tareas desde localStorage
+
+### 4. Grid de Tareas
+
+```html
+<div class="tasks-grid" id="tasksGrid">
+    <!-- Generado dinámicamente por JavaScript -->
+</div>
+```
+
+**Renderizado Dinámico:**
+```javascript
+grid.innerHTML = tareasFiltradas.map(tarea => `
+    <div class="task-card ${tarea.estado}">
+        <!-- Contenido de la tarjeta -->
+    </div>
+`).join('');
+```
+
+### 5. Modal de Detalles
+
+```html
+<div class="modal-overlay" id="modalDetalles">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>📋 Detalles de la Tarea</h2>
+            <button class="modal-close" onclick="cerrarModal()">×</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <!-- Contenido dinámico -->
+        </div>
+    </div>
+</div>
+```
+
+**Características:**
+- **Overlay con blur**: Fondo difuminado
+- **Animaciones CSS**: Entrada suave desde abajo
+- **Cierre múltiple**: Click fuera, botón X, tecla ESC
+- **Scroll interno**: Para contenido largo
+
+---
+
+## 🎨 Diseño y Estilos CSS {#diseño-css}
+
+### 1. Sistema de Colores y Gradientes
+
+```css
+/* Paleta Principal */
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    --info-gradient: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    --warning-gradient: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%);
+    --danger-gradient: linear-gradient(135deg, #ff4757 0%, #ff6b7a 100%);
+}
+
+/* Fondo del Body */
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+```
+
+**Filosofía de Diseño:**
+- **Gradientes suaves**: Transiciones naturales de color
+- **Jerarquía visual**: Colores según importancia
+- **Estados claros**: Cada estado tiene su color único
+
+### 2. Diseño de Tarjetas de Tarea
+
+```css
+.task-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 2px solid #e9ecef;
+    border-radius: 18px;
+    padding: 25px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Barra lateral de color según estado */
+.task-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+}
+
+.task-card.pendiente::before {
+    background: linear-gradient(180deg, #f39c12 0%, #e74c3c 100%);
+}
+
+.task-card.en-progreso::before {
+    background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+}
+
+.task-card.completada::before {
+    background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%);
+}
+```
+
+**Técnicas Avanzadas:**
+- **Pseudo-elementos**: `::before` para barra de estado
+- **Position absolute**: Overlay sin afectar layout
+- **Gradient orientation**: 180deg para vertical
+
+### 3. Animaciones y Transiciones
+
+#### Hover en Tarjetas
+```css
+.task-card {
+    transition: all 0.3s ease;
+}
+
+.task-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+}
+```
+
+#### Entrada del Modal
+```css
+@keyframes slideUp {
+    from {
+        transform: translateY(100px) scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    animation: slideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+```
+
+**Cubic-bezier Personalizado:**
+- `(0.68, -0.55, 0.265, 1.55)`: Crea efecto de rebote
+- Valores negativos generan "overshoot" (sobrepaso)
+
+#### Notificaciones
+```css
+.notificacion {
+    transform: translateX(400px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.notificacion.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+```
+
+### 4. Diseño Responsive
+
+```css
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .filters-section {
+        flex-direction: column;
+    }
+    
+    .task-footer {
+        flex-direction: column;
+    }
+}
+```
+
+**Breakpoints:**
+- `768px`: Tablets y móviles
+- Layout vertical en pantallas pequeñas
+- Botones a ancho completo
+
+### 5. Estado de Botones
+
+```css
+.btn-task {
+    transition: all 0.3s ease;
+}
+
+.btn-iniciar {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.btn-iniciar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(52, 152, 219, 0.5);
+}
+```
+
+**Feedback Visual:**
+- **Elevación**: `translateY(-2px)` al hover
+- **Sombra incrementada**: Efecto de profundidad
+- **Gradientes**: Sensación premium
+
+---
+
+## ⚙️ Lógica JavaScript {#lógica-javascript}
+
+### 1. Estructura de Datos
+
+#### Objeto Tarea
+```javascript
+{
+    id: "PED-1234567890",           // ID único del pedido
+    titulo: "Lavado de Muebles",    // Resumen del servicio
+    cliente: "María González",       // Nombre del cliente
+    direccion: "Calle 123 #45-67",  // Dirección completa
+    ciudad: "Bogotá",                // Ciudad
+    telefono: "3001234567",          // Contacto
+    fecha: "2025-11-05",             // Fecha programada (YYYY-MM-DD)
+    hora: "09:00",                   // Hora programada (HH:MM)
+    servicios: [                     // Array de servicios
+        {
+            nombre: "Lavado de muebles",
+            cantidad: 1,
+            tamano: "Grande",
+            tipoLavado: "Profundo",
+            precio: 90000
+        }
+    ],
+    observaciones: "Texto libre",    // Notas especiales
+    total: 90000,                    // Suma total
+    estado: "pendiente",             // pendiente | en-progreso | completada
+    trabajadorAsignado: "trabajador@gmail.com",
+    prioridad: "alta"                // alta | normal
+}
+```
+
+#### Variables Globales
+```javascript
+let tareas = [];              // Array completo de tareas
+let tareasFiltradas = [];     // Array después de aplicar filtros
+```
+
+### 2. Generación de Tareas Simuladas
+
+```javascript
+function generarTareasSimuladas() {
+    // 1. Obtener pedidos reales del localStorage
+    const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+    const trabajadorEmail = session.email;
+    
+    // 2. Convertir cada pedido en una tarea
+    const tareasGeneradas = pedidos.map((pedido, index) => {
+        // Determinar estado basado en la fecha
+        let estado = 'pendiente';
+        const fechaPedido = new Date(pedido.fecha);
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        
+        if (fechaPedido < hoy) {
+            estado = 'completada';  // Tareas del pasado
+        } else if (fechaPedido.getTime() === hoy.getTime()) {
+            // Tareas de hoy: aleatorio entre pendiente y en-progreso
+            estado = Math.random() > 0.5 ? 'en-progreso' : 'pendiente';
+        }
+        
+        // 3. Crear objeto tarea
+        return {
+            id: pedido.id,
+            titulo: `Servicio - ${pedido.servicios[0].nombre}`,
+            cliente: `Cliente #${index + 1}`,
+            direccion: pedido.direccion,
+            ciudad: pedido.ciudad,
+            telefono: pedido.telefono,
+            fecha: pedido.fecha,
+            hora: pedido.hora,
+            servicios: pedido.servicios,
+            observaciones: pedido.observaciones || 'Sin observaciones',
+            total: pedido.total,
+            estado: estado,
+            trabajadorAsignado: trabajadorEmail,
+            prioridad: Math.random() > 0.7 ? 'alta' : 'normal'
+        };
+    });
+    
+    // 4. Si no hay pedidos, generar tareas de ejemplo
+    if (tareasGeneradas.length === 0) {
+        // Código de tareas de ejemplo...
+    }
+    
+    return tareasGeneradas;
+}
+```
+
+**Lógica de Estados Automáticos:**
+
+```javascript
+// Fecha en el pasado → Completada
+if (fechaPedido < hoy) {
+    estado = 'completada';
+}
+
+// Fecha hoy → Aleatorio (simulación realista)
+else if (fechaPedido.getTime() === hoy.getTime()) {
+    estado = Math.random() > 0.5 ? 'en-progreso' : 'pendiente';
+}
+
+// Fecha futura → Pendiente
+else {
+    estado = 'pendiente';
+}
+```
+
+### 3. Carga y Renderizado
+
+```javascript
+function cargarTareas() {
+    // 1. Generar/cargar tareas
+    tareas = generarTareasSimuladas();
+    
+    // 2. Inicializar filtradas (todas)
+    tareasFiltradas = [...tareas];
+    
+    // 3. Actualizar UI
+    actualizarEstadisticas();
+    renderizarTareas();
+    
+    // 4. Notificar
+    mostrarNotificacion('Tareas actualizadas correctamente', 'success');
+}
+```
+
+**Spread Operator:**
+```javascript
+tareasFiltradas = [...tareas];  // Crea copia superficial
+```
+Importante: Evita mutaciones no deseadas del array original.
+
+### 4. Renderizado de Tarjetas
+
+```javascript
+function renderizarTareas() {
+    const grid = document.getElementById('tasksGrid');
+    const count = document.getElementById('tasksCount');
+    
+    // Actualizar contador
+    count.textContent = `${tareasFiltradas.length} tarea${tareasFiltradas.length !== 1 ? 's' : ''}`;
+    
+    // Estado vacío
+    if (tareasFiltradas.length === 0) {
+        grid.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <div class="empty-state-text">No hay tareas que mostrar</div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Renderizar tarjetas
+    grid.innerHTML = tareasFiltradas.map(tarea => {
+        const estadoClass = tarea.estado.replace(' ', '-');
+        const estadoTexto = tarea.estado.charAt(0).toUpperCase() + 
+                           tarea.estado.slice(1);
+        
+        return `
+            <div class="task-card ${estadoClass}">
+                <!-- HTML de la tarjeta -->
+            </div>
+        `;
+    }).join('');
+}
+```
+
+**Técnicas Utilizadas:**
+- **Template Literals**: Strings multilínea con interpolación
+- **Array.map()**: Transformar array en HTML
+- **join('')**: Convertir array a string sin separadores
+- **Capitalización**: Primera letra en mayúscula
+
+### 5. Cambio de Estado de Tareas
+
+```javascript
+function cambiarEstado(tareaId, nuevoEstado) {
+    // 1. Buscar tarea
+    const tarea = tareas.find(t => t.id === tareaId);
+    if (!tarea) return;
+    
+    const estadoAnterior = tarea.estado;
+    
+    // 2. Actualizar en memoria
+    tarea.estado = nuevoEstado;
+    
+    // 3. Sincronizar con localStorage
+    const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+    const pedidoIndex = pedidos.findIndex(p => p.id === tareaId);
+    
+    if (pedidoIndex !== -1) {
+        pedidos[pedidoIndex].estado = nuevoEstado;
+        localStorage.setItem('pedidos', JSON.stringify(pedidos));
+    }
+    
+    // 4. Actualizar UI
+    filtrarTareas();
+    actualizarEstadisticas();
+    
+    // 5. Notificar
+    const mensajes = {
+        'en-progreso': '⏳ Tarea iniciada correctamente',
+        'completada': '✅ ¡Tarea completada! Excelente trabajo'
+    };
+    mostrarNotificacion(mensajes[nuevoEstado], 'success');
+    
+    // 6. Log para debugging
+    console.log(`Tarea ${tareaId}: ${estadoAnterior} → ${nuevoEstado}`);
+}
+```
+
+**Flujo de Sincronización:**
+```
+Memoria (tareas array)
+        ↓
+    Actualizar
+        ↓
+LocalStorage (pedidos)
+        ↓
+    Actualizar UI
+        ↓
+    Notificar Usuario
+```
+
+### 6. Sistema de Filtrado
+
+```javascript
+function filtrarTareas() {
+    const filterEstado = document.getElementById('filterEstado').value;
+    const filterFecha = document.getElementById('filterFecha').value;
+    
+    tareasFiltradas = tareas.filter(tarea => {
+        // Filtro por estado
+        let cumpleEstado = filterEstado === 'todos' || 
+                          tarea.estado === filterEstado;
+        
+        // Filtro por fecha
+        let cumpleFecha = true;
+        if (filterFecha !== 'todos') {
+            const fechaTarea = new Date(tarea.fecha);
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            
+            switch(filterFecha) {
+                case 'hoy':
+                    cumpleFecha = fechaTarea.toDateString() === hoy.toDateString();
+                    break;
+                    
+                case 'manana':
+                    const manana = new Date(hoy);
+                    manana.setDate(manana.getDate() + 1);
+                    cumpleFecha = fechaTarea.toDateString() === manana.toDateString();
+                    break;
+                    
+                case 'semana':
+                    const finSemana = new Date(hoy);
+                    finSemana.setDate(finSemana.getDate() + 7);
+                    cumpleFecha = fechaTarea >= hoy && fechaTarea <= finSemana;
+                    break;
+            }
+        }
+        
+        return cumpleEstado && cumpleFecha;
+    });
+    
+    renderizarTareas();
+}
+```
+
+**Operador Lógico AND:**
+```javascript
+return cumpleEstado && cumpleFecha;
+// Ambos deben ser true para incluir la tarea
+```
+
+**Comparación de Fechas:**
+```javascript
+// Normalizar horas para comparar solo fecha
+hoy.setHours(0, 0, 0, 0);
+
+// Comparar strings de fecha
+fechaTarea.toDateString() === hoy.toDateString()
+
+// Comparar rangos
+fechaTarea >= hoy && fechaTarea <= finSemana
+```
+
+### 7. Modal de Detalles
+
+```javascript
+function verDetalles(tareaId) {
+    const tarea = tareas.find(t => t.id === tareaId);
+    if (!tarea) return;
+    
+    const modal = document.getElementById('modalDetalles');
+    const modalBody = document.getElementById('modalBody');
+    
+    // Generar HTML detallado
+    modalBody.innerHTML = `
+        <div class="detalle-item">
+            <div class="detalle-label">🆔 ID de Tarea</div>
+            <div class="detalle-value">${tarea.id}</div>
+        </div>
+        
+        <!-- Más detalles... -->
+        
+        <div class="detalle-item">
+            <div class="detalle-label">📞 Teléfono de Contacto</div>
+            <div class="detalle-value">
+                ${tarea.telefono}
+                <br>
+                <a href="tel:${tarea.telefono}" style="color: #667eea;">
+                    📱 Llamar ahora
+                </a>
+            </div>
+        </div>
+        
+        <!-- Servicios con loop -->
+        <div class="detalle-item">
+            <div class="detalle-label">📦 Servicios Solicitados</div>
+            <div class="detalle-value">
+                ${tarea.servicios.map(s => `
+                    <div style="background: #f8f9fa; padding: 12px;">
+                        <strong>${s.nombre}</strong><br>
+                        • Cantidad: ${s.cantidad}<br>
+                        • Tamaño: ${s.tamano}<br>
+                        • Tipo: ${s.tipoLavado}<br>
+                        • Precio: $${(s.precio * s.cantidad).toLocaleString('es-CO')}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    modal.classList.add('show');
+}
+```
+
+**Protocolo tel:**
+```html
+<a href="tel:3001234567">Llamar</a>
+```
+En móviles, abre la aplicación de teléfono directamente.
+
+### 8. Sistema de Notificaciones
+
+```javascript
+function mostrarNotificacion(mensaje, tipo = 'info') {
+    const container = document.getElementById('notificacionContainer');
+    
+    // Crear elemento
+    const notificacion = document.createElement('div');
+    notificacion.className = `notificacion ${tipo}`;
+    
+    // Iconos según tipo
+    const iconos = {
+        'success': '✅',
+        'info': 'ℹ️',
+        'warning': '⚠️',
+        'error': '❌'
+    };
+    
+    // Contenido
+    notificacion.innerHTML = `
+        <span class="notificacion-icono">${iconos[tipo]}</span>
+        <span class="notificacion-mensaje">${mensaje}</span>
+    `;
+    
+    // Agregar al DOM
+    container.appendChild(notificacion);
+    
+    // Animación de entrada (después de render)
+    setTimeout(() => notificacion.classList.add('show'), 10);
+    
+    // Animación de salida y eliminación
+    setTimeout(() => {
+        notificacion.classList.remove('show');
+        setTimeout(() => notificacion.remove(), 400);
+    }, 4000);
+}
+```
+
+**Timing de Animaciones:**
+```
+t=0ms: Elemento agregado al DOM (invisible)
+t=10ms: Clase 'show' agregada (inicia animación entrada)
+t=4000ms: Clase 'show' removida (inicia animación salida)
+t=4400ms: Elemento eliminado del DOM
+```
+
+**¿Por qué 10ms de delay?**
+- Permite que el navegador renderice el elemento
+- Asegura que la transición CSS se ejecute correctamente
+
+### 9. Actualización Automática
+
+```javascript
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('✅ Panel de tareas inicializado');
+    cargarTareas();
+    
+    // Actualizar cada 30 segundos
+    setInterval(() => {
+        const totalAntes = tareas.length;
+        cargarTareas();
+        const totalDespues = tareas.length;
+        
+        // Notificar si hay nuevas tareas
+        if (totalDespues > totalAntes) {
+            const nuevas = totalDespues - totalAntes;
+            mostrarNotificacion(
+                `🔔 ${nuevas} nueva(s) tarea(s) asignada(s)`, 
+                'info'
+            );
+        }
+    }, 30000);  // 30000ms = 30 segundos
+});
+```
+
+**setInterval vs setTimeout:**
+- `setInterval`: Se ejecuta repetidamente cada X ms
+- `setTimeout`: Se ejecuta una sola vez después de X ms
+
+### 10. Funciones Auxiliares
+
+#### Formateo de Fechas
+
+```javascript
+function formatearFecha(fecha) {
+    const date = new Date(fecha + 'T00:00:00');
+    return date.toLocaleDateString('es-CO', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+}
+// Resultado: "05/11/2025"
+
+function formatearFechaCompleta(fecha) {
+    const date = new Date(fecha + 'T00:00:00');
+    return date.toLocaleDateString('es-CO', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    });
+}
+// Resultado: "martes, 5 de noviembre de 2025"
+```
+
+**¿Por qué agregar 'T00:00:00'?**
+- Evita problemas de zona horaria
+- Asegura que la fecha se interprete como medianoche local
+- Previene errores de "día anterior" por UTC
+
+---
+
+## 🔐 Sistema de Seguridad {#seguridad}
+
+### 1. Protección de Acceso
+
+```javascript
+// Ejecutado al cargar la página
+const session = protectPage(['trabajador']);
+```
+
+**¿Qué hace `protectPage()`?**
+
+```javascript
+function protectPage(allowedRoles = []) {
+    // 1. Verificar si existe sesión activa
+    const session = checkActiveSession();
+    
+    if (!session.isActive) {
+        // Sin sesión → Redirigir al login
+        alert('Debes iniciar sesión para acceder a esta página.');
+        window.location.href = './index.html';
+        return false;
+    }
+    
+    // 2. Verificar rol si se especificaron roles permitidos
+    if (allowedRoles.length > 0 && !allowedRoles.includes(session.role)) {
+        // Rol no autorizado → Redirigir
+        alert('No tienes permisos para acceder a esta página.');
+        window.location.href = './index.html';
+        return false;
+    }
+    
+    // 3. Actualizar actividad de la sesión
+    actualizarActividadSesion(session.token);
+    
+    // 4. Retornar información de sesión
+    console.log('✅ Acceso autorizado:', session.role, '-', session.email);
+    return session;
+}
+```
+
+**Flujo de Validación:**
+
+```
+Usuario accede a tareas.html
+        ↓
+¿Existe authToken en sessionStorage?
+        ↓
+    NO → Redirigir a index.html
+    SÍ → Continuar
+        ↓
+¿El rol es 'trabajador'?
+        ↓
+    NO → Redirigir a index.html
+    SÍ → Permitir acceso
+        ↓
+Actualizar timestamp de actividad
+        ↓
+Retornar objeto session
+```
+
+### 2. Gestión de Sesión Activa
+
+```javascript
+// Al cargar la página
+if (session && session.email) {
+    document.getElementById('userName').textContent = session.email;
+    console.log('✅ Panel de trabajador cargado para:', session.email);
+}
+```
+
+**Objeto Session:**
+```javascript
+{
+    isActive: true,
+    token: "token-trabajador-67890",
+    role: "trabajador",
+    email: "trabajador@gmail.com"
+}
+```
+
+### 3. Cierre de Sesión Seguro
+
+```javascript
+function cerrarSesionTrabajador() {
+    if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+        mostrarNotificacion('Cerrando sesión...', 'info');
+        
+        setTimeout(() => {
+            logout();  // Función de login.js
+        }, 1000);
+    }
+}
+```
+
+**¿Qué hace `logout()`?**
+
+```javascript
+function logout() {
+    const token = sessionStorage.getItem('authToken');
+    
+    // 1. Eliminar sesión activa del registro
+    if (token) {
+        eliminarSesionActiva(token);
+    }
+    
+    // 2. Limpiar sessionStorage
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('userRole');
+    sessionStorage.removeItem('userEmail');
+    
+    // 3. Redirigir al login
+    window.location.href = './index.html';
+}
+```
+
+### 4. Actualización de Actividad
+
+```javascript
+function actualizarActividadSesion(token) {
+    let sesionesActivas = JSON.parse(
+        localStorage.getItem('sesionesActivas') || '[]'
+    );
+    
+    const sesion = sesionesActivas.find(s => s.token === token);
+    if (sesion) {
+        sesion.ultimaActividad = new Date().toISOString();
+        localStorage.setItem('sesionesActivas', JSON.stringify(sesionesActivas));
+    }
+}
+```
+
+**¿Cuándo se actualiza?**
+- Al cargar la página
+- Cada vez que se ejecuta `protectPage()`
+- Automáticamente en el background
+
+### 5. Limpieza de Sesiones Expiradas
+
+```javascript
+function limpiarSesionesExpiradas() {
+    let sesionesActivas = JSON.parse(
+        localStorage.getItem('sesionesActivas') || '[]'
+    );
+    
+    const ahora = new Date().getTime();
+    const dosHoras = 2 * 60 * 60 * 1000;  // 2 horas en milisegundos
+    
+    // Filtrar sesiones activas (menos de 2 horas sin actividad)
+    sesionesActivas = sesionesActivas.filter(sesion => {
+        const ultimaActividad = new Date(sesion.ultimaActividad).getTime();
+        return (ahora - ultimaActividad) < dosHoras;
+    });
+    
+    localStorage.setItem('sesionesActivas', JSON.stringify(sesionesActivas));
+}
+```
+
+**Tiempo de Expiración:**
+- 2 horas sin actividad → Sesión eliminada
+- Se ejecuta al cargar cualquier página
+- Limpieza automática del sistema
+
+---
+
+## 🔄 Flujo de Datos {#flujo-datos}
+
+### 1. Diagrama Completo del Flujo
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    CLIENTE WEB                          │
+│         (servicios_cliente.html)                        │
+└─────────────────────────────────────────────────────────┘
+                        ↓
+              Crea pedido y lo guarda
+                        ↓
+┌─────────────────────────────────────────────────────────┐
+│                   LOCALSTORAGE                          │
+│   Key: 'pedidos'                                        │
+│   Value: [{id, servicios, fecha, hora, ...}, ...]      │
+└─────────────────────────────────────────────────────────┘
+                        ↓
+              Trabajador hace login
+                        ↓
+┌─────────────────────────────────────────────────────────┐
+│              SISTEMA DE AUTENTICACIÓN                   │
+│   1. Validar credenciales                               │
+│   2. Crear sesión en sessionStorage                     │
+│   3. Registrar en sesionesActivas                       │
+└─────────────────────────────────────────────────────────┘
+                        ↓
+            Redirige a tareas.html
+                        ↓
+┌─────────────────────────────────────────────────────────┐
+│            PROTECCIÓN DE PÁGINA                         │
+│   1. Verificar token                                    │
+│   2. Verificar rol = 'trabajador'                       │
+│   3. Actualizar actividad                               │
+└─────────────────────────────────────────────────────────┘
+                        ↓
+              Acceso concedido
+                        ↓
+┌─────────────────────────────────────────────────────────┐
+│          GENERACIÓN DE TAREAS                           │
+│   1. Leer pedidos de localStorage                       │
+│   2. Convertir cada pedido en tarea                     │
+│   3. Asignar estados según fecha                        │
+│   4. Asignar al trabajador actual                       │
+└─────────────────────────────────────────────────────────┘
+                        ↓
+              Renderizar en UI
+                        ↓
+┌─────────────────────────────────────────────────────────┐
+│          INTERACCIÓN DEL USUARIO                        │
+│   • Filtrar tareas                                      │
+│   • Cambiar estados                                     │
+│   • Ver detalles                                        │
+└─────────────────────────────────────────────────────────┘
+                        ↓
+        Estados se sincronizan con localStorage
+                        ↓
+┌─────────────────────────────────────────────────────────┐
+│            ACTUALIZACIÓN AUTOMÁTICA                     │
+│   Cada 30 segundos:                                     │
+│   1. Recargar tareas                                    │
+│   2. Detectar cambios                                   │
+│   3. Notificar nuevas tareas                            │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 2. Sincronización de Estados
+
+**Escenario: Trabajador inicia una tarea**
+
+```
+Usuario hace click en "Iniciar Tarea"
+        ↓
+cambiarEstado(tareaId, 'en-progreso')
+        ↓
+1. Actualizar en memoria:
+   tareas[index].estado = 'en-progreso'
+        ↓
+2. Actualizar en localStorage:
+   pedidos[index].estado = 'en-progreso'
+   localStorage.setItem('pedidos', JSON.stringify(pedidos))
+        ↓
+3. Actualizar UI:
+   filtrarTareas()
+   actualizarEstadisticas()
+        ↓
+4. Notificar usuario:
+   mostrarNotificacion('Tarea iniciada')
+```
+
+### 3. Persistencia de Datos
+
+**¿Qué se guarda en LocalStorage?**
+
+```javascript
+// 1. Pedidos (creados por clientes)
+localStorage.setItem('pedidos', JSON.stringify([...]));
+
+// 2. Sesiones activas del sistema
+localStorage.setItem('sesionesActivas', JSON.stringify([...]));
+```
+
+**¿Qué se guarda en SessionStorage?**
+
+```javascript
+// 1. Token de autenticación
+sessionStorage.setItem('authToken', 'token-trabajador-67890');
+
+// 2. Rol del usuario
+sessionStorage.setItem('userRole', 'trabajador');
+
+// 3. Email del usuario
+sessionStorage.setItem('userEmail', 'trabajador@gmail.com');
+```
+
+**Diferencias:**
+- **LocalStorage**: Persiste incluso cerrando el navegador
+- **SessionStorage**: Se borra al cerrar la pestaña
+
+---
+
+## 📊 Gestión de Estados {#estados}
+
+### 1. Ciclo de Vida de una Tarea
+
+```
+┌─────────────┐
+│  PENDIENTE  │ ← Estado inicial
+└─────────────┘
+       ↓
+   [Iniciar]
+       ↓
+┌─────────────┐
+│ EN PROGRESO │
+└─────────────┘
+       ↓
+  [Completar]
+       ↓
+┌─────────────┐
+│ COMPLETADA  │ ← Estado final
+└─────────────┘
+```
+
+### 2. Reglas de Transición
+
+```javascript
+// Estados posibles
+const ESTADOS = {
+    PENDIENTE: 'pendiente',
+    EN_PROGRESO: 'en-progreso',
+    COMPLETADA: 'completada'
+};
+
+// Transiciones válidas
+const TRANSICIONES_VALIDAS = {
+    'pendiente': ['en-progreso'],
+    'en-progreso': ['completada'],
+    'completada': []  // No puede cambiar
+};
+```
+
+**Validación (no implementada pero recomendada):**
+
+```javascript
+function puedeTransicionar(estadoActual, estadoNuevo) {
+    return TRANSICIONES_VALIDAS[estadoActual].includes(estadoNuevo);
+}
+
+function cambiarEstado(tareaId, nuevoEstado) {
+    const tarea = tareas.find(t => t.id === tareaId);
+    
+    if (!puedeTransicionar(tarea.estado, nuevoEstado)) {
+        mostrarNotificacion('Transición de estado no válida', 'error');
+        return;
+    }
+    
+    // Continuar con el cambio...
+}
+```
+
+### 3. Estados Visuales
+
+**Colores por Estado:**
+
+```css
+/* Pendiente - Naranja/Rojo */
+.task-card.pendiente::before {
+    background: linear-gradient(180deg, #f39c12 0%, #e74c3c 100%);
+}
+
+.task-status.pendiente {
+    background: rgba(243, 156, 18, 0.1);
+    color: #f39c12;
+    border: 2px solid rgba(243, 156, 18, 0.3);
+}
+
+/* En Progreso - Azul */
+.task-card.en-progreso::before {
+    background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+}
+
+.task-status.en-progreso {
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+    border: 2px solid rgba(52, 152, 219, 0.3);
+}
+
+/* Completada - Verde */
+.task-card.completada::before {
+    background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%);
+}
+
+.task-status.completada {
+    background: rgba(46, 204, 113, 0.1);
+    color: #2ecc71;
+    border: 2px solid rgba(46, 204, 113, 0.3);
+}
+```
+
+### 4. Botones Contextuales
+
+```javascript
+// Renderizado condicional de botones
+${tarea.estado === 'pendiente' ? `
+    <button class="btn-task btn-iniciar" 
+            onclick="cambiarEstado('${tarea.id}', 'en-progreso')">
+        ▶️ Iniciar Tarea
+    </button>
+` : ''}
+
+${tarea.estado === 'en-progreso' ? `
+    <button class="btn-task btn-completar" 
+            onclick="cambiarEstado('${tarea.id}', 'completada')">
+        ✅ Completar
+    </button>
+` : ''}
+
+<!-- Siempre visible -->
+<button class="btn-task btn-ver-detalles" 
+        onclick="verDetalles('${tarea.id}')">
+    👁️ Ver Detalles
+</button>
+```
+
+**Lógica:**
+- **Pendiente**: Muestra "Iniciar Tarea"
+- **En Progreso**: Muestra "Completar"
+- **Completada**: Solo "Ver Detalles"
+
+---
+
+## 🚀 Funcionalidades Avanzadas {#funcionalidades}
+
+### 1. Búsqueda y Filtrado Combinado
+
+```javascript
+function filtrarTareas() {
+    const filterEstado = document.getElementById('filterEstado').value;
+    const filterFecha = document.getElementById('filterFecha').value;
+    
+    tareasFiltradas = tareas.filter(tarea => {
+        // Ambos filtros deben cumplirse (AND lógico)
+        let cumpleEstado = filterEstado === 'todos' || 
+                          tarea.estado === filterEstado;
+        let cumpleFecha = validarFiltroFecha(tarea.fecha, filterFecha);
+        
+        return cumpleEstado && cumpleFecha;
+    });
+    
+    renderizarTareas();
+}
+```
+
+**Ejemplo de Uso:**
+- Estado: "En Progreso"
+- Fecha: "Hoy"
+- Resultado: Solo tareas en progreso programadas para hoy
+
+### 2. Estadísticas en Tiempo Real
+
+```javascript
+function actualizarEstadisticas() {
+    const total = tareas.length;
+    const pendientes = tareas.filter(t => t.estado === 'pendiente').length;
+    const enProgreso = tareas.filter(t => t.estado === 'en-progreso').length;
+    
+    // Completadas HOY (no total)
+    const hoy = new Date().toISOString().split('T')[0];
+    const completadasHoy = tareas.filter(t => 
+        t.estado === 'completada' && t.fecha === hoy
+    ).length;
+    
+    // Actualizar DOM
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statPendientes').textContent = pendientes;
+    document.getElementById('statEnProgreso').textContent = enProgreso;
+    document.getElementById('statCompletadas').textContent = completadasHoy;
+}
+```
+
+**Llamada Automática:**
+```javascript
+// Se ejecuta en:
+cargarTareas()
+cambiarEstado()
+filtrarTareas()
+```
+
+### 3. Notificaciones de Nuevas Tareas
+
+```javascript
+setInterval(() => {
+    const totalAntes = tareas.length;
+    cargarTareas();
+    const totalDespues = tareas.length;
+    
+    if (totalDespues > totalAntes) {
+        const nuevas = totalDespues - totalAntes;
+        mostrarNotificacion(
+            `🔔 ${nuevas} nueva(s) tarea(s) asignada(s)`, 
+            'info'
+        );
+    }
+}, 30000);
+```
+
+**Escenario:**
+1. Cliente crea pedido en su panel
+2. Pedido se guarda en localStorage
+3. Cada 30s, trabajador recarga tareas
+4. Detecta incremento en cantidad
+5. Muestra notificación
+
+### 4. Enlace de Llamada Directa
+
+```javascript
+// En el modal de detalles
+<a href="tel:${tarea.telefono}" style="color: #667eea;">
+    📱 Llamar ahora
+</a>
+```
+
+**Comportamiento:**
+- **En móvil**: Abre la aplicación de teléfono
+- **En desktop**: Puede abrir Skype, FaceTime, etc.
+- **Fallback**: Copia el número si no hay app
+
+### 5. Sistema de Prioridades
+
+```javascript
+prioridad: Math.random() > 0.7 ? 'alta' : 'normal'
+```
+
+**Uso Futuro:**
+- Ordenar tareas por prioridad
+- Resaltar tareas urgentes
+- Alertas especiales
+
+**Implementación Sugerida:**
+
+```javascript
+function ordenarPorPrioridad(tareas) {
+    return tareas.sort((a, b) => {
+        const prioridades = { alta: 2, normal: 1 };
+        return prioridades[b.prioridad] - prioridades[a.prioridad];
+    });
+}
+```
+
+---
+
+## ⚠️ Consideraciones Técnicas {#consideraciones}
+
+### 1. Limitaciones Actuales
+
+#### A. Sin Backend Real
+```javascript
+// ❌ Todo se guarda en el navegador
+localStorage.setItem('pedidos', JSON.stringify(pedidos));
+
+// ✅ Debería ser:
+await fetch('/api/pedidos', {
+    method: 'PUT',
+    body: JSON.stringify(pedido)
+});
+```
+
+**Consecuencias:**
+- Datos solo en el navegador del usuario
+- No hay sincronización entre dispositivos
+- Pérdida de datos si se borra el navegador
+
+#### B. Seguridad Simulada
+
+```javascript
+// ❌ Token estático y predecible
+token: "token-trabajador-67890"
+
+// ✅ Debería ser:
+token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."  // JWT real
+```
+
+**Vulnerabilidades:**
+- Tokens fáciles de falsificar
+- Sin expiración real
+- Sin renovación automática
+
+#### C. Sin Validación de Servidor
+
+```javascript
+// ❌ Cualquier cambio es aceptado
+tarea.estado = nuevoEstado;
+localStorage.setItem(...)
+
+// ✅ Debería validar:
+if (usuarioPuedeModificar(tarea, usuario)) {
+    // Permitir cambio
+}
+```
+
+### 2. Rendimiento
+
+#### Optimizaciones Implementadas
+
+**Event Delegation (no usado pero recomendado):**
+
+```javascript
+// ❌ Actual: onclick inline
+<button onclick="cambiarEstado(...)">
+
+// ✅ Mejor:
+document.getElementById('tasksGrid').addEventListener('click', (e) => {
+    if (e.target.classList.contains('btn-iniciar')) {
+        const tareaId = e.target.dataset.tareaId;
+        cambiarEstado(tareaId, 'en-progreso');
+    }
+});
+```
+
+**Ventajas:**
+- Un solo listener en lugar de N
+- Mejor rendimiento con muchas tareas
+- Funciona con contenido dinámico
+
+#### Posibles Mejoras
+
+**Virtual Scrolling:**
+```javascript
+// Solo renderizar tareas visibles
+function renderizarTareasVisibles(startIndex, endIndex) {
+    const tareasVisibles = tareasFiltradas.slice(startIndex, endIndex);
+    // Renderizar solo estas
+}
+```
+
+**Debouncing en Búsqueda:**
+```javascript
+let searchTimeout;
+searchInput.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        filtrarTareas(e.target.value);
+    }, 300);  // Esperar 300ms después de escribir
+});
+```
+
+### 3. Compatibilidad de Navegadores
+
+**Características ES6+ Usadas:**
+
+```javascript
+// Arrow functions
+const mapear = tareas.map(t => t.nombre);
+
+// Template literals
+const html = `<div>${nombre}</div>`;
+
+// Destructuring
+const { id, nombre } = tarea;
+
+// Spread operator
+const copia = [...tareas];
+
+// Array methods
+tareas.filter(t => t.estado === 'pendiente');
+```
+
+**Navegadores Soportados:**
+- Chrome/Edge 51+
+- Firefox 54+
+- Safari 10+
+- Opera 38+
+
+**No Soportado:**
+- Internet Explorer (ninguna versión)
+
+### 4. Accesibilidad
+
+#### Implementado
+
+```html
+<!-- Semántica correcta -->
+<header>, <main>, <section>, <article>
+
+<!-- Labels para inputs -->
+<label for="filterEstado">Estado</label>
+<select id="filterEstado">...</select>
+```
+
+#### Pendiente de Mejora
+
+```javascript
+// Navegación por teclado
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.classList.contains('task-card')) {
+        verDetalles(e.target.dataset.tareaId);
+    }
+});
+
+// Atributos ARIA
+<div role="region" aria-label="Lista de tareas">
+    <div role="article" aria-label="Tarea: Lavado de muebles">
+        ...
+    </div>
+</div>
+
+// Anuncios para lectores de pantalla
+<div aria-live="polite" aria-atomic="true">
+    3 tareas pendientes
+</div>
+```
+
+### 5. Manejo de Errores
+
+**Actual:**
+```javascript
+const tarea = tareas.find(t => t.id === tareaId);
+if (!tarea) return;  // Falla silenciosamente
+```
+
+**Mejorado:**
+```javascript
+const tarea = tareas.find(t => t.id === tareaId);
+if (!tarea) {
+    console.error(`Tarea ${tareaId} no encontrada`);
+    mostrarNotificacion('Error: Tarea no encontrada', 'error');
+    return;
+}
+```
+
+**Try-Catch para LocalStorage:**
+```javascript
+function guardarEnLocalStorage(key, data) {
+    try {
+        localStorage.setItem(key, JSON.stringify(data));
+        return true;
+    } catch (error) {
+        if (error.name === 'QuotaExceededError') {
+            mostrarNotificacion('Almacenamiento lleno', 'error');
+        } else {
+            console.error('Error al guardar:', error);
+            mostrarNotificacion('Error al guardar datos', 'error');
+        }
+        return false;
+    }
+}
+```
+
+---
+
+## 🛠️ Guía de Mantenimiento {#mantenimiento}
+
+### 1. Agregar un Nuevo Estado
+
+**Paso 1: Definir el estado**
+```javascript
+const ESTADOS = {
+    PENDIENTE: 'pendiente',
+    EN_PROGRESO: 'en-progreso',
+    PAUSADA: 'pausada',  // NUEVO
+    COMPLETADA: 'completada'
+};
+```
+
+**Paso 2: Actualizar CSS**
+```css
+.task-card.pausada::before {
+    background: linear-gradient(180deg, #95a5a6 0%, #7f8c8d 100%);
+}
+
+.task-status.pausada {
+    background: rgba(149, 165, 166, 0.1);
+    color: #95a5a6;
+    border: 2px solid rgba(149, 165, 166, 0.3);
+}
+```
+
+**Paso 3: Agregar botón**
+```javascript
+${tarea.estado === 'en-progreso' ? `
+    <button onclick="cambiarEstado('${tarea.id}', 'pausada')">
+        ⏸️ Pausar
+    </button>
+` : ''}
+```
+
+### 2. Agregar un Nuevo Filtro
+
+**Paso 1: HTML**
+```html
+<div class="filter-group">
+    <label>Prioridad</label>
+    <select id="filterPrioridad" onchange="filtrarTareas()">
+        <option value="todas">Todas</option>
+        <option value="alta">Alta</option>
+        <option value="normal">Normal</option>
+    </select>
+</div>
+```
+
+**Paso 2: Lógica**
+```javascript
+function filtrarTareas() {
+    const filterPrioridad = document.getElementById('filterPrioridad').value;
+    
+    tareasFiltradas = tareas.filter(tarea => {
+        let cumplePrioridad = filterPrioridad === 'todas' || 
+                             tarea.prioridad === filterPrioridad;
+        return cumpleEstado && cumpleFecha && cumplePrioridad;
+    });
+    
+    renderizarTareas();
+}
+```
+
+### 3. Integrar con API Backend
+
+**Estructura Recomendada:**
+
+```javascript
+// services/tareasAPI.js
+const API_URL = 'https://api.foamwash.com';
+
+async function obtenerTareas(trabajadorId) {
+    try {
+        const response = await fetch(`${API_URL}/tareas?trabajador=${trabajadorId}`, {
+            headers: {
+                'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`
+            }
+        });
+        
+        if (!response.ok) throw new Error('Error al obtener tareas');
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarNotificacion('Error al cargar tareas', 'error');
+        return [];
+    }
+}
+
+async function actualizarEstadoTarea(tareaId, nuevoEstado) {
+    try {
+        const response = await fetch(`${API_URL}/tareas/${tareaId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`
+            },
+            body: JSON.stringify({ estado: nuevoEstado })
+        });
+        
+        if (!response.ok) throw new Error('Error al actualizar');
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarNotificacion('Error al actualizar tarea', 'error');
+        return null;
+    }
+}
+```
+
+**Modificar función cargarTareas:**
+```javascript
+async function cargarTareas() {
+    // Mostrar loading
+    mostrarNotificacion('Cargando tareas...', 'info');
+    
+    // Obtener de API
+    tareas = await obtenerTareas(session.email);
+    tareasFiltradas = [...tareas];
+    
+    // Actualizar UI
+    actualizarEstadisticas();
+    renderizarTareas();
+    
+    mostrarNotificacion('Tareas actualizadas', 'success');
+}
+```
+
+### 4. Debugging y Logs
+
+**Agregar Logging Estructurado:**
+
+```javascript
+const Logger = {
+    debug: (msg, data) => console.log(`[DEBUG] ${msg}`, data),
+    info: (msg, data) => console.info(`[INFO] ${msg}`, data),
+    warn: (msg, data) => console.warn(`[WARN] ${msg}`, data),
+    error: (msg, data) => console.error(`[ERROR] ${msg}`, data)
+};
+
+// Uso
+function cambiarEstado(tareaId, nuevoEstado) {
+    Logger.info(`Cambiando estado de tarea ${tareaId}`, {
+        estadoAnterior: tarea.estado,
+        estadoNuevo: nuevoEstado
+    });
+    
+    // Lógica...
+    
+    Logger.debug('Estado actualizado exitosamente');
+}
+```
+
+### 5. Testing
+
+**Estructura de Pruebas Recomendada:**
+
+```javascript
+// tests/tareas.test.js
+describe('Sistema de Tareas', () => {
+    describe('generarTareasSimuladas()', () => {
+        test('debe generar tareas desde pedidos', () => {
+            // Arrange
+            const pedidosMock = [
+                { id: 'PED-001', servicios: [...], fecha: '2025-11-05' }
+            ];
+            localStorage.setItem('pedidos', JSON.stringify(pedidosMock));
+            
+            // Act
+            const tareas = generarTareasSimuladas();
+            
+            // Assert
+            expect(tareas).toHaveLength(1);
+            expect(tareas[0].id).toBe('PED-001');
+        });
+        
+        test('debe generar ejemplos si no hay pedidos', () => {
+            localStorage.removeItem('pedidos');
+            const tareas = generarTareasSimuladas();
+            expect(tareas).toHaveLength(3);
+        });
+    });
+    
+    describe('cambiarEstado()', () => {
+        test('debe actualizar estado en memoria', () => {
+            const tareaId = 'TAREA-001';
+            cambiarEstado(tareaId, 'en-progreso');
+            
+            const tarea = tareas.find(t => t.id === tareaId);
+            expect(tarea.estado).toBe('en-progreso');
+        });
+        
+        test('debe sincronizar con localStorage', () => {
+            cambiarEstado('TAREA-001', 'completada');
+            
+            const pedidos = JSON.parse(localStorage.getItem('pedidos'));
+            const pedido = pedidos.find(p => p.id === 'TAREA-001');
+            expect(pedido.estado).toBe('completada');
+        });
+    });
+});
+```
+
+### 6. Documentación del Código
+
+**Ejemplo de JSDoc:**
+
+```javascript
+/**
+ * Cambia el estado de una tarea y sincroniza con localStorage
+ * @param {string} tareaId - ID único de la tarea
+ * @param {('pendiente'|'en-progreso'|'completada')} nuevoEstado - Nuevo estado
+ * @# Documentación Técnica: Panel de Tareas para Trabajadores - FoamWash
+
+## 📋 Índice
+1. [Descripción General](#descripción-general)
+2. [Arquitectura del Sistema](#arquitectura)
+3. [Estructura HTML](#estructura-html)
+4. [Diseño y Estilos CSS](#diseño-css)
+5. [Lógica JavaScript](#lógica-javascript)
+6. [Sistema de Seguridad](#seguridad)
+7. [Flujo de Datos](#flujo-datos)
+8. [Gestión de Estados](#estados)
+9. [Funcionalidades Avanzadas](#funcionalidades)
+10. [Consideraciones Técnicas](#consideraciones)
+11. [Guía de Mantenimiento](#mantenimiento)
+
+---
+
+## 🎯 Descripción General {#descripción-general}
+
+### Propósito del Sistema
+El Panel de Tareas para Trabajadores es una interfaz web diseñada específicamente para empleados de FoamWash que deben gestionar y ejecutar servicios de limpieza asignados. El sistema permite:
+
+- **Visualizar tareas asignadas** con toda la información necesaria
+- **Gestionar el estado** de cada tarea (Pendiente → En Progreso → Completada)
+- **Filtrar y organizar** tareas según criterios específicos
+- **Acceder a detalles completos** de cada servicio
+- **Mantener comunicación** con clientes mediante enlaces directos
+
+### Contexto en el Ecosistema FoamWash
+
+```
+┌─────────────────┐
+│  Cliente Web    │ → Crea pedidos → LocalStorage
+└─────────────────┘
+        ↓
+┌─────────────────┐
+│ Sistema Login   │ → Autentica usuarios
+└─────────────────┘
+        ↓
+┌─────────────────┐
+│ Panel Trabajador│ → Lee pedidos como tareas
+└─────────────────┘
+```
+
+### Tecnologías Utilizadas
+- **HTML5**: Estructura semántica moderna
+- **CSS3**: Diseño responsive con animaciones avanzadas
+- **JavaScript ES6+**: Lógica de negocio y manipulación del DOM
+- **LocalStorage**: Persistencia de datos del lado del cliente
+- **SessionStorage**: Gestión de sesiones de usuario
+
+---
+
+## 🏗️ Arquitectura del Sistema {#arquitectura}
+
+### Estructura de Archivos
+
+```
+proyecto/
+├── trabajador/
+│   └── tareas.html              # Panel principal (este archivo)
+├── js/
+│   ├── login.js                 # Sistema de autenticación
+│   └── sesiones_activas.js      # Gestión de sesiones
+└── view/
+    └── index.html               # Página de login
+```
+
+### Flujo de Carga de Scripts
+
+**Orden crítico de ejecución:**
+
+```javascript
+// 1. PRIMERO: Sistema de autenticación
+<script src="../js/login.js"></script>
+
+// 2. SEGUNDO: Sistema de sesiones
+<script src="../js/sesiones_activas.js"></script>
+
+// 3. TERCERO: Protección de página
+<script>
+    const session = protectPage(['trabajador']);
+</script>
+
+// 4. FINALMENTE: Lógica de tareas
+<script>
+    // Código específico de tareas
+</script>
+```
+
+**⚠️ IMPORTANTE:** El orden es crítico. Si se altera, el sistema de seguridad fallará.
+
+### Diagrama de Componentes
+
+```
+┌──────────────────────────────────────────┐
+│           HEADER (Usuario Info)          │
+└──────────────────────────────────────────┘
+                    ↓
+┌──────────────────────────────────────────┐
+│      PANEL DE ESTADÍSTICAS (4 Cards)     │
+│  [Total] [Pendientes] [Progreso] [Hoy]  │
+└──────────────────────────────────────────┘
+                    ↓
+┌──────────────────────────────────────────┐
+│     FILTROS (Estado + Fecha + Refresh)   │
+└──────────────────────────────────────────┘
+                    ↓
+┌──────────────────────────────────────────┐
+│        LISTA DE TAREAS (Grid Cards)      │
+│  ┌──────────┐  ┌──────────┐             │
+│  │ Tarea 1  │  │ Tarea 2  │  ...        │
+│  └──────────┘  └──────────┘             │
+└──────────────────────────────────────────┘
+                    ↓
+        ┌─────────────────────┐
+        │  MODAL DE DETALLES  │
+        └─────────────────────┘
+```
+
+---
+
+## 📄 Estructura HTML {#estructura-html}
+
+### 1. Header - Navegación Principal
+
+```html
+<header class="header">
+    <div class="header-content">
+        <div class="logo-section">
+            <h1>🧼 FoamWash - Panel Trabajador</h1>
+            <p>Gestión de Tareas y Servicios</p>
+        </div>
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-name" id="userName">Cargando...</div>
+                <div class="user-role">👷 Trabajador</div>
+            </div>
+            <button class="btn-logout" onclick="cerrarSesionTrabajador()">
+                🚪 Cerrar Sesión
+            </button>
+        </div>
+    </div>
+</header>
+```
+
+**Características:**
+- **Sticky positioning**: Permanece visible al hacer scroll
+- **Backdrop blur**: Efecto de vidrio esmerilado
+- **Información dinámica**: El email se carga desde la sesión
+- **Cierre de sesión integrado**: Llama a la función `logout()` de `login.js`
+
+### 2. Panel de Estadísticas
+
+```html
+<div class="stats-panel">
+    <div class="stat-card">
+        <span class="stat-icon">📋</span>
+        <div class="stat-number" id="statTotal">0</div>
+        <div class="stat-label">Total Tareas</div>
+    </div>
+    <!-- 3 cards más... -->
+</div>
+```
+
+**Estructura de Datos:**
+- `statTotal`: Contador total de tareas
+- `statPendientes`: Tareas sin iniciar
+- `statEnProgreso`: Tareas en ejecución
+- `statCompletadas`: Completadas en el día actual
+
+**Actualización:**
+```javascript
+function actualizarEstadisticas() {
+    document.getElementById('statTotal').textContent = tareas.length;
+    document.getElementById('statPendientes').textContent = 
+        tareas.filter(t => t.estado === 'pendiente').length;
+    // ... más contadores
+}
+```
+
+### 3. Sistema de Filtros
+
+```html
+<div class="filters-section">
+    <div class="filter-group">
+        <label>Estado</label>
+        <select class="filter-select" id="filterEstado" onchange="filtrarTareas()">
+            <option value="todos">Todos</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="en-progreso">En Progreso</option>
+            <option value="completada">Completadas</option>
+        </select>
+    </div>
+    <!-- Más filtros... -->
+</div>
+```
+
+**Funcionalidad:**
+- **Filtrado en tiempo real**: Se ejecuta al cambiar selección
+- **Combinación de filtros**: Estado + Fecha simultáneamente
+- **Botón de actualización**: Recarga tareas desde localStorage
+
+### 4. Grid de Tareas
+
+```html
+<div class="tasks-grid" id="tasksGrid">
+    <!-- Generado dinámicamente por JavaScript -->
+</div>
+```
+
+**Renderizado Dinámico:**
+```javascript
+grid.innerHTML = tareasFiltradas.map(tarea => `
+    <div class="task-card ${tarea.estado}">
+        <!-- Contenido de la tarjeta -->
+    </div>
+`).join('');
+```
+
+### 5. Modal de Detalles
+
+```html
+<div class="modal-overlay" id="modalDetalles">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>📋 Detalles de la Tarea</h2>
+            <button class="modal-close" onclick="cerrarModal()">×</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <!-- Contenido dinámico -->
+        </div>
+    </div>
+</div>
+```
+
+**Características:**
+- **Overlay con blur**: Fondo difuminado
+- **Animaciones CSS**: Entrada suave desde abajo
+- **Cierre múltiple**: Click fuera, botón X, tecla ESC
+- **Scroll interno**: Para contenido largo
+
+---
+
+## 🎨 Diseño y Estilos CSS {#diseño-css}
+
+### 1. Sistema de Colores y Gradientes
+
+```css
+/* Paleta Principal */
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    --info-gradient: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    --warning-gradient: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%);
+    --danger-gradient: linear-gradient(135deg, #ff4757 0%, #ff6b7a 100%);
+}
+
+/* Fondo del Body */
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+```
+
+**Filosofía de Diseño:**
+- **Gradientes suaves**: Transiciones naturales de color
+- **Jerarquía visual**: Colores según importancia
+- **Estados claros**: Cada estado tiene su color único
+
+### 2. Diseño de Tarjetas de Tarea
+
+```css
+.task-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 2px solid #e9ecef;
+    border-radius: 18px;
+    padding: 25px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Barra lateral de color según estado */
+.task-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+}
+
+.task-card.pendiente::before {
+    background: linear-gradient(180deg, #f39c12 0%, #e74c3c 100%);
+}
+
+.task-card.en-progreso::before {
+    background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+}
+
+.task-card.completada::before {
+    background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%);
+}
+```
+
+**Técnicas Avanzadas:**
+- **Pseudo-elementos**: `::before` para barra de estado
+- **Position absolute**: Overlay sin afectar layout
+- **Gradient orientation**: 180deg para vertical
+
+### 3. Animaciones y Transiciones
+
+#### Hover en Tarjetas
+```css
+.task-card {
+    transition: all 0.3s ease;
+}
+
+.task-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+}
+```
+
+#### Entrada del Modal
+```css
+@keyframes slideUp {
+    from {
+        transform: translateY(100px) scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    animation: slideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+```
+
+**Cubic-bezier Personalizado:**
+- `(0.68, -0.55, 0.265, 1.55)`: Crea efecto de rebote
+- Valores negativos generan "overshoot" (sobrepaso)
+
+#### Notificaciones
+```css
+.notificacion {
+    transform: translateX(400px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.notificacion.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+```
+
+### 4. Diseño Responsive
+
+```css
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .filters-section {
+        flex-direction: column;
+    }
+    
+    .task-footer {
+        flex-direction: column;
+    }
+}
+```
+
+**Breakpoints:**
+- `768px`: Tablets y móviles
+- Layout vertical en pantallas pequeñas
+- Botones a ancho completo
+
+### 5. Estado de Botones
+
+```css
+.btn-task {
+    transition: all 0.3s ease;
+}
+
+.btn-iniciar {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.btn-iniciar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(52, 152, 219, 0.5);
+}
+```
+
+**Feedback Visual:**
+- **Elevación**: `translateY(-2px)` al hover
+- **Sombra incrementada**: Efecto de profundidad
+- **Gradientes**: Sensación premium
+
+---
+
+## ⚙️ Lógica JavaScript {#lógica-javascript}
+
+### 1. Estructura de Datos
+
+#### Objeto Tarea
+```javascript
+{
+    id: "PED-1234567890",           // ID único del pedido
+    titulo: "Lavado de Muebles",    // Resumen del servicio
+    cliente: "María González",       // Nombre del cliente
+    direccion: "Calle 123 #45-67",  // Dirección completa
+    ciudad: "Bogotá",                // Ciudad
+    telefono: "3001234567",          // Contacto
+    fecha: "2025-11-05",             // Fecha programada (YYYY-MM-DD)
+    hora: "09:00",                   // Hora programada (HH:MM)
+    servicios: [                     // Array de servicios
+        {
+            nombre: "Lavado de muebles",
+            cantidad: 1,
+            tamano: "Grande",
+            tipoLavado: "Profundo",
+            precio: 90000
+        }
+    ],
+    observaciones: "Texto libre",    // Notas especiales
+    total: 90000,                    // Suma total
+    estado: "pendiente",             // pendiente | en-progreso | completada
+    trabajadorAsignado: "trabajador@gmail.com",
+    prioridad: "alta"                // alta | normal
+}
+```
+
+#### Variables Globales
+```javascript
+let tareas = [];              // Array completo de tareas
+let tareasFiltradas = [];     // Array después de aplicar filtros
+```
+
+### 2. Generación de Tareas Simuladas
+
+```javascript
+function generarTareasSimuladas() {
+    // 1. Obtener pedidos reales del localStorage
+    const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+    const trabajadorEmail = session.email;
+    
+    // 2. Convertir cada pedido en una tarea
+    const tareasGeneradas = pedidos.map((pedido, index) => {
+        // Determinar estado basado en la fecha
+        let estado = 'pendiente';
+        const fechaPedido = new Date(pedido.fecha);
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        
+        if (fechaPedido < hoy) {
+            estado = 'completada';  // Tareas del pasado
+        } else if (fechaPedido.getTime() === hoy.getTime()) {
+            // Tareas de hoy: aleatorio entre pendiente y en-progreso
+            estado = Math.random() > 0.5 ? 'en-progreso' : 'pendiente';
+        }
+        
+        // 3. Crear objeto tarea
+        return {
+            id: pedido.id,
+            titulo: `Servicio - ${pedido.servicios[0].nombre}`,
+            cliente: `Cliente #${index + 1}`,
+            direccion: pedido.direccion,
+            ciudad: pedido.ciudad,
+            telefono: pedido.telefono,
+            fecha: pedido.fecha,
+            hora: pedido.hora,
+            servicios: pedido.servicios,
+            observaciones: pedido.observaciones || 'Sin observaciones',
+            total: pedido.total,
+            estado: estado,
+            trabajadorAsignado: trabajadorEmail,
+            prioridad: Math.random() > 0.7 ? 'alta' : 'normal'
+        };
+    });
+    
+    // 4. Si no hay pedidos, generar tareas de ejemplo
+    if (tareasGeneradas.length === 0) {
+        // Código de tareas de ejemplo...
+    }
+    
+    return tareasGeneradas;
+}
+```
+
+**Lógica de Estados Automáticos:**
+
+```javascript
+// Fecha en el pasado → Completada
+if (fechaPedido < hoy) {
+    estado = 'completada';
+}
+
+// Fecha hoy → Aleatorio (simulación realista)
+else if (fechaPedido.getTime() === hoy.getTime()) {
+    estado = Math.random() > 0.5 ? 'en-progreso' : 'pendiente';
+}
+
+// Fecha futura → Pendiente
+else {
+    estado = 'pendiente';
+}
+```
+
+### 3. Carga y Renderizado
+
+```javascript
+function cargarTareas() {
+    // 1. Generar/cargar tareas
+    tareas = generarTareasSimuladas();
+    
+    // 2. Inicializar filtradas (todas)
+    tareasFiltradas = [...tareas];
+    
+    // 3. Actualizar UI
+    actualizarEstadisticas();
+    renderizarTareas();
+    
+    // 4. Notificar
+    mostrarNotificacion('Tareas actualizadas correctamente', 'success');
+}
+```
+
+**Spread Operator:**
+```javascript
+tareasFiltradas = [...tareas];  // Crea copia superficial
+```
+Importante: Evita mutaciones no deseadas del array original.
+
+### 4. Renderizado de Tarjetas
+
+```javascript
+function renderizarTareas() {
+    const grid = document.getElementById('tasksGrid');
+    const count = document.getElementById('tasksCount');
+    
+    // Actualizar contador
+    count.textContent = `${tareasFiltradas.length} tarea${tareasFiltradas.length !== 1 ? 's' : ''}`;
+    
+    // Estado vacío
+    if (tareasFiltradas.length === 0) {
+        grid.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <div class="empty-state-text">No hay tareas que mostrar</div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Renderizar tarjetas
+    grid.innerHTML = tareasFiltradas.map(tarea => {
+        const estadoClass = tarea.estado.replace(' ', '-');
+        const estadoTexto = tarea.estado.charAt(0).toUpperCase() + 
+                           tarea.estado.slice(1);
+        
+        return `
+            <div class="task-card ${estadoClass}">
+                <!-- HTML de la tarjeta -->
+            </div>
+        `;
+    }).join('');
+}
+```
+
+**Técnicas Utilizadas:**
+- **Template Literals**: Strings multilínea con interpolación
+- **Array.map()**: Transformar array en HTML
+- **join('')**: Convertir array a string sin separadores
+- **Capitalización**: Primera letra en mayúscula
+
+### 5. Cambio de Estado de Tareas
+
+```javascript
+function cambiarEstado(tareaId, nuevoEstado) {
+    // 1. Buscar tarea
+    const tarea = tareas.find(t => t.id === tareaId);
+    if (!tarea) return;
+    
+    const estadoAnterior = tarea.estado;
+    
+    // 2. Actualizar en memoria
+    tarea.estado = nuevoEstado;
+    
+    // 3. Sincronizar con localStorage
+    const pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+    const pedidoIndex = pedidos.findIndex(p => p.id === tareaId);
+    
+    if (pedidoIndex !== -1) {
+        pedidos[pedidoIndex].estado = nuevoEstado;
+        localStorage.setItem('pedidos', JSON.stringify(pedidos));
+    }
+    
+    // 4. Actualizar UI
+    filtrarTareas();
+    actualizarEstadisticas();
+    
+    // 5. Notificar
+    const mensajes = {
+        'en-progreso': '⏳ Tarea iniciada correctamente',
+        'completada': '✅ ¡Tarea completada! Excelente trabajo'
+    };
+    mostrarNotificacion(mensajes[nuevoEstado], 'success');
+    
+    // 6. Log para debugging
+    console.log(`Tarea ${tareaId}: ${estadoAnterior} → ${nuevoEstado}`);
+}
+```
+
+**Flujo de Sincronización:**
+```
+Memoria (tareas array)
+        ↓
+    Actualizar
+        ↓
+LocalStorage (pedidos)
+        ↓
+    Actualizar UI
+        ↓
+    Notificar Usuario
+```
+
+### 6. Sistema de Filtrado
+
+```javascript
+function filtrarTareas() {
+    const filterEstado = document.getElementById('filterEstado').value;
+    const filterFecha = document.getElementById('filterFecha').value;
+    
+    tareasFiltradas = tareas.filter(tarea => {
+        // Filtro por estado
+        let cumpleEstado = filterEstado === 'todos' || 
+                          tarea.estado === filterEstado;
+        
+        // Filtro por fecha
+        let cumpleFecha = true;
+        if (filterFecha !== 'todos') {
+            const fechaTarea = new Date(tarea.fecha);
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            
+            switch(filterFecha) {
+                case 'hoy':
+                    cumpleFecha = fechaTarea.toDateString() === hoy.toDateString();
+                    break;
+                    
+                case 'manana':
+                    const manana = new Date(hoy);
+                    manana.setDate(manana.getDate() + 1);
+                    cumpleFecha = fechaTarea.toDateString() === manana.toDateString();
+                    break;
+                    
+                case 'semana':
+                    const finSemana = new Date(hoy);
+                    finSemana.setDate(finSemana.getDate() + 7);
+                    cumpleFecha = fechaTarea >= hoy && fechaTarea <= finSemana;
+                    break;
+            }
+        }
+        
+        return cumpleEstado && cumpleFecha;
+    });
+    
+    renderizarTareas();
+}
+```
+
+**Operador Lógico AND:**
+```javascript
+return cumpleEstado && cumpleFecha;
+// Ambos deben ser true para incluir la tarea
+```
+
+**Comparación de Fechas:**
+```javascript
+// Normalizar horas para comparar solo fecha
+hoy.setHours(0, 0, 0, 0);
+
+// Comparar strings de fecha
+fechaTarea.toDateString() === hoy.toDateString()
+
+// Comparar rangos
+fechaTarea >= hoy && fechaTarea <= finSemana
+```
+
+### 7. Modal de Detalles
+
+```javascript
+function verDetalles(tareaId) {
+    const tarea = tareas.find(t => t.id === tareaId);
+    if (!tarea) return;
+    
+    const modal = document.getElementById('modalDetalles');
+    const modalBody = document.getElementById('modalBody');
+    
+    // Generar HTML detallado
+    modalBody.innerHTML = `
+        <div class="detalle-item">
+            <div class="detalle-label">🆔 ID de Tarea</div>
+            <div class="detalle-value">${tarea.id}</div>
+        </div>
+        
+        <!-- Más detalles... -->
+        
+        <div class="detalle-item">
+            <div class="detalle-label">📞 Teléfono de Contacto</div>
+            <div class="detalle-value">
+                ${tarea.telefono}
+                <br>
+                <a href="tel:${tarea.telefono}" style="color: #667eea;">
+                    📱 Llamar ahora
+                </a>
+            </div>
+        </div>
+        
+        <!-- Servicios con loop -->
+        <div class="detalle-item">
+            <div class="detalle-label">📦 Servicios Solicitados</div>
+            <div class="detalle-value">
+                ${tarea.servicios.map(s => `
+                    <div style="background: #f8f9fa; padding: 12px;">
+                        <strong>${s.nombre}</strong><br>
+                        • Cantidad: ${s.cantidad}<br>
+                        • Tamaño: ${s.tamano}<br>
+                        • Tipo: ${s.tipoLavado}<br>
+                        • Precio: $${(s.precio * s.cantidad).toLocaleString('es-CO')}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    modal.classList.add('show');
+}
+```
+
+**Protocolo tel:**
+```html
+<a href="tel:3001234567">Llamar</a>
+```
+En móviles, abre la aplicación de teléfono directamente.
+
+### 8. Sistema de Notificaciones
+
+```javascript
+function mostrarNotificacion(mensaje, tipo = 'info') {
+    const container = document.getElementById('notificacionContainer');
+    
+    // Crear elemento
+    const notificacion = document.createElement('div');
+    notificacion.className = `notificacion ${tipo}`;
+    
+    // Iconos según tipo
+    const iconos = {
+        'success': '✅',
+        'info': 'ℹ️',
+        'warning': '⚠️',
+        'error': '❌'
+    };
+    
+    // Contenido
+    notificacion.innerHTML = `
+        <span class="notificacion-icono">${iconos[tipo]}</span>
+        <span class="notificacion-mensaje">${mensaje}</span>
+    `;
+    
+    // Agregar al DOM
+    container.appendChild(notificacion);
+    
+    // Animación de entrada (después de render)
+    setTimeout(() => notificacion.classList.add('show'), 10);
+    
+    // Animación de salida y eliminación
+    setTimeout(() => {
+        notificacion.classList.remove('show');
+        setTimeout(() => notificacion.remove(), 400);
+    }, 4000);
+}
+```
+
+**Timing de Animaciones:**
+```
+t=0ms: Elemento agregado al DOM (invisible)
+t=10ms: Clase 'show' agregada (inicia animación entrada)
+t=4000ms: Clase 'show' removida (inicia animación salida)
+t=4400ms: Elemento eliminado del DOM
+```
+
+**¿Por qué 10ms de delay?**
+- Permite que el navegador renderice el elemento
+- Asegura que la transición CSS se ejecute correctamente
+
+### 9. Actualización Automática
+
+```javascript
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('✅ Panel de tareas inicializado');
+    cargarTareas();
+    
+    // Actualizar cada 30 segundos
+    setInterval(() => {
+        const totalAntes = tareas.length;
+        cargarTareas();
+        const totalDespues = tareas.length;
+        
+        // Notificar si hay nuevas tareas
+        if (totalDespues > totalAntes) {
+            const nuevas = totalDespues - totalAntes;
+            mostrarNotificacion(
+                `🔔 ${nuevas} nueva(s) tarea(s) asignada(s)`, 
+                'info'
+            );
+        }
+    }, 30000);  // 30000ms = 30 segundos
+});
+```
+
+**setInterval vs setTimeout:**
+- `setInterval`: Se ejecuta repetidamente cada X ms
+- `setTimeout`: Se ejecuta una sola vez después de X ms
+
+### 10. Funciones Auxiliares
+
+#### Formateo de Fechas
+
+```javascript
+function formatearFecha(fecha) {
+    const date = new Date(fecha + 'T00:00:00');
+    return date.toLocaleDateString('es-CO', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+}
+// Resultado: "05/11/2025"
+
+function formatearFechaCompleta(fecha) {
+    const date = new Date(fecha + 'T00:00:00');
+    return date.toLocaleDateString('es-CO', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    });
+}
+// Resultado: "martes, 5 de noviembre de 2025"
+```
+
+**¿Por qué agregar 'T00:00:00'?**
+- Evita problemas de zona horaria
+- Asegura que la fecha se interprete como medianoche local
+- Previene errores de "día anterior" por UTC
+
+---
+
+## 🔐 Sistema de Seguridad {#seguridad}
+
+### 1. Protección de Acceso
+
+```javascript
+// Ejecutado al cargar la página
+const session = protectPage(['trabajador']);
+```
+
+**¿Qué hace `protectPage()`?**
+
+```javascript
+function protectPage(allowedRoles = []) {
+    // 1. Verificar si existe sesión activa
+    const session = checkActiveSession();
+    
+    if (!session.isActive) {
+        // Sin sesión → Redirigir al login
+        alert('Debes iniciar sesión para acceder a esta página.');
+        window.location.href = './index.html';
+        return false;
+    }
+    
+    // 2. Verificar rol si se especificaron roles permitidos
+    if (allowedRoles.length > 0 && !allowedRoles.includes(session.role)) {
+        // Rol no autorizado → Redirigir
+        alert('No tienes permisos para acceder a esta página.');
+        window.location.href = './index.html';
+        return false;
+    }
+    
+    // 3. Actualizar actividad de la sesión
+    actualizarActividadSesion(session.token);
+    
+    // 4. Retornar información de sesión
+    console.log('✅ Acceso autorizado:', session.role, '-', session.email);
+    return session;
+}
+```
+
+**Flujo de Validación:**
+
+```
+Usuario accede a tareas.html
+        ↓
+¿Existe authToken en sessionStorage?
+        ↓
+    NO → Redirigir a index.html
+    SÍ → Continuar
+        ↓
+¿El rol es 'trabajador'?
+        ↓
+    NO → Redirigir a index.html
+    SÍ → Permitir acceso
+        ↓
+Actualizar timestamp de actividad
+        ↓
+Retornar objeto session
+```
+
+### 2. Gestión de Sesión Activa
+
+```javascript
+// Al cargar la página
+if (session && session.email) {
+    document.getElementById('userName').textContent = session.email;
+    console.log('✅ Panel de trabajador cargado para:', session.email);
+}
+```
+
+**Objeto Session:**
+```javascript
+{
+    isActive: true,
+    token: "token-trabajador-67890",
+    role: "trabajador",
+    email: "trabajador@gmail.com"
+}
+```
+
+### 3. Cierre de Sesión Seguro
+
+```javascript
+function cerrarSesionTrabajador() {
+    if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+        mostrarNotificacion('Cerrando sesión...', 'info');
+        
+        setTimeout(() => {
+            logout();  // Función de login.js
+        }, 1000);
+    }
+}
+```
+
+**¿Qué hace `logout()`?**
+
+```javascript
+function logout() {
+    const token = sessionStorage.getItem('authToken');
+    
+    // 1. Eliminar sesión activa del registro
+    if (token) {
+        eliminarSesionActiva(token);
+    }
+    
+    // 2. Limpiar sessionStorage
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('userRole');
+    sessionStorage.removeItem('userEmail');
+    
+    // 3. Redirigir al login
+    window.location.href = './index.html';
+}
+```
+
+### 4. Actualización de Actividad
+
+```javascript
+function actualizarActividadSesion(token) {
+    let sesionesActivas = JSON.parse(
+        localStorage.getItem('sesionesActivas') || '[]'
+    );
+    
+    const sesion = sesionesActivas.find(s => s.token === token);
+    if (sesion) {
+        sesion.ultimaActividad = new Date().toISOString();
+        localStorage.setItem('sesionesActivas', JSON.stringify(sesionesActivas));
+    }
+}
+```
+
+**¿Cuándo se actualiza?**
+- Al cargar la página
+- Cada vez que se ejecuta `protectPage()`
+- Automáticamente en el background
+
+### 5. Limpieza de Sesiones Expiradas
+
+```javascript
+function limpiarSesionesExpiradas() {
+    let sesionesActivas = JSON.parse(
+        localStorage.getItem('sesionesActivas') || '[]'
+    );
+    
+    const ahora = new Date().getTime();
+    const dosHoras = 2 * 60 * 60 * 1000;  // 2 horas en milisegundos
+    
+    // Filtrar sesiones activas (menos de 2 horas sin actividad)
+    sesionesActivas = sesionesActivas.filter(sesion => {
+        const ultimaActividad = new Date(sesion.ultimaActividad).getTime();
+        return (ahora - ultimaActividad) < dosHoras;
+    });
+    
+    localStorage.setItem('sesionesActivas', JSON.stringify(sesionesActivas));
+}
+```
+
+**Tiempo de Expiración:**
+- 2 horas sin actividad → Sesión eliminada
+- Se ejecuta al cargar cualquier página
+- Limpieza automática del sistema
+
+---
+
+## 🔄 Flujo de Datos {#flujo-datos}
+
+### 1. Diagrama Completo del Flujo
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    CLIENTE WEB                          │
+│         (servicios_cliente.html)                        │
+└─────────────────────────────────────────────────────────┘
+                        ↓
+              Crea pedido y lo guarda
+                        ↓
+┌─────────────────────────────────────────────────────────┐
+│                   LOCALSTORAGE                          │
+│   Key: 'pedidos'                                        │
+│   Value: [{id, servicios, fecha, hora, ...}, ...]      │
+└─────────────────────────────────────────────────────────┘
+                        ↓
+              Trabajador hace login
+                        ↓
+┌─────────────────────────────────────────────────────────┐
+│              SISTEMA DE AUTENTICACIÓN                   │
+│   1. Validar credenciales                               │
+│   2. Crear sesión en sessionStorage                     │
+│   3. Registrar en sesionesActivas                       │
+└─────────────────────────────────────────────────────────┘
+                        ↓
+            Redirige a tareas.html
+                        ↓
+┌─────────────────────────────────────────────────────────┐
+│            PROTECCIÓN DE PÁGINA                         │
+│   1. Verificar token                                    │
+│   2. Verificar rol = 'trabajador'                       │
+│   3. Actualizar actividad                               │
+└─────────────────────────────────────────────────────────┘
+                        ↓
+              Acceso concedido
+                        ↓
+┌─────────────────────────────────────────────────────────┐
+│          GENERACIÓN DE TAREAS                           │
+│   1. Leer pedidos de localStorage                       │
+│   2. Convertir cada pedido en tarea                     │
+│   3. Asignar estados según fecha                        │
+│   4. Asignar al trabajador actual                       │
+└─────────────────────────────────────────────────────────┘
+                        ↓
+              Renderizar en UI
+                        ↓
+┌─────────────────────────────────────────────────────────┐
+│          INTERACCIÓN DEL USUARIO                        │
+│   • Filtrar tareas                                      │
+│   • Cambiar estados                                     │
+│   • Ver detalles                                        │
+└─────────────────────────────────────────────────────────┘
+                        ↓
+        Estados se sincronizan con localStorage
+                        ↓
+┌─────────────────────────────────────────────────────────┐
+│            ACTUALIZACIÓN AUTOMÁTICA                     │
+│   Cada 30 segundos:                                     │
+│   1. Recargar tareas                                    │
+│   2. Detectar cambios                                   │
+│   3. Notificar nuevas tareas                            │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 2. Sincronización de Estados
+
+**Escenario: Trabajador inicia una tarea**
+
+```
+Usuario hace click en "Iniciar Tarea"
+        ↓
+cambiarEstado(tareaId, 'en-progreso')
+        ↓
+1. Actualizar en memoria:
+   tareas[index].estado = 'en-progreso'
+        ↓
+2. Actualizar en localStorage:
+   pedidos[index].estado = 'en-progreso'
+   localStorage.setItem('pedidos', JSON.stringify(pedidos))
+        ↓
+3. Actualizar UI:
+   filtrarTareas()
+   actualizarEstadisticas()
+        ↓
+4. Notificar usuario:
+   mostrarNotificacion('Tarea iniciada')
+```
+
+### 3. Persistencia de Datos
+
+**¿Qué se guarda en LocalStorage?**
+
+```javascript
+// 1. Pedidos (creados por clientes)
+localStorage.setItem('pedidos', JSON.stringify([...]));
+
+// 2. Sesiones activas del sistema
+localStorage.setItem('sesionesActivas', JSON.stringify([...]));
+```
+
+**¿Qué se guarda en SessionStorage?**
+
+```javascript
+// 1. Token de autenticación
+sessionStorage.setItem('authToken', 'token-trabajador-67890');
+
+// 2. Rol del usuario
+sessionStorage.setItem('userRole', 'trabajador');
+
+// 3. Email del usuario
+sessionStorage.setItem('userEmail', 'trabajador@gmail.com');
+```
+
+**Diferencias:**
+- **LocalStorage**: Persiste incluso cerrando el navegador
+- **SessionStorage**: Se borra al cerrar la pestaña
+
+---
+
+## 📊 Gestión de Estados {#estados}
+
+### 1. Ciclo de Vida de una Tarea
+
+```
+┌─────────────┐
+│  PENDIENTE  │ ← Estado inicial
+└─────────────┘
+       ↓
+   [Iniciar]
+       ↓
+┌─────────────┐
+│ EN PROGRESO │
+└─────────────┘
+       ↓
+  [Completar]
+       ↓
+┌─────────────┐
+│ COMPLETADA  │ ← Estado final
+└─────────────┘
+```
+
+### 2. Reglas de Transición
+
+```javascript
+// Estados posibles
+const ESTADOS = {
+    PENDIENTE: 'pendiente',
+    EN_PROGRESO: 'en-progreso',
+    COMPLETADA: 'completada'
+};
+
+// Transiciones válidas
+const TRANSICIONES_VALIDAS = {
+    'pendiente': ['en-progreso'],
+    'en-progreso': ['completada'],
+    'completada': []  // No puede cambiar
+};
+```
+
+**Validación (no implementada pero recomendada):**
+
+```javascript
+function puedeTransicionar(estadoActual, estadoNuevo) {
+    return TRANSICIONES_VALIDAS[estadoActual].includes(estadoNuevo);
+}
+
+function cambiarEstado(tareaId, nuevoEstado) {
+    const tarea = tareas.find(t => t.id === tareaId);
+    
+    if (!puedeTransicionar(tarea.estado, nuevoEstado)) {
+        mostrarNotificacion('Transición de estado no válida', 'error');
+        return;
+    }
+    
+    // Continuar con el cambio...
+}
+```
+
+### 3. Estados Visuales
+
+**Colores por Estado:**
+
+```css
+/* Pendiente - Naranja/Rojo */
+.task-card.pendiente::before {
+    background: linear-gradient(180deg, #f39c12 0%, #e74c3c 100%);
+}
+
+.task-status.pendiente {
+    background: rgba(243, 156, 18, 0.1);
+    color: #f39c12;
+    border: 2px solid rgba(243, 156, 18, 0.3);
+}
+
+/* En Progreso - Azul */
+.task-card.en-progreso::before {
+    background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+}
+
+.task-status.en-progreso {
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+    border: 2px solid rgba(52, 152, 219, 0.3);
+}
+
+/* Completada - Verde */
+.task-card.completada::before {
+    background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%);
+}
+
+.task-status.completada {
+    background: rgba(46, 204, 113, 0.1);
+    color: #2ecc71;
+    border: 2px solid rgba(46, 204, 113, 0.3);
+}
+```
+
+### 4. Botones Contextuales
+
+```javascript
+// Renderizado condicional de botones
+${tarea.estado === 'pendiente' ? `
+    <button class="btn-task btn-iniciar" 
+            onclick="cambiarEstado('${tarea.id}', 'en-progreso')">
+        ▶️ Iniciar Tarea
+    </button>
+` : ''}
+
+${tarea.estado === 'en-progreso' ? `
+    <button class="btn-task btn-completar" 
+            onclick="cambiarEstado('${tarea.id}', 'completada')">
+        ✅ Completar
+    </button>
+` : ''}
+
+<!-- Siempre visible -->
+<button class="btn-task btn-ver-detalles" 
+        onclick="verDetalles('${tarea.id}')">
+    👁️ Ver Detalles
+</button>
+```
+
+**Lógica:**
+- **Pendiente**: Muestra "Iniciar Tarea"
+- **En Progreso**: Muestra "Completar"
+- **Completada**: Solo "Ver Detalles"
+
+---
+
+## 🚀 Funcionalidades Avanzadas {#funcionalidades}
+
+### 1. Búsqueda y Filtrado Combinado
+
+```javascript
+function filtrarTareas() {
+    const filterEstado = document.getElementById('filterEstado').value;
+    const filterFecha = document.getElementById('filterFecha').value;
+    
+    tareasFiltradas = tareas.filter(tarea => {
+        // Ambos filtros deben cumplirse (AND lógico)
+        let cumpleEstado = filterEstado === 'todos' || 
+                          tarea.estado === filterEstado;
+        let cumpleFecha = validarFiltroFecha(tarea.fecha, filterFecha);
+        
+        return cumpleEstado && cumpleFecha;
+    });
+    
+    renderizarTareas();
+}
+```
+
+**Ejemplo de Uso:**
+- Estado: "En Progreso"
+- Fecha: "Hoy"
+- Resultado: Solo tareas en progreso programadas para hoy
+
+### 2. Estadísticas en Tiempo Real
+
+```javascript
+function actualizarEstadisticas() {
+    const total = tareas.length;
+    const pendientes = tareas.filter(t => t.estado === 'pendiente').length;
+    const enProgreso = tareas.filter(t => t.estado === 'en-progreso').length;
+    
+    // Completadas HOY (no total)
+    const hoy = new Date().toISOString().split('T')[0];
+    const completadasHoy = tareas.filter(t => 
+        t.estado === 'completada' && t.fecha === hoy
+    ).length;
+    
+    // Actualizar DOM
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statPendientes').textContent = pendientes;
+    document.getElementById('statEnProgreso').textContent = enProgreso;
+    document.getElementById('statCompletadas').textContent = completadasHoy;
+}
+```
+
+**Llamada Automática:**
+```javascript
+// Se ejecuta en:
+cargarTareas()
+cambiarEstado()
+filtrarTareas()
+```
+
+### 3. Notificaciones de Nuevas Tareas
+
+```javascript
+setInterval(() => {
+    const totalAntes = tareas.length;
+    cargarTareas();
+    const totalDespues = tareas.length;
+    
+    if (totalDespues > totalAntes) {
+        const nuevas = totalDespues - totalAntes;
+        mostrarNotificacion(
+            `🔔 ${nuevas} nueva(s) tarea(s) asignada(s)`, 
+            'info'
+        );
+    }
+}, 30000);
+```
+
+**Escenario:**
+1. Cliente crea pedido en su panel
+2. Pedido se guarda en localStorage
+3. Cada 30s, trabajador recarga tareas
+4. Detecta incremento en cantidad
+5. Muestra notificación
+
+### 4. Enlace de Llamada Directa
+
+```javascript
+// En el modal de detalles
+<a href="tel:${tarea.telefono}" style="color: #667eea;">
+    📱 Llamar ahora
+</a>
+```
+
+**Comportamiento:**
+- **En móvil**: Abre la aplicación de teléfono
+- **En desktop**: Puede abrir Skype, FaceTime, etc.
+- **Fallback**: Copia el número si no hay app
+
+### 5. Sistema de Prioridades
+
+```javascript
+prioridad: Math.random() > 0.7 ? 'alta' : 'normal'
+```
+
+**Uso Futuro:**
+- Ordenar tareas por prioridad
+- Resaltar tareas urgentes
+- Alertas especiales
+
+**Implementación Sugerida:**
+
+```javascript
+function ordenarPorPrioridad(tareas) {
+    return tareas.sort((a, b) => {
+        const prioridades = { alta: 2, normal: 1 };
+        return prioridades[b.prioridad] - prioridades[a.prioridad];
+    });
+}
+```
+
+---
+
+## ⚠️ Consideraciones Técnicas {#consideraciones}
+
+### 1. Limitaciones Actuales
+
+#### A. Sin Backend Real
+```javascript
+// ❌ Todo se guarda en el navegador
+localStorage.setItem('pedidos', JSON.stringify(pedidos));
+
+// ✅ Debería ser:
+await fetch('/api/pedidos', {
+    method: 'PUT',
+    body: JSON.stringify(pedido)
+});
+```
+
+**Consecuencias:**
+- Datos solo en el navegador del usuario
+- No hay sincronización entre dispositivos
+- Pérdida de datos si se borra el navegador
+
+#### B. Seguridad Simulada
+
+```javascript
+// ❌ Token estático y predecible
+token: "token-trabajador-67890"
+
+// ✅ Debería ser:
+token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."  // JWT real
+```
+
+**Vulnerabilidades:**
+- Tokens fáciles de falsificar
+- Sin expiración real
+- Sin renovación automática
+
+#### C. Sin Validación de Servidor
+
+```javascript
+// ❌ Cualquier cambio es aceptado
+tarea.estado = nuevoEstado;
+localStorage.setItem(...)
+
+// ✅ Debería validar:
+if (usuarioPuedeModificar(tarea, usuario)) {
+    // Permitir cambio
+}
+```
+
+### 2. Rendimiento
+
+#### Optimizaciones Implementadas
+
+**Event Delegation (no usado pero recomendado):**
+
+```javascript
+// ❌ Actual: onclick inline
+<button onclick="cambiarEstado(...)">
+
+// ✅ Mejor:
+document.getElementById('tasksGrid').addEventListener('click', (e) => {
+    if (e.target.classList.contains('btn-iniciar')) {
+        const tareaId = e.target.dataset.tareaId;
+        cambiarEstado(tareaId, 'en-progreso');
+    }
+});
+```
+
+**Ventajas:**
+- Un solo listener en lugar de N
+- Mejor rendimiento con muchas tareas
+- Funciona con contenido dinámico
+
+#### Posibles Mejoras
+
+**Virtual Scrolling:**
+```javascript
+// Solo renderizar tareas visibles
+function renderizarTareasVisibles(startIndex, endIndex) {
+    const tareasVisibles = tareasFiltradas.slice(startIndex, endIndex);
+    // Renderizar solo estas
+}
+```
+
+**Debouncing en Búsqueda:**
+```javascript
+let searchTimeout;
+searchInput.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        filtrarTareas(e.target.value);
+    }, 300);  // Esperar 300ms después de escribir
+});
+```
+
+### 3. Compatibilidad de Navegadores
+
+**Características ES6+ Usadas:**
+
+```javascript
+// Arrow functions
+const mapear = tareas.map(t => t.nombre);
+
+// Template literals
+const html = `<div>${nombre}</div>`;
+
+// Destructuring
+const { id, nombre } = tarea;
+
+// Spread operator
+const copia = [...tareas];
+
+// Array methods
+tareas.filter(t => t.estado === 'pendiente');
+```
+
+**Navegadores Soportados:**
+- Chrome/Edge 51+
+- Firefox 54+
+- Safari 10+
+- Opera 38+
+
+**No Soportado:**
+- Internet Explorer (ninguna versión)
+
+### 4. Accesibilidad
+
+#### Implementado
+
+```html
+<!-- Semántica correcta -->
+<header>, <main>, <section>, <article>
+
+<!-- Labels para inputs -->
+<label for="filterEstado">Estado</label>
+<select id="filterEstado">...</select>
+```
+
+#### Pendiente de Mejora
+
+```javascript
+// Navegación por teclado
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.classList.contains('task-card')) {
+        verDetalles(e.target.dataset.tareaId);
+    }
+});
+
+// Atributos ARIA
+<div role="region" aria-label="Lista de tareas">
+    <div role="article" aria-label="Tarea: Lavado de muebles">
+        ...
+    </div>
+</div>
+
+// Anuncios para lectores de pantalla
+<div aria-live="polite" aria-atomic="true">
+    3 tareas pendientes
+</div>
+```
+
+### 5. Manejo de Errores
+
+**Actual:**
+```javascript
+const tarea = tareas.find(t => t.id === tareaId);
+if (!tarea) return;  // Falla silenciosamente
+```
+
+**Mejorado:**
+```javascript
+const tarea = tareas.find(t => t.id === tareaId);
+if (!tarea) {
+    console.error(`Tarea ${tareaId} no encontrada`);
+    mostrarNotificacion('Error: Tarea no encontrada', 'error');
+    return;
+}
+```
+
+**Try-Catch para LocalStorage:**
+```javascript
+function guardarEnLocalStorage(key, data) {
+    try {
+        localStorage.setItem(key, JSON.stringify(data));
+        return true;
+    } catch (error) {
+        if (error.name === 'QuotaExceededError') {
+            mostrarNotificacion('Almacenamiento lleno', 'error');
+        } else {
+            console.error('Error al guardar:', error);
+            mostrarNotificacion('Error al guardar datos', 'error');
+        }
+        return false;
+    }
+}
+```
+
+---
+
+## 🛠️ Guía de Mantenimiento {#mantenimiento}
+
+### 1. Agregar un Nuevo Estado
+
+**Paso 1: Definir el estado**
+```javascript
+const ESTADOS = {
+    PENDIENTE: 'pendiente',
+    EN_PROGRESO: 'en-progreso',
+    PAUSADA: 'pausada',  // NUEVO
+    COMPLETADA: 'completada'
+};
+```
+
+**Paso 2: Actualizar CSS**
+```css
+.task-card.pausada::before {
+    background: linear-gradient(180deg, #95a5a6 0%, #7f8c8d 100%);
+}
+
+.task-status.pausada {
+    background: rgba(149, 165, 166, 0.1);
+    color: #95a5a6;
+    border: 2px solid rgba(149, 165, 166, 0.3);
+}
+```
+
+**Paso 3: Agregar botón**
+```javascript
+${tarea.estado === 'en-progreso' ? `
+    <button onclick="cambiarEstado('${tarea.id}', 'pausada')">
+        ⏸️ Pausar
+    </button>
+` : ''}
+```
+
+### 2. Agregar un Nuevo Filtro
+
+**Paso 1: HTML**
+```html
+<div class="filter-group">
+    <label>Prioridad</label>
+    <select id="filterPrioridad" onchange="filtrarTareas()">
+        <option value="todas">Todas</option>
+        <option value="alta">Alta</option>
+        <option value="normal">Normal</option>
+    </select>
+</div>
+```
+
+**Paso 2: Lógica**
+```javascript
+function filtrarTareas() {
+    const filterPrioridad = document.getElementById('filterPrioridad').value;
+    
+    tareasFiltradas = tareas.filter(tarea => {
+        let cumplePrioridad = filterPrioridad === 'todas' || 
+                             tarea.prioridad === filterPrioridad;
+        return cumpleEstado && cumpleFecha && cumplePrioridad;
+    });
+    
+    renderizarTareas();
+}
+```
+
+### 3. Integrar con API Backend
+
+**Estructura Recomendada:**
+
+```javascript
+// services/tareasAPI.js
+const API_URL = 'https://api.foamwash.com';
+
+async function obtenerTareas(trabajadorId) {
+    try {
+        const response = await fetch(`${API_URL}/tareas?trabajador=${trabajadorId}`, {
+            headers: {
+                'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`
+            }
+        });
+        
+        if (!response.ok) throw new Error('Error al obtener tareas');
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarNotificacion('Error al cargar tareas', 'error');
+        return [];
+    }
+}
+
+async function actualizarEstadoTarea(tareaId, nuevoEstado) {
+    try {
+        const response = await fetch(`${API_URL}/tareas/${tareaId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`
+            },
+            body: JSON.stringify({ estado: nuevoEstado })
+        });
+        
+        if (!response.ok) throw new Error('Error al actualizar');
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarNotificacion('Error al actualizar tarea', 'error');
+        return null;
+    }
+}
+```
+
+**Modificar función cargarTareas:**
+```javascript
+async function cargarTareas() {
+    // Mostrar loading
+    mostrarNotificacion('Cargando tareas...', 'info');
+    
+    // Obtener de API
+    tareas = await obtenerTareas(session.email);
+    tareasFiltradas = [...tareas];
+    
+    // Actualizar UI
+    actualizarEstadisticas();
+    renderizarTareas();
+    
+    mostrarNotificacion('Tareas actualizadas', 'success');
+}
+```
+
+### 4. Debugging y Logs
+
+**Agregar Logging Estructurado:**
+
+```javascript
+const Logger = {
+    debug: (msg, data) => console.log(`[DEBUG] ${msg}`, data),
+    info: (msg, data) => console.info(`[INFO] ${msg}`, data),
+    warn: (msg, data) => console.warn(`[WARN] ${msg}`, data),
+    error: (msg, data) => console.error(`[ERROR] ${msg}`, data)
+};
+
+// Uso
+function cambiarEstado(tareaId, nuevoEstado) {
+    Logger.info(`Cambiando estado de tarea ${tareaId}`, {
+        estadoAnterior: tarea.estado,
+        estadoNuevo: nuevoEstado
+    });
+    
+    // Lógica...
+    
+    Logger.debug('Estado actualizado exitosamente');
+}
+```
+
+### 5. Testing
+
+**Estructura de Pruebas Recomendada:**
+
+```javascript
+// tests/tareas.test.js
+describe('Sistema de Tareas', () => {
+    describe('generarTareasSimuladas()', () => {
+        test('debe generar tareas desde pedidos', () => {
+            // Arrange
+            const pedidosMock = [
+                { id: 'PED-001', servicios: [...], fecha: '2025-11-05' }
+            ];
+            localStorage.setItem('pedidos', JSON.stringify(pedidosMock));
+            
+            // Act
+            const tareas = generarTareasSimuladas();
+            
+            // Assert
+            expect(tareas).toHaveLength(1);
+            expect(tareas[0].id).toBe('PED-001');
+        });
+        
+        test('debe generar ejemplos si no hay pedidos', () => {
+            localStorage.removeItem('pedidos');
+            const tareas = generarTareasSimuladas();
+            expect(tareas).toHaveLength(3);
+        });
+    });
+    
+    describe('cambiarEstado()', () => {
+        test('debe actualizar estado en memoria', () => {
+            const tareaId = 'TAREA-001';
+            cambiarEstado(tareaId, 'en-progreso');
+            
+            const tarea = tareas.find(t => t.id === tareaId);
+            expect(tarea.estado).toBe('en-progreso');
+        });
+        
+        test('debe sincronizar con localStorage', () => {
+            cambiarEstado('TAREA-001', 'completada');
+            
+            const pedidos = JSON.parse(localStorage.getItem('pedidos'));
+            const pedido = pedidos.find(p => p.id === 'TAREA-001');
+            expect(pedido.estado).toBe('completada');
+        });
+    });
+});
+```
+
+### 6. Documentación del Código
+
+**Ejemplo de JSDoc:**
+
+```javascript
+/**
+ * Cambia el estado de una tarea y sincroniza con localStorage
+ * @param {string} tareaId - ID único de la tarea
+ * @param {('pendiente'|'en-progreso'|'completada')} nuevoEstado - Nuevo estado
+ * @

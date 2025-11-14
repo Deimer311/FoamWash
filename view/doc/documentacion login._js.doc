@@ -1,0 +1,355 @@
+# 🗂️ GUÍA DE RUTAS SEGÚN TU ESTRUCTURA
+
+## 📁 Estructura de tu Proyecto
+
+```
+view/
+├── css/
+│   ├── estilos_cotizar.css
+│   ├── estilos_login.css
+│   ├── estilos_servicios_cliente.css
+│   ├── estilos_servicios.css
+│   └── styles.css
+│
+├── img/
+│   ├── fondo.png
+│   ├── logo_empresa.jpg
+│   ├── serv_alfombras.jpg
+│   ├── serv_colchones.jpg
+│   ├── serv_cortinas.jpg
+│   ├── serv_desinfeccion.jpg
+│   ├── serv_lavado_muebles.jpg
+│   └── serv_tapiceria_carro.jpg
+│
+├── js/
+│   ├── cotizar.js
+│   ├── index.js
+│   ├── login.js
+│   ├── servicios_cliente.js
+│   ├── servicios.js
+│   └── sesiones_activas.js
+│
+├── index.html (LOGIN/REGISTRO)
+├── login.html
+├── servicios_cliente.html
+└── servicios.html
+```
+
+---
+
+## 🎯 RUTAS CORRECTAS EN login.js
+
+### 1. Función `logout()`
+
+```javascript
+function logout() {
+    const token = sessionStorage.getItem('authToken');
+    const email = sessionStorage.getItem('userEmail');
+    
+    if (token) {
+        eliminarSesionActiva(token);
+    }
+    
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('userRole');
+    sessionStorage.removeItem('userEmail');
+    
+    console.log('👋 Sesión cerrada:', email);
+    
+    // ✅ CORRECTO - Redirige a index.html en la misma carpeta (view)
+    window.location.href = './index.html';
+}
+```
+
+### 2. Función `protectPage()`
+
+```javascript
+function protectPage(allowedRoles = []) {
+    const session = checkActiveSession();
+    
+    if (!session.isActive) {
+        alert('Debes iniciar sesión para acceder a esta página.');
+        // ✅ CORRECTO - Redirige a index.html en la misma carpeta
+        window.location.href = './index.html';
+        return false;
+    }
+    
+    if (allowedRoles.length > 0 && !allowedRoles.includes(session.role)) {
+        alert('No tienes permisos para acceder a esta página.');
+        // ✅ CORRECTO - Redirige a index.html en la misma carpeta
+        window.location.href = './index.html';
+        return false;
+    }
+    
+    return session;
+}
+```
+
+### 3. Base de Datos `USERS_DB`
+
+```javascript
+const USERS_DB = {
+    "admin@gmail.com": { 
+        password: "123456", 
+        role: "admin", 
+        token: "token-admin-12345", 
+        // Si tienes carpeta admin dentro de view:
+        redirect: "./admin/dashboard.html"
+        // Si NO tienes carpeta admin, crear una página en view:
+        // redirect: "./admin_dashboard.html"
+    },
+    "trabajador@gmail.com": { 
+        password: "123456", 
+        role: "trabajador", 
+        token: "token-trabajador-67890", 
+        // Si tienes carpeta trabajador dentro de view:
+        redirect: "./trabajador/tareas.html"
+        // Si NO, crear en view:
+        // redirect: "./trabajador_tareas.html"
+    },
+    "cliente@gmail.com": { 
+        password: "123456", 
+        role: "cliente", 
+        token: "token-cliente-abcde", 
+        // ✅ CORRECTO - servicios_cliente.html está en view
+        redirect: "./servicios_cliente.html" 
+    }
+};
+```
+
+---
+
+## 📝 RUTAS EN servicios_cliente.html
+
+Tu `servicios_cliente.html` está en la carpeta `view/`, así que:
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servicios - FoamWash</title>
+    
+    <!-- ✅ CSS en subcarpeta css/ -->
+    <link rel="stylesheet" href="./css/estilos_servicios_cliente.css">
+</head>
+<body>
+    <!-- Tu contenido aquí -->
+    
+    <!-- ✅ Scripts en subcarpeta js/ -->
+    <script src="./js/login.js"></script>
+    <script src="./js/sesiones_activas.js"></script>
+    
+    <script>
+        // Protección de página
+        const session = protectPage(['cliente']);
+        
+        if (session && session.email) {
+            document.getElementById('userEmail').textContent = `👤 ${session.email}`;
+        }
+        
+        function cerrarSesionCliente(e) {
+            e.preventDefault();
+            if (confirm('¿Deseas cerrar sesión?')) {
+                if (typeof mostrarNotificacion === 'function') {
+                    mostrarNotificacion('Cerrando sesión...');
+                }
+                setTimeout(() => logout(), 1000);
+            }
+        }
+    </script>
+    
+    <script src="./js/servicios_cliente.js"></script>
+</body>
+</html>
+```
+
+---
+
+## 🖼️ RUTAS DE IMÁGENES
+
+En `servicios_cliente.html`, las imágenes deben apuntar a:
+
+```html
+<!-- ✅ CORRECTO - Imágenes en subcarpeta img/ -->
+<img src="./img/serv_lavado_muebles.jpg" alt="Lavado de muebles">
+<img src="./img/serv_alfombras.jpg" alt="Lavado de alfombras">
+<img src="./img/serv_tapiceria_carro.jpg" alt="Tapicería de carros">
+<img src="./img/serv_cortinas.jpg" alt="Lavado de cortinas">
+<img src="./img/serv_colchones.jpg" alt="Lavado de colchones">
+<img src="./img/serv_desinfeccion.jpg" alt="Desinfección">
+```
+
+---
+
+## 🎨 RUTAS DE CSS
+
+En todos tus archivos HTML dentro de `view/`:
+
+```html
+<!-- index.html o login.html -->
+<link rel="stylesheet" href="./css/estilos_login.css">
+
+<!-- servicios_cliente.html -->
+<link rel="stylesheet" href="./css/estilos_servicios_cliente.css">
+
+<!-- servicios.html -->
+<link rel="stylesheet" href="./css/estilos_servicios.css">
+
+<!-- cotizar.html (si existe) -->
+<link rel="stylesheet" href="./css/estilos_cotizar.css">
+```
+
+---
+
+## 💻 RUTAS DE SCRIPTS
+
+En todos tus archivos HTML dentro de `view/`:
+
+```html
+<!-- Scripts de autenticación (en páginas protegidas) -->
+<script src="./js/login.js"></script>
+<script src="./js/sesiones_activas.js"></script>
+
+<!-- Scripts específicos según la página -->
+<script src="./js/servicios_cliente.js"></script>
+<script src="./js/servicios.js"></script>
+<script src="./js/cotizar.js"></script>
+<script src="./js/index.js"></script>
+```
+
+---
+
+## 🔄 TABLA RESUMEN DE RUTAS
+
+| Desde | Hacia | Ruta Correcta |
+|-------|-------|---------------|
+| `servicios_cliente.html` | `index.html` (login) | `./index.html` |
+| `servicios_cliente.html` | CSS | `./css/estilos_servicios_cliente.css` |
+| `servicios_cliente.html` | JS | `./js/servicios_cliente.js` |
+| `servicios_cliente.html` | Imágenes | `./img/nombre_imagen.jpg` |
+| `index.html` | `servicios_cliente.html` | `./servicios_cliente.html` |
+| Cualquier HTML | Cerrar sesión | `./index.html` |
+
+---
+
+## ✅ VERIFICACIÓN RÁPIDA
+
+### Checklist de Rutas:
+
+- [ ] `logout()` redirige a `./index.html` ✅
+- [ ] `protectPage()` redirige a `./index.html` ✅
+- [ ] CSS carga desde `./css/` ✅
+- [ ] JS carga desde `./js/` ✅
+- [ ] Imágenes cargan desde `./img/` ✅
+- [ ] Login redirige a `./servicios_cliente.html` ✅
+
+---
+
+## 🚨 ERRORES COMUNES A EVITAR
+
+❌ **INCORRECTO:**
+```javascript
+window.location.href = '../index.html';  // NO - Busca en carpeta padre
+window.location.href = '/index.html';     // NO - Busca en raíz del servidor
+window.location.href = 'index.html';      // FUNCIONA pero mejor usar ./
+```
+
+✅ **CORRECTO:**
+```javascript
+window.location.href = './index.html';    // SÍ - Carpeta actual (view/)
+```
+
+---
+
+## 📂 SI TIENES SUBCARPETAS (Admin/Trabajador)
+
+Si creas carpetas `admin/` y `trabajador/` dentro de `view/`:
+
+```
+view/
+├── admin/
+│   └── dashboard.html
+├── trabajador/
+│   └── tareas.html
+├── css/
+├── img/
+├── js/
+├── index.html
+├── servicios_cliente.html
+└── ...
+```
+
+Entonces en `admin/dashboard.html`:
+
+```html
+<!-- admin/dashboard.html -->
+<head>
+    <!-- ❌ INCORRECTO -->
+    <link rel="stylesheet" href="./css/estilos_admin.css">
+    
+    <!-- ✅ CORRECTO -->
+    <link rel="stylesheet" href="../css/estilos_admin.css">
+</head>
+<body>
+    <!-- Scripts -->
+    <script src="../js/login.js"></script>
+    <script src="../js/sesiones_activas.js"></script>
+    
+    <script>
+        // Proteger página de admin
+        const session = protectPage(['admin']);
+        
+        // Cerrar sesión debe volver a view/index.html
+        function cerrarSesionAdmin() {
+            if (confirm('¿Cerrar sesión?')) {
+                // Modificar temporalmente la ruta
+                sessionStorage.setItem('logoutRedirect', '../index.html');
+                logout();
+            }
+        }
+    </script>
+</body>
+```
+
+Y modificar `logout()` para soportar subcarpetas:
+
+```javascript
+function logout() {
+    const token = sessionStorage.getItem('authToken');
+    const email = sessionStorage.getItem('userEmail');
+    
+    if (token) {
+        eliminarSesionActiva(token);
+    }
+    
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('userRole');
+    sessionStorage.removeItem('userEmail');
+    
+    // Verificar si hay una ruta personalizada
+    const customRedirect = sessionStorage.getItem('logoutRedirect');
+    sessionStorage.removeItem('logoutRedirect');
+    
+    console.log('👋 Sesión cerrada:', email);
+    
+    // Redirigir
+    window.location.href = customRedirect || './index.html';
+}
+```
+
+---
+
+## 🎉 RESUMEN
+
+Para tu estructura actual donde **todo está en `view/`**:
+
+1. ✅ Usa `./` para archivos en la misma carpeta
+2. ✅ Usa `./css/` para archivos en subcarpeta css
+3. ✅ Usa `./js/` para archivos en subcarpeta js
+4. ✅ Usa `./img/` para archivos en subcarpeta img
+5. ✅ `logout()` redirige a `./index.html`
+6. ✅ `protectPage()` redirige a `./index.html`
+
+**¡Todo listo!** 🚀

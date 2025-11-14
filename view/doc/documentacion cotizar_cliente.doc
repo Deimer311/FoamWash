@@ -1,0 +1,1899 @@
+📘 Documentación Técnica - Sistema de Cotización FoamWash
+📋 Índice
+1.	Descripción General
+2.	Estructura del Proyecto
+3.	Flujo de la Aplicación
+4.	Documentación CSS
+5.	Documentación JavaScript
+6.	Documentación HTML
+7.	Sistema de Autenticación
+8.	Guía de Modificación
+9.	Solución de Problemas
+________________________________________
+🎯 Descripción General
+Propósito
+Sistema web para que clientes registrados de FoamWash puedan:
+•	Cotizar servicios de limpieza y lavado
+•	Agendar servicios después de cotizar
+•	Gestionar su carrito de servicios
+•	Ver resumen de cotizaciones y pedidos
+Características Principales
+✅ Sistema de cotización paso a paso ✅ Carrito de compras interactivo ✅ Validación de formularios ✅ Notificaciones visuales ✅ Almacenamiento local (localStorage) ✅ Diseño responsive (móvil, tablet, escritorio) ✅ Protección por autenticación
+________________________________________
+📁 Estructura del Proyecto
+proyecto/
+│
+├── html/
+│   └── cotizar_cliente.html          # Página principal
+│
+├── css/
+│   └── estilos_cotizar_cliente.css   # Estilos completos
+│
+├── js/
+│   ├── cotizar_cliente.js            # Lógica de cotización
+│   ├── login.js                      # Sistema de autenticación
+│   └── sesiones_activas.js           # Manejo de sesiones
+│
+└── img/
+    ├── serv_lavado_muebles.jpg
+    ├── serv_alfombras.jpg
+    ├── serv_tapiceria_carro.jpg
+    ├── serv_cortinas.jpg
+    ├── serv_colchones.jpg
+    └── serv_desinfeccion.jpg
+________________________________________
+🔄 Flujo de la Aplicación
+Diagrama de Flujo
+┌─────────────────────┐
+│ 1. LOGIN/REGISTRO   │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ 2. PÁGINA SERVICIOS │ ← Usuario ve catálogo
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ 3. AGREGAR CARRITO  │ ← Clic en "Agregar"
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ 4. VER CARRITO      │ ← Clic en botón flotante
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ 5. GENERAR          │ ← Completa detalles:
+│    COTIZACIÓN       │   - Tamaño
+└──────────┬──────────┘   - Tipo lavado
+           │               - Cantidad
+           ▼
+┌─────────────────────┐
+│ 6. VER COTIZACIÓN   │ ← Muestra total
+└──────────┬──────────┘
+           │
+       ┌───┴───┐
+       ▼       ▼
+  ┌─────┐   ┌──────────┐
+  │ 7A. │   │ 7B.      │
+  │ MÁS │   │ AGENDAR  │
+  └─────┘   └────┬─────┘
+               │
+               ▼
+        ┌─────────────┐
+        │ 8. LLENAR   │ ← Formulario:
+        │ FORMULARIO  │   - Dirección
+        └──────┬──────┘   - Fecha/Hora
+               │           - Teléfono
+               ▼
+        ┌─────────────┐
+        │ 9. CONFIRMAR│ ← Guarda en localStorage
+        │    PEDIDO   │
+        └─────────────┘
+________________________________________
+🎨 Documentación CSS
+Archivo: estilos_cotizar_cliente.css
+Secciones Principales
+1. RESET Y BASE (Líneas 1-10)
+* { margin: 0; padding: 0; box-sizing: border-box; }
+Propósito: Elimina estilos por defecto del navegador
+2. HEADER (Líneas 12-100)
+.header-banner { ... }
+.logo-header { ... }
+.nav-bar { ... }
+Componentes:
+•	Banner superior con gradiente morado
+•	Logo "FoamWash"
+•	Barra de navegación
+•	Botón de cerrar sesión
+Modificar colores:
+•	Fondo: Línea 17 background: linear-gradient(...)
+•	Logo: Línea 39 color: white
+•	Links: Línea 54 color: white
+3. BUSCADOR (Líneas 102-150)
+.search-section { ... }
+.search-input { ... }
+Elementos:
+•	Input de búsqueda centrado
+•	Botón de búsqueda
+•	Efecto de foco (borde azul)
+4. TARJETAS DE SERVICIOS (Líneas 152-280)
+.service-card { ... }
+.service-image { ... }
+.service-btn { ... }
+Grid responsive:
+•	Desktop: 3 columnas
+•	Tablet: 2 columnas
+•	Móvil: 1 columna
+Animaciones:
+•	Hover: Tarjeta sube 10px
+•	Imagen: Zoom 1.1x
+5. CARRITO FLOTANTE (Líneas 282-400)
+.btn-carrito-flotante { ... }
+Animaciones:
+•	float: Movimiento arriba/abajo
+•	pulse-ring: Anillo pulsante
+•	shine: Brillo deslizante
+Modificar posición:
+•	Derecha: Línea 285 right: 40px
+•	Abajo: Línea 286 bottom: 40px
+6. MODALES (Líneas 402-650)
+.modal-overlay { ... }
+.modal-content { ... }
+Estructura:
+•	Overlay oscuro con blur
+•	Contenido centrado
+•	Header con gradiente
+•	Body con scroll
+•	Footer con botones
+7. CARRITO DE SERVICIOS (Líneas 652-800)
+.carrito-item { ... }
+.cantidad-control { ... }
+Elementos:
+•	Items del carrito
+•	Controles de cantidad (+/-)
+•	Botón eliminar
+•	Total con gradiente
+⚠️ CAMBIO IMPORTANTE: Línea 752
+color: rgb(0, 0, 0); /* NEGRO para visibilidad */
+8. FORMULARIOS (Líneas 802-950)
+.form-group { ... }
+.servicio-detalle { ... }
+Inputs:
+•	Padding: 14px
+•	Border: 2px solid
+•	Focus: Sombra azul
+9. CONFIRMACIÓN (Líneas 952-1050)
+.confirmacion-exitosa { ... }
+.icono-exito { ... }
+Gradiente verde: Éxito de operación
+10. BOTONES (Líneas 1052-1200)
+Tipos de botones:
+Clase	Color	Uso
+.btn-primary	Morado	Acción principal
+.btn-confirmar	Verde	Confirmar pedido
+.btn-cancelar	Rosa/Morado	Seguir cotizando
+.btn-secondary	Blanco/Morado	Cancelar
+Efectos:
+•	Hover: Sube 3px
+•	Shadow: Aumenta
+•	Animación: Flecha aparece (confirmar)
+11. NOTIFICACIONES (Líneas 1202-1250)
+.notificacion { ... }
+Comportamiento:
+•	Aparece desde derecha
+•	Desaparece en 3 segundos
+•	Ícono verde de check
+12. RESPONSIVE (Líneas 1252-1350)
+Breakpoints:
+@media (max-width: 1024px) { ... } /* Tablets */
+@media (max-width: 768px) { ... }  /* Móviles */
+Cambios en móvil:
+•	Grid: 1 columna
+•	Botones: 100% ancho
+•	Header: Más compacto
+•	Notificaciones: Full width
+________________________________________
+💻 Documentación JavaScript
+Archivo: cotizar_cliente.js
+Variables Globales
+// Líneas 1-40
+const SERVICIOS = [...]      // Array de servicios disponibles
+let carrito = []             // Array de servicios en carrito
+let cotizacionesGuardadas = [] // Array de cotizaciones generadas
+Funciones Principales
+1. Gestión del Carrito
+agregarAlCarrito(servicioId) - Línea 42
+// ¿Qué hace?
+// 1. Busca el servicio por ID
+// 2. Verifica si ya existe en carrito
+// 3. Aumenta cantidad o agrega nuevo
+// 4. Actualiza UI
+// 5. Muestra notificación
+
+// Uso:
+onclick="agregarAlCarrito(1)"
+eliminarDelCarrito(servicioId) - Línea 62
+// ¿Qué hace?
+// 1. Filtra el servicio del array
+// 2. Actualiza UI
+// 3. Muestra notificación
+
+// Uso:
+onclick="eliminarDelCarrito(1)"
+actualizarCantidad(servicioId, nuevaCantidad) - Línea 68
+// ¿Qué hace?
+// 1. Encuentra el item
+// 2. Actualiza su cantidad
+// 3. Si cantidad = 0, elimina
+// 4. Actualiza UI
+
+// Uso:
+onchange="actualizarCantidad(1, 3)"
+2. Cálculos
+calcularTotal() - Línea 82
+// Retorna: Número (suma total)
+// Fórmula: Σ(precio × cantidad)
+return carrito.reduce((total, item) => 
+    total + (item.precio * item.cantidad), 0);
+3. Actualización de UI
+actualizarCarrito() - Línea 86
+// ¿Qué hace?
+// 1. Cuenta items totales
+// 2. Actualiza badge del botón flotante
+// 3. Llama a actualizarModalCarrito()
+actualizarModalCarrito() - Línea 98
+// ¿Qué hace?
+// 1. Verifica si carrito vacío → muestra mensaje
+// 2. Genera HTML de cada item
+// 3. Muestra total formateado
+4. Modales
+abrirModalCarrito() - Línea 136
+// Agrega clase 'show' al modal
+document.getElementById('modalCarrito').classList.add('show');
+cerrarModalCarrito() - Línea 141
+// Remueve clase 'show' del modal
+document.getElementById('modalCarrito').classList.remove('show');
+5. Proceso de Cotización
+finalizarCompra() - Línea 146
+// ¿Qué hace?
+// 1. Valida que carrito no esté vacío
+// 2. Cierra modal carrito
+// 3. Abre modal cotización
+abrirModalCotizacion() - Línea 156
+// ¿Qué hace?
+// 1. Genera formulario para cada servicio:
+//    - Select de tamaño
+//    - Input de cantidad
+//    - Select de tipo de lavado
+// 2. Muestra botón "Generar Cotización"
+generarCotizacion() - Línea 217
+// ¿Qué hace?
+// 1. Valida que todos los detalles estén completos
+// 2. Crea objeto cotización con:
+//    - ID único (COT-timestamp)
+//    - Servicios con detalles
+//    - Total
+//    - Fecha de creación
+// 3. Guarda en array
+// 4. Muestra resultado
+mostrarResultadoCotizacion(cotizacion) - Línea 238
+// ¿Qué hace?
+// 1. Muestra código de cotización
+// 2. Lista servicios cotizados
+// 3. Muestra total
+// 4. Presenta 2 botones:
+//    a) Seguir Cotizando
+//    b) Realizar Agendación
+6. Opciones Post-Cotización
+seguirCotizando() - Línea 277
+// ¿Qué hace?
+// 1. Limpia carrito actual
+// 2. Mantiene cotizaciones guardadas
+// 3. Cierra modal
+// 4. Usuario puede agregar más servicios
+realizarAgendacion() - Línea 284
+// ¿Qué hace?
+// 1. Oculta cotización
+// 2. Muestra formulario con:
+//    - Dirección
+//    - Ciudad
+//    - Teléfono
+//    - Fecha (mínimo mañana)
+//    - Hora (horarios predefinidos)
+//    - Observaciones
+// 3. Actualiza botón a "Confirmar Pedido"
+7. Confirmación de Pedido
+confirmarPedido() - Línea 341
+// ¿Qué hace?
+// 1. Valida formulario
+// 2. Obtiene última cotización
+// 3. Crea objeto pedido:
+//    - ID único (PED-timestamp)
+//    - ID de cotización vinculada
+//    - Datos de entrega
+//    - Estado: "Pendiente"
+// 4. Guarda en localStorage
+// 5. Muestra confirmación
+Estructura del pedido guardado:
+{
+    id: "PED-1699123456789",
+    cotizacionId: "COT-1699123400000",
+    servicios: [...],
+    direccion: "Calle 123 #45-67",
+    ciudad: "Bogotá",
+    telefono: "3001234567",
+    fecha: "2024-01-15",
+    hora: "10:00",
+    observaciones: "...",
+    total: 270000,
+    estado: "Pendiente",
+    fechaCreacion: "2024-01-10T10:30:00.000Z"
+}
+8. Utilidades
+formatearFecha(fecha) - Línea 384
+// Entrada: "2024-01-15"
+// Salida: "lunes, 15 de enero de 2024"
+actualizarDetalleServicio(servicioId, campo, valor) - Línea 195
+// Actualiza propiedades del servicio en carrito
+// Campos: 'tamano', 'tipoLavado'
+configurarBusqueda() - Línea 407
+// Configura event listener para buscar servicios
+filtrarServicios(termino) - Línea 416
+// Filtra tarjetas por título o descripción
+mostrarNotificacion(mensaje) - Línea 432
+// Muestra notificación temporal (3 seg)
+9. Event Listeners
+// Línea 467: Click fuera del modal cierra
+window.addEventListener('click', (e) => { ... })
+
+// Línea 481: Inicialización al cargar página
+document.addEventListener('DOMContentLoaded', () => { ... })
+________________________________________
+🌐 Documentación HTML
+Archivo: cotizar_cliente.html
+Estructura General
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Meta tags y título -->
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <!-- 1. Header -->
+    <!-- 2. Buscador -->
+    <!-- 3. Grid de servicios -->
+    <!-- 4. Botón flotante -->
+    <!-- 5. Modal carrito -->
+    <!-- 6. Modal confirmación -->
+    <!-- 7. Scripts -->
+</body>
+</html>
+Secciones Detalladas
+1. Header (Líneas 14-26)
+<header class="header-banner">
+    <h1 class="logo-header">FoamWash</h1>
+    <nav class="nav-bar">
+        <a href="#" class="nav-link">Hogar</a>
+        <a href="./cotizar_cliente.html">Cotización</a>
+        <a href="#" class="nav-link">Agendar</a>
+        <span id="userEmail">👤 Usuario</span>
+        <a href="#" onclick="cerrarSesionCliente(event)">
+            🚪 Cerrar Sesión
+        </a>
+    </nav>
+</header>
+IDs importantes:
+•	userEmail: Se actualiza con email del usuario
+2. Buscador (Líneas 28-35)
+<section class="search-section">
+    <input type="text" 
+           id="searchInput" 
+           placeholder="Buscar servicios...">
+    <button class="search-button">🔍</button>
+</section>
+3. Grid de Servicios (Líneas 37-120)
+<section class="services-section">
+    <h2>Nuestros Servicios</h2>
+    <div class="services-grid">
+        <!-- 6 tarjetas de servicio -->
+        <article class="service-card">
+            <div class="service-image">
+                <img src="..." alt="...">
+            </div>
+            <div class="service-content">
+                <h3 class="service-title">...</h3>
+                <p class="service-desc">...</p>
+                <span class="service-price">$90.000</span>
+                <button onclick="agregarAlCarrito(1)">
+                    🛒 Agregar
+                </button>
+            </div>
+        </article>
+    </div>
+</section>
+Modificar servicios:
+•	Cambiar precio en <span class="service-price">
+•	Cambiar ID en onclick="agregarAlCarrito(X)"
+•	También actualizar array SERVICIOS en JS
+4. Botón Flotante (Líneas 122-126)
+<button class="btn-carrito-flotante" 
+        onclick="abrirModalCarrito()">
+    <span class="carrito-icono">🛒</span>
+    <span id="carritoBadge">0</span>
+</button>
+IDs importantes:
+•	carritoBadge: Muestra cantidad de items
+5. Modal Carrito (Líneas 128-150)
+<div class="modal-overlay" id="modalCarrito">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>🛒 Carrito de Servicios</h2>
+            <button onclick="cerrarModalCarrito()">×</button>
+        </div>
+        <div class="modal-body">
+            <div id="carritoItems"></div>
+            <div class="carrito-total">
+                <h3>Total: <span id="carritoTotal">$0</span></h3>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="cerrarModalCarrito()">
+                Seguir Cotizando
+            </button>
+            <button onclick="finalizarCompra()">
+                Ver Cotización Final
+            </button>
+        </div>
+    </div>
+</div>
+IDs importantes:
+•	modalCarrito: Contenedor principal
+•	carritoItems: Se llena dinámicamente con JS
+•	carritoTotal: Se actualiza con total
+6. Modal Confirmación (Líneas 152-220)
+<div class="modal-overlay" id="modalConfirmacion">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>📋 Confirmar Pedido</h2>
+            <button onclick="cerrarModalConfirmacion()">×</button>
+        </div>
+        <div class="modal-body">
+            <!-- Área de servicios a cotizar -->
+            <div id="serviciosConfirmacion"></div>
+            
+            <!-- Formulario de agendación -->
+            <form id="formConfirmacion">
+                <input type="text" id="direccion">
+                <input type="text" id="ciudad">
+                <input type="tel" id="telefono">
+                <input type="date" id="fecha">
+                <select id="hora">...</select>
+                <textarea id="observaciones"></textarea>
+                
+                <!-- Resumen -->
+                <div class="resumen-pedido">
+                    <div id="resumenPedido"></div>
+                    <div id="totalFinal">$0</div>
+                </div>
+            </form>
+            
+            <!-- Mensaje de confirmación -->
+            <div id="mensajeConfirmacion"></div>
+        </div>
+        <div class="modal-footer" id="modalFooterConfirm">
+            <!-- Botones dinámicos -->
+        </div>
+    </div>
+</div>
+IDs dinámicos (cambian según etapa):
+•	serviciosConfirmacion: Detalles o formulario
+•	mensajeConfirmacion: Confirmación final
+•	modalFooterConfirm: Botones cambian
+7. Scripts (Líneas 225-270)
+Orden de carga (CRÍTICO):
+<!-- 1. Sistema de login -->
+<script src="./js/login.js"></script>
+
+<!-- 2. Sistema de sesiones -->
+<script src="./js/sesiones_activas.js"></script>
+
+<!-- 3. Protección de página -->
+<script>
+    const session = protectPage(['cliente']);
+    // Verifica que usuario esté logueado
+    // Redirige a login si no está autenticado
+</script>
+
+<!-- 4. Funcionalidad -->
+<script src="./js/cotizar_cliente.js"></script>
+⚠️ NO cambiar el orden - rompe autenticación
+________________________________________
+🔐 Sistema de Autenticación
+Archivos Involucrados
+•	login.js: Funciones de login/logout
+•	sesiones_activas.js: Gestión de sesiones
+•	cotizar_cliente.html: Script de protección
+Flujo de Autenticación
+Usuario → Login → Genera Token → Crea Sesión → Accede
+                        ↓
+                  (localStorage)
+                        ↓
+              session = {
+                  email: "...",
+                  role: "cliente",
+                  token: "...",
+                  timestamp: ...
+              }
+Funciones Clave
+protectPage(['cliente'])
+// ¿Qué hace?
+// 1. Lee sesión de localStorage
+// 2. Verifica rol permitido
+// 3. Si no coincide → redirige a login
+// 4. Retorna objeto session si OK
+logout()
+// ¿Qué hace?
+// 1. Elimina sesión de localStorage
+// 2. Redirige a login.html
+Objeto Session
+{
+    email: "cliente@ejemplo.com",
+    role: "cliente",
+    token: "abcd1234",
+    timestamp: 1699123456789,
+    loginTime: "2024-01-10T10:30:00"
+}
+________________________________________
+🛠️ Guía de Modificación
+Cambios Comunes
+1. Agregar Nuevo Servicio
+Paso 1: Actualizar SERVICIOS en cotizar_cliente.js
+{
+    id: 7,  // Nuevo ID único
+    nombre: "Limpieza de persianas",
+    precio: 60000,
+    imagen: "URL_IMAGEN",
+    duracion: "1-2 horas",
+    tamanos: ["Pequeña", "Mediana", "Grande"],
+    tiposLavado: ["Básico", "Profundo"]
+}
+Paso 2: Agregar tarjeta en HTML
+<article class="service-card">
+    <div class="service-image">
+        <img src="./img/persianas.jpg" alt="Persianas">
+    </div>
+    <div class="service-content">
+        <h3 class="service-title">Limpieza de persianas</h3>
+        <p class="service-desc">...</p>
+        <span class="service-price">$60.000</span>
+        <button onclick="agregarAlCarrito(7)">🛒 Agregar</button>
+    </div>
+</article>
+2. Cambiar Colores del Tema
+Header (Gradiente morado):
+/* Línea 17 en CSS */
+background: linear-gradient(
+    135deg, 
+    rgba(70, 70, 130, 0.95),  /* Cambiar aquí */
+    rgba(100, 80, 150, 0.95)  /* Y aquí */
+);
+Botón flotante:
+/* Línea 283 en CSS */
+background: linear-gradient(
+    135deg, 
+    #667eea 0%,  /* Cambiar aquí */
+    #764ba2 100% /* Y aquí */
+);
+Botón confirmar:
+/* Línea 1090 en CSS */
+background: linear-gradient(
+    135deg, 
+    #11998e 0%,  /* Verde actual */
+    #38ef7d 100%
+);
+3. Cambiar Horarios Disponibles
+En HTML (Línea 190):
+<select id="hora">
+    <option value="07:00">07:00 AM</option>  <!-- Nuevo -->
+    <option value="08:00">08:00 AM</option>
+    <!-- ... más opciones ... -->
+    <option value="18:00">06:00 PM</option>  <!-- Nuevo -->
+</select>
+4. Cambiar Validez de Cotización
+En JS (Línea 260):
+<p style="margin: 0; font-size: 14px;">
+    ✨ Esta cotización es válida por 30 días  <!-- Cambiar aquí -->
+</p>
+5. Modificar Tiempo de Notificación
+En JS (Línea 448):
+setTimeout(() => {
+    notificacion.classList.remove('show');
+    setTimeout(() => notificacion.remove(), 400);
+}, 5000);  // Cambiar de 3000 a 5000 (5 segundos)
+6. Añadir Campo al Formulario
+Paso 1: Agregar en HTML (después línea 180):
+<div class="form-group">
+    <label for="barrio">Barrio *</label>
+    <input type="text" 
+           id="barrio" 
+           placeholder="Ej: Chapinero" 
+           required>
+</div>
+Paso 2: Capturar en JS (línea 354):
+const pedido = {
+    // ... otros campos ...
+    barrio: document.getElementById('barrio').value,  // Nuevo
+    // ... resto ...
+};
+7. Cambiar Formato de Moneda
+En JS (todas las instancias de toLocaleString):
+// Actual (Colombia):
+precio.toLocaleString('es-CO')  // 90.000
+
+// Cambiar a México:
+precio.toLocaleString('es-MX')  // 90,000
+
+// Cambiar a USA:
+precio.toLocaleString('en-US')  // 90,000
+________________________________________
+🐛 Solución de Problemas
+Problema 1: "No se ven los textos en el carrito"
+Causa: Color de texto igual al fondo
+Solución: En CSS (líneas 698-710)
+.carrito-item-info h4 {
+    color: #000000;  /* Asegurar negro */
+}
+
+.carrito-item-duracion {
+    color: #333;  /* Gris oscuro */
+}
+Problema 2: "El carrito no suma correctamente"
+Causa: Tipos de datos incorrectos
+Solución: En JS, verificar:
+// Asegurar que sean números
+item.cantidad = parseInt(item.cantidad);
+item.precio = parseFloat(item.precio);
+
+Problema 3: "La cotización no se guarda"
+Causa: localStorage lleno o bloqueado
+Solución: En JS (después línea 361):
+try {
+    localStorage.setItem('pedidos', JSON.stringify(pedidos));
+} catch (e) {
+    if (e.name === 'QuotaExceededError') {
+        alert('Almacenamiento lleno. Borra datos antiguos.');
+    }
+}
+
+
+Problema 4: "Los modales no se abren"
+Causa: Conflicto de IDs o clase 'show' no aplicada
+Solución: Verificar en HTML:
+<!-- IDs deben ser únicos -->
+<div class="modal-overlay" id="modalCarrito">...</div>
+<div class="modal-overlay" id="modalConfirmacion">...</div>
+En CSS verificar:
+.modal-overlay.show {
+    display: flex;  /* Debe estar presente */
+}
+Problema 5: "El badge del carrito no actualiza"
+Causa: ID incorrecto o función no llamada
+Solución: En HTML verificar:
+<span id="carritoBadge" class="carrito-badge-flotante">0</span>
+En JS verificar (línea 88):
+const badge = document.getElementById('carritoBadge');
+if (badge) {
+    badge.textContent = totalItems;
+    badge.style.display = totalItems > 0 ? 'flex' : 'none';
+}
+Problema 6: "Error de autenticación"
+Causa: Scripts cargados en orden incorrecto
+Solución: En HTML, verificar orden:
+<!-- DEBE SER ESTE ORDEN: -->
+<script src="./js/login.js"></script>
+<script src="./js/sesiones_activas.js"></script>
+<script>
+    const session = protectPage(['cliente']);
+</script>
+<script src="./js/cotizar_cliente.js"></script>
+Problema 7: "Fecha mínima no funciona"
+Causa: Formato de fecha incorrecto
+Solución: En JS (línea 293):
+const hoy = new Date();
+const manana = new Date(hoy);
+manana.setDate(manana.getDate() + 1);
+// Formato ISO correcto: YYYY-MM-DD
+fechaInput.min = manana.toISOString().split('T')[0];
+Problema 8: "Notificaciones no desaparecen"
+Causa: Elemento no se elimina del DOM
+Solución: En JS (línea 444):
+setTimeout(() => {
+    notificacion.classList.remove('show');
+    setTimeout(() => {
+        if (notificacion && notificacion.parentNode) {
+            notificacion.remove();
+        }
+    }, 400);
+}, 3000);
+Problema 9: "Grid no es responsive"
+Causa: Falta media queries o unidades incorrectas
+Solución: En CSS verificar (línea 168):
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    /* minmax es clave para responsive */
+}
+
+@media (max-width: 768px) {
+    .services-grid {
+        grid-template-columns: 1fr; /* 1 columna en móvil */
+    }
+}
+Problema 10: "localStorage no persiste"
+Causa: Modo incógnito o localStorage deshabilitado
+Solución: Detectar y notificar al usuario:
+function verificarLocalStorage() {
+    try {
+        const test = 'test';
+        localStorage.setItem(test, test);
+        localStorage.removeItem(test);
+        return true;
+    } catch(e) {
+        alert('El navegador tiene localStorage deshabilitado');
+        return false;
+    }
+}
+
+// Llamar al inicio
+if (!verificarLocalStorage()) {
+    // Usar memoria alternativa
+}
+________________________________________
+📱 Responsive Design
+Breakpoints Definidos
+/* DESKTOP: > 1024px */
+- Grid: 3 columnas
+- Header: Navegación horizontal completa
+- Modales: Ancho máximo 650px
+
+/* TABLET: 768px - 1024px */
+@media (max-width: 1024px) {
+    - Grid: 2 columnas
+    - Gap reducido: 30px
+    - Nav: Espaciado reducido
+}
+
+/* MÓVIL: < 768px */
+@media (max-width: 768px) {
+    - Grid: 1 columna
+    - Header: Comprimido
+    - Botones: 100% ancho
+    - Modal: 95% ancho
+    - Notificaciones: Full width
+}
+Elementos Responsive Clave
+1. Grid de Servicios
+/* AUTO-RESPONSIVE con auto-fit */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 40px;
+}
+
+/* En móvil fuerza 1 columna */
+@media (max-width: 768px) {
+    .services-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 0 10px;
+    }
+}
+2. Header y Navegación
+/* Desktop */
+.nav-bar {
+    gap: 80px;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .nav-bar {
+        gap: 40px;
+    }
+}
+
+/* Móvil */
+@media (max-width: 768px) {
+    .header-banner {
+        height: auto;
+        padding: 20px 10px;
+    }
+    
+    .nav-bar {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+    
+    .nav-link {
+        font-size: 16px;
+    }
+}
+3. Modales
+/* Desktop */
+.modal-content {
+    width: 90%;
+    max-width: 650px;
+}
+
+/* Móvil */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        max-width: none;
+        max-height: 95vh;
+    }
+    
+    .modal-header h2 {
+        font-size: 20px;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+}
+4. Botones
+/* Desktop */
+.btn-primary, .btn-confirmar {
+    padding: 14px 35px;
+    min-width: auto;
+}
+
+/* Móvil */
+@media (max-width: 768px) {
+    .modal-footer {
+        flex-direction: column;
+    }
+    
+    .btn-primary,
+    .btn-secondary,
+    .btn-confirmar,
+    .btn-cancelar {
+        width: 100%;
+        padding: 16px 20px;
+    }
+}
+5. Carrito Items
+/* Desktop */
+.carrito-item {
+    display: flex;
+    flex-direction: row;
+}
+
+/* Móvil */
+@media (max-width: 768px) {
+    .carrito-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .carrito-item-img {
+        width: 100%;
+        height: 150px;
+        margin: 0 auto 15px;
+    }
+    
+    .carrito-item-actions {
+        flex-direction: row;
+        justify-content: center;
+        gap: 20px;
+    }
+}
+6. Formularios
+/* Desktop */
+.form-group input,
+.form-group select {
+    font-size: 15px;
+}
+
+/* Móvil */
+@media (max-width: 768px) {
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-group input,
+    .form-group select {
+        font-size: 16px; /* Evita zoom en iOS */
+        padding: 16px;
+    }
+}
+7. Notificaciones
+/* Desktop */
+.notificacion {
+    right: 20px;
+    left: auto;
+    min-width: 320px;
+}
+
+/* Móvil */
+@media (max-width: 768px) {
+    .notificacion {
+        right: 10px;
+        left: 10px;
+        min-width: auto;
+        width: calc(100% - 20px);
+    }
+}
+8. Botón Flotante del Carrito
+/* Desktop */
+.btn-carrito-flotante {
+    bottom: 40px;
+    right: 40px;
+    width: 80px;
+    height: 80px;
+}
+
+/* Móvil */
+@media (max-width: 768px) {
+    .btn-carrito-flotante {
+        bottom: 20px;
+        right: 20px;
+        width: 65px;
+        height: 65px;
+    }
+    
+    .carrito-icono {
+        font-size: 32px;
+    }
+    
+    .carrito-badge-flotante {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+}
+Testing Responsive
+Puntos a verificar en cada breakpoint:
+✅ Desktop (> 1024px)
+•	[ ] Grid muestra 3 columnas
+•	[ ] Navegación completa visible
+•	[ ] Modales centrados
+•	[ ] Botones en línea horizontal
+✅ Tablet (768px - 1024px)
+•	[ ] Grid muestra 2 columnas
+•	[ ] Navegación ajustada
+•	[ ] Modales responsivos
+•	[ ] Textos legibles
+✅ Móvil (< 768px)
+•	[ ] Grid muestra 1 columna
+•	[ ] Header apilado verticalmente
+•	[ ] Botones 100% ancho
+•	[ ] Modal ocupa 95% pantalla
+•	[ ] Formularios fáciles de completar
+•	[ ] Sin scroll horizontal
+•	[ ] Touch targets > 44px
+________________________________________
+🔧 Optimizaciones Recomendadas
+Performance
+1. Debounce en Búsqueda
+// En cotizar_cliente.js (línea 410)
+let searchTimeout;
+searchInput.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        filtrarServicios(e.target.value);
+    }, 300); // Espera 300ms después de escribir
+});
+2. Lazy Loading de Imágenes
+<!-- En HTML, agregar loading="lazy" -->
+<img src="..." alt="..." loading="lazy">
+3. Comprimir Imágenes
+•	Usar formato WebP cuando sea posible
+•	Tamaño máximo recomendado: 500KB por imagen
+•	Dimensiones: 500x300px para tarjetas
+4. Minimizar CSS/JS en Producción
+Usar herramientas como:
+•	CSS: cssnano o clean-css
+•	JS: uglify-js o terser
+Accesibilidad
+1. ARIA Labels
+<!-- Mejorar en HTML -->
+<button aria-label="Agregar al carrito" 
+        onclick="agregarAlCarrito(1)">
+    🛒 Agregar
+</button>
+
+<input type="text" 
+       aria-label="Buscar servicios"
+       id="searchInput">
+2. Navegación por Teclado
+// Agregar en JS
+document.addEventListener('keydown', (e) => {
+    // ESC cierra modales
+    if (e.key === 'Escape') {
+        cerrarModalCarrito();
+        cerrarModalConfirmacion();
+    }
+});
+3. Contraste de Colores
+Verificar que cumplan WCAG 2.1 AA:
+•	Texto normal: Ratio mínimo 4.5:1
+•	Texto grande: Ratio mínimo 3:1
+Herramienta: https://webaim.org/resources/contrastchecker/
+Seguridad
+1. Sanitizar Inputs
+// Agregar función de sanitización
+function sanitizeInput(input) {
+    const div = document.createElement('div');
+    div.textContent = input;
+    return div.innerHTML;
+}
+
+// Usar al capturar datos
+direccion: sanitizeInput(document.getElementById('direccion').value)
+2. Validación de Fechas
+// Mejorar validación (línea 293)
+const hoy = new Date();
+const manana = new Date(hoy);
+manana.setDate(manana.getDate() + 1);
+
+const maxDate = new Date(hoy);
+maxDate.setMonth(maxDate.getMonth() + 2); // Máximo 2 meses
+
+fechaInput.min = manana.toISOString().split('T')[0];
+fechaInput.max = maxDate.toISOString().split('T')[0];
+3. Limitar localStorage
+// Agregar límite de pedidos guardados
+function guardarPedido(pedido) {
+    let pedidos = JSON.parse(localStorage.getItem('pedidos') || '[]');
+    
+    // Mantener solo últimos 50 pedidos
+    if (pedidos.length >= 50) {
+        pedidos = pedidos.slice(-49);
+    }
+    
+    pedidos.push(pedido);
+    localStorage.setItem('pedidos', JSON.stringify(pedidos));
+}
+________________________________________
+📊 Estructura de Datos
+localStorage Keys
+// Estructura de almacenamiento local
+localStorage = {
+    "session": {
+        email: "cliente@ejemplo.com",
+        role: "cliente",
+        token: "abc123",
+        timestamp: 1699123456789
+    },
+    
+    "pedidos": [
+        {
+            id: "PED-1699123456789",
+            cotizacionId: "COT-1699123400000",
+            servicios: [...],
+            direccion: "...",
+            ciudad: "...",
+            telefono: "...",
+            fecha: "2024-01-15",
+            hora: "10:00",
+            observaciones: "...",
+            total: 270000,
+            estado: "Pendiente",
+            fechaCreacion: "2024-01-10T10:30:00Z"
+        }
+    ],
+    
+    "usuarios": [
+        {
+            email: "cliente@ejemplo.com",
+            password: "hashed_password",
+            role: "cliente",
+            nombre: "Juan Pérez",
+            telefono: "3001234567"
+        }
+    ]
+}
+Variables en Memoria (Runtime)
+// cotizar_cliente.js
+
+// Servicios disponibles (constante)
+const SERVICIOS = [
+    {
+        id: 1,
+        nombre: "Lavado de muebles",
+        precio: 90000,
+        imagen: "URL",
+        duracion: "2-3 horas",
+        tamanos: ["Pequeño", "Mediano", "Grande"],
+        tiposLavado: ["Básico", "Profundo", "Premium"]
+    }
+    // ... más servicios
+];
+
+// Carrito actual (temporal)
+let carrito = [
+    {
+        id: 1,
+        nombre: "Lavado de muebles",
+        precio: 90000,
+        imagen: "URL",
+        duracion: "2-3 horas",
+        tamanos: [...],
+        tiposLavado: [...],
+        cantidad: 2,           // Agregado por usuario
+        tamano: "Mediano",     // Seleccionado por usuario
+        tipoLavado: "Profundo" // Seleccionado por usuario
+    }
+];
+
+// Cotizaciones generadas (temporal)
+let cotizacionesGuardadas = [
+    {
+        id: "COT-1699123400000",
+        servicios: [...],
+        total: 270000,
+        fechaCreacion: "2024-01-10T10:30:00Z"
+    }
+];
+________________________________________
+🚀 Despliegue
+Checklist Pre-Producción
+•	[ ] Archivos Minimizados
+o	[ ] CSS comprimido
+o	[ ] JS comprimido
+o	[ ] HTML sin comentarios
+•	[ ] Imágenes Optimizadas
+o	[ ] Formato WebP con fallback
+o	[ ] Compresión aplicada
+o	[ ] Tamaños correctos
+•	[ ] Testing
+o	[ ] Desktop: Chrome, Firefox, Safari
+o	[ ] Móvil: iOS Safari, Android Chrome
+o	[ ] Tablet: iPad, Android tablets
+•	[ ] Funcionalidad
+o	[ ] Login/Logout funciona
+o	[ ] Carrito suma correctamente
+o	[ ] Cotización se genera
+o	[ ] Pedido se guarda
+o	[ ] Notificaciones aparecen
+•	[ ] Responsive
+o	[ ] Sin scroll horizontal
+o	[ ] Textos legibles
+o	[ ] Botones alcanzables
+o	[ ] Modales centrados
+•	[ ] Accesibilidad
+o	[ ] ARIA labels presentes
+o	[ ] Navegación por teclado
+o	[ ] Contraste adecuado
+o	[ ] Screen reader compatible
+Hosting Recomendado
+Opciones Gratuitas:
+•	Netlify (recomendado)
+•	Vercel
+•	GitHub Pages
+Configuración Netlify:
+# netlify.toml
+[build]
+  publish = "."
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+________________________________________
+📚 Glosario Técnico
+Términos CSS
+•	Flexbox: Sistema de layout unidimensional
+•	Grid: Sistema de layout bidimensional
+•	Media Query: Regla CSS para responsive
+•	Pseudo-clase: Selector especial (:hover, :focus)
+•	Transform: Transformación visual (escalar, rotar)
+•	Transition: Animación suave entre estados
+•	z-index: Orden de apilamiento de elementos
+Términos JavaScript
+•	Array: Lista ordenada de elementos
+•	Callback: Función pasada como argumento
+•	Event Listener: Función que escucha eventos
+•	LocalStorage: Almacenamiento local del navegador
+•	Template Literal: String con ${variable}
+•	Arrow Function: Función con sintaxis () => {}
+•	Spread Operator: (...) copia propiedades
+Términos HTML
+•	Semantic HTML: Etiquetas con significado
+•	ARIA: Accesibilidad para screen readers
+•	Modal: Ventana emergente
+•	Form: Formulario de entrada de datos
+•	Input: Campo de entrada
+________________________________________
+📞 Soporte y Contacto
+Para Desarrolladores
+Preguntas Frecuentes:
+1.	¿Cómo agregar un nuevo servicio? → Ver sección "Guía de Modificación" punto 1
+2.	¿Cómo cambiar colores? → Ver sección "Guía de Modificación" punto 2
+3.	¿Error de autenticación? → Ver sección "Solución de Problemas" punto 6
+Recursos Adicionales:
+•	MDN Web Docs: https://developer.mozilla.org
+•	CSS Tricks: https://css-tricks.com
+•	JavaScript.info: https://javascript.info
+Control de Versiones
+Versión 1.0 - 2024-01-10
+- Sistema de cotización básico
+- Carrito de servicios
+- Autenticación
+
+Versión 1.1 - [PENDIENTE]
+- [ ] Sistema de pagos
+- [ ] Historial de pedidos
+- [ ] Notificaciones push
+- [ ] Panel de administración
+________________________________________
+✅ Conclusión
+Este documento proporciona toda la información necesaria para:
+•	✅ Entender el código
+•	✅ Modificar funcionalidades
+•	✅ Resolver problemas comunes
+•	✅ Mantener el sistema
+•	✅ Agregar nuevas características
+Recuerda: Siempre hacer backup antes de modificar código en producción.
+________________________________________
+Documentación creada por: [Tu Nombre]
+Última actualización: [Fecha]
+Versión del Sistema: 1.0 Propósito Sistema web para que clientes registrados de FoamWash puedan:
+•	Cotizar servicios de limpieza y lavado
+•	Agendar servicios después de cotizar
+•	Gestionar su carrito de servicios
+•	Ver resumen de cotizaciones y pedidos
+Características Principales
+✅ Sistema de cotización paso a paso ✅ Carrito de compras interactivo ✅ Validación de formularios ✅ Notificaciones visuales ✅ Almacenamiento local (localStorage) ✅ Diseño responsive (móvil, tablet, escritorio) ✅ Protección por autenticación
+________________________________________
+📁 Estructura del Proyecto
+proyecto/
+│
+├── html/
+│   └── cotizar_cliente.html          # Página principal
+│
+├── css/
+│   └── estilos_cotizar_cliente.css   # Estilos completos
+│
+├── js/
+│   ├── cotizar_cliente.js            # Lógica de cotización
+│   ├── login.js                      # Sistema de autenticación
+│   └── sesiones_activas.js           # Manejo de sesiones
+│
+└── img/
+    ├── serv_lavado_muebles.jpg
+    ├── serv_alfombras.jpg
+    ├── serv_tapiceria_carro.jpg
+    ├── serv_cortinas.jpg
+    ├── serv_colchones.jpg
+    └── serv_desinfeccion.jpg
+________________________________________
+🔄 Flujo de la Aplicación
+Diagrama de Flujo
+┌─────────────────────┐
+│ 1. LOGIN/REGISTRO   │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ 2. PÁGINA SERVICIOS │ ← Usuario ve catálogo
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ 3. AGREGAR CARRITO  │ ← Clic en "Agregar"
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ 4. VER CARRITO      │ ← Clic en botón flotante
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ 5. GENERAR          │ ← Completa detalles:
+│    COTIZACIÓN       │   - Tamaño
+└──────────┬──────────┘   - Tipo lavado
+           │               - Cantidad
+           ▼
+┌─────────────────────┐
+│ 6. VER COTIZACIÓN   │ ← Muestra total
+└──────────┬──────────┘
+           │
+       ┌───┴───┐
+       ▼       ▼
+  ┌─────┐   ┌──────────┐
+  │ 7A. │   │ 7B.      │
+  │ MÁS │   │ AGENDAR  │
+  └─────┘   └────┬─────┘
+               │
+               ▼
+        ┌─────────────┐
+        │ 8. LLENAR   │ ← Formulario:
+        │ FORMULARIO  │   - Dirección
+        └──────┬──────┘   - Fecha/Hora
+               │           - Teléfono
+               ▼
+        ┌─────────────┐
+        │ 9. CONFIRMAR│ ← Guarda en localStorage
+        │    PEDIDO   │
+        └─────────────┘
+________________________________________
+🎨 Documentación CSS
+Archivo: estilos_cotizar_cliente.css
+Secciones Principales
+1. RESET Y BASE (Líneas 1-10)
+* { margin: 0; padding: 0; box-sizing: border-box; }
+Propósito: Elimina estilos por defecto del navegador
+2. HEADER (Líneas 12-100)
+.header-banner { ... }
+.logo-header { ... }
+.nav-bar { ... }
+Componentes:
+•	Banner superior con gradiente morado
+•	Logo "FoamWash"
+•	Barra de navegación
+•	Botón de cerrar sesión
+Modificar colores:
+•	Fondo: Línea 17 background: linear-gradient(...)
+•	Logo: Línea 39 color: white
+•	Links: Línea 54 color: white
+3. BUSCADOR (Líneas 102-150)
+.search-section { ... }
+.search-input { ... }
+Elementos:
+•	Input de búsqueda centrado
+•	Botón de búsqueda
+•	Efecto de foco (borde azul)
+4. TARJETAS DE SERVICIOS (Líneas 152-280)
+.service-card { ... }
+.service-image { ... }
+.service-btn { ... }
+Grid responsive:
+•	Desktop: 3 columnas
+•	Tablet: 2 columnas
+•	Móvil: 1 columna
+Animaciones:
+•	Hover: Tarjeta sube 10px
+•	Imagen: Zoom 1.1x
+5. CARRITO FLOTANTE (Líneas 282-400)
+.btn-carrito-flotante { ... }
+Animaciones:
+•	float: Movimiento arriba/abajo
+•	pulse-ring: Anillo pulsante
+•	shine: Brillo deslizante
+Modificar posición:
+•	Derecha: Línea 285 right: 40px
+•	Abajo: Línea 286 bottom: 40px
+6. MODALES (Líneas 402-650)
+.modal-overlay { ... }
+.modal-content { ... }
+Estructura:
+•	Overlay oscuro con blur
+•	Contenido centrado
+•	Header con gradiente
+•	Body con scroll
+•	Footer con botones
+7. CARRITO DE SERVICIOS (Líneas 652-800)
+.carrito-item { ... }
+.cantidad-control { ... }
+Elementos:
+•	Items del carrito
+•	Controles de cantidad (+/-)
+•	Botón eliminar
+•	Total con gradiente
+⚠️ CAMBIO IMPORTANTE: Línea 752
+color: rgb(0, 0, 0); /* NEGRO para visibilidad */
+8. FORMULARIOS (Líneas 802-950)
+.form-group { ... }
+.servicio-detalle { ... }
+Inputs:
+•	Padding: 14px
+•	Border: 2px solid
+•	Focus: Sombra azul
+9. CONFIRMACIÓN (Líneas 952-1050)
+.confirmacion-exitosa { ... }
+.icono-exito { ... }
+Gradiente verde: Éxito de operación
+10. BOTONES (Líneas 1052-1200)
+Tipos de botones:
+Clase	Color	Uso
+.btn-primary	Morado	Acción principal
+.btn-confirmar	Verde	Confirmar pedido
+.btn-cancelar	Rosa/Morado	Seguir cotizando
+.btn-secondary	Blanco/Morado	Cancelar
+Efectos:
+•	Hover: Sube 3px
+•	Shadow: Aumenta
+•	Animación: Flecha aparece (confirmar)
+11. NOTIFICACIONES (Líneas 1202-1250)
+.notificacion { ... }
+Comportamiento:
+•	Aparece desde derecha
+•	Desaparece en 3 segundos
+•	Ícono verde de check
+12. RESPONSIVE (Líneas 1252-1350)
+Breakpoints:
+@media (max-width: 1024px) { ... } /* Tablets */
+@media (max-width: 768px) { ... }  /* Móviles */
+Cambios en móvil:
+•	Grid: 1 columna
+•	Botones: 100% ancho
+•	Header: Más compacto
+•	Notificaciones: Full width
+________________________________________
+💻 Documentación JavaScript
+Archivo: cotizar_cliente.js
+Variables Globales
+// Líneas 1-40
+const SERVICIOS = [...]      // Array de servicios disponibles
+let carrito = []             // Array de servicios en carrito
+let cotizacionesGuardadas = [] // Array de cotizaciones generadas
+Funciones Principales
+1. Gestión del Carrito
+agregarAlCarrito(servicioId) - Línea 42
+// ¿Qué hace?
+// 1. Busca el servicio por ID
+// 2. Verifica si ya existe en carrito
+// 3. Aumenta cantidad o agrega nuevo
+// 4. Actualiza UI
+// 5. Muestra notificación
+
+// Uso:
+onclick="agregarAlCarrito(1)"
+eliminarDelCarrito(servicioId) - Línea 62
+// ¿Qué hace?
+// 1. Filtra el servicio del array
+// 2. Actualiza UI
+// 3. Muestra notificación
+
+// Uso:
+onclick="eliminarDelCarrito(1)"
+actualizarCantidad(servicioId, nuevaCantidad) - Línea 68
+// ¿Qué hace?
+// 1. Encuentra el item
+// 2. Actualiza su cantidad
+// 3. Si cantidad = 0, elimina
+// 4. Actualiza UI
+
+// Uso:
+onchange="actualizarCantidad(1, 3)"
+2. Cálculos
+calcularTotal() - Línea 82
+// Retorna: Número (suma total)
+// Fórmula: Σ(precio × cantidad)
+return carrito.reduce((total, item) => 
+    total + (item.precio * item.cantidad), 0);
+3. Actualización de UI
+actualizarCarrito() - Línea 86
+// ¿Qué hace?
+// 1. Cuenta items totales
+// 2. Actualiza badge del botón flotante
+// 3. Llama a actualizarModalCarrito()
+actualizarModalCarrito() - Línea 98
+// ¿Qué hace?
+// 1. Verifica si carrito vacío → muestra mensaje
+// 2. Genera HTML de cada item
+// 3. Muestra total formateado
+4. Modales
+abrirModalCarrito() - Línea 136
+// Agrega clase 'show' al modal
+document.getElementById('modalCarrito').classList.add('show');
+cerrarModalCarrito() - Línea 141
+// Remueve clase 'show' del modal
+document.getElementById('modalCarrito').classList.remove('show');
+5. Proceso de Cotización
+finalizarCompra() - Línea 146
+// ¿Qué hace?
+// 1. Valida que carrito no esté vacío
+// 2. Cierra modal carrito
+// 3. Abre modal cotización
+abrirModalCotizacion() - Línea 156
+// ¿Qué hace?
+// 1. Genera formulario para cada servicio:
+//    - Select de tamaño
+//    - Input de cantidad
+//    - Select de tipo de lavado
+// 2. Muestra botón "Generar Cotización"
+generarCotizacion() - Línea 217
+// ¿Qué hace?
+// 1. Valida que todos los detalles estén completos
+// 2. Crea objeto cotización con:
+//    - ID único (COT-timestamp)
+//    - Servicios con detalles
+//    - Total
+//    - Fecha de creación
+// 3. Guarda en array
+// 4. Muestra resultado
+mostrarResultadoCotizacion(cotizacion) - Línea 238
+// ¿Qué hace?
+// 1. Muestra código de cotización
+// 2. Lista servicios cotizados
+// 3. Muestra total
+// 4. Presenta 2 botones:
+//    a) Seguir Cotizando
+//    b) Realizar Agendación
+6. Opciones Post-Cotización
+seguirCotizando() - Línea 277
+// ¿Qué hace?
+// 1. Limpia carrito actual
+// 2. Mantiene cotizaciones guardadas
+// 3. Cierra modal
+// 4. Usuario puede agregar más servicios
+realizarAgendacion() - Línea 284
+// ¿Qué hace?
+// 1. Oculta cotización
+// 2. Muestra formulario con:
+//    - Dirección
+//    - Ciudad
+//    - Teléfono
+//    - Fecha (mínimo mañana)
+//    - Hora (horarios predefinidos)
+//    - Observaciones
+// 3. Actualiza botón a "Confirmar Pedido"
+7. Confirmación de Pedido
+confirmarPedido() - Línea 341
+// ¿Qué hace?
+// 1. Valida formulario
+// 2. Obtiene última cotización
+// 3. Crea objeto pedido:
+//    - ID único (PED-timestamp)
+//    - ID de cotización vinculada
+//    - Datos de entrega
+//    - Estado: "Pendiente"
+// 4. Guarda en localStorage
+// 5. Muestra confirmación
+Estructura del pedido guardado:
+{
+    id: "PED-1699123456789",
+    cotizacionId: "COT-1699123400000",
+    servicios: [...],
+    direccion: "Calle 123 #45-67",
+    ciudad: "Bogotá",
+    telefono: "3001234567",
+    fecha: "2024-01-15",
+    hora: "10:00",
+    observaciones: "...",
+    total: 270000,
+    estado: "Pendiente",
+    fechaCreacion: "2024-01-10T10:30:00.000Z"
+}
+8. Utilidades
+formatearFecha(fecha) - Línea 384
+// Entrada: "2024-01-15"
+// Salida: "lunes, 15 de enero de 2024"
+actualizarDetalleServicio(servicioId, campo, valor) - Línea 195
+// Actualiza propiedades del servicio en carrito
+// Campos: 'tamano', 'tipoLavado'
+configurarBusqueda() - Línea 407
+// Configura event listener para buscar servicios
+filtrarServicios(termino) - Línea 416
+// Filtra tarjetas por título o descripción
+mostrarNotificacion(mensaje) - Línea 432
+// Muestra notificación temporal (3 seg)
+9. Event Listeners
+// Línea 467: Click fuera del modal cierra
+window.addEventListener('click', (e) => { ... })
+
+// Línea 481: Inicialización al cargar página
+document.addEventListener('DOMContentLoaded', () => { ... })
+________________________________________
+🌐 Documentación HTML
+Archivo: cotizar_cliente.html
+Estructura General
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Meta tags y título -->
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <!-- 1. Header -->
+    <!-- 2. Buscador -->
+    <!-- 3. Grid de servicios -->
+    <!-- 4. Botón flotante -->
+    <!-- 5. Modal carrito -->
+    <!-- 6. Modal confirmación -->
+    <!-- 7. Scripts -->
+</body>
+</html>
+Secciones Detalladas
+1. Header (Líneas 14-26)
+<header class="header-banner">
+    <h1 class="logo-header">FoamWash</h1>
+    <nav class="nav-bar">
+        <a href="#" class="nav-link">Hogar</a>
+        <a href="./cotizar_cliente.html">Cotización</a>
+        <a href="#" class="nav-link">Agendar</a>
+        <span id="userEmail">👤 Usuario</span>
+        <a href="#" onclick="cerrarSesionCliente(event)">
+            🚪 Cerrar Sesión
+        </a>
+    </nav>
+</header>
+IDs importantes:
+•	userEmail: Se actualiza con email del usuario
+2. Buscador (Líneas 28-35)
+<section class="search-section">
+    <input type="text" 
+           id="searchInput" 
+           placeholder="Buscar servicios...">
+    <button class="search-button">🔍</button>
+</section>
+3. Grid de Servicios (Líneas 37-120)
+<section class="services-section">
+    <h2>Nuestros Servicios</h2>
+    <div class="services-grid">
+        <!-- 6 tarjetas de servicio -->
+        <article class="service-card">
+            <div class="service-image">
+                <img src="..." alt="...">
+            </div>
+            <div class="service-content">
+                <h3 class="service-title">...</h3>
+                <p class="service-desc">...</p>
+                <span class="service-price">$90.000</span>
+                <button onclick="agregarAlCarrito(1)">
+                    🛒 Agregar
+                </button>
+            </div>
+        </article>
+    </div>
+</section>
+Modificar servicios:
+•	Cambiar precio en <span class="service-price">
+•	Cambiar ID en onclick="agregarAlCarrito(X)"
+•	También actualizar array SERVICIOS en JS
+4. Botón Flotante (Líneas 122-126)
+<button class="btn-carrito-flotante" 
+        onclick="abrirModalCarrito()">
+    <span class="carrito-icono">🛒</span>
+    <span id="carritoBadge">0</span>
+</button>
+IDs importantes:
+•	carritoBadge: Muestra cantidad de items
+5. Modal Carrito (Líneas 128-150)
+<div class="modal-overlay" id="modalCarrito">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>🛒 Carrito de Servicios</h2>
+            <button onclick="cerrarModalCarrito()">×</button>
+        </div>
+        <div class="modal-body">
+            <div id="carritoItems"></div>
+            <div class="carrito-total">
+                <h3>Total: <span id="carritoTotal">$0</span></h3>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="cerrarModalCarrito()">
+                Seguir Cotizando
+            </button>
+            <button onclick="finalizarCompra()">
+                Ver Cotización Final
+            </button>
+        </div>
+    </div>
+</div>
+IDs importantes:
+•	modalCarrito: Contenedor principal
+•	carritoItems: Se llena dinámicamente con JS
+•	carritoTotal: Se actualiza con total
+6. Modal Confirmación (Líneas 152-220)
+<div class="modal-overlay" id="modalConfirmacion">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>📋 Confirmar Pedido</h2>
+            <button onclick="cerrarModalConfirmacion()">×</button>
+        </div>
+        <div class="modal-body">
+            <!-- Área de servicios a cotizar -->
+            <div id="serviciosConfirmacion"></div>
+            
+            <!-- Formulario de agendación -->
+            <form id="formConfirmacion">
+                <input type="text" id="direccion">
+                <input type="text" id="ciudad">
+                <input type="tel" id="telefono">
+                <input type="date" id="fecha">
+                <select id="hora">...</select>
+                <textarea id="observaciones"></textarea>
+                
+                <!-- Resumen -->
+                <div class="resumen-pedido">
+                    <div id="resumenPedido"></div>
+                    <div id="totalFinal">$0</div>
+                </div>
+            </form>
+            
+            <!-- Mensaje de confirmación -->
+            <div id="mensajeConfirmacion"></div>
+        </div>
+        <div class="modal-footer" id="modalFooterConfirm">
+            <!-- Botones dinámicos -->
+        </div>
+    </div>
+</div>
+IDs dinámicos (cambian según etapa):
+•	serviciosConfirmacion: Detalles o formulario
+•	mensajeConfirmacion: Confirmación final
+•	modalFooterConfirm: Botones cambian
+7. Scripts (Líneas 225-270)
+Orden de carga (CRÍTICO):
+<!-- 1. Sistema de login -->
+<script src="./js/login.js"></script>
+
+<!-- 2. Sistema de sesiones -->
+<script src="./js/sesiones_activas.js"></script>
+
+<!-- 3. Protección de página -->
+<script>
+    const session = protectPage(['cliente']);
+    // Verifica que usuario esté logueado
+    // Redirige a login si no está autenticado
+</script>
+
+<!-- 4. Funcionalidad -->
+<script src="./js/cotizar_cliente.js"></script>
+⚠️ NO cambiar el orden - rompe autenticación
+________________________________________
+🔐 Sistema de Autenticación
+Archivos Involucrados
+•	login.js: Funciones de login/logout
+•	sesiones_activas.js: Gestión de sesiones
+•	cotizar_cliente.html: Script de protección
+Flujo de Autenticación
+Usuario → Login → Genera Token → Crea Sesión → Accede
+                        ↓
+                  (localStorage)
+                        ↓
+              session = {
+                  email: "...",
+                  role: "cliente",
+                  token: "...",
+                  timestamp: ...
+              }
+Funciones Clave
+protectPage(['cliente'])
+// ¿Qué hace?
+// 1. Lee sesión de localStorage
+// 2. Verifica rol permitido
+// 3. Si no coincide → redirige a login
+// 4. Retorna objeto session si OK
+logout()
+// ¿Qué hace?
+// 1. Elimina sesión de localStorage
+// 2. Redirige a login.html
+Objeto Session
+{
+    email: "cliente@ejemplo.com",
+    role: "cliente",
+    token: "abcd1234",
+    timestamp: 1699123456789,
+    loginTime: "2024-01-10T10:30:00"
+}
+________________________________________
+🛠️ Guía de Modificación
+Cambios Comunes
+1. Agregar Nuevo Servicio
+Paso 1: Actualizar SERVICIOS en cotizar_cliente.js
+{
+    id: 7,  // Nuevo ID único
+    nombre: "Limpieza de persianas",
+    precio: 60000,
+    imagen: "URL_IMAGEN",
+    duracion: "1-2 horas",
+    tamanos: ["Pequeña", "Mediana", "Grande"],
+    tiposLavado: ["Básico", "Profundo"]
+}
+Paso 2: Agregar tarjeta en HTML
+<article class="service-card">
+    <div class="service-image">
+        <img src="./img/persianas.jpg" alt="Persianas">
+    </div>
+    <div class="service-content">
+        <h3 class="service-title">Limpieza de persianas</h3>
+        <p class="service-desc">...</p>
+        <span class="service-price">$60.000</span>
+        <button onclick="agregarAlCarrito(7)">🛒 Agregar</button>
+    </div>
+</article>
+2. Cambiar Colores del Tema
+Header (Gradiente morado):
+/* Línea 17 en CSS */
+background: linear-gradient(
+    135deg, 
+    rgba(70, 70, 130, 0.95),  /* Cambiar aquí */
+    rgba(100, 80, 150, 0.95)  /* Y aquí */
+);
+Botón flotante:
+/* Línea 283 en CSS */
+background: linear-gradient(
+    135deg, 
+    #667eea 0%,  /* Cambiar aquí */
+    #764ba2 100% /* Y aquí */
+);
+Botón confirmar:
+/* Línea 1090 en CSS */
+background: linear-gradient(
+    135deg, 
+    #11998e 0%,  /* Verde actual */
+    #38ef7d 100%
+);
+3. Cambiar Horarios Disponibles
+En HTML (Línea 190):
+<select id="hora">
+    <option value="07:00">07:00 AM</option>  <!-- Nuevo -->
+    <option value="08:00">08:00 AM</option>
+    <!-- ... más opciones ... -->
+    <option value="18:00">06:00 PM</option>  <!-- Nuevo -->
+</select>
+4. Cambiar Validez de Cotización
+En JS (Línea 260):
+<p style="margin: 0; font-size: 14px;">
+    ✨ Esta cotización es válida por 30 días  <!-- Cambiar aquí -->
+</p>
+5. Modificar Tiempo de Notificación
+En JS (Línea 448):
+setTimeout(() => {
+    notificacion.classList.remove('show');
+    setTimeout(() => notificacion.remove(), 400);
+}, 5000);  // Cambiar de 3000 a 5000 (5 segundos)
+6. Añadir Campo al Formulario
+Paso 1: Agregar en HTML (después línea 180):
+<div class="form-group">
+    <label for="barrio">Barrio *</label>
+    <input type="text" 
+           id="barrio" 
+           placeholder="Ej: Chapinero" 
+           required>
+</div>
+Paso 2: Capturar en JS (línea 354):
+const pedido = {
+    // ... otros campos ...
+    barrio: document.getElementById('barrio').value,  // Nuevo
+    // ... resto ...
+};
+7. Cambiar Formato de Moneda
+En JS (todas las instancias de toLocaleString):
+// Actual (Colombia):
+precio.toLocaleString('es-CO')  // 90.000
+
+// Cambiar a México:
+precio.toLocaleString('es-MX')  // 90,000
+
+// Cambiar a USA:
+precio.toLocaleString('en-US')  // 90,000
+________________________________________
+🐛 Solución de Problemas
+Problema 1: "No se ven los textos en el carrito"
+Causa: Color de texto igual al fondo
+Solución: En CSS (líneas 698-710)
+.carrito-item-info h4 {
+    color: #000000;  /* Asegurar negro */
+}
+
+.carrito-item-duracion {
+    color: #333;  /* Gris oscuro */
+}
+Problema 2: "El carrito no suma correctamente"
+Causa: Tipos de datos incorrectos
+Solución: En JS, verificar:
+// Asegurar que sean números
+item.cantidad = parseInt(item.cantidad);
+item.precio = parseFloat(item.precio);
+Problema 3: "La cotización no se guarda"
+Causa: localStorage lleno o bloqueado
+Solución: En JS (después línea 361):
+try {
+    localStorage.setItem('pedidos', JSON.stringify(pedidos));
+} catch (e) {
+    if (e.name === 'QuotaExceededError') {
+        alert('Almacenamiento lleno. Borra datos antiguos.');
+    }
+}
+

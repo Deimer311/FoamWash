@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Gestión de Servicios</title>
+<link rel="stylesheet" href="./css/estilos_reportes.css">
+<style>
+    .nav-link {
+        font-size: 15px;
+        padding: 8px 15px;
+        width: 100%;
+        text-align: center;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+    }
+</style>
+</head>
+<body>
+<header>
+    <h1>Sistema de Gestión de Servicios</h1>
+    <nav>
+        <label for="ordenes">Gestión de Órdenes</label>
+        <label for="reportes">Reportes y Desempeño</label>
+        <label><a href="./Perfiladmin.html" class="nav-link">Perfil</a></label>
+        <button class="btn-cerrar-sesion" onclick="cerrarSesion()">🚪 Cerrar Sesión</button>
+    </nav>
+</header>
+<input type="radio" name="menu" id="ordenes" checked>
+<input type="radio" name="menu" id="reportes">
+
+<!-- Sección Gestión de Órdenes -->
+<section id="gestion-ordenes" class="content">
+    <div class="ordenes-container">
+        <h2>Órdenes de Servicio</h2>
+        <p>Gestiona y da seguimiento a todas las órdenes</p>
+
+        <div class="columns">
+            <!-- Pendiente -->
+            <div class="col pendiente">
+                <h3>Pendiente</h3>
+                <div class="card">
+                    <h4>Empresa ABC</h4>
+                    <span class="badge alta">Alta</span>
+                    <span class="badge tipo">Mantenimiento</span>
+                    <p class="fecha">📅 19/10/2025</p>
+                    <p class="desc">Revisión completa del sistema eléctrico</p>
+                    <button class="btn-asignar">👤 Asignar Personal</button>
+                </div>
+            </div>
+
+            <!-- En Proceso -->
+            <div class="col proceso">
+                <h3>En Proceso</h3>
+                <div class="card">
+                    <h4>Corporación XYZ</h4>
+                    <span class="badge media">Media</span>
+                    <span class="badge tipo">Instalación</span>
+                    <p class="fecha">📅 20/10/2025</p>
+                    <p class="personal">👤 Juan Pérez</p>
+                    <div class="progreso">
+                        <div class="barra" style="width:45%"></div>
+                    </div>
+                    <p class="desc">Instalación de nuevos equipos</p>
+                    <button class="btn-completar">Completar</button>
+                </div>
+            </div>
+
+            <!-- Finalizada -->
+            <div class="col finalizada">
+                <h3>Finalizada</h3>
+                <div class="card">
+                    <h4>Tienda Local</h4>
+                    <span class="badge baja">Baja</span>
+                    <span class="badge tipo">Reparación</span>
+                    <p class="fecha">📅 21/10/2025</p>
+                    <p class="personal">👤 María González</p>
+                    <p class="desc">Reparación menor</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historial -->
+        <div class="historial">
+            <h3>Historial de Órdenes</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Servicio</th>
+                        <th>Prioridad</th>
+                        <th>Fecha</th>
+                        <th>Personal</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#1</td>
+                        <td>Empresa ABC</td>
+                        <td>Mantenimiento</td>
+                        <td><span class="badge alta">Alta</span></td>
+                        <td>19/10/2025</td>
+                        <td>Sin asignar</td>
+                        <td><span class="estado pendiente">Pendiente</span></td>
+                    </tr>
+                    <tr>
+                        <td>#4</td>
+                        <td>Hotel Premium</td>
+                        <td>Consultoría</td>
+                        <td><span class="badge alta">Alta</span></td>
+                        <td>19/10/2025</td>
+                        <td>Carlos Ruiz</td>
+                        <td><span class="estado proceso">En Proceso</span></td>
+                    </tr>
+                    <tr>
+                        <td>#2</td>
+                        <td>Corporación XYZ</td>
+                        <td>Instalación</td>
+                        <td><span class="badge media">Media</span></td>
+                        <td>20/10/2025</td>
+                        <td>Juan Pérez</td>
+                        <td><span class="estado proceso">En Proceso</span></td>
+                    </tr>
+                    <tr>
+                        <td>#3</td>
+                        <td>Tienda Local</td>
+                        <td>Reparación</td>
+                        <td><span class="badge baja">Baja</span></td>
+                        <td>21/10/2025</td>
+                        <td>María González</td>
+                        <td><span class="estado finalizada">Finalizada</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- Sección Reportes y Desempeño -->
+<section id="reportes-desempeno" class="content">
+    <h2>Reportes y Desempeño</h2>
+    <p>Análisis y métricas del negocio</p>
+
+    <div class="metrics">
+        <div class="metric">Total Reservas<br><strong>156</strong><br><small>+12.5% vs mes anterior</small></div>
+        <div class="metric">Servicios Completados<br><strong>98</strong><br><small>+8.3% vs mes anterior</small></div>
+        <div class="metric">Ingresos Totales<br><strong>$45.780</strong><br><small>+15.2% vs mes anterior</small></div>
+        <div class="metric">Desempeño Promedio<br><strong>87.5%</strong><br><small>-2.1% vs mes anterior</small></div>
+    </div>
+
+    <div class="charts">
+        <div class="chart">
+            <h4>Ingresos y Servicios</h4>
+            <img src="https://dummyimage.com/400x200/667eea/ffffff&text=Gráfica+Ingresos+vs+Servicios" alt="Gráfica ingresos">
+        </div>
+        <div class="chart">
+            <h4>Distribución por Tipo de Servicio</h4>
+            <img src="https://dummyimage.com/300x200/764ba2/ffffff&text=Gráfico+de+Pastel" alt="Gráfico pastel">
+        </div>
+    </div>
+
+    <div class="chart">
+        <h4>Desempeño por Empleado</h4>
+        <img src="https://dummyimage.com/500x200/667eea/ffffff&text=Gráfico+Barras" alt="Gráfico barras">
+    </div>
+
+    <div class="insights">
+        <div class="alert alerta">⚠ La productividad del personal ha disminuido 2.1% este mes</div>
+        <div class="alert verde">📈 Los ingresos han aumentado 15.2% comparado con el mes anterior</div>
+        <div class="alert azul">🔍 Alta demanda de servicios de mantenimiento en Zona Norte</div>
+    </div>
+</section>
+
+<!-- Modal de confirmación de cierre de sesión -->
+<div class="modal" id="modalCerrarSesion">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>🚪 Cerrar Sesión</h3>
+            <span class="cerrar" onclick="cerrarModal()">✖</span>
+        </div>
+        <p style="margin: 1.5rem 0;">¿Estás seguro de que deseas cerrar sesión?</p>
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <button onclick="cerrarModal()" style="padding: 0.7rem 1.5rem; border: none; border-radius: 8px; background: #e0e0e0; cursor: pointer; font-weight: 600;">Cancelar</button>
+            <button onclick="confirmarCerrarSesion()" style="padding: 0.7rem 1.5rem; border: none; border-radius: 8px; background: #dc3545; color: white; cursor: pointer; font-weight: 600;">Sí, cerrar sesión</button>
+        </div>
+    </div>
+</div>
+
+<!-- Contenedor de notificaciones -->
+<div id="notificacionContainer"></div>
+
+<script src="./js/login.js"></script><!-- script de login para sus funcionalidades -->
+<script src="./js/sesiones_activas.js"></script><!-- script de las sesiones activas -->
+<script>
+        // ===================================================================
+        // PROTECCIÓN DE PÁGINA - Solo clientes pueden acceder
+        // ===================================================================
+        const session = protectPage(['admin']);
+        
+        // Mostrar información del usuario en el header
+        if (session && session.email) {
+            const userEmailElement = document.getElementById('userEmail');
+            if (userEmailElement) {
+                userEmailElement.textContent = `👤 ${session.email}`;
+            }
+            
+            console.log('✅ Página de servicios cargada para:', session.email);
+            console.log('🔐 Rol:', session.role);
+            console.log('🎫 Token:', session.token);
+        }
+        
+        // ===================================================================
+        // FUNCIÓN PARA CERRAR SESIÓN EN ESTA PÁGINA
+        // ===================================================================
+        function cerrarSesionCliente(e) {
+            e.preventDefault();
+            
+            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                // Mostrar notificación si la función existe
+                if (typeof mostrarNotificacion === 'function') {
+                    mostrarNotificacion('Cerrando sesión...');
+                }
+                
+                // Cerrar sesión después de 1 segundo
+                setTimeout(() => {
+                    logout(); // Función definida en login.js
+                }, 1000);
+            }
+        }
+        
+        // ===================================================================
+        // INFORMACIÓN DE DEBUG (Opcional - quitar en producción)
+        // ===================================================================
+        console.log('📊 Sesiones activas en el sistema:', contarSesionesActivas());
+        console.log('👥 Detalles de todas las sesiones:', obtenerSesionesActivas());
+    </script>
+</body>
+</html>

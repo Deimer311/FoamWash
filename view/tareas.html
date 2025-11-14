@@ -1,0 +1,161 @@
+<!--
+    PANEL DE TAREAS PARA TRABAJADORES
+    Permite ver, gestionar y completar las tareas asignadas
+    Incluye sistema de autenticación y gestión de sesiones
+-->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Tareas - FoamWash Trabajador</title>
+    <link rel="stylesheet" href="./css/tareas.css"><!-- hace referencia a los estilos -->
+    <style>
+        /* ==================estilos adicionaales para las etiquetas A============================ */
+        .nav-link {
+            font-size: 15px;
+            padding: 8px 15px;
+            width: 100%;
+            text-align: center;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- ==================== HEADER ==================== -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🧼 FoamWash - Panel Trabajador</h1>
+                <p>Gestión de Tareas y Servicios</p>
+            </div>
+            <div class="user-section">
+                <div class="user-info">
+                    <div class="user-name" id="userName">Cargando...</div>
+                    <div class="user-role">👷 Trabajador</div>
+                </div>
+                <nav>
+                    <a href="./Perfiltrabajador.html">Perfil</a>
+                </nav>
+                <button class="btn-logout" onclick="cerrarSesionTrabajador()">
+                    🚪 Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==================== CONTENEDOR PRINCIPAL ==================== -->
+    <div class="container">
+        <!-- Panel de Estadísticas -->
+        <div class="stats-panel">
+            <div class="stat-card">
+                <span class="stat-icon">📋</span>
+                <div class="stat-number" id="statTotal">0</div>
+                <div class="stat-label">Total Tareas</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">⏳</span>
+                <div class="stat-number" id="statPendientes">0</div>
+                <div class="stat-label">Pendientes</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">🔄</span>
+                <div class="stat-number" id="statEnProgreso">0</div>
+                <div class="stat-label">En Progreso</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">✅</span>
+                <div class="stat-number" id="statCompletadas">0</div>
+                <div class="stat-label">Completadas Hoy</div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters-section">
+            <div class="filter-group">
+                <label>Estado</label>
+                <select class="filter-select" id="filterEstado" onchange="filtrarTareas()">
+                    <option value="todos">Todos</option>
+                    <option value="pendiente">Pendientes</option>
+                    <option value="en-progreso">En Progreso</option>
+                    <option value="completada">Completadas</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Fecha</label>
+                <select class="filter-select" id="filterFecha" onchange="filtrarTareas()">
+                    <option value="todos">Todas las fechas</option>
+                    <option value="hoy">Hoy</option>
+                    <option value="manana">Mañana</option>
+                    <option value="semana">Esta Semana</option>
+                </select>
+            </div>
+            <button class="btn-refresh" onclick="cargarTareas()">
+                🔄 Actualizar
+            </button>
+        </div>
+
+        <!-- Lista de Tareas -->
+        <div class="tasks-section">
+            <div class="section-header">
+                <h2 class="section-title">Mis Tareas Asignadas</h2>
+                <span class="tasks-count" id="tasksCount">0 tareas</span>
+            </div>
+            <div class="tasks-grid" id="tasksGrid">
+                <!-- Las tareas se cargarán dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalles -->
+    <div class="modal-overlay" id="modalDetalles">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📋 Detalles de la Tarea</h2>
+                <button class="modal-close" onclick="cerrarModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor de Notificaciones -->
+    <div id="notificacionContainer"></div>
+
+    <!-- ==================== SCRIPTS ==================== -->
+    
+    <!-- 1. Sistema de autenticación -->
+    <script src="../js/login.js"></script>
+    
+    <!-- 2. Sistema de sesiones -->
+    <script src="../js/sesiones_activas.js"></script>
+    
+    <!-- 3. Protección de página -->
+    <script>
+        // Proteger página - solo trabajadores pueden acceder
+        const session = protectPage(['trabajador']);
+        
+        // Mostrar información del usuario
+        if (session && session.email) {
+            document.getElementById('userName').textContent = session.email;
+            console.log('✅ Panel de trabajador cargado para:', session.email);
+        }
+        
+        // Función para cerrar sesión
+        function cerrarSesionTrabajador() {
+            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                mostrarNotificacion('Cerrando sesión...', 'info');
+                setTimeout(() => {
+                    logout();
+                }, 1000);
+            }
+        }
+    </script>
+    
+    <!-- 4. Lógica de tareas -->
+    <script src="./js/tareas.js"></script>
+</body>
+</html>

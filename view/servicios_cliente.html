@@ -1,0 +1,292 @@
+<!--
+    ESTE ARCHIVO HACE REFERENCIA A LA PÁGINA DE SERVICIOS DISPONIBLES PARA LOS CLIENTES
+    CUANDO YA SE ENCUENTRAN REGISTRADOS EN EL SISTEMA, O SI YA SE ENCUENTRAN LOGEADOS.
+    SIRVE PARA QUE EL CLIENTE PUEDA EXPLORAR LOS SERVICIOS OFRECIDOS POR FOAM WASH  Y SU SOCIO
+    COMERCIAL LAVADOS GONZALEZ, ADEMÁS DE PERMITIR AGREGARLOS A SU CARRITO Y PROCEDER A AGENDAR
+    EL SERVICIO QUE DESEE ADQUIRIR.
+-->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servicios - FoamWash</title>
+    <link rel="stylesheet" href="./css/estilos_servicios_cliente.css">
+</head>
+<body>
+    <!-- ==================== HEADER CON BANNER ==================== -->
+    <header class="header-banner">
+        <h1 class="logo-header">FoamWash</h1>
+        
+        <nav class="nav-bar">
+            <a href="#" class="nav-link">Hogar</a>
+            <a href="./cotizar_cliente.html" class="nav-link">Cotización</a>
+            <a href="#" class="nav-link" style="color: rgb(133, 198, 255);">Agendar</a>
+            <a href="./perfilcliente.html" class="nav-link">Perfil</a>
+            <!-- AGREGADO: Mostrar email del usuario -->
+            <span id="userEmail" class="nav-link" style="color: #fff; cursor: default;"><a href="./perfilcliente.html">👤 Usuario</a></span>
+            <!-- MODIFICADO: Cambiar función de cerrar sesión -->
+            <a href="#" class="nav-link btn-salir" onclick="cerrarSesionCliente(event)">🚪 Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
+    <section class="search-section">
+        <div class="search-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="Buscar servicios (ej: lavado muebles, sillas, carros, tapetes...)" aria-label="Buscar servicios">
+            <button class="search-button" aria-label="buscar">🔍</button>
+        </div>
+    </section>
+    
+    <section class="services-section">
+        <h2 class="section-title">Nuestros Servicios</h2>
+        <div class="services-grid">
+            <!-- Servicio 1 -->
+            <article class="service-card">
+                <div class="service-image">
+                    <img src="./img/serv_lavado_muebles.jpg" alt="Lavado de muebles">
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Lavado de muebles</h3>
+                    <p class="service-desc">Lavado profundo de sofás y sillas, eliminación de manchas y olores.</p>
+                    <div class="service-meta">
+                        <span class="service-price">$90.000</span>
+                        <button type="button" class="service-btn" onclick="agregarAlCarrito(1)">🛒 Agregar</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Servicio 2 -->
+            <article class="service-card">
+                <div class="service-image">
+                    <img src="./img/serv_alfombras.jpg" alt="Lavado de alfombras">
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Lavado de alfombras</h3>
+                    <p class="service-desc">Limpieza profunda para alfombras pequeñas y medianas.</p>
+                    <div class="service-meta">
+                        <span class="service-price">$50.000</span>
+                        <button type="button" class="service-btn" onclick="agregarAlCarrito(2)">🛒 Agregar</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Servicio 3 -->
+            <article class="service-card">
+                <div class="service-image">
+                    <img src="./img/serv_tapiceria_carro.jpg" alt="Tapicería de carros">
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Tapicería de carros</h3>
+                    <p class="service-desc">Limpieza interior del vehículo: asientos, alfombras y paneles.</p>
+                    <div class="service-meta">
+                        <span class="service-price">$140.000</span>
+                        <button type="button" class="service-btn" onclick="agregarAlCarrito(3)">🛒 Agregar</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Servicio 4 -->
+            <article class="service-card">
+                <div class="service-image">
+                    <img src="./img/serv_cortinas.jpg" alt="Lavado de cortinas">
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Lavado de cortinas</h3>
+                    <p class="service-desc">Lavado y planchado ligero para cortinas y visillos.</p>
+                    <div class="service-meta">
+                        <span class="service-price">$80.000</span>
+                        <button type="button" class="service-btn" onclick="agregarAlCarrito(4)">🛒 Agregar</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Servicio 5 -->
+            <article class="service-card">
+                <div class="service-image">
+                    <img src="./img/serv_colchones.jpg" alt="Lavado de colchones">
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Lavado de colchones</h3>
+                    <p class="service-desc">Eliminación de ácaros y manchas, desodorización y secado rápido.</p>
+                    <div class="service-meta">
+                        <span class="service-price">$90.000</span>
+                        <button type="button" class="service-btn" onclick="agregarAlCarrito(5)">🛒 Agregar</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Servicio 6 -->
+            <article class="service-card">
+                <div class="service-image">
+                    <img src="./img/serv_desinfeccion.jpg" alt="Desinfección">
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Desinfección y sanitización</h3>
+                    <p class="service-desc">Servicio rápido de desinfección para hogares y oficinas.</p>
+                    <div class="service-meta">
+                        <span class="service-price">$150.000</span>
+                        <button type="button" class="service-btn" onclick="agregarAlCarrito(6)">🛒 Agregar</button>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- Botón flotante del carrito -->
+    <button class="btn-carrito-flotante" onclick="abrirModalCarrito()" title="Ver carrito">
+        <span class="carrito-icono">🛒</span>
+        <span id="carritoBadge" class="carrito-badge-flotante">0</span>
+    </button>
+
+    <!-- Modal del carrito -->
+    <div class="modal-overlay" id="modalCarrito">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🛒 Carrito de Servicios</h2>
+                <button class="modal-close" onclick="cerrarModalCarrito()">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="carritoItems"></div>
+                <div class="carrito-total">
+                    <h3>Total: <span id="carritoTotal">$0</span></h3>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="cerrarModalCarrito()">Seguir comprando</button>
+                <button class="btn-primary" onclick="finalizarCompra()">Finalizar compra</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div class="modal-overlay" id="modalConfirmacion">
+        <div class="modal-content modal-confirmacion">
+            <div class="modal-header">
+                <h2>📋 Confirmar Pedido</h2>
+                <button class="modal-close" onclick="cerrarModalConfirmacion()">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="serviciosConfirmacion"></div>
+                
+                <form id="formConfirmacion" class="form-confirmacion">
+                    <div class="form-group">
+                        <label for="direccion">Dirección de servicio *</label>
+                        <input type="text" id="direccion" placeholder="Ej: Calle 123 #45-67, Apto 101" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ciudad">Ciudad *</label>
+                        <input type="text" id="ciudad" placeholder="Ej: Bogotá" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefono">Teléfono de contacto *</label>
+                        <input type="tel" id="telefono" placeholder="Ej: 3001234567" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fecha">Fecha preferida del servicio *</label>
+                        <input type="date" id="fecha" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hora">Hora preferida *</label>
+                        <select id="hora" required>
+                            <option value="">Seleccionar hora</option>
+                            <option value="08:00">08:00 AM</option>
+                            <option value="09:00">09:00 AM</option>
+                            <option value="10:00">10:00 AM</option>
+                            <option value="11:00">11:00 AM</option>
+                            <option value="14:00">02:00 PM</option>
+                            <option value="15:00">03:00 PM</option>
+                            <option value="16:00">04:00 PM</option>
+                            <option value="17:00">05:00 PM</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="observaciones">Observaciones adicionales</label>
+                        <textarea id="observaciones" placeholder="Información adicional..." rows="3"></textarea>
+                    </div>
+
+                    <div class="resumen-pedido">
+                        <h3>Resumen de tu pedido</h3>
+                        <div id="resumenPedido"></div>
+                        <div class="resumen-total-final">
+                            <strong>Total a pagar:</strong>
+                            <span id="totalFinal">$0</span>
+                        </div>
+                    </div>
+                </form>
+                
+                <div id="mensajeConfirmacion" style="display: none;"></div>
+            </div>
+            <div class="modal-footer" id="modalFooterConfirm">
+                <button class="btn-secondary" onclick="cerrarModalConfirmacion()">Cancelar</button>
+                <button class="btn-primary" onclick="confirmarPedido()">Confirmar pedido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor de notificaciones -->
+    <div id="notificacionContainer"></div>
+
+    <!-- ==================== SCRIPTS - ORDEN CRÍTICO ==================== -->
+    
+    <!-- 1. PRIMERO: Sistema de autenticación -->
+    <script src="./js/login.js"></script>
+    
+    <!-- 2. SEGUNDO: Sistema de sesiones -->
+    <script src="./js/sesiones_activas.js"></script>
+    
+    <!-- 3. TERCERO: Protección de página -->
+    <script>
+        // ===================================================================
+        // PROTECCIÓN DE PÁGINA - Solo clientes pueden acceder
+        // ===================================================================
+        const session = protectPage(['cliente']);
+        
+        // Mostrar información del usuario en el header
+        if (session && session.email) {
+            const userEmailElement = document.getElementById('userEmail');
+            if (userEmailElement) {
+                userEmailElement.textContent = `👤 ${session.email}`;
+            }
+            
+            console.log('✅ Página de servicios cargada para:', session.email);
+            console.log('🔐 Rol:', session.role);
+            console.log('🎫 Token:', session.token);
+        }
+        
+        // ===================================================================
+        // FUNCIÓN PARA CERRAR SESIÓN EN ESTA PÁGINA
+        // ===================================================================
+        function cerrarSesionCliente(e) {
+            e.preventDefault();
+            
+            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                // Mostrar notificación si la función existe
+                if (typeof mostrarNotificacion === 'function') {
+                    mostrarNotificacion('Cerrando sesión...');
+                }
+                
+                // Cerrar sesión después de 1 segundo
+                setTimeout(() => {
+                    logout(); // Función definida en login.js
+                }, 1000);
+            }
+        }
+        
+        // ===================================================================
+        // INFORMACIÓN DE DEBUG (Opcional - quitar en producción)
+        // ===================================================================
+        console.log('📊 Sesiones activas en el sistema:', contarSesionesActivas());
+        console.log('👥 Detalles de todas las sesiones:', obtenerSesionesActivas());
+    </script>
+    
+    <!-- 4. FINALMENTE: Scripts específicos de funcionalidad -->
+    <script src="./js/servicios_cliente.js"></script>
+</body>
+</html>
