@@ -28,7 +28,7 @@ export const USERS_DB = {
         password: "123456",
         role: "cliente",
         token: "token-cliente-abcde",
-        redirect: "./servicios_cliente.jsx"
+        redirect: "./servicios_cliente_page.jsx"
     }
 };
 

@@ -74,40 +74,43 @@ const ServiciosPage = ({ onBackToHome, onGoToLogin }) => {
         alert(`Servicio: ${servicio.titulo}\nPrecio: ${servicio.precio}\n\n¡Próximamente podrás agendarlo!`);
     };
 
-    return (
-        <div className="servicios-page">
-            <ServicesHeader 
-                onBackToHome={onBackToHome}
-                onGoToLogin={onGoToLogin}
-            />
-            
-            <SearchSection 
-                searchQuery={searchQuery}
-                onSearch={handleSearch}
-            />
-            
-            <section className="services-section">
-                <h2 className="section-title">Nuestros servicios</h2>
+   // En ServiciosPage.jsx, actualiza esta parte:
+
+        return (
+            <div className="servicios-page">
+                <ServicesHeader 
+                    onBackToHome={onBackToHome}
+                    onGoToLogin={onGoToLogin}
+                />
                 
-                {serviciosFiltrados.length > 0 ? (
-                    <ServicesGrid 
-                        servicios={serviciosFiltrados}
-                        onSolicitar={handleSolicitar}
-                    />
-                ) : (
-                    <div className="no-results">
-                        <p>No se encontraron servicios que coincidan con "{searchQuery}"</p>
-                        <button 
-                            className="clear-search-btn"
-                            onClick={() => setSearchQuery('')}
-                        >
-                            Limpiar búsqueda
-                        </button>
-                    </div>
-                )}
-            </section>
-        </div>
-    );
+                <SearchSection 
+                    searchQuery={searchQuery}
+                    onSearch={handleSearch}
+                />
+                
+                <section className="services-section">
+                    <h2 className="section-title">Nuestros servicios</h2>
+                    
+                    {serviciosFiltrados.length > 0 ? (
+                        <ServicesGrid 
+                            servicios={serviciosFiltrados}
+                            onSolicitar={handleSolicitar}
+                            onGoToLogin={onGoToLogin}  // ← AGREGAR ESTA LÍNEA
+                        />
+                    ) : (
+                        <div className="no-results">
+                            <p>No se encontraron servicios que coincidan con "{searchQuery}"</p>
+                            <button 
+                                className="clear-search-btn"
+                                onClick={() => setSearchQuery('')}
+                            >
+                                Limpiar búsqueda
+                            </button>
+                        </div>
+                    )}
+                </section>
+            </div>
+        );
 };
 
 export default ServiciosPage;
