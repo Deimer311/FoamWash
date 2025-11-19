@@ -72,7 +72,7 @@ const AuthPromptModal = ({ onClose, onLogin, onRegister }) => (
       
       <div style={{ textAlign: 'center', padding: '6px 6px 2px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'center', marginBottom: '12px' }}>
-          <div style={{ width: '64px', height: '64px', borderRadius: '12px', background: 'linear-gradient(135deg,#ffd54f,#ff7043)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: '700', fontSize: '24px' }}>FW</div>
+          <div style={{ width: '64px', height: '64px', borderRadius: '12px', background: 'linear-gradient(#223BFF)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: '700', fontSize: '24px' }}>FW</div>
           <div style={{ textAlign: 'left' }}>
             <h3 style={{ margin: '0', fontSize: '18px' }}>Debes iniciar sesión primero</h3>
             <p style={{ margin: '6px 0 0', color: '#555' }}>Para cotizar un servicio crea una cuenta o inicia sesión.</p>
