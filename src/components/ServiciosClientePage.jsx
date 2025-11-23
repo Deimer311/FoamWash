@@ -1,0 +1,272 @@
+// =============================================================================
+// SERVICIOSCLIENTEPAGE.JSX - RESPETANDO CSS ORIGINAL
+// =============================================================================
+// Esta versión usa las clases CSS de tu archivo estilos_cotizar_cliente.css
+// =============================================================================
+
+import React, { useState } from 'react';
+import { useAuth } from './AuthContext';
+import { useCarrito } from './CarritoContext';
+import { useNotificaciones, NotificacionContainer } from './Notificacion';
+import CarritoModal from './CarritoModal';
+import ConfirmacionModal from './ConfirmacionModal';
+import BotonCarritoFlotante from './BotonCarritoFlotante';
+
+// Importar tu CSS original
+import './css/estilos_cotizar_cliente.css';
+
+// =============================================================================
+// DATOS DE SERVICIOS (mismo que tenías en servicios_cliente.js)
+// =============================================================================
+const SERVICIOS_DATA = [
+    {
+        id: 1,
+        nombre: 'Lavado de muebles',
+        descripcion: 'Lavado profundo de sofás y sillas, eliminación de manchas y olores.',
+        precio: 90000,
+        imagen: '/img/serv_lavado_muebles.jpg',
+        duracion: '2-3 horas',
+        tamanos: ['Pequeño', 'Mediano', 'Grande'],
+        tiposLavado: ['Básico', 'Profundo', 'Premium']
+    },
+    {
+        id: 2,
+        nombre: 'Lavado de alfombras',
+        descripcion: 'Limpieza profunda para alfombras pequeñas y medianas.',
+        precio: 50000,
+        imagen: '/img/serv_alfombras.jpg',
+        duracion: '1-2 horas',
+        tamanos: ['Pequeña', 'Mediana', 'Grande'],
+        tiposLavado: ['Básico', 'Profundo', 'Premium']
+    },
+    {
+        id: 3,
+        nombre: 'Tapicería de carros',
+        descripcion: 'Limpieza interior del vehículo: asientos, alfombras y paneles.',
+        precio: 140000,
+        imagen: '/img/serv_tapiceria_carro.jpg',
+        duracion: '3-4 horas',
+        tamanos: ['Sedan', 'SUV', 'Camioneta'],
+        tiposLavado: ['Básico', 'Completo', 'Premium']
+    },
+    {
+        id: 4,
+        nombre: 'Lavado de cortinas',
+        descripcion: 'Lavado y planchado ligero para cortinas y visillos.',
+        precio: 80000,
+        imagen: '/img/serv_cortinas.jpg',
+        duracion: '2 horas',
+        tamanos: ['Por metro', 'Juego completo'],
+        tiposLavado: ['Básico', 'Con planchado']
+    },
+    {
+        id: 5,
+        nombre: 'Lavado de colchones',
+        descripcion: 'Eliminación de ácaros y manchas, desodorización y secado rápido.',
+        precio: 90000,
+        imagen: '/img/serv_colchones.jpg',
+        duracion: '2-3 horas',
+        tamanos: ['Sencillo', 'Semi-doble', 'Doble', 'Queen', 'King'],
+        tiposLavado: ['Básico', 'Profundo', 'Sanitización']
+    },
+    {
+        id: 6,
+        nombre: 'Mantenimiento y pulido de pisos',
+        descripcion: 'Recuperar brillo, proteger la superficie y mejorar su apariencia.',
+        precio: 100000,
+        imagen: '/img/serv_desinfeccion.jpg',
+        duracion: '1-2 horas',
+        tamanos: ['Pequeño (hasta 50m²)', 'Mediano (50-100m²)', 'Grande (más de 100m²)'],
+        tiposLavado: ['Básica', 'Profunda', 'Completa']
+    },
+    
+];
+
+// =============================================================================
+// COMPONENTE PRINCIPAL
+// =============================================================================
+const ServiciosClientePage = ({ onBackToHome, onCotizacion, onPerfil }) => {
+    const { user, logout } = useAuth();
+    const { agregarAlCarrito } = useCarrito();
+    const { notificaciones, agregarNotificacion, removerNotificacion } = useNotificaciones();
+    
+    const [searchQuery, setSearchQuery] = useState('');
+    const [mostrarCarritoModal, setMostrarCarritoModal] = useState(false);
+    const [mostrarConfirmacionModal, setMostrarConfirmacionModal] = useState(false);
+    
+    // Filtrar servicios según búsqueda
+    const serviciosFiltrados = SERVICIOS_DATA.filter(servicio => {
+        if (!searchQuery.trim()) return true;
+        
+        const query = searchQuery.toLowerCase();
+        const nombre = servicio.nombre.toLowerCase();
+        const descripcion = servicio.descripcion.toLowerCase();
+        
+        return nombre.includes(query) || descripcion.includes(query);
+    });
+    
+    // Manejador de cerrar sesión
+    const handleCerrarSesion = (e) => {
+        e.preventDefault();
+        if (window.confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+            agregarNotificacion('Cerrando sesión...', 'info');
+            setTimeout(() => {
+                logout();
+                onBackToHome();
+            }, 1000);
+        }
+    };
+    
+    // Manejador de agregar al carrito
+    const handleAgregarAlCarrito = (servicio) => {
+        agregarAlCarrito(servicio);
+        agregarNotificacion(`${servicio.nombre} agregado al carrito`, 'exito');
+    };
+    
+    return (
+        <>
+            {/* ==================== HEADER CON BANNER ==================== */}
+            <header className="header-banner">
+                {/* <img src="img/ima9.jpg" alt="Fondo encabezado" className="fondo" /> */}
+                <h1 
+                    className="logo-header"
+                    onClick={onBackToHome}
+                    style={{ cursor: 'pointer' }}
+                >
+                    FoamWash
+                </h1>
+                
+                <nav className="nav-bar">
+                    <a 
+                        href="#" 
+                        className="nav-link"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            onBackToHome();
+                        }}
+                    >
+                        Hogar
+                    </a>
+                    <a 
+                        href="#" 
+                        className="nav-link"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            onCotizacion ? onCotizacion() : alert('Cotización próximamente');
+                        }}
+                    >
+                        Cotización
+                    </a>
+                    <a 
+                        href="#" 
+                        className="nav-link" 
+                        style={{ color: 'rgb(133, 198, 255)' }}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            document.querySelector('.services-section')?.scrollIntoView({ 
+                                behavior: 'smooth' 
+                            });
+                        }}
+                    >
+                        Agendar
+                    </a>
+                    <a 
+                        href="#" 
+                        className="nav-link"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            onPerfil ? onPerfil() : alert('Perfil próximamente');
+                        }}
+                    >
+                        Perfil
+                    </a>
+                    <a 
+                        href="#" 
+                        className="nav-link btn-salir" 
+                        onClick={handleCerrarSesion}
+                    >
+                        Cerrar Sesión
+                    </a>
+                </nav>
+            </header>
+
+            {/* ==================== CONTENIDO PRINCIPAL ==================== */}
+            <section className="search-section">
+                <div className="search-container">
+                    <input 
+                        type="text" 
+                        className="search-input" 
+                        id="searchInput" 
+                        placeholder="Buscar servicios (ej: lavado muebles, sillas, carros, tapetes...)" 
+                        aria-label="Buscar servicios"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <button className="search-button" aria-label="buscar">🔍</button>
+                </div>
+            </section>
+            
+            <section className="services-section">
+                <h2 className="section-title">Nuestros Servicios</h2>
+                <div className="services-grid">
+                    {serviciosFiltrados.map(servicio => (
+                        <article key={servicio.id} className="service-card">
+                            <div className="service-image">
+                                <img 
+                                    src={servicio.imagen} 
+                                    alt={servicio.nombre}
+                                    onError={(e) => {
+                                        e.target.src = 'https://via.placeholder.com/500x300?text=Imagen+no+disponible';
+                                    }}
+                                />
+                            </div>
+                            <div className="service-content">
+                                <h3 className="service-title">{servicio.nombre}</h3>
+                                <p className="service-desc">{servicio.descripcion}</p>
+                                <div className="service-meta">
+                                    <span className="service-price">
+                                        ${servicio.precio.toLocaleString('es-CO')}
+                                    </span>
+                                    <button 
+                                        type="button" 
+                                        className="service-btn" 
+                                        onClick={() => handleAgregarAlCarrito(servicio)}
+                                    >
+                                        Agregar
+                                    </button>
+                                </div>
+                            </div>
+                        </article>
+                    ))}
+                </div>
+            </section>
+
+            {/* BOTÓN FLOTANTE DEL CARRITO */}
+            <BotonCarritoFlotante onClick={() => setMostrarCarritoModal(true)} />
+
+            {/* MODAL DEL CARRITO */}
+            <CarritoModal
+                isOpen={mostrarCarritoModal}
+                onClose={() => setMostrarCarritoModal(false)}
+                onFinalizarCompra={() => {
+                    setMostrarCarritoModal(false);
+                    setMostrarConfirmacionModal(true);
+                }}
+            />
+
+            {/* MODAL DE CONFIRMACIÓN */}
+            <ConfirmacionModal
+                isOpen={mostrarConfirmacionModal}
+                onClose={() => setMostrarConfirmacionModal(false)}
+            />
+
+            {/* SISTEMA DE NOTIFICACIONES */}
+            <NotificacionContainer
+                notificaciones={notificaciones}
+                onRemove={removerNotificacion}
+            />
+        </>
+    );
+};
+
+export default ServiciosClientePage;

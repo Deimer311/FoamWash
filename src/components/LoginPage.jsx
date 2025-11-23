@@ -1,157 +1,63 @@
 // =============================================================================
-// LOGINPAGE.JSX - COMPONENTE PRINCIPAL DEL LOGIN CON EFECTO CARD FLIP
+// LOGINPAGE.JSX - CON REDIRECCIÓN AUTOMÁTICA CORRECTA
 // =============================================================================
-// Este componente maneja el toggle entre la vista de Login y Registro.
-// Replica el efecto de "tarjeta deslizante" del HTML original.
+// ACTUALIZADO para pasar el objeto completo del resultado del login
+// al callback onLoginSuccess, incluyendo redirectPage
 // =============================================================================
 
 import React, { useState } from 'react';
-import LoginView from './LoginView';
-import RegisterView from './RegisterView';
-import './css/login.css'; // Importar los estilos del login
+import { useAuth } from './AuthContext';
+import './css/login.css';
 
-/**
- * COMPONENTE PRINCIPAL: LoginPage
- * 
- * ESTADO:
- * - isRegisterActive: boolean que controla si mostramos Login o Registro
- * 
- * CONCEPTO CLAVE:
- * - En React, el "estado" (state) es información que puede cambiar y hace que 
- *   el componente se vuelva a renderizar cuando cambia.
- * - useState() es un Hook que nos permite agregar estado a componentes funcionales.
- */
-const LoginPage = ({ onBackToHome }) => {
-    // -------------------------------------------------------------------------
-    // 1. ESTADO DEL COMPONENTE
-    // -------------------------------------------------------------------------
-    // useState devuelve un array con 2 elementos:
-    // [0] = valor actual del estado
-    // [1] = función para actualizar ese estado
-    // 
-    // Usamos "destructuring" para nombrarlos:
+const LoginPage = ({ onBackToHome, onLoginSuccess }) => {
+    
     const [isRegisterActive, setIsRegisterActive] = useState(false);
     
-    // isRegisterActive = false → Muestra LOGIN
-    // isRegisterActive = true  → Muestra REGISTRO
-
-    // -------------------------------------------------------------------------
-    // 2. FUNCIONES MANEJADORAS DE EVENTOS
-    // -------------------------------------------------------------------------
-    
-    /**
-     * Cambia a la vista de REGISTRO
-     * Se ejecuta cuando el usuario hace clic en el botón "Registrar"
-     */
     const switchToRegister = () => {
-        setIsRegisterActive(true); // Actualiza el estado a true
-        // Cuando el estado cambia, React vuelve a renderizar el componente
+        setIsRegisterActive(true);
     };
     
-    /**
-     * Cambia a la vista de LOGIN
-     * Se ejecuta cuando el usuario hace clic en el botón "Iniciar sesión"
-     */
     const switchToLogin = () => {
-        setIsRegisterActive(false); // Actualiza el estado a false
+        setIsRegisterActive(false);
     };
     
-    /**
-     * Maneja la redirección después del login/registro exitoso
-     * @param {string} redirectUrl - URL a la que redirigir
-     */
-    const handleRedirect = (redirectUrl) => {
-        console.log('Redirigiendo a:', redirectUrl);
-        // En React Router usarías: navigate(redirectUrl)
-        // Por ahora solo mostramos el mensaje
-        alert(`¡Sesión iniciada! Redirigiendo a: ${redirectUrl}`);
-    };
-
-    // -------------------------------------------------------------------------
-    // 3. RENDERIZADO DEL COMPONENTE
-    // -------------------------------------------------------------------------
     return (
         <>
-            {/* FONDO DE LA PÁGINA */}
             <div className="background"></div>
 
-            {/* LOGO HEADER */}
             <center>
-                <a href="./index.html" style={{ textDecoration: 'none' }}>
+                <a 
+                    href="#" 
+                    onClick={(e) => {
+                        e.preventDefault();
+                        onBackToHome();
+                    }}
+                    style={{ textDecoration: 'none' }}
+                >
                     <h1 className="logo-header">FoamWash</h1>
                 </a>
             </center>
 
-            {/* CONTENEDOR PRINCIPAL */}
             <div className="container">
-                {/* 
-                    TARJETA CON EFECTO FLIP
-                    
-                    CONCEPTO CLAVE - CLASES CONDICIONALES:
-                    - En HTML puro: agregábamos/quitábamos clases con JS
-                    - En React: usamos template literals y expresiones condicionales
-                    
-                    `card-wrapper ${isRegisterActive ? 'register-active' : ''}`
-                    
-                    Esto significa:
-                    - Si isRegisterActive es true  → "card-wrapper register-active"
-                    - Si isRegisterActive es false → "card-wrapper"
-                    
-                    La clase 'register-active' activa las animaciones CSS del flip
-                */}
                 <div className={`card-wrapper ${isRegisterActive ? 'register-active' : ''}`}>
 
-                    {/* =================================================== */}
-                    {/* LADO IZQUIERDO: FORMULARIOS (LOGIN Y REGISTRO)     */}
-                    {/* =================================================== */}
                     <div className="card-side form-side">
-                        {/* 
-                            RENDERIZADO CONDICIONAL:
-                            - En React podemos mostrar/ocultar componentes con operadores lógicos
-                            - {!isRegisterActive && <LoginView />} significa:
-                              "Si isRegisterActive es FALSE, renderiza LoginView"
-                            - El operador && (AND) funciona así:
-                              · Si la primera parte es true, evalúa y devuelve la segunda parte
-                              · Si la primera parte es false, no evalúa la segunda parte
-                        */}
-                        
-                        {/* Mostrar LOGIN cuando isRegisterActive es false */}
                         {!isRegisterActive && (
-                            <LoginView onRedirect={handleRedirect} />
+                            <LoginView onLoginSuccess={onLoginSuccess} />
                         )}
                         
-                        {/* Mostrar REGISTRO cuando isRegisterActive es true */}
                         {isRegisterActive && (
-                            <RegisterView onRedirect={handleRedirect} />
+                            <RegisterView onLoginSuccess={onLoginSuccess} />
                         )}
                     </div>
 
-                    {/* =================================================== */}
-                    {/* LADO DERECHO: TOGGLE/MENSAJES DE BIENVENIDA        */}
-                    {/* =================================================== */}
                     <div className="card-side toggle-side">
-                        
-                        {/* CONTENIDO CUANDO LOGIN ESTÁ ACTIVO */}
-                        {/* Se muestra cuando isRegisterActive es false */}
                         <div className={`toggle-content login-active-content ${!isRegisterActive ? 'active' : ''}`}>
                             <h2 className="toggle-title">¡Hola amig@!</h2>
-                            
                             <p className="toggle-text">
                                 Si no tienes una cuenta<br />
                                 puedes crear una nueva
                             </p>
-                            
-                            {/* 
-                                EVENTOS EN REACT:
-                                - En HTML: onclick="funcionJS()"
-                                - En React: onClick={funcionReact}
-                                
-                                DIFERENCIAS IMPORTANTES:
-                                1. En React usamos camelCase: onClick, onChange, onSubmit
-                                2. Pasamos una REFERENCIA a la función (sin paréntesis)
-                                3. Si ponemos paréntesis onClick={switchToRegister()}, 
-                                   se ejecutaría inmediatamente al renderizar
-                            */}
                             <button 
                                 className="toggle-button" 
                                 onClick={switchToRegister}
@@ -160,16 +66,12 @@ const LoginPage = ({ onBackToHome }) => {
                             </button>
                         </div>
                         
-                        {/* CONTENIDO CUANDO REGISTRO ESTÁ ACTIVO */}
-                        {/* Se muestra cuando isRegisterActive es true */}
                         <div className={`toggle-content register-active-content ${isRegisterActive ? 'active' : ''}`}>
                             <h2 className="toggle-title">¡Bienvenido de nuevo!</h2>
-                            
                             <p className="toggle-text">
                                 Si ya tienes una cuenta<br />
                                 puedes iniciar sesión
                             </p>
-                            
                             <button 
                                 className="toggle-button" 
                                 onClick={switchToLogin}
@@ -185,30 +87,302 @@ const LoginPage = ({ onBackToHome }) => {
     );
 };
 
+// =============================================================================
+// COMPONENTE: LoginView (ACTUALIZADO)
+// =============================================================================
+const LoginView = ({ onLoginSuccess }) => {
+    const { login } = useAuth();
+    
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [message, setMessage] = useState({ 
+        text: '', 
+        isError: false, 
+        isLoading: false 
+    });
+
+    const handleLogin = (e) => {
+        e.preventDefault();
+        
+        setMessage({ text: '', isError: false, isLoading: true });
+
+        // Simular delay de red (opcional)
+        setTimeout(() => {
+            // Llamar a login del contexto
+            const result = login(email, password);
+
+            if (result.success) {
+                // ✅ LOGIN EXITOSO
+                
+                console.log('✅ Login exitoso en LoginView:', result);
+                
+                setMessage({ 
+                    text: result.message, 
+                    isError: false, 
+                    isLoading: false 
+                });
+                
+                // IMPORTANTE: Pasar el resultado COMPLETO al callback
+                // Esto incluye: { success, message, role, redirectPage }
+                setTimeout(() => {
+                    if (onLoginSuccess) {
+                        // Pasar el objeto completo con role y redirectPage
+                        onLoginSuccess({
+                            role: result.role,
+                            redirectPage: result.redirectPage
+                        });
+                    }
+                }, 1000);
+
+            } else {
+                // ❌ LOGIN FALLIDO
+                console.log('❌ Login fallido:', result.message);
+                
+                setMessage({ 
+                    text: result.message, 
+                    isError: true, 
+                    isLoading: false 
+                });
+            }
+        }, 500);
+    };
+    
+    return (
+        <div className="form-content login-view">
+            <h2 className="title">Iniciar sesión</h2>
+            
+            {message.text && (
+                <div className={`message-area ${message.isError ? 'error-message' : 'success-message'}`}>
+                    {message.isLoading ? 'Cargando...' : message.text}
+                </div>
+            )}
+
+            <form className="form" onSubmit={handleLogin}>
+                <div className="input-group">
+                    <input 
+                        type="email" 
+                        className="input-field" 
+                        placeholder="Correo electrónico" 
+                        required
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                </div>
+
+                <div className="input-group">
+                    <input 
+                        type="password" 
+                        className="input-field" 
+                        placeholder="Contraseña" 
+                        required
+                        autoComplete="current-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                </div>
+
+                <div className="forgot-password">
+                    <a href="#" className="forgot-link">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <button 
+                    type="submit" 
+                    className="submit-button"
+                    disabled={message.isLoading}
+                >
+                    {message.isLoading ? 'Cargando...' : 'Iniciar sesión'}
+                </button>
+            </form>
+            
+            
+        </div>
+    );
+};
+
+// =============================================================================
+// COMPONENTE: RegisterView (ACTUALIZADO)
+// =============================================================================
+const RegisterView = ({ onLoginSuccess }) => {
+    const { register } = useAuth();
+    
+    const [email, setEmail] = useState('');
+    const [fullName, setFullName] = useState('');
+    const [phone, setPhone] = useState('');
+    const [address, setAddress] = useState('');
+    const [password, setPassword] = useState('');
+    const [message, setMessage] = useState({ 
+        text: '', 
+        isError: false, 
+        isLoading: false 
+    });
+
+    const handleRegister = (e) => {
+        e.preventDefault();
+        
+        setMessage({ text: '', isError: false, isLoading: true });
+
+        // Validaciones
+        if (phone && phone.length !== 10) {
+            setMessage({ 
+                text: 'El teléfono debe tener exactamente 10 dígitos.', 
+                isError: true, 
+                isLoading: false 
+            });
+            return;
+        }
+        
+        if (phone && !/^\d+$/.test(phone)) {
+            setMessage({ 
+                text: 'El teléfono solo puede contener números.', 
+                isError: true, 
+                isLoading: false 
+            });
+            return;
+        }
+
+        setTimeout(() => {
+            // Llamar a register del contexto
+            const result = register(email, password, fullName, phone, address);
+
+            if (result.success) {
+                // ✅ REGISTRO EXITOSO
+                
+                console.log('✅ Registro exitoso en RegisterView:', result);
+                
+                setMessage({ 
+                    text: result.message, 
+                    isError: false, 
+                    isLoading: false 
+                });
+                
+                // IMPORTANTE: Pasar el resultado COMPLETO al callback
+                setTimeout(() => {
+                    if (onLoginSuccess) {
+                        // Pasar el objeto completo con role y redirectPage
+                        onLoginSuccess({
+                            role: result.role,
+                            redirectPage: result.redirectPage
+                        });
+                    }
+                }, 1000);
+
+            } else {
+                // ❌ REGISTRO FALLIDO
+                console.log('❌ Registro fallido:', result.message);
+                
+                setMessage({ 
+                    text: result.message, 
+                    isError: true, 
+                    isLoading: false 
+                });
+            }
+        }, 1000);
+    };
+    
+    return (
+        <div className="form-content register-view">
+            <h2 className="title">Regístrate</h2>
+            
+            {message.text && (
+                <div className={`message-area ${message.isError ? 'error-message' : 'success-message'}`}>
+                    {message.isLoading ? 'Procesando...' : message.text}
+                </div>
+            )}
+
+            <form className="form" onSubmit={handleRegister}>
+                <div className="input-group">
+                    <input 
+                        type="email" 
+                        className="input-field" 
+                        placeholder="Correo electrónico *" 
+                        required
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                </div>
+                
+                <div className="input-group">
+                    <input 
+                        type="text" 
+                        className="input-field" 
+                        placeholder="Nombre completo *" 
+                        required
+                        autoComplete="name"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                    />
+                </div>
+                
+                <div className="input-group">
+                    <input 
+                        type="tel" 
+                        className="input-field" 
+                        placeholder="Teléfono (10 dígitos) *" 
+                        required
+                        pattern="[0-9]{10}"
+                        autoComplete="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                    />
+                </div>
+                
+                <div className="input-group">
+                    <input 
+                        type="text" 
+                        className="input-field" 
+                        placeholder="Dirección (opcional)" 
+                        autoComplete="street-address"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                    />
+                </div>
+                
+                <div className="input-group">
+                    <input 
+                        type="password" 
+                        className="input-field" 
+                        placeholder="Contraseña (mín. 6 caracteres) *" 
+                        required
+                        autoComplete="new-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                </div>
+                
+                <button 
+                    type="submit" 
+                    className="submit-button register-submit"
+                    disabled={message.isLoading}
+                >
+                    {message.isLoading ? 'Procesando...' : 'Registrar'}
+                </button>
+            </form>
+        </div>
+    );
+};
+
 export default LoginPage;
 
 // =============================================================================
-// CONCEPTOS CLAVE QUE APRENDISTE:
+// CAMBIOS CLAVE EN ESTA VERSIÓN:
 // =============================================================================
-// 
-// 1. ESTADO (STATE):
-//    - useState() para manejar datos que cambian
-//    - Cuando el estado cambia, React re-renderiza el componente
-// 
-// 2. RENDERIZADO CONDICIONAL:
-//    - {condicion && <Componente />}  → Renderiza si la condición es true
-//    - {condicion ? <A /> : <B />}    → Renderiza A si true, B si false
-// 
-// 3. CLASES CONDICIONALES:
-//    - className={`clase-base ${condicion ? 'clase-adicional' : ''}`}
-//    - Permite aplicar CSS dinámicamente según el estado
-// 
-// 4. EVENTOS EN REACT:
-//    - onClick, onChange, onSubmit (camelCase)
-//    - Pasamos referencias a funciones (sin paréntesis)
-// 
-// 5. PROPS:
-//    - onRedirect={handleRedirect} pasa la función como prop
-//    - Los componentes hijos pueden llamar a esa función
-// 
+//
+// 1. LOGIN EXITOSO:
+//    ANTES: onLoginSuccess(result.role)
+//    AHORA: onLoginSuccess({ role: result.role, redirectPage: result.redirectPage })
+//    
+//    ¿POR QUÉ? App.js necesita ambos datos para redirigir correctamente
+//
+// 2. REGISTRO EXITOSO:
+//    ANTES: onLoginSuccess(result.role)
+//    AHORA: onLoginSuccess({ role: result.role, redirectPage: result.redirectPage })
+//    
+//    ¿POR QUÉ? Igual que con login, necesitamos la página de redirección
+//
+// 3. LOGGING MEJORADO:
+//    - console.log muestra el resultado completo para debugging
+//    - Ayuda a verificar que redirectPage se está pasando correctamente
+//
 // =============================================================================

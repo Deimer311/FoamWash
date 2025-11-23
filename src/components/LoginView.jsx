@@ -112,8 +112,8 @@ const LoginView = ({ onRedirect }) => {
                 RENDERIZADO CONDICIONAL:
                 - Solo mostramos el mensaje si message.text tiene contenido
                 - {message.text && <div>...</div>} 
-                  → Si message.text es una cadena vacía "", no renderiza nada
-                  → Si message.text tiene contenido, renderiza el div
+                → Si message.text es una cadena vacía "", no renderiza nada
+                → Si message.text tiene contenido, renderiza el div
             */}
             {message.text && (
                 <div className={`message-area ${message.isError ? 'error-message' : 'success-message'}`}>

@@ -1,125 +1,227 @@
-// =============================================================================
-// APP.JS - COMPONENTE PRINCIPAL CON INTEGRACIÓN DE LOGIN
-// =============================================================================
-// Este archivo controla si mostramos la página principal o el login
-// usando un estado simple.
-// =============================================================================
-
-import React, { useState } from 'react'; // ← Importar useState
-import './styles.css';
-import './components/css/login.css'; // ← IMPORTANTE: Importar estilos del login
-
-// Importar todos los componentes
+import React, { useState, useEffect } from 'react';
+//==============================================================================
+// Contextos de Autenticación y Carrito
+//==============================================================================
+import { AuthProvider, useAuth } from './components/AuthContext';
+import { CarritoProvider } from './components/CarritoContext';
+//==============================================================================
+// Páginas y Componentes
+//==============================================================================
+import LoginPage from './components/LoginPage';
+import ServiciosPage from './components/ServiciosPage';
+import ServiciosClientePage from './components/ServiciosClientePage';
+import CotizacionesCliente from './components/CotizacionesCliente'; // ✅ Importar componente de cotizaciones
+//==============================================================================
+// Componentes de la Aplicación
+//==============================================================================
 import Header from './components/Header';
 import MainContent from './components/MainContent';
 import Footer from './components/Footer';
-import LoginPage from './components/LoginPage';
-import ServiciosPage from './components/ServiciosPage.jsx';
+import './styles.css'
 
-import useBubbles from './hooks/useBubbles';
+const AppContent = () => {
+    
+    const { isAuthenticated, user, logout } = useAuth();
+    const [currentPage, setCurrentPage] = useState('home');
+    
+    useEffect(() => {
+        if (isAuthenticated && user) {
+            const redirectPage = user.redirectPage || getDefaultRedirect(user.role);
+            setCurrentPage(redirectPage);
+        }
+    }, []);
+    
+    const goToHome = () => setCurrentPage('home');
+    const goToLogin = () => setCurrentPage('login');
+    const goToServicios = () => setCurrentPage('servicios');
+    const goToServiciosCliente = () => {
+        if (!isAuthenticated) {
+            goToLogin();
+        } else {
+            setCurrentPage('servicios-cliente');
+        }
+    };
+    
+    // ✅ FUNCIÓN MEJORADA: Redirige según si está logeado o no
+    const goToCotizacion = () => {
+        if (isAuthenticated && user?.role === 'cliente') {
+            // Si está logeado como cliente, ir a cotizaciones de cliente
+            setCurrentPage('cotizacion-cliente');
+        } else if (isAuthenticated) {
+            // Si está logeado pero no es cliente (admin/trabajador)
+            alert('Las cotizaciones están disponibles solo para clientes');
+        } else {
+            // Si NO está logeado, pedir que inicie sesión
+            alert('Por favor inicia sesión para acceder a las cotizaciones');
+            goToLogin();
+        }
+    };
+    
+    const goToPerfil = () => alert('Página de perfil próximamente');
+    
+    const handleLogout = () => {
+        if (window.confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+            logout();
+            goToHome();
+        }
+    };
+    
+    const getDefaultRedirect = (role) => {
+        switch (role) {
+            case 'admin': return 'reportes';
+            case 'trabajador': return 'tareas';
+            case 'cliente': return 'servicios-cliente';
+            default: return 'home';
+        }
+    };
+    
+    const handleLoginSuccess = (result) => {
+        const { role, redirectPage } = result;
+        setCurrentPage(redirectPage || getDefaultRedirect(role));
+    };
+    
+    const renderPage = () => {
+        switch (currentPage) {
+            case 'home':
+                return (
+                    <>
+                        <Header onLoginClick={goToLogin} />
+                        <MainContent onServiciosClick={goToServicios} />
+                        <Footer />
+                        <div className='background-image-container'></div>
+                    </>
+                );
+            
+            case 'login':
+                return (
+                    <LoginPage 
+                        onBackToHome={goToHome}
+                        onLoginSuccess={handleLoginSuccess}
+                    />
+                );
+            
+            case 'servicios':
+                return (
+                    <ServiciosPage 
+                        onBackToHome={goToHome}
+                        onGoToLogin={goToLogin}
+                        onCotizacion={goToCotizacion}
+                    />
+                );
+            
+            // ✅ NUEVO CASE: Cotizaciones para clientes logeados
+            case 'cotizacion-cliente':
+                if (!isAuthenticated || user?.role !== 'cliente') {
+                    goToLogin();
+                    return null;
+                }
+                return (
+                    <CotizacionesCliente 
+                        onBackToHome={goToHome}
+                        onGoToServicios={goToServiciosCliente}
+                        onPerfil={goToPerfil}
+                    />
+                );
+            
+            case 'servicios-cliente':
+                if (!isAuthenticated) {
+                    goToLogin();
+                    return null;
+                }
+                return (
+                    <ServiciosClientePage 
+                        onBackToHome={goToHome}
+                        onCotizacion={goToCotizacion}
+                        onPerfil={goToPerfil}
+                    />
+                );
+            
+            case 'reportes':
+                if (!isAuthenticated || user?.role !== 'admin') {
+                    goToHome();
+                    return null;
+                }
+                return (
+                    <div style={{
+                        minHeight: '100vh',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexDirection: 'column',
+                        gap: '20px',
+                        padding: '20px'
+                    }}>
+                        <h1 style={{ fontSize: '48px' }}>📊 Panel de Reportes</h1>
+                        <p style={{ fontSize: '18px', color: '#666' }}>Bienvenido, {user?.name}</p>
+                        <p style={{ fontSize: '16px', color: '#999' }}>Página próximamente...</p>
+                        <button onClick={goToHome} style={{
+                            padding: '12px 30px',
+                            background: '#0099ff',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '25px',
+                            fontSize: '16px',
+                            cursor: 'pointer'
+                        }}>Volver al inicio</button>
+                    </div>
+                );
+            
+            case 'tareas':
+                if (!isAuthenticated || user?.role !== 'trabajador') {
+                    goToHome();
+                    return null;
+                }
+                return (
+                    <div style={{
+                        minHeight: '100vh',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexDirection: 'column',
+                        gap: '20px',
+                        padding: '20px'
+                    }}>
+                        <h1 style={{ fontSize: '48px' }}>📋 Panel de Tareas</h1>
+                        <p style={{ fontSize: '18px', color: '#666' }}>Bienvenido, {user?.name}</p>
+                        <p style={{ fontSize: '16px', color: '#999' }}>Página próximamente...</p>
+                        <button onClick={goToHome} style={{
+                            padding: '12px 30px',
+                            background: '#0099ff',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '25px',
+                            fontSize: '16px',
+                            cursor: 'pointer'
+                        }}>Volver al inicio</button>
+                    </div>
+                );
+            
+            default:
+                return (
+                    <>
+                        <Header onLoginClick={goToLogin} />
+                        <MainContent onServiciosClick={goToServicios} />
+                        <Footer />
+                    </>
+                );
+        }
+    };
+    
+    return (
+        <div className="app" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            {renderPage()}
+        </div>
+    );
+};
 
 const App = () => {
-    // -------------------------------------------------------------------------
-    // ESTADO: Controla qué página mostrar
-    // -------------------------------------------------------------------------
-    /**
-     * Posibles valores:
-     * - 'home'      → Página principal (index)
-     * - 'login'     → Página de login/registro
-     * - 'servicios' → Página de servicios
-     */
-    const [currentPage, setCurrentPage] = useState('home');
-
-    // Iniciar animación de burbujas solo en la página principal
-    useBubbles('.container');
-
-    // -------------------------------------------------------------------------
-    // FUNCIONES DE NAVEGACIÓN
-    // -------------------------------------------------------------------------
-    
-    /**
-     * Navega a la página principal
-     */
-    const goToHome = () => {
-        setCurrentPage('home');
-        console.log('🏠 Navegando a: Inicio');
-    };
-
-    /**
-     * Navega a la página de login
-     */
-    const goToLogin = () => {
-        setCurrentPage('login');
-        console.log('🔐 Navegando a: Login');
-    };
-
-    /**
-     * Navega a la página de servicios
-     */
-    const goToServicios = () => {
-        setCurrentPage('servicios');
-        console.log('🧼 Navegando a: Servicios');
-    };
-
-    // -------------------------------------------------------------------------
-    // RENDERIZADO CONDICIONAL CON SWITCH
-    // -------------------------------------------------------------------------
-    
-    switch (currentPage) {
-        case 'login':
-            // PÁGINA DE LOGIN
-            return <LoginPage onBackToHome={goToHome} />;
-        
-        case 'servicios':
-            // PÁGINA DE SERVICIOS
-            // IMPORTANTE: Pasar TANTO goToHome COMO goToLogin
-            return (
-                <ServiciosPage 
-                    onBackToHome={goToHome}
-                    onGoToLogin={goToLogin}
-                />
-            );
-        
-        case 'home':
-        default:
-            // PÁGINA PRINCIPAL (HOME)
-            return (
-                <>
-                    <div className="background-image-container"></div>
-                    
-                    <div className="container">
-                        <Header onLoginClick={goToLogin} />
-                        
-                        {/* IMPORTANTE: Pasar goToServicios a MainContent */}
-                        <MainContent onServiciosClick={goToServicios} />
-                        
-                        <div className="foam-effect"></div>
-                        
-                        <Footer />
-                    </div>
-                </>
-            );
-    }
+    return (
+        <AuthProvider>
+            <CarritoProvider>
+                <AppContent />
+            </CarritoProvider>
+        </AuthProvider>
+    );
 };
 
 export default App;
-
-// =============================================================================
-// CONCEPTOS CLAVE:
-// =============================================================================
-//
-// 1. NAVEGACIÓN CON SWITCH:
-//    - Más limpio que múltiples if/else
-//    - Fácil agregar más páginas
-//
-// 2. PROPS MÚLTIPLES:
-//    - ServiciosPage recibe DOS funciones:
-//      · onBackToHome → Para volver al inicio
-//      · onGoToLogin → Para ir al login desde servicios
-//
-// 3. FUNCIONES DE NAVEGACIÓN:
-//    - goToHome(), goToLogin(), goToServicios()
-//    - Todas hacen lo mismo: setCurrentPage(valor)
-//    - Separadas por claridad
-//
-// =============================================================================

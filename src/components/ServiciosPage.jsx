@@ -49,7 +49,8 @@ const SERVICIOS_DATA = [
     }
 ];
 
-const ServiciosPage = ({ onBackToHome, onGoToLogin }) => {
+// ✅ AGREGAR onCotizacion A LAS PROPS
+const ServiciosPage = ({ onBackToHome, onGoToLogin, onCotizacion }) => {
     const [searchQuery, setSearchQuery] = useState('');
 
     const serviciosFiltrados = SERVICIOS_DATA.filter(servicio => {
@@ -74,43 +75,43 @@ const ServiciosPage = ({ onBackToHome, onGoToLogin }) => {
         alert(`Servicio: ${servicio.titulo}\nPrecio: ${servicio.precio}\n\n¡Próximamente podrás agendarlo!`);
     };
 
-   // En ServiciosPage.jsx, actualiza esta parte:
-
-        return (
-            <div className="servicios-page">
-                <ServicesHeader 
-                    onBackToHome={onBackToHome}
-                    onGoToLogin={onGoToLogin}
-                />
+    return (
+        <div className="servicios-page">
+            {/* ✅ PASAR onCotizacion AL HEADER */}
+            <ServicesHeader 
+                onBackToHome={onBackToHome}
+                onGoToLogin={onGoToLogin}
+                onCotizacion={onCotizacion}
+            />
+            
+            <SearchSection 
+                searchQuery={searchQuery}
+                onSearch={handleSearch}
+            />
+            
+            <section className="services-section">
+                <h2 className="section-title">Nuestros servicios</h2>
                 
-                <SearchSection 
-                    searchQuery={searchQuery}
-                    onSearch={handleSearch}
-                />
-                
-                <section className="services-section">
-                    <h2 className="section-title">Nuestros servicios</h2>
-                    
-                    {serviciosFiltrados.length > 0 ? (
-                        <ServicesGrid 
-                            servicios={serviciosFiltrados}
-                            onSolicitar={handleSolicitar}
-                            onGoToLogin={onGoToLogin}  // ← AGREGAR ESTA LÍNEA
-                        />
-                    ) : (
-                        <div className="no-results">
-                            <p>No se encontraron servicios que coincidan con "{searchQuery}"</p>
-                            <button 
-                                className="clear-search-btn"
-                                onClick={() => setSearchQuery('')}
-                            >
-                                Limpiar búsqueda
-                            </button>
-                        </div>
-                    )}
-                </section>
-            </div>
-        );
+                {serviciosFiltrados.length > 0 ? (
+                    <ServicesGrid 
+                        servicios={serviciosFiltrados}
+                        onSolicitar={handleSolicitar}
+                        onGoToLogin={onGoToLogin}
+                    />
+                ) : (
+                    <div className="no-results">
+                        <p>No se encontraron servicios que coincidan con "{searchQuery}"</p>
+                        <button 
+                            className="clear-search-btn"
+                            onClick={() => setSearchQuery('')}
+                        >
+                            Limpiar búsqueda
+                        </button>
+                    </div>
+                )}
+            </section>
+        </div>
+    );
 };
 
 export default ServiciosPage;

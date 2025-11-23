@@ -16,10 +16,9 @@ import React from 'react';
  * CONCEPTO CLAVE:
  * Este componente es "presentacional" (solo muestra UI, no maneja lógica compleja)
  */
-const ServicesHeader = ({ onBackToHome, onGoToLogin }) => {
+const ServicesHeader = ({ onBackToHome, onGoToLogin, onCotizacion }) => {
     return (
         <header className="header-banner">
-            {/* LOGO CLICKEABLE */}
             <h1 
                 className="logo-header"
                 onClick={onBackToHome}
@@ -28,17 +27,9 @@ const ServicesHeader = ({ onBackToHome, onGoToLogin }) => {
                 FoamWash
             </h1>
             
-            {/* BARRA DE NAVEGACIÓN */}
             <nav className="nav-bar">
-                {/* 
-                    NAVEGACIÓN:
-                    - Hogar: Vuelve al inicio
-                    - Cotización: Próximamente (por ahora solo alert)
-                    - Agendar: Destacado (color diferente)
-                    - Iniciar Sesión: ✅ Ahora funciona de verdad
-                */}
-                <a 
-                    href="#" 
+                <a
+                    href="#"
                     className="nav-link"
                     onClick={(e) => {
                         e.preventDefault();
@@ -48,24 +39,24 @@ const ServicesHeader = ({ onBackToHome, onGoToLogin }) => {
                     Hogar
                 </a>
                 
+                {/* ✅ AHORA CON LA PROP CORRECTA */}
                 <a 
                     href="#" 
                     className="nav-link"
                     onClick={(e) => {
                         e.preventDefault();
-                        alert('Cotización próximamente');
+                        onCotizacion(); // ✅ Ahora sí funcionará
                     }}
                 >
                     Cotización
                 </a>
                 
-                <a
+                <a 
                     href="#" 
                     className="nav-link" 
                     style={{ color: 'rgb(133, 198, 255)' }}
                     onClick={(e) => {
                         e.preventDefault();
-                        // Scroll hacia los servicios
                         document.querySelector('.services-section')?.scrollIntoView({ 
                             behavior: 'smooth' 
                         });
@@ -79,7 +70,7 @@ const ServicesHeader = ({ onBackToHome, onGoToLogin }) => {
                     className="nav-link"
                     onClick={(e) => {
                         e.preventDefault();
-                        onGoToLogin(); // ✅ Ahora funciona de verdad
+                        onGoToLogin();
                     }}
                 >
                     Iniciar Sesión
