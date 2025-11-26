@@ -11,7 +11,7 @@ const serviceData = [
   { id: 3, img: "/img/imag5.jpg", title: "Tapicería de carros", desc: "Limpieza interior del vehículo: asientos, alfombras y paneles.", price: "$140.000" },
   { id: 4, img: "/img/imag7.jpg", title: "Lavado de cortinas", desc: "Lavado y planchado ligero para cortinas y visillos.", price: "$80.000" },
   { id: 5, img: "/img/imag6.jpg", title: "Lavado de colchones", desc: "Eliminación de ácaros y manchas, desodorización y secado rápido.", price: "$90.000" },
-  { id: 6, img: "/img/imag8.jpg", title: "Mantenimiento y pulido de pisos", desc: "Recuperar brillo, proteger la superficie y mejorar su apariencia..", price: "$100.000" },
+  { id: 6, img: "/img/imag8.jpg", title: "Mantenimiento y pulido de pisos", desc: "Recuperar brillo, proteger la superficie y mejorar su apariencia.", price: "$100.000" },
   { id: 7, img: "/img/imag2.jpg", title: "Limpieza sillas de comedor", desc: "Elimina manchas, suciedad y malos olores.", price: "$7.000 por silla" },
   { id: 8, img: "/img/imag3.jpg", title: "Limpieza de tapetes decorativos", desc: "Remueve suciedad, polvo y manchas, devolviendo frescura y color..", price: "$60.000" },
 ];

@@ -1,25 +1,27 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import '../styles/estilos_cotizar_cliente.css'; 
+// IMPORTANTE: Asegúrate de que tu CSS (estilos_cotizar_cliente.css) esté importado 
+// en este archivo o en el App.js para que los estilos funcionen correctamente.
+// import '../styles/estilos_cotizar_cliente.css'; 
 
 // =======================================================
-// DATOS DE SERVICIOS
+// DATOS DE SERVICIOS (Extraídos de cotizar_cliente.js)
 // =======================================================
 const SERVICIOS = [
-    { id: 1, nombre: "Lavado de muebles", precio: 90000, imagen: "/img/imag1.jpg", duracion: "2-3 horas", tamanos: ["Pequeño", "Mediano", "Grande"] },
-    { id: 2, nombre: "Lavado de alfombras", precio: 50000, imagen: "/img/imag4.jpg", duracion: "1-2 horas", tamanos: ["Pequeña", "Mediana", "Grande"] },
-    { id: 3, nombre: "Tapicería de carros", precio: 140000, imagen: "/img/imag5.jpg", duracion: "3-4 horas", tamanos: ["Sedan", "SUV", "Camioneta"] },
-    { id: 4, nombre: "Lavado de cortinas", precio: 80000, imagen: "/img/imag7.jpg", duracion: "2 horas", tamanos: ["Por metro", "Juego completo"] },
-    { id: 5, nombre: "Lavado de colchones", precio: 90000, imagen: "/img/imag6.jpg", duracion: "2-3 horas", tamanos: ["Sencillo", "Semi-doble", "Doble", "Queen", "King"] },
-    { id: 6, nombre: "Mantenimiento y pulido de pisos", precio: 100000, imagen: "/img/imag8.jpg", duracion: "1-2 horas", tamanos: ["Pequeño (hasta 50m²)", "Mediano (50-100m²)", "Grande (más de 100m²)"] },
-    { id: 7, nombre: "Limpieza sillas de comedor", precio: 7000, imagen: "/img/imag2.jpg", duracion: "1-2 horas", tamanos: ["7.000 por silla", "10.000 por silla"] },
-    { id: 8, nombre: "Limpieza de tapetes decorativos", precio: 60000, imagen: "/img/imag3.jpg", duracion: "1-2 horas", tamanos: ["Pequeño (hasta 50m²)", "Mediano (50-100m²)", "Grande (más de 100m²)"] },
+    { id: 1, nombre: "Lavado de muebles", precio: 90000, imagen: "/img/imag1.jpg", desc: "Lavado profundo de sofás y sillas, eliminación de manchas y olores.", tamanos: ["Pequeño", "Mediano", "Grande"] },
+    { id: 2, nombre: "Lavado de alfombras", precio: 50000, imagen: "/img/imag4.jpg",desc: "Limpieza profunda para alfombras pequeñas y medianas", tamanos: ["Pequeña", "Mediana", "Grande"] },
+    { id: 3, nombre: "Tapicería de carros", precio: 140000, imagen: "/img/imag5.jpg",desc: "Limpieza interior del vehículo: asientos, alfombras y paneles.", tamanos: ["Sedan", "SUV", "Camioneta"] },
+    { id: 4, nombre: "Lavado de cortinas", precio: 80000, imagen: "/img/imag7.jpg", desc: "Lavado y planchado ligero para cortinas y visillos.", tamanos: ["Por metro", "Juego completo"] },
+    { id: 5, nombre: "Lavado de colchones", precio: 90000, imagen: "/img/imag6.jpg",desc:"Eliminación de ácaros y manchas, desodorización y secado rápido.", tamanos: ["Sencillo", "Semi-doble", "Doble", "Queen", "King"] },
+    { id: 6, nombre: "Mantenimiento y pulido de pisos", precio: 100000, imagen: "/img/imag8.jpg",desc: "Recuperar brillo, proteger la superficie y mejorar su apariencia.", tamanos: ["Pequeño (hasta 50m²)", "Mediano (50-100m²)", "Grande (más de 100m²)"] },
+    { id: 7, nombre: "Limpieza sillas de comedor", precio: 7000, imagen: "/img/imag2.jpg", desc: "Elimina manchas, suciedad y malos olores.", tamanos: ["7.000 por silla", "10.000 por silla"] },
+    { id: 8, nombre: "Limpieza de tapetes decorativos", precio: 60000, imagen: "/img/imag3.jpg", desc: "Remueve suciedad, polvo y manchas, devolviendo frescura y color..", tamanos: ["Pequeño (hasta 50m²)", "Mediano (50-100m²)", "Grande (más de 100m²)"] },
 ];
 
 // =======================================================
-// UTILIDADES Y LÓGICA DE ESTADO
+// UTILIDADES Y LÓGICA DE ESTADO (Adaptadas del JS original)
 // =======================================================
-// NOTA: calcularTotal ahora usa precioAjustado si existe
-const calcularTotal = (items) => items.reduce((total, item) => total + ( (item.precioAjustado || item.precio) * item.cantidad), 0);
+const calcularTotal = (items) => items.reduce((total, item) => total + (item.precio * item.cantidad), 0);
 const formatearMoneda = (value) => `$${value.toLocaleString('es-CO')}`;
 const formatearFecha = (fecha) => {
     const date = new Date(fecha + 'T00:00:00');
@@ -32,6 +34,13 @@ const getStoredItems = (key) => {
         return [];
     }
 };
+const saveItem = (key, item) => {
+    const arr = getStoredItems(key);
+    arr.push(item);
+    localStorage.setItem(key, JSON.stringify(arr));
+};
+
+// Simulación de usuario logueado (basado en el propósito del HTML)
 const getMockUser = () => ({
     isLoggedIn: true,
     email: "cliente.demo@foamwash.com",
@@ -43,21 +52,21 @@ const getMockUser = () => ({
 // SUBCOMPONENTE: Tarjeta de Servicio (ServiceCard)
 // =======================================================
 const ServiceCard = ({ service, onAgregar }) => (
-    <article className="service-card">
-        <div className="service-image">
-            <img src={service.imagen} alt={service.nombre} />
-        </div>
-        <div className="service-content">
-            <h3 className="service-title">{service.nombre}</h3>
-            <p className="service-desc">{service.desc}</p>
-            <div className="service-meta">
-                <span className="service-price">{formatearMoneda(service.precio)}</span>
-                <button type="button" className="service-btn" onClick={() => onAgregar(service.id)}> 
-                    Agregar
-                </button>
-            </div>
-        </div>
-    </article>
+  <article className="service-card">
+    <div className="service-image">
+      <img src={service.imagen} alt={service.nombre} />
+    </div>
+    <div className="service-content">
+      <h3 className="service-title">{service.nombre}</h3>
+      <p className="service-desc">{service.desc}</p>
+      <div className="service-meta">
+        <span className="service-price">{formatearMoneda(service.precio)}</span>
+        <button type="button" className="service-btn" onClick={() => onAgregar(service.id)}> 
+          Agregar
+        </button>
+      </div>
+    </div>
+  </article>
 );
 
 
@@ -65,66 +74,58 @@ const ServiceCard = ({ service, onAgregar }) => (
 // SUBCOMPONENTE: Modal Carrito (CartModal)
 // =======================================================
 const CartModal = ({ carrito, total, onActualizarCantidad, onCerrar, onFinalizarCompra }) => (
-    <div className="modal-overlay show" id="modalCarrito" onClick={(e) => e.target.classList.contains('modal-overlay') && onCerrar()}>
-        <div className="modal-content">
-            <div className="modal-header">
-                <h2>🛒 Carrito de Servicios</h2>
-                <button className="modal-close" onClick={onCerrar}>×</button>
-            </div>
-            <div className="modal-body">
-                <div id="carritoItems">
-                    {carrito.length === 0 ? (
-                        <p className="carrito-vacio">El carrito está vacío</p>
-                    ) : (
-                        carrito.map((item) => (
-                            <div key={item.id} className="carrito-item">
-                                <img src={item.imagen} alt={item.nombre} className="carrito-item-img" />
-                                <div className="carrito-item-info">
-                                    <h4>{item.nombre}</h4>
-                                    <p className="carrito-item-duracion">⏱️ {item.duracion}</p>
-                                    {/* Muestra el precio ajustado si existe */}
-                                    <p className="carrito-item-precio">{formatearMoneda(item.precioAjustado || item.precio)}</p>
-                                </div>
-                                <div className="carrito-item-actions">
-                                    <div className="cantidad-control">
-                                        <button onClick={() => onActualizarCantidad(item.id, item.cantidad - 1)}>-</button>
-                                        <span>{item.cantidad}</span>
-                                        <button onClick={() => onActualizarCantidad(item.id, item.cantidad + 1)}>+</button>
-                                    </div>
-                                    <button className="btn-eliminar" onClick={() => onActualizarCantidad(item.id, 0)}>🗑️</button>
-                                </div>
-                            </div>
-                        ))
-                    )}
+  <div className="modal-overlay show" id="modalCarrito" onClick={(e) => e.target.classList.contains('modal-overlay') && onCerrar()}>
+    <div className="modal-content">
+      <div className="modal-header">
+        <h2>🛒 Carrito de Servicios</h2>
+        <button className="modal-close" onClick={onCerrar}>×</button>
+      </div>
+      <div className="modal-body">
+        <div id="carritoItems">
+          {carrito.length === 0 ? (
+            <p className="carrito-vacio">El carrito está vacío</p>
+          ) : (
+            carrito.map((item) => (
+              <div key={item.id} className="carrito-item">
+                <img src={item.imagen} alt={item.nombre} className="carrito-item-img" />
+                <div className="carrito-item-info">
+                  <h4>{item.nombre}</h4>
+                  <p className="carrito-item-duracion">⏱️ {item.duracion}</p>
+                  <p className="carrito-item-precio">{formatearMoneda(item.precio)}</p>
                 </div>
-                <div className="carrito-total">
-                    <h3>Total: <span id="carritoTotal">{formatearMoneda(total)}</span></h3>
+                <div className="carrito-item-actions">
+                  <div className="cantidad-control">
+                    <button onClick={() => onActualizarCantidad(item.id, item.cantidad - 1)}>-</button>
+                    <span>{item.cantidad}</span>
+                    <button onClick={() => onActualizarCantidad(item.id, item.cantidad + 1)}>+</button>
+                  </div>
+                  <button className="btn-eliminar" onClick={() => onActualizarCantidad(item.id, 0)}>🗑️</button>
                 </div>
-            </div>
-            <div className="modal-footer">
-                <button className="btn-secondary" onClick={onCerrar}>Seguir Cotizando</button>
-                <button className="btn-primary" onClick={onFinalizarCompra} disabled={carrito.length === 0}>Ver Cotizacion Final</button>
-            </div>
+              </div>
+            ))
+          )}
         </div>
+        <div className="carrito-total">
+          <h3>Total: <span id="carritoTotal">{formatearMoneda(total)}</span></h3>
+        </div>
+      </div>
+      <div className="modal-footer">
+        <button className="btn-secondary" onClick={onCerrar}>Seguir Cotizando</button>
+        <button className="btn-primary" onClick={onFinalizarCompra} disabled={carrito.length === 0}>Ver Cotizacion Final</button>
+      </div>
     </div>
+  </div>
 );
 
 
 // =======================================================
-// SUBCOMPONENTE: Modal de Confirmación
+// SUBCOMPONENTE: Modal de Confirmación (Cotización/Agendamiento)
 // =======================================================
-const ConfirmationModal = ({ carrito, total, onCerrar, onActualizarDetalle, onConfirmarPedido, onSeguirCotizando, ultimaCotizacion, onSaveCotizacion }) => {
+const ConfirmationModal = ({ carrito, total, onCerrar, onActualizarDetalle, onConfirmarPedido, onSeguirCotizando, ultimaCotizacion }) => {
+    // 0: Detalles (Seleccionar Tamaño) | 1: Cotización Generada | 2: Formulario Agendamiento Final | 3: Pedido Confirmado
     const [modalStage, setModalStage] = useState(0); 
     const [formData, setFormData] = useState({});
     const [pedidoFinal, setPedidoFinal] = useState(null);
-    
-    const cotizacionActual = modalStage >= 1 && ultimaCotizacion;
-
-    const saveItem = (key, item) => {
-        const arr = getStoredItems(key);
-        arr.push(item);
-        localStorage.setItem(key, JSON.stringify(arr));
-    };
 
     const handleGenerarCotizacion = () => {
         const sinDetalles = carrito.some(item => !item.tamano);
@@ -135,59 +136,55 @@ const ConfirmationModal = ({ carrito, total, onCerrar, onActualizarDetalle, onCo
 
         const cotizacion = {
             id: `COT-${Date.now()}`,
-            servicios: carrito.map(item => ({ 
-                ...item,
-                // Guarda el precio real calculado en la cotización
-                precioUnitario: item.precioAjustado || item.precio
-            })), 
-            total: total, 
+            servicios: carrito.map(item => ({ ...item })), // Clonar carrito
+            total: total,
             fechaCreacion: new Date().toISOString()
         };
-        
-        onSaveCotizacion(cotizacion); 
-        setModalStage(1); 
+        saveItem('cotizacionesGuardadas', cotizacion);
+        setModalStage(1); // Muestra la cotización generada
     };
 
     const handleAgendacion = () => {
-        setModalStage(2); 
+        setModalStage(2); // Muestra el formulario de agendamiento
+        // Reiniciar el formulario de agendamiento
         setFormData({});
     };
 
     const handleConfirmar = (e) => {
         e.preventDefault();
+        // Simulación de validación
         if (!formData.direccion || !formData.fecha || !formData.hora) {
             alert('Por favor completa los campos requeridos.');
             return;
         }
-        
-        const serviciosParaPedido = cotizacionActual ? cotizacionActual.servicios : carrito.map(item => ({ ...item }));
-        const totalParaPedido = cotizacionActual ? cotizacionActual.total : total;
 
         const pedido = {
             id: `PED-${Date.now()}`,
-            cotizacionId: cotizacionActual ? cotizacionActual.id : null,
-            servicios: serviciosParaPedido,
+            cotizacionId: ultimaCotizacion ? ultimaCotizacion.id : null,
+            servicios: ultimaCotizacion ? ultimaCotizacion.servicios : carrito.map(item => ({ ...item })),
             ...formData,
-            total: totalParaPedido,
+            total: ultimaCotizacion ? ultimaCotizacion.total : total,
             estado: 'Pendiente',
             fechaCreacion: new Date().toISOString()
         };
 
         saveItem('pedidos', pedido);
         setPedidoFinal(pedido);
-        setModalStage(3); 
-        onConfirmarPedido(); 
+        setModalStage(3); // Muestra el éxito del pedido
+        onConfirmarPedido(); // Limpia el carrito en el padre
     };
 
     const onCloseWrapper = () => {
-        setModalStage(0); 
+        setModalStage(0); // Reinicia el estado interno al cerrar
         setPedidoFinal(null);
         onCerrar();
     };
     
+    // --- Renderizado Condicional del Contenido del Modal ---
     let modalContent;
     let modalFooter;
 
+    const cotizacionActual = modalStage >= 1 ? ultimaCotizacion : null;
     const itemsParaResumen = cotizacionActual ? cotizacionActual.servicios : carrito;
     
     // 1. STAGE 0: Detalles de Cotización
@@ -201,15 +198,10 @@ const ConfirmationModal = ({ carrito, total, onCerrar, onActualizarDetalle, onCo
                     </div>
                     {carrito.map((item, index) => (
                         <div key={item.id} className="servicio-detalle">
-                            <h4>{item.nombre} (x{item.cantidad}) - Base: {formatearMoneda(item.precio)}</h4>
+                            <h4>{item.nombre} (x{item.cantidad})</h4>
                             <div className="form-group">
                                 <label htmlFor={`tamano-${index}`}>Tamaño *</label>
-                                <select 
-                                    id={`tamano-${index}`} 
-                                    required 
-                                    value={item.tamano || ''} 
-                                    onChange={(e) => onActualizarDetalle(item.id, 'tamano', e.target.value)}
-                                >
+                                <select id={`tamano-${index}`} required onChange={(e) => onActualizarDetalle(item.id, 'tamano', e.target.value)}>
                                     <option value="">Seleccionar tamaño</option>
                                     {item.tamanos.map(t => <option key={t} value={t}>{t}</option>)}
                                 </select>
@@ -217,11 +209,8 @@ const ConfirmationModal = ({ carrito, total, onCerrar, onActualizarDetalle, onCo
                             <div className="form-group">
                                 <label htmlFor={`cantidad-${index}`}>Cantidad *</label>
                                 <input type="number" id={`cantidad-${index}`} min="1" value={item.cantidad} 
-                                    onChange={(e) => onActualizarDetalle(item.id, 'cantidad', parseInt(e.target.value) || 1)} required />
+                                    onChange={(e) => onActualizarDetalle(item.id, 'cantidad', parseInt(e.target.value))} required />
                             </div>
-                            <p className="servicio-detalle-precio">
-                                Precio Final Unitario: <strong>{formatearMoneda(item.precioAjustado || item.precio)}</strong>
-                            </p>
                         </div>
                     ))}
                 </div>
@@ -244,11 +233,11 @@ const ConfirmationModal = ({ carrito, total, onCerrar, onActualizarDetalle, onCo
                 <p><strong>{cotizacionActual.id}</strong></p>
                 <div style={{ background: '#f8f9fa', padding: '15px', borderRadius: '8px', margin: '20px 0', textAlign: 'left' }}>
                     <h4 style={{ marginBottom: '10px' }}>Servicios cotizados:</h4>
-                    {cotizacionActual.servicios.map((item, index) => (
-                        <div key={item.id + '-' + index} style={{ padding: '8px 0', borderBottom: '1px solid #dee2e6' }}>
+                    {cotizacionActual.servicios.map(item => (
+                        <div key={item.id} style={{ padding: '8px 0', borderBottom: '1px solid #dee2e6' }}>
                             <strong>{item.nombre}</strong><br/>
-                            <small>📏 {item.tamano} | ✖️ {item.cantidad} | Precio Unitario: {formatearMoneda(item.precioUnitario)}</small><br/>
-                            <span style={{ color: '#28a745', fontWeight: 'bold' }}>{formatearMoneda(item.precioUnitario * item.cantidad)}</span>
+                            <small>📏 {item.tamano} | ✖️ {item.cantidad}</small><br/>
+                            <span style={{ color: '#28a745', fontWeight: 'bold' }}>{formatearMoneda(item.precio * item.cantidad)}</span>
                         </div>
                     ))}
                 </div>
@@ -274,6 +263,7 @@ const ConfirmationModal = ({ carrito, total, onCerrar, onActualizarDetalle, onCo
             <form onSubmit={handleConfirmar} className="form-confirmacion" id="formConfirmacion">
                 <h3 style={{ textAlign: 'center', marginBottom: '20px' }}>📅 Agendar Servicio</h3>
                 
+                {/* Form fields */}
                 <div className="form-group">
                     <label htmlFor="direccion">Dirección *</label>
                     <input type="text" id="direccion" name="direccion" onChange={(e) => setFormData({...formData, direccion: e.target.value})} required placeholder="Calle 123 #45-67" />
@@ -305,16 +295,16 @@ const ConfirmationModal = ({ carrito, total, onCerrar, onActualizarDetalle, onCo
                 <div className="resumen-pedido">
                     <h3>Resumen de tu pedido</h3>
                     <div id="resumenPedido">
-                        {itemsParaResumen.map((item, index) => (
-                            <div key={item.id + '-' + index} className="resumen-item">
+                        {itemsParaResumen.map(item => (
+                            <div key={item.id} className="resumen-item">
                                 <span>{item.nombre} x{item.cantidad} ({item.tamano})</span>
-                                <span>{formatearMoneda((item.precioUnitario || item.precioAjustado || item.precio) * item.cantidad)}</span>
+                                <span>{formatearMoneda(item.precio * item.cantidad)}</span>
                             </div>
                         ))}
                     </div>
                     <div className="resumen-total-final">
                         <strong>Total a pagar:</strong>
-                        <span id="totalFinal">{formatearMoneda(cotizacionActual ? cotizacionActual.total : total)}</span>
+                        <span id="totalFinal">{formatearMoneda(total)}</span>
                     </div>
                 </div>
             </form>
@@ -342,6 +332,7 @@ const ConfirmationModal = ({ carrito, total, onCerrar, onActualizarDetalle, onCo
         modalFooter = (
             <button className="btn-primary" onClick={onCloseWrapper}>Aceptar</button>
         );
+        // El script original cerraba después de 5s, aquí el padre podría implementar un useEffect
     }
 
     return (
@@ -368,32 +359,29 @@ const ConfirmationModal = ({ carrito, total, onCerrar, onActualizarDetalle, onCo
 // =======================================================
 export default function CotizacionesCliente() {
     const [searchTerm, setSearchTerm] = useState('');
-    const [carrito, setCarrito] = useState(getStoredItems('carrito') || []); 
+    const [carrito, setCarrito] = useState(getStoredItems('carrito') || []); // Cargar carrito de LS
     const [showCartModal, setShowCartModal] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [cotizacionesGuardadas, setCotizacionesGuardadas] = useState(getStoredItems('cotizacionesGuardadas') || []);
-    const user = getMockUser(); 
+    const user = getMockUser(); // Usuario logueado (Simulación)
 
-    // Sincronizar el carrito con localStorage
+    // Usar useEffect para sincronizar el carrito con localStorage
     useEffect(() => {
         localStorage.setItem('carrito', JSON.stringify(carrito));
     }, [carrito]);
     
-    // Función para guardar cotización y actualizar estado
-    const handleSaveCotizacion = (nuevaCotizacion) => {
-        const arr = getStoredItems('cotizacionesGuardadas');
-        arr.push(nuevaCotizacion);
-        localStorage.setItem('cotizacionesGuardadas', JSON.stringify(arr));
-        setCotizacionesGuardadas(prev => [...prev, nuevaCotizacion]);
-    };
-    
-    // Calcular el total del carrito usando precioAjustado
+    // Calcular el total del carrito y el total de items
     const total = useMemo(() => calcularTotal(carrito), [carrito]);
     const totalItems = useMemo(() => carrito.reduce((sum, item) => sum + item.cantidad, 0), [carrito]);
-    
     const ultimaCotizacion = cotizacionesGuardadas[cotizacionesGuardadas.length - 1];
 
-    // Lógica de Agregar al carrito
+    // LOGICA: Filtro de servicios
+    const filteredServices = SERVICIOS.filter(service => {
+        const query = searchTerm.toLowerCase();
+        return service.nombre.toLowerCase().includes(query) || service.desc.toLowerCase().includes(query);
+    });
+
+    // LOGICA: Manejo del carrito
     const handleAgregarAlCarrito = (servicioId) => {
         const servicio = SERVICIOS.find(s => s.id === servicioId);
         if (!servicio) return;
@@ -406,12 +394,7 @@ export default function CotizacionesCliente() {
                     item.id === servicioId ? { ...item, cantidad: item.cantidad + 1 } : item
                 );
             } else {
-                return [...prevCarrito, { 
-                    ...servicio, 
-                    cantidad: 1, 
-                    tamano: '', 
-                    precioAjustado: servicio.precio // Inicializa el precio ajustado
-                }];
+                return [...prevCarrito, { ...servicio, cantidad: 1, tamano: '' }];
             }
         });
     };
@@ -421,43 +404,17 @@ export default function CotizacionesCliente() {
             if (nuevaCantidad <= 0) {
                 return prevCarrito.filter(item => item.id !== servicioId);
             }
-            const cantidad = parseInt(nuevaCantidad); 
             return prevCarrito.map(item =>
-                item.id === servicioId ? { ...item, cantidad: cantidad } : item
+                item.id === servicioId ? { ...item, cantidad: nuevaCantidad } : item
             );
         });
     };
     
-    // LÓGICA CLAVE: Ajustar precio (+$30.000) si es Mediano o Grande
+    // Actualizar el detalle (tamaño, tipo) del servicio en el carrito
     const handleActualizarDetalle = (servicioId, campo, valor) => {
-        setCarrito(prevCarrito => prevCarrito.map(item => {
-            if (item.id === servicioId) {
-                let nuevoPrecioAjustado = item.precio;
-                let nuevoTamano = item.tamano;
-                let nuevaCantidad = item.cantidad;
-                
-                if (campo === 'tamano') {
-                    nuevoTamano = valor;
-                    // Lógica para sumar 30.000 si es Mediano o Grande
-                    if (nuevoTamano && (nuevoTamano.toLowerCase().includes('mediano') || nuevoTamano.toLowerCase().includes('grande'))) {
-                        nuevoPrecioAjustado = item.precio + 30000;
-                    } else {
-                        nuevoPrecioAjustado = item.precio; // Restablecer al precio base
-                    }
-                } else if (campo === 'cantidad') {
-                    nuevaCantidad = valor;
-                }
-                
-                return { 
-                    ...item, 
-                    [campo]: valor, 
-                    tamano: nuevoTamano,
-                    cantidad: nuevaCantidad,
-                    precioAjustado: nuevoPrecioAjustado // Guarda el precio calculado
-                };
-            }
-            return item;
-        }));
+        setCarrito(prevCarrito => prevCarrito.map(item => 
+            item.id === servicioId ? { ...item, [campo]: valor } : item
+        ));
     };
 
     const handleFinalizarCompra = () => {
@@ -467,23 +424,20 @@ export default function CotizacionesCliente() {
     };
 
     const handleConfirmarPedido = () => {
+        // Esta función se llama al completar el pedido en el modal, resetea el carrito
         setCarrito([]);
     };
     
+    // La función cerrarSesionCliente original usa logout() y redirecciona
     const handleCerrarSesionCliente = (e) => {
         e.preventDefault();
         if (window.confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+            // Aquí llamarías a tu función de logout y luego redirigirías
+            // logout(); // Función definida en login.js (simulación)
+            // window.location.href = '/login.html'; // Redirección
             alert('Cerrando Sesión (Simulación)');
         }
     };
-    
-    // =======================================================
-    // CORRECCIÓN: filteredServices movido DENTRO del componente
-    // =======================================================
-    const filteredServices = SERVICIOS.filter(service => {
-        const query = searchTerm.toLowerCase();
-        return service.nombre.toLowerCase().includes(query) || (service.desc && service.desc.toLowerCase().includes(query));
-    });
 
     return (
         <>
@@ -520,7 +474,6 @@ export default function CotizacionesCliente() {
             <section className="services-section">
                 <h2 className="section-title">Nuestros Servicios</h2>
                 <div className="services-grid">
-                    {/* Variable filteredServices ya definida correctamente */}
                     {filteredServices.map(service => (
                         <ServiceCard 
                             key={service.id}
@@ -560,10 +513,10 @@ export default function CotizacionesCliente() {
                     onConfirmarPedido={handleConfirmarPedido}
                     onSeguirCotizando={() => setCarrito([])}
                     ultimaCotizacion={ultimaCotizacion}
-                    onSaveCotizacion={handleSaveCotizacion}
                 />
             )}
             
+            {/* El contenedor de notificaciones debe ser implementado aparte con un hook de notificaciones */}
         </>
     );
 }
