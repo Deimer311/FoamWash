@@ -9,6 +9,8 @@ function App() {
         Header, Barra de búsqueda y la Cuadrícula de Servicios.
       */}
       <Cotizar />
+      <CotizacionesCliente/>
+      
       
     </div>
   );
