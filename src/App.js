@@ -8,8 +8,9 @@ function App() {
       {/* El componente Cotizaciones renderiza todo el contenido de la página:
         Header, Barra de búsqueda y la Cuadrícula de Servicios.
       */}
-      <Cotizar />
-      <CotizacionesCliente/>
+      <Cotizar/>
+
+      
       
       
     </div>

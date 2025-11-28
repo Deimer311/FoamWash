@@ -257,6 +257,7 @@ const ConfirmationModal = ({ carrito, total, onCerrar, onActualizarDetalle, onCo
             </>
         );
     }
+
     // 3. STAGE 2: Formulario de Agendamiento
     else if (modalStage === 2) {
         modalContent = (
