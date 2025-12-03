@@ -1,43 +1,45 @@
-    //=====================================================================
-    // ESTE ARCHIVO MANEJA LA CONEXION CON LA BASE DE DATOS
-    //=====================================================================
+// Importa el módulo 'mysql2/promise' para interactuar con la base de datos MySQL.
+// Se utiliza la versión 'promise' para trabajar con async/await y evitar callbacks anidados.
+const mysql = require('mysql2/promise');
 
-    // src/db.js
+// Importa y configura el módulo 'dotenv' para cargar variables de entorno desde un archivo .env.
+// Esto mantiene las credenciales de la base de datos seguras y separadas del código fuente.
+require('dotenv').config();
 
-    // Importa el módulo 'mysql2' con la interfaz de promesas.
-    // Esto permite usar async/await para manejar las operaciones de la base de datos de forma más limpia.
-    const mysql = require('mysql2/promise'); // Nota el '/promise'
+// Crea un 'pool' (piscina) de conexiones a la base de datos.
+// Un pool gestiona múltiples conexiones y las reutiliza, lo que es más eficiente que abrir y cerrar
+// una nueva conexión para cada consulta.
+const pool = mysql.createPool({
+    // Dirección del host de la base de datos (e.g., 'localhost' o una IP).
+    host: process.env.DB_HOST,
+    // Nombre de usuario para autenticarse en la base de datos.
+    user: process.env.DB_USER,
+    // Contraseña del usuario.
+    password: process.env.DB_PASSWORD,
+    // Nombre de la base de datos específica a la que se conectará.
+    database: process.env.DB_NAME,
+    // Indica si el pool debe esperar automáticamente si se excede el límite de conexiones disponibles.
+    waitForConnections: true,
+    // El número máximo de conexiones simultáneas que el pool puede manejar en un momento dado.
+    connectionLimit: 10,
+    // El número máximo de solicitudes de conexión que se pueden poner en cola si el límite de conexiones está lleno.
+    queueLimit: 0
+});
 
-    // Carga las variables de entorno del archivo .env.
-    // Esto permite acceder a las credenciales de forma segura usando process.env.
-    require('dotenv').config();
-
-    // Crea un "pool" de conexiones a la base de datos.
-    // Un pool gestiona automáticamente un grupo de conexiones abiertas y las reutiliza,
-    // lo cual es mucho más eficiente que abrir y cerrar una conexión para cada consulta.
-    const pool = mysql.createPool({
-    host: process.env.DB_HOST,         // Dirección del servidor MySQL (ej. 'localhost')
-    user: process.env.DB_USER,         // Nombre de usuario de la BD (ej. 'root')
-    password: process.env.DB_PASSWORD, // Contraseña del usuario (del archivo .env)
-    database: process.env.DB_NAME,     // Nombre de la base de datos a la que conectarse
-    waitForConnections: true,          // Si se agotan las conexiones, espera en cola en lugar de dar error inmediatamente
-    connectionLimit: 10,               // Número máximo de conexiones simultáneas que el pool mantendrá abiertas
-    queueLimit: 0                      // Límite para la cola de espera de conexiones (0 significa ilimitado)
-    });
-
-    // Prueba de conexión rápida (opcional):
-    // Intenta obtener una conexión del pool para verificar que la configuración es correcta.
-    pool.getConnection()
+// --- Bloque de prueba de conexión ---
+// Intenta obtener una conexión del pool para verificar si la configuración es correcta.
+pool.getConnection()
     .then(connection => {
-        // Si tiene éxito, libera la conexión inmediatamente de vuelta al pool
+        // Si tiene éxito, libera la conexión inmediatamente de vuelta al pool.
         pool.releaseConnection(connection);
+        // Muestra un mensaje de éxito en la consola.
         console.log('✅ Base de datos MySQL conectada exitosamente');
     })
     .catch(err => {
-        // Si hay un error en la conexión inicial, lo muestra en la consola
+        // Si ocurre un error durante la conexión inicial, lo captura y lo muestra en la consola.
         console.error('❌ Error al conectar a la BD:', err);
     });
 
-    // Exporta el objeto pool para que pueda ser utilizado en otras partes de la aplicación (ej. en tus rutas).
-    // Al exportar el pool, puedes ejecutar consultas en cualquier momento sin preocuparte por la conexión.
-    module.exports = pool;
+// Exporta el objeto 'pool' para que pueda ser utilizado en otros archivos de la aplicación
+// (e.g., para ejecutar consultas SQL).
+module.exports = pool;

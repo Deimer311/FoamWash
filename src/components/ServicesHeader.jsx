@@ -19,6 +19,7 @@ import React from 'react';
 const ServicesHeader = ({ onBackToHome, onGoToLogin, onCotizacion }) => {
     return (
         <header className="header-banner">
+                <img src="/img/ima9.jpg" alt="Fondo encabezado" className="fondo" />
             <h1 
                 className="logo-header"
                 onClick={onBackToHome}

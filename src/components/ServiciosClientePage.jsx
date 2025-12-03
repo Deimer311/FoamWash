@@ -19,66 +19,15 @@ import './css/estilos_cotizar_cliente.css';
 // DATOS DE SERVICIOS (mismo que tenías en servicios_cliente.js)
 // =============================================================================
 const SERVICIOS_DATA = [
-    {
-        id: 1,
-        nombre: 'Lavado de muebles',
-        descripcion: 'Lavado profundo de sofás y sillas, eliminación de manchas y olores.',
-        precio: 90000,
-        imagen: '/img/serv_lavado_muebles.jpg',
-        duracion: '2-3 horas',
-        tamanos: ['Pequeño', 'Mediano', 'Grande'],
-        tiposLavado: ['Básico', 'Profundo', 'Premium']
-    },
-    {
-        id: 2,
-        nombre: 'Lavado de alfombras',
-        descripcion: 'Limpieza profunda para alfombras pequeñas y medianas.',
-        precio: 50000,
-        imagen: '/img/serv_alfombras.jpg',
-        duracion: '1-2 horas',
-        tamanos: ['Pequeña', 'Mediana', 'Grande'],
-        tiposLavado: ['Básico', 'Profundo', 'Premium']
-    },
-    {
-        id: 3,
-        nombre: 'Tapicería de carros',
-        descripcion: 'Limpieza interior del vehículo: asientos, alfombras y paneles.',
-        precio: 140000,
-        imagen: '/img/serv_tapiceria_carro.jpg',
-        duracion: '3-4 horas',
-        tamanos: ['Sedan', 'SUV', 'Camioneta'],
-        tiposLavado: ['Básico', 'Completo', 'Premium']
-    },
-    {
-        id: 4,
-        nombre: 'Lavado de cortinas',
-        descripcion: 'Lavado y planchado ligero para cortinas y visillos.',
-        precio: 80000,
-        imagen: '/img/serv_cortinas.jpg',
-        duracion: '2 horas',
-        tamanos: ['Por metro', 'Juego completo'],
-        tiposLavado: ['Básico', 'Con planchado']
-    },
-    {
-        id: 5,
-        nombre: 'Lavado de colchones',
-        descripcion: 'Eliminación de ácaros y manchas, desodorización y secado rápido.',
-        precio: 90000,
-        imagen: '/img/serv_colchones.jpg',
-        duracion: '2-3 horas',
-        tamanos: ['Sencillo', 'Semi-doble', 'Doble', 'Queen', 'King'],
-        tiposLavado: ['Básico', 'Profundo', 'Sanitización']
-    },
-    {
-        id: 6,
-        nombre: 'Mantenimiento y pulido de pisos',
-        descripcion: 'Recuperar brillo, proteger la superficie y mejorar su apariencia.',
-        precio: 100000,
-        imagen: '/img/serv_desinfeccion.jpg',
-        duracion: '1-2 horas',
-        tamanos: ['Pequeño (hasta 50m²)', 'Mediano (50-100m²)', 'Grande (más de 100m²)'],
-        tiposLavado: ['Básica', 'Profunda', 'Completa']
-    },
+    { id: 1, nombre: "Lavado de muebles", precio: 90000, imagen: "/img/imag1.jpg", desc: "Lavado profundo de sofás y sillas, eliminación de manchas y olores.", tamanos: ["Pequeño", "Mediano", "Grande"] },
+    { id: 2, nombre: "Lavado de alfombras", precio: 50000, imagen: "/img/imag4.jpg",desc: "Limpieza profunda para alfombras pequeñas y medianas", tamanos: ["Pequeña", "Mediana", "Grande"] },
+    { id: 3, nombre: "Tapicería de carros", precio: 140000, imagen: "/img/imag5.jpg",desc: "Limpieza interior del vehículo: asientos, alfombras y paneles.", tamanos: ["Sedan", "SUV", "Camioneta"] },
+    { id: 4, nombre: "Lavado de cortinas", precio: 80000, imagen: "/img/imag7.jpg", desc: "Lavado y planchado ligero para cortinas y visillos.", tamanos: ["Por metro", "Juego completo"] },
+    { id: 5, nombre: "Lavado de colchones", precio: 90000, imagen: "/img/imag6.jpg",desc:"Eliminación de ácaros y manchas, desodorización y secado rápido.", tamanos: ["Sencillo", "Semi-doble", "Doble", "Queen", "King"] },
+    { id: 6, nombre: "Mantenimiento y pulido de pisos", precio: 100000, imagen: "/img/imag8.jpg",desc: "Recuperar brillo, proteger la superficie y mejorar su apariencia.", tamanos: ["Pequeño (hasta 50m²)", "Mediano (50-100m²)", "Grande (más de 100m²)"] },
+    { id: 7, nombre: "Limpieza sillas de comedor", precio: 7000, imagen: "/img/imag2.jpg", desc: "Elimina manchas, suciedad y malos olores.", tamanos: ["7.000 por silla", "10.000 por silla"] },
+    { id: 8, nombre: "Limpieza de tapetes decorativos", precio: 60000, imagen: "/img/imag3.jpg", desc: "Remueve suciedad, polvo y manchas, devolviendo frescura y color..", tamanos: ["Pequeño (hasta 50m²)", "Mediano (50-100m²)", "Grande (más de 100m²)"] },
+
     
 ];
 
@@ -127,7 +76,7 @@ const ServiciosClientePage = ({ onBackToHome, onCotizacion, onPerfil }) => {
         <>
             {/* ==================== HEADER CON BANNER ==================== */}
             <header className="header-banner">
-                {/* <img src="img/ima9.jpg" alt="Fondo encabezado" className="fondo" /> */}
+                <img src="img/ima9.jpg" alt="Fondo encabezado" className="fondo" />
                 <h1 
                     className="logo-header"
                     onClick={onBackToHome}
@@ -175,7 +124,7 @@ const ServiciosClientePage = ({ onBackToHome, onCotizacion, onPerfil }) => {
                         className="nav-link"
                         onClick={(e) => {
                             e.preventDefault();
-                            onPerfil ? onPerfil() : alert('Perfil próximamente');
+                            onPerfil ? onPerfil() : alert('redirigiendo');
                         }}
                     >
                         Perfil

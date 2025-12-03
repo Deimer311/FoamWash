@@ -1,69 +1,23 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from './AuthContext';
-import './css/estilos_cotizar_cliente.css';
+import './css/estilos_cotizar_cliente.css'; 
 
 // =======================================================
-// DATOS DE SERVICIOS
+// DATOS DE SERVICIOS (Extraídos de cotizar_cliente.js)
 // =======================================================
 const SERVICIOS = [
-    { 
-        id: 1, 
-        imagen: "/img/serv_lavado_muebles.jpg", 
-        nombre: "Lavado de muebles",
-        desc: "Lavado profundo de sofás y sillas, eliminación de manchas y olores.", 
-        precio: 90000,
-        duracion: '2-3 horas',
-        tamanos: ['Pequeño', 'Mediano', 'Grande']
-    },
-    { 
-        id: 2, 
-        imagen: "/img/serv_alfombras.jpg", 
-        nombre: "Lavado de alfombras",
-        desc: "Limpieza profunda para alfombras pequeñas y medianas.", 
-        precio: 50000,
-        duracion: '1-2 horas',
-        tamanos: ['Pequeña', 'Mediana', 'Grande']
-    },
-    { 
-        id: 3, 
-        imagen: "/img/serv_tapiceria_carro.jpg", 
-        nombre: "Tapicería de carros",
-        desc: "Limpieza interior del vehículo: asientos, alfombras y paneles.", 
-        precio: 140000,
-        duracion: '3-4 horas',
-        tamanos: ['Sedan', 'SUV', 'Camioneta']
-    },
-    { 
-        id: 4, 
-        imagen: "/img/serv_cortinas.jpg", 
-        nombre: "Lavado de cortinas",
-        desc: "Lavado y planchado ligero para cortinas y visillos.", 
-        precio: 80000,
-        duracion: '2 horas',
-        tamanos: ['Por metro', 'Juego completo']
-    },
-    { 
-        id: 5, 
-        imagen: "/img/serv_colchones.jpg", 
-        nombre: "Lavado de colchones",
-        desc: "Eliminación de ácaros y manchas, desodorización y secado rápido.", 
-        precio: 90000,
-        duracion: '2-3 horas',
-        tamanos: ['Sencillo', 'Semi-doble', 'Doble', 'Queen', 'King']
-    },
-    { 
-        id: 6, 
-        imagen: "/img/serv_desinfeccion.jpg", 
-        nombre: "Desinfección y sanitización",
-        desc: "Servicio rápido de desinfección para hogares y oficinas.", 
-        precio: 150000,
-        duracion: '1-2 horas',
-        tamanos: ['Pequeño', 'Mediano', 'Grande']
-    }
+    { id: 1, nombre: "Lavado de muebles", precio: 90000, imagen: "/img/imag1.jpg", desc: "Lavado profundo de sofás y sillas, eliminación de manchas y olores.", tamanos: ["Pequeño", "Mediano", "Grande"] },
+    { id: 2, nombre: "Lavado de alfombras", precio: 50000, imagen: "/img/imag4.jpg",desc: "Limpieza profunda para alfombras pequeñas y medianas", tamanos: ["Pequeña", "Mediana", "Grande"] },
+    { id: 3, nombre: "Tapicería de carros", precio: 140000, imagen: "/img/imag5.jpg",desc: "Limpieza interior del vehículo: asientos, alfombras y paneles.", tamanos: ["Sedan", "SUV", "Camioneta"] },
+    { id: 4, nombre: "Lavado de cortinas", precio: 80000, imagen: "/img/imag7.jpg", desc: "Lavado y planchado ligero para cortinas y visillos.", tamanos: ["Por metro", "Juego completo"] },
+    { id: 5, nombre: "Lavado de colchones", precio: 90000, imagen: "/img/imag6.jpg",desc:"Eliminación de ácaros y manchas, desodorización y secado rápido.", tamanos: ["Sencillo", "Semi-doble", "Doble", "Queen", "King"] },
+    { id: 6, nombre: "Mantenimiento y pulido de pisos", precio: 100000, imagen: "/img/imag8.jpg",desc: "Recuperar brillo, proteger la superficie y mejorar su apariencia.", tamanos: ["Pequeño (hasta 50m²)", "Mediano (50-100m²)", "Grande (más de 100m²)"] },
+    { id: 7, nombre: "Limpieza sillas de comedor", precio: 7000, imagen: "/img/imag2.jpg", desc: "Elimina manchas, suciedad y malos olores.", tamanos: ["7.000 por silla", "10.000 por silla"] },
+    { id: 8, nombre: "Limpieza de tapetes decorativos", precio: 60000, imagen: "/img/imag3.jpg", desc: "Remueve suciedad, polvo y manchas, devolviendo frescura y color..", tamanos: ["Pequeño (hasta 50m²)", "Mediano (50-100m²)", "Grande (más de 100m²)"] },
 ];
 
 // =======================================================
-// UTILIDADES
+// UTILIDADES Y LÓGICA DE ESTADO
 // =======================================================
 const calcularTotal = (items) => items.reduce((total, item) => total + (item.precio * item.cantidad), 0);
 const formatearMoneda = (value) => `$${value.toLocaleString('es-CO')}`;
@@ -85,78 +39,78 @@ const saveItem = (key, item) => {
 };
 
 // =======================================================
-// SUBCOMPONENTE: Tarjeta de Servicio
+// SUBCOMPONENTE: Tarjeta de Servicio (ServiceCard)
 // =======================================================
 const ServiceCard = ({ service, onAgregar }) => (
-  <article className="service-card">
+<article className="service-card">
     <div className="service-image">
-      <img src={service.imagen} alt={service.nombre} />
+    <img src={service.imagen} alt={service.nombre} />
     </div>
     <div className="service-content">
-      <h3 className="service-title">{service.nombre}</h3>
-      <p className="service-desc">{service.desc}</p>
-      <div className="service-meta">
+    <h3 className="service-title">{service.nombre}</h3>
+    <p className="service-desc">{service.desc}</p>
+    <div className="service-meta">
         <span className="service-price">{formatearMoneda(service.precio)}</span>
         <button type="button" className="service-btn" onClick={() => onAgregar(service.id)}> 
-          Agregar
+        Agregar
         </button>
-      </div>
     </div>
-  </article>
+    </div>
+</article>
 );
 
 // =======================================================
-// SUBCOMPONENTE: Modal Carrito
+// SUBCOMPONENTE: Modal Carrito (CartModal)
 // =======================================================
 const CartModal = ({ carrito, total, onActualizarCantidad, onCerrar, onFinalizarCompra }) => (
-  <div className="modal-overlay show" id="modalCarrito" onClick={(e) => e.target.classList.contains('modal-overlay') && onCerrar()}>
+<div className="modal-overlay show" id="modalCarrito" onClick={(e) => e.target.classList.contains('modal-overlay') && onCerrar()}>
     <div className="modal-content">
-      <div className="modal-header">
+    <div className="modal-header">
         <h2>🛒 Carrito de Servicios</h2>
         <button className="modal-close" onClick={onCerrar}>×</button>
-      </div>
-      <div className="modal-body">
+    </div>
+    <div className="modal-body">
         <div id="carritoItems">
-          {carrito.length === 0 ? (
+        {carrito.length === 0 ? (
             <p className="carrito-vacio">El carrito está vacío</p>
-          ) : (
+        ) : (
             carrito.map((item) => (
-              <div key={item.id} className="carrito-item">
+            <div key={item.id} className="carrito-item">
                 <img src={item.imagen} alt={item.nombre} className="carrito-item-img" />
                 <div className="carrito-item-info">
-                  <h4>{item.nombre}</h4>
-                  <p className="carrito-item-duracion">⏱️ {item.duracion}</p>
-                  <p className="carrito-item-precio">{formatearMoneda(item.precio)}</p>
+                <h4>{item.nombre}</h4>
+                <p className="carrito-item-duracion">⏱️ {item.duracion}</p>
+                <p className="carrito-item-precio">{formatearMoneda(item.precio)}</p>
                 </div>
                 <div className="carrito-item-actions">
-                  <div className="cantidad-control">
+                <div className="cantidad-control">
                     <button onClick={() => onActualizarCantidad(item.id, item.cantidad - 1)}>-</button>
                     <span>{item.cantidad}</span>
                     <button onClick={() => onActualizarCantidad(item.id, item.cantidad + 1)}>+</button>
-                  </div>
-                  <button className="btn-eliminar" onClick={() => onActualizarCantidad(item.id, 0)}>🗑️</button>
                 </div>
-              </div>
+                <button className="btn-eliminar" onClick={() => onActualizarCantidad(item.id, 0)}>🗑️</button>
+                </div>
+            </div>
             ))
-          )}
+        )}
         </div>
         <div className="carrito-total">
-          <h3>Total: <span id="carritoTotal">{formatearMoneda(total)}</span></h3>
+        <h3>Total: <span id="carritoTotal">{formatearMoneda(total)}</span></h3>
         </div>
-      </div>
-      <div className="modal-footer">
-        <button className="btn-secondary" onClick={onCerrar}>Seguir Cotizando</button>
-        <button className="btn-primary" onClick={onFinalizarCompra} disabled={carrito.length === 0}>Ver Cotización Final</button>
-      </div>
     </div>
-  </div>
+    <div className="modal-footer">
+        <button className="btn-secondary" onClick={onCerrar}>Seguir Cotizando</button>
+        <button className="btn-primary" onClick={onFinalizarCompra} disabled={carrito.length === 0}>Ver Cotizacion Final</button>
+    </div>
+    </div>
+</div>
 );
 
 // =======================================================
 // SUBCOMPONENTE: Modal de Confirmación
 // =======================================================
 const ConfirmationModal = ({ carrito, total, onCerrar, onActualizarDetalle, onConfirmarPedido, onSeguirCotizando, ultimaCotizacion }) => {
-    const [modalStage, setModalStage] = useState(0);
+    const [modalStage, setModalStage] = useState(0); 
     const [formData, setFormData] = useState({});
     const [pedidoFinal, setPedidoFinal] = useState(null);
 
@@ -345,7 +299,7 @@ const ConfirmationModal = ({ carrito, total, onCerrar, onActualizarDetalle, onCo
     else if (modalStage === 3 && pedidoFinal) {
         modalContent = (
             <div className="confirmacion-exitosa">
-                <div className="icono-exito">✔</div>
+                <div className="icono-exito">✓</div>
                 <h3>¡Pedido confirmado!</h3>
                 <p>Tu código de pedido es:</p>
                 <p><strong>{pedidoFinal.id}</strong></p>
@@ -373,13 +327,12 @@ const ConfirmationModal = ({ carrito, total, onCerrar, onActualizarDetalle, onCo
                     {modalFooter}
                 </div>
             </div>
-        </div>
+        </div> 
     );
 };
 
 // =======================================================
 // COMPONENTE PRINCIPAL: CotizacionesCliente
-// ✅ ACTUALIZADO CON PROPS
 // =======================================================
 export default function CotizacionesCliente({ onBackToHome, onGoToServicios, onPerfil }) {
     const { user, logout } = useAuth();
@@ -446,8 +399,7 @@ export default function CotizacionesCliente({ onBackToHome, onGoToServicios, onP
         setCarrito([]);
     };
     
-    // ✅ MANEJADOR DE CERRAR SESIÓN ACTUALIZADO
-    const handleCerrarSesionCliente = (e) => {
+    const handleCerrarSesion = (e) => {
         e.preventDefault();
         if (window.confirm('¿Estás seguro de que deseas cerrar sesión?')) {
             logout();
@@ -459,6 +411,7 @@ export default function CotizacionesCliente({ onBackToHome, onGoToServicios, onP
         <>
             {/* ==================== HEADER CON BANNER ==================== */}
             <header className="header-banner">
+                <img src="/img/ima9.jpg" alt="Fondo encabezado" className="fondo" />
                 <h1 
                     className="logo-header"
                     onClick={onBackToHome}
@@ -481,6 +434,7 @@ export default function CotizacionesCliente({ onBackToHome, onGoToServicios, onP
                         href="#" 
                         className="nav-link" 
                         style={{ color: 'rgb(133, 198, 255)' }}
+                        onClick={(e) => e.preventDefault()}
                     >
                         Cotización
                     </a>
@@ -489,9 +443,7 @@ export default function CotizacionesCliente({ onBackToHome, onGoToServicios, onP
                         className="nav-link"
                         onClick={(e) => {
                             e.preventDefault();
-                            if (onGoToServicios) {
-                                onGoToServicios();
-                            }
+                            onGoToServicios();
                         }}
                     >
                         Agendar
@@ -501,11 +453,7 @@ export default function CotizacionesCliente({ onBackToHome, onGoToServicios, onP
                         className="nav-link"
                         onClick={(e) => {
                             e.preventDefault();
-                            if (onPerfil) {
-                                onPerfil();
-                            } else {
-                                alert('Perfil próximamente');
-                            }
+                            onPerfil();
                         }}
                     >
                         Perfil
@@ -513,7 +461,7 @@ export default function CotizacionesCliente({ onBackToHome, onGoToServicios, onP
                     <a 
                         href="#" 
                         className="nav-link btn-salir" 
-                        onClick={handleCerrarSesionCliente}
+                        onClick={handleCerrarSesion}
                     >
                         Cerrar Sesión
                     </a>
