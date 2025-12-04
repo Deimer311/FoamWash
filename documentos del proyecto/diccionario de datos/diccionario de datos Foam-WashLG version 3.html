@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="WB DataDic" />
+    <meta name="description" content="foam_wash_db Data Dictionary." />
+    <title>foam_wash_db Data Dictionary</title>
+    <link rel="icon" href="logo_empresa.jpg" type="image/jpeg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style type="text/css">
+        /* --- General Styling and Typography --- */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        :root {
+            --primary-blue: #007bff; /* Bright blue */
+            --secondary-green: #28a745; /* Clean green */
+            --light-blue: #e0f2f7; /* Very light blue background */
+            --dark-blue: #0056b3;
+            --text-color: #343a40;
+            --header-bg: #ffffff; /* White background for header */
+            --table-header-bg: #cce7e8; /* Light teal for table headers */
+            --row-hover-bg: #dff9fb; /* Lightest cyan for hover */
+            --accent-green-light: #d4edda; /* Light green accent */
+            --border-color: #a7d9de; /* Soft blue-green border */
+            --font-family: 'Poppins', sans-serif;
+            --box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Stronger shadow */
+            --subtle-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: var(--font-family);
+            line-height: 1.7;
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px 30px;
+            background-color: var(--light-blue);
+            background-image: linear-gradient(135deg, var(--light-blue) 0%, #ffffff 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        h1, h2 {
+            color: var(--dark-blue);
+            font-weight: 700;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px dashed var(--border-color);
+            margin: 40px 0;
+            opacity: 0.7;
+        }
+
+        /* --- Header Section --- */
+        #title-sect {
+            text-align: right;
+            margin-bottom: 40px;
+            padding: 30px;
+            background-color: var(--header-bg);
+            border-radius: 12px;
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #title-sect::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            background: linear-gradient(45deg, rgba(0, 123, 255, 0.05), rgba(40, 167, 69, 0.05));
+            z-index: 0;
+        }
+
+        #title-sect h1 {
+            color: var(--primary-blue);
+            margin-top: 0;
+            font-size: 3.5em; /* Larger title */
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+            animation: textWave 3s infinite alternate ease-in-out;
+        }
+        
+        @keyframes textWave {
+            0% { transform: scale(1); color: var(--primary-blue); }
+            50% { transform: scale(1.02); color: var(--dark-blue); }
+            100% { transform: scale(1); color: var(--primary-blue); }
+        }
+
+        #title-sect p {
+            font-style: italic;
+            color: var(--secondary-color);
+            margin: 5px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- Logo Styling and Animation --- */
+        .logo-container {
+            float: left;
+            width: 400px; /* Even Larger logo (200px) */
+            height: 400px; /* Even Larger logo (200px) */
+            margin-right: 30px;
+            margin-top: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10%;
+            box-shadow: var(--box-shadow);
+            animation: heartbeat 1.5s infinite ease-in-out; /* Heartbeat animation */
+            display: block;
+            object-fit: cover; /* Ensures logo fits well */
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.05); }
+            50% { transform: scale(1); }
+            75% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+        /* --- Index Styling --- */
+        h2 {
+            padding-top: 15px;
+            border-bottom: 3px solid var(--secondary-green);
+            margin-bottom: 25px;
+            text-align: center;
+            position: relative;
+        }
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 5px;
+            background-color: var(--primary-blue);
+            border-radius: 5px;
+        }
+        
+        ul {
+            list-style: none;
+            padding: 20px;
+            margin-bottom: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px 30px;
+            background-color: var(--header-bg);
+            border-radius: 12px;
+            box-shadow: var(--subtle-shadow);
+            justify-content: center;
+        }
+
+        ul li a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.3s ease-in-out;
+            background-color: #f0f8ff; /* Very light blue for index items */
+            border: 1px solid var(--border-color);
+        }
+
+        ul li a:hover {
+            color: var(--header-bg);
+            background-color: var(--secondary-green);
+            transform: translateY(-3px);
+            box-shadow: var(--subtle-shadow);
+        }
+
+        /* --- Table Styling (Data Dictionary) --- */
+        table {
+            width: 100%;
+            margin-bottom: 50px;
+            border-collapse: collapse;
+            background-color: var(--header-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            animation: fadeIn 1s ease-out; /* Fade-in animation for tables */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        table caption {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--primary-blue);
+            padding: 20px 0;
+            caption-side: top;
+            background-color: var(--accent-green-light); /* Light green for captions */
+            border-bottom: 2px solid var(--secondary-green);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+
+        td, th {
+            border: 1px solid var(--border-color);
+            padding: 15px 18px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--table-header-bg);
+            color: var(--dark-blue);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.95em;
+            position: sticky;
+            top: 0; /* Keep table headers visible on scroll */
+            z-index: 10;
+        }
+
+        td {
+            color: var(--text-color);
+            font-size: 0.9em;
+        }
+
+        tr:hover {
+            background-color: var(--row-hover-bg) !important;
+            color: #000000;
+            transform: scale(1.005);
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* Alternate row coloring for better distinction */
+        tr:nth-child(even) {
+            background-color: #f8ffff; /* Very light subtle blue */
+        }
+        tr:nth-child(even):hover {
+            background-color: var(--row-hover-bg) !important;
+        }
+
+        /* Special column styling */
+        .attr {
+            text-align: center;
+        }
+
+        td:nth-child(3), /* PK */
+        td:nth-child(4), /* NN */
+        td:nth-child(5), /* UQ */
+        td:nth-child(9) { /* AI */
+            text-align: center;
+        }
+
+        /* Abbreviation Styling */
+        abbr {
+            cursor: help;
+            border-bottom: 1px dotted var(--primary-blue);
+            text-decoration: none;
+        }
+
+        /* Checkmark styling for better visibility */
+        td:contains("✓") {
+            color: var(--secondary-green);
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        /* --- Audio Control Button Styling (SOLO BOTÓN) --- */
+        #audio-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            padding: 8px 12px; /* Tamaño compacto para el botón */
+            border-radius: 50px;
+            background-color: rgba(0, 123, 255, 0.9);
+            box-shadow: var(--box-shadow);
+        }
+
+        #mute-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: white;
+            font-size: 1.4em; /* Tamaño del ícono */
+            line-height: 1;
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        #mute-button:hover {
+            transform: scale(1.1);
+            color: var(--secondary-green);
+        }
+    </style>
+</head>
+<body>
+    <audio id="background-music" loop **autoplay**>
+        <source src="musica_fondo.mp3" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+
+    <div id="audio-controls">
+        <button id="mute-button">
+            <i class="fas fa-headphones"></i>
+        </button>
+    </div>
+    
+<script>
+    const music = document.getElementById('background-music');
+    const muteButton = document.getElementById('mute-button');
+    
+    // ⬇️ LÍNEA PARA MODIFICAR EL VOLUMEN 
+    // El volumen debe ser un número entre 0.0 (silencio) y 1.0 (máximo). 
+    // 0.2 es el 20%
+    const defaultVolume = 0.2; 
+    music.volume = defaultVolume; 
+    // ⬆️ FIN DE LA LÍNEA PARA MODIFICAR EL VOLUMEN
+
+    // NOTA: El atributo 'autoplay' se añadió al HTML. El 'play().catch' queda como respaldo 
+    // por si el navegador bloquea el autoplay.
+    music.play().catch(error => {
+        console.log("Autoplay bloqueado. El audio se reproducirá con el primer clic.");
+    });
+
+
+    // FUNCIÓN DE SILENCIAR/REACTIVAR (Auricular)
+    muteButton.addEventListener('click', () => {
+        if (music.muted) {
+            // REACTIVAR (Desmutear)
+            music.muted = false;
+            // Al desmutear, restauramos el volumen al valor deseado (20%)
+            music.volume = defaultVolume; 
+            muteButton.innerHTML = '<i class="fas fa-headphones"></i>'; // Icono normal
+            
+            if (music.paused) {
+                music.play().catch(e => {});
+            }
+        } else {
+            // SILENCIAR (Mutear)
+            music.muted = true;
+            muteButton.innerHTML = '<i class="fas fa-headphones-slash"></i>'; // Icono tachado
+        }
+    });
+
+</script>
+
+<div id="title-sect" class="clearfix">
+    <div class="logo-container">
+        <img src="logo_empresa.jpg" alt="Logo de la Empresa" title="Logo de Foam Wash">
+    </div>
+    <h1>foam_wash_db<br> Data Dictionary</h1>
+    <p>
+        <em>2025-09-28</em>
+    </p>
+    <p class="proj-desc">
+        <em>Un vistazo detallado a la estructura de nuestra base de datos.</em>
+    </p>
+</div>
+
+<h2>Índice Alfabético</h2>
+<ul>
+<li><a href='#Tipo_de_Documento'>Tipo_de_Documento</a></li>
+<li><a href='#cotizacion'>cotizacion</a></li>
+<li><a href='#notificaciones'>notificaciones</a></li>
+<li><a href='#observacion'>observacion</a></li>
+<li><a href='#reserva'>reserva</a></li>
+<li><a href='#rol'>rol</a></li>
+<li><a href='#servicio'>servicio</a></li>
+<li><a href='#usuario'>usuario</a></li>
+</ul>
+<hr>
+
+<table id='Tipo_de_Documento'>
+<caption>TIPO_DE_DOCUMENTO</caption>
+<tr><td colspan='11'></td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>idTipo_de_Documento</td>
+    <td>INT</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>identificador unico del tipo de documento de identificacion o DNI</td>
+</tr>
+<tr>
+    <td>nombre_del_documento</td>
+    <td>DOUBLE</td>
+    <td>&nbsp;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>nombre del documento o DNI</td>
+</tr>
+</table>
+
+---
+
+<table id='cotizacion'>
+<caption>COTIZACION</caption>
+<tr><td colspan='11'></td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>Id_Cotizacion</td>
+    <td>INT(11)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>PK: Identificador único de la cotización.</td>
+</tr>
+<tr>
+    <td>Id_usuario</td>
+    <td>INT(11)</td>
+    <td>&nbsp;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>FK: Usuario que realizó la cotización. Referencia a USUARIO(Id_Usuario).</td>
+</tr>
+<tr>
+    <td>servicio_Id_Servicio</td>
+    <td>INT(11)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>FK: Servicio cotizado. Referencia a SERVICIO(Id_Servicio).</td>
+</tr>
+</table>
+
+---
+
+<table id='notificaciones'>
+<caption>NOTIFICACIONES</caption>
+<tr><td colspan='11'></td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>id_notificaciones</td>
+    <td>INT</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>diferenciador unico de la notificacion</td>
+</tr>
+<tr>
+    <td>descricion_notificacion</td>
+    <td>VARCHAR(30)</td>
+    <td>&nbsp;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>descripcion sobre la notificacion</td>
+</tr>
+<tr>
+    <td>fecha_notificacion</td>
+    <td>DATE</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>fecha de creacion de la notificacion</td>
+</tr>
+<tr>
+    <td>usuario_Id_Usuario</td>
+    <td>INT(11)</td>
+    <td>&nbsp;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>FK: ID del usuario al que va dirigida.</td>
+</tr>
+<tr>
+    <td>usuario_rol_Id_Rol</td>
+    <td>INT(11)</td>
+    <td>&nbsp;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>FK: ID del rol del usuario.</td>
+</tr>
+<tr>
+    <td>usuario_Tipo_de_Documento_idTipo_de_Documento</td>
+    <td>INT</td>
+    <td>&nbsp;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>FK: ID del tipo de documento del usuario.</td>
+</tr>
+</table>
+
+---
+
+<table id='observacion'>
+<caption>OBSERVACION</caption>
+<tr><td colspan='11'></td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>Id_Observaciones</td>
+    <td>INT(11)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>PK: Identificador único de la observación.</td>
+</tr>
+<tr>
+    <td>Observaciones</td>
+    <td>VARCHAR(255)</td>
+    <td>&nbsp;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Texto de la observación (ej: Trabajo terminado, sillas limpias).</td>
+</tr>
+<tr>
+    <td>reserva_ID_Reserva</td>
+    <td>INT(11)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>PK, FK: Identificador de la reserva.</td>
+</tr>
+<tr>
+    <td>reserva_cotizacion_Id_Cotizacion</td>
+    <td>INT(11)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>PK, FK: ID de la cotización asociada a la reserva.</td>
+</tr>
+<tr>
+    <td>reserva_servicio_Id_Servicio</td>
+    <td>INT(11)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>PK, FK: ID del servicio en la reserva.</td>
+</tr>
+</table>
+
+---
+
+<table id='reserva'>
+<caption>RESERVA</caption>
+<tr><td colspan='11'></td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>ID_Reserva</td>
+    <td>INT(11)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>PK: Identificador único de la reserva.</td>
+</tr>
+<tr>
+    <td>Estado</td>
+    <td>VARCHAR(50)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Estado actual de la reserva (ej: Terminados, Pendiente).</td>
+</tr>
+<tr>
+    <td>Id_Usuario</td>
+    <td>INT(11)</td>
+    <td>&nbsp;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>FK: usuario que gestionó la reserva. Referencia a USUARIO(Id_Usuario).</td>
+</tr>
+<tr>
+    <td>fecha</td>
+    <td>DATE</td>
+    <td>&nbsp;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>fecha de creación de la reserva</td>
+</tr>
+<tr>
+    <td>cotizacion_Id_Cotizacion</td>
+    <td>INT(11)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>PK, FK: ID de la cotización asociada.</td>
+</tr>
+<tr>
+    <td>servicio_Id_Servicio</td>
+    <td>INT(11)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>PK, FK: ID del servicio asociado.</td>
+</tr>
+</table>
+
+---
+
+<table id='rol'>
+<caption>ROL</caption>
+<tr><td colspan='11'></td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>Id_Rol</td>
+    <td>INT(11)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>PK: Identificador único del rol (ej: 100, 101, 102).</td>
+</tr>
+<tr>
+    <td>Rol</td>
+    <td>VARCHAR(50)</td>
+    <td>&nbsp;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Nombre del rol (ej: Administrador, Trabajador, Cliente).</td>
+</tr>
+</table>
+
+---
+
+<table id='servicio'>
+<caption>SERVICIO</caption>
+<tr><td colspan='11'></td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>Id_Servicio</td>
+    <td>INT(11)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>PK: Identificador único del servicio.</td>
+</tr>
+<tr>
+    <td>Nombre_Servicio</td>
+    <td>VARCHAR(100)</td>
+    <td>&nbsp;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Nombre o descripción del servicio (ej: Lavado de sillas).</td>
+</tr>
+<tr>
+    <td>Precio</td>
+    <td>DECIMAL(10,2)</td>
+    <td>&nbsp;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Precio monetario del servicio.</td>
+</tr>
+</table>
+
+---
+
+<table id='usuario'>
+<caption>USUARIO</caption>
+<tr><td colspan='11'></td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>Id_Usuario</td>
+    <td>INT(11)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>PK: Identificador único del usuario.</td>
+</tr>
+<tr>
+    <td>Nombre1</td>
+    <td>VARCHAR(50)</td>
+    <td>&nbsp;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Primer nombre del usuario.</td>
+</tr>
+<tr>
+    <td>Nombre2</td>
+    <td>VARCHAR(50)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Segundo nombre del usuario (puede ser NULL).</td>
+</tr>
+<tr>
+    <td>Apellido1</td>
+    <td>VARCHAR(50)</td>
+    <td>&nbsp;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Primer apellido del usuario.</td>
+</tr>
+<tr>
+    <td>Apellido2</td>
+    <td>VARCHAR(50)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Segundo apellido del usuario (puede ser NULL).</td>
+</tr>
+<tr>
+    <td>Telefono</td>
+    <td>VARCHAR(15)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Número de teléfono de contacto.</td>
+</tr>
+<tr>
+    <td>N_Documento</td>
+    <td>VARCHAR(20)</td>
+    <td>&nbsp;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Número de documento de identificación (único).</td>
+</tr>
+<tr>
+    <td>Direccion</td>
+    <td>VARCHAR(100)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Dirección de residencia.</td>
+</tr>
+<tr>
+    <td>Correo</td>
+    <td>VARCHAR(100)</td>
+    <td>&nbsp;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Correo electrónico del usuario (único).</td>
+</tr>
+<tr>
+    <td>rol_Id_Rol</td>
+    <td>INT(11)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>FK: identificador unico del rol al que referencia.</td>
+</tr>
+<tr>
+    <td>Tipo_de_Documento_idTipo_de_Documento</td>
+    <td>INT</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>FK: id del tipo de documento al que referencia.</td>
+</tr>
+</table>
+</body>
+</html>

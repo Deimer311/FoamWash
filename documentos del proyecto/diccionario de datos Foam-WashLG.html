@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="WB DataDic" />
+    <meta name="description" content="foam_wash Data Dictionary." />
+    <title>foam_wash Data Dictionary</title>
+    <style type="text/css">
+    body {
+        font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+        background: #f7fafc;
+        color: #222;
+        margin: 0;
+        padding: 0 0 40px 0;
+        max-width: calc(100vw - 200px);
+        margin: 100px auto 100px auto;
+        box-sizing: border-box;
+        transition: background 0.6s cubic-bezier(.77,0,.18,1);
+    }
+
+    #title-sect {
+        color: #4a5568;
+        text-align: right;
+        margin: 32px 0 16px 0;
+        background: linear-gradient(90deg, #e3f9e5 0%, #c2e9fb 100%);
+        padding: 24px 32px 18px 0;
+        border-radius: 0 0 16px 16px;
+        box-shadow: 0 2px 12px rgba(44, 62, 80, 0.06);
+        animation: fadeInDown 1s cubic-bezier(.77,0,.18,1);
+    }
+
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-40px);}
+        to { opacity: 1; transform: translateY(0);}
+    }
+
+    h1 {
+        font-size: 2.2em;
+        font-weight: 700;
+        color: #2b7a78;
+        margin-bottom: 0.2em;
+        letter-spacing: 1px;
+        text-shadow: 0 2px 8px #c2e9fb55;
+        animation: popIn 1.2s cubic-bezier(.77,0,.18,1);
+    }
+
+    @keyframes popIn {
+        0% { opacity: 0; transform: scale(0.8);}
+        80% { opacity: 1; transform: scale(1.05);}
+        100% { opacity: 1; transform: scale(1);}
+    }
+
+    h2 {
+        font-size: 1.3em;
+        color: #205072;
+        margin-top: 32px;
+        margin-bottom: 12px;
+        font-weight: 600;
+        border-left: 6px solid #2b7a78;
+        padding-left: 12px;
+        background: #e3f9e5;
+        border-radius: 0 12px 12px 0;
+        box-shadow: 0 2px 8px #c2e9fb22;
+        animation: fadeInLeft 1s cubic-bezier(.77,0,.18,1);
+    }
+
+    @keyframes fadeInLeft {
+        from { opacity: 0; transform: translateX(-40px);}
+        to { opacity: 1; transform: translateX(0);}
+    }
+
+    ul {
+        font-style: italic;
+        margin-bottom: 32px;
+        padding-left: 20px;
+        color: #205072;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px #c2e9fb22;
+        padding: 18px 24px 18px 32px;
+        margin-top: 0;
+        margin-bottom: 36px;
+        font-size: 1.08em;
+        animation: fadeInUp 1.2s cubic-bezier(.77,0,.18,1);
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(40px);}
+        to { opacity: 1; transform: translateY(0);}
+    }
+
+    ul li {
+        margin-bottom: 8px;
+        line-height: 1.7;
+        transition: transform 0.3s cubic-bezier(.77,0,.18,1);
+    }
+
+    ul li:hover {
+        transform: scale(1.05) translateX(8px);
+    }
+
+    ul li a {
+        color: #2b7a78;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s, background 0.3s, box-shadow 0.3s;
+        padding: 2px 8px;
+        border-radius: 6px;
+        box-shadow: 0 0 0 #e3f9e5;
+    }
+
+    ul li a:hover,
+    ul li a:focus {
+        color: #205072;
+        background: #e3f9e5;
+        text-decoration: underline;
+        box-shadow: 0 2px 8px #c2e9fb44;
+    }
+
+    table {
+        width: 100%;
+        margin-bottom: 40px;
+        background: #ffffff;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 24px rgba(44, 62, 80, 0.08);
+        transition: box-shadow 0.4s cubic-bezier(.77,0,.18,1), transform 0.4s cubic-bezier(.77,0,.18,1);
+        animation: fadeInTable 1.2s cubic-bezier(.77,0,.18,1);
+    }
+
+    @keyframes fadeInTable {
+        from { opacity: 0; transform: scale(0.95);}
+        to { opacity: 1; transform: scale(1);}
+    }
+
+    table:hover {
+        box-shadow: 0 8px 32px rgba(44, 62, 80, 0.18);
+        transform: scale(1.01);
+    }
+
+    table caption {
+        font-size: 1.15em;
+        font-weight: 700;
+        color: #205072;
+        background: #e3f9e5;
+        padding: 12px 0;
+        border-bottom: 2px solid #c2e9fb;
+        letter-spacing: 0.5px;
+        animation: fadeInCaption 1.1s cubic-bezier(.77,0,.18,1);
+    }
+
+    @keyframes fadeInCaption {
+        from { opacity: 0; transform: translateY(-20px);}
+        to { opacity: 1; transform: translateY(0);}
+    }
+
+    th, td {
+        padding: 12px 16px;
+        text-align: left;
+        border: none;
+        transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+    }
+
+    th {
+        background: linear-gradient(90deg, #c2e9fb 0%, #e3f9e5 100%);
+        color: #205072;
+        font-weight: 600;
+        font-size: 1em;
+        border-bottom: 2px solid #e3f9e5;
+        animation: fadeInTh 1.2s cubic-bezier(.77,0,.18,1);
+    }
+
+    @keyframes fadeInTh {
+        from { opacity: 0; transform: translateY(-20px);}
+        to { opacity: 1; transform: translateY(0);}
+    }
+
+    td {
+        color: #4a5568;
+        font-size: 0.98em;
+        background: #fff;
+        transition: background 0.2s, color 0.2s, box-shadow 0.3s;
+    }
+
+    tr:nth-child(even) td {
+        background: #f7fafc;
+    }
+
+    tr:hover td {
+        background: #e3f9e5;
+        color: #205072;
+        box-shadow: 0 2px 8px #c2e9fb33;
+        animation: rowPulse 0.5s;
+    }
+
+    @keyframes rowPulse {
+        0% { box-shadow: 0 0 0 #c2e9fb33;}
+        50% { box-shadow: 0 4px 16px #c2e9fb33;}
+        100% { box-shadow: 0 2px 8px #c2e9fb33;}
+    }
+
+    tr:first-child td {
+        background: #e3f9e5;
+        color: #205072;
+        font-weight: 500;
+    }
+
+    abbr {
+        cursor: help;
+        text-decoration: underline dotted #205072 1.5px;
+        transition: color 0.2s;
+    }
+
+    abbr:hover {
+        color: #2b7a78;
+    }
+
+    td.attr {
+        text-align: center;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    table, th, td {
+        border-radius: 0;
+    }
+
+    table {
+        border-radius: 12px;
+    }
+
+    th:first-child, td:first-child {
+        border-top-left-radius: 12px;
+    }
+    th:last-child, td:last-child {
+        border-top-right-radius: 12px;
+    }
+
+    .proj-desc em {
+        font-size: 1em;
+        color: #4a5568;
+        background: #f7fafc;
+        padding: 2px 10px;
+        border-radius: 6px;
+        font-style: italic;
+        font-weight: 400;
+        animation: fadeInUp 1.3s cubic-bezier(.77,0,.18,1);
+    }
+
+    #title-sect h1 {
+        margin-top: 0;
+        margin-bottom: 8px;
+        font-size: 2.4em;
+        color: #2b7a78;
+        letter-spacing: 1.5px;
+        text-shadow: 0 2px 8px #c2e9fb55;
+    }
+
+    #title-sect p em {
+        font-size: 1.08em;
+        color: #205072;
+        background: #e3f9e5;
+        padding: 4px 12px;
+        border-radius: 8px;
+        font-style: normal;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        box-shadow: 0 1px 6px #c2e9fb22;
+        animation: fadeInUp 1.4s cubic-bezier(.77,0,.18,1);
+    }
+
+    @media (max-width: 900px) {
+        table, th, td {
+            font-size: 0.95em;
+        }
+        h1 {
+            font-size: 1.5em;
+        }
+        h2 {
+            font-size: 1.1em;
+            padding-left: 8px;
+        }
+        #title-sect {
+            padding: 16px 12px 12px 0;
+        }
+        ul {
+            padding: 12px 10px 12px 16px;
+            font-size: 0.98em;
+        }
+    }
+    </style>
+</head>
+<body>
+<div id="title-sect">
+<h1>foam_wash<br> Data Dictionay</h1>
+<p>
+<em>2025-09-02</em>
+</p>
+<p class="proj-desc">
+<em></em>
+</p>
+</div>
+<h2>Alphabetic Index</h2>
+<ul>
+<li><a href='#administrador'>administrador</a></li>
+<li><a href='#cliente'>cliente</a></li>
+<li><a href='#cliente_has_reserva'>cliente_has_reserva</a></li>
+<li><a href='#estado'>estado</a></li>
+<li><a href='#historial'>historial</a></li>
+<li><a href='#reserva'>reserva</a></li>
+<li><a href='#servicios'>servicios</a></li>
+<li><a href='#servicios_has_reserva'>servicios_has_reserva</a></li>
+<li><a href='#tipo_documento'>tipo_documento</a></li>
+<li><a href='#trabajador'>trabajador</a></li>
+<li><a href='#usuario'>usuario</a></li>
+</ul>
+<table id='administrador'>
+<caption>administrador</caption>
+<tr><td colspan='11'>Tabla que guarda los datos de los administradores del sistema.</td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>codadministrador</td>
+    <td>VARCHAR(30)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Codigo unico del administrador</td>
+</tr>
+<tr>
+    <td>usuario_id_usuario</td>
+    <td>VARCHAR(10)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Identificador del usuario relacionado con el administrador</td>
+</tr>
+<tr>
+    <td>usuario_tipo_de_documento_id_tipo_documento</td>
+    <td>VARCHAR(3)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Tipo de documento del usuario administrador</td>
+</tr>
+<table id='cliente'>
+<caption>cliente</caption>
+<tr><td colspan='11'>Tabla que guarda los datos de los clientes que hacen reservas.</td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>id_cliente</td>
+    <td>VARCHAR(30)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Identificador unico del cliente</td>
+</tr>
+<tr>
+    <td>direccion</td>
+    <td>VARCHAR(20)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Direccion del cliente</td>
+</tr>
+<tr>
+    <td>usuario_id_usuario</td>
+    <td>VARCHAR(10)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Usuario relacionado con el cliente</td>
+</tr>
+<tr>
+    <td>usuario_tipo_de_documento_id_tipo_documento</td>
+    <td>VARCHAR(3)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Tipo de documento del cliente</td>
+</tr>
+<table id='cliente_has_reserva'>
+<caption>cliente_has_reserva</caption>
+<tr><td colspan='11'>Tabla intermedia que relaciona clientes con sus reservas.</td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>cliente_id_cliente</td>
+    <td>VARCHAR(30)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Identificador del cliente relacionado</td>
+</tr>
+<tr>
+    <td>reserva_id_reserva</td>
+    <td>VARCHAR(30)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Identificador de la reserva relacionada</td>
+</tr>
+<table id='estado'>
+<caption>estado</caption>
+<tr><td colspan='11'>Tabla que define los diferentes estados de una reserva.</td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>id_estado</td>
+    <td>VARCHAR(30)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Identificador unico del estado</td>
+</tr>
+<tr>
+    <td>nuevo</td>
+    <td>VARCHAR(50)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Nombre del estado nuevo</td>
+</tr>
+<tr>
+    <td>anterior</td>
+    <td>VARCHAR(50)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Nombre del estado anterior</td>
+</tr>
+<table id='historial'>
+<caption>historial</caption>
+<tr><td colspan='11'>Tabla que guarda el historial de cambios de estado en las reservas.</td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>id_historial</td>
+    <td>VARCHAR(30)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Identificador unico del historial</td>
+</tr>
+<tr>
+    <td>reserva_id_reserva</td>
+    <td>VARCHAR(30)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Reserva relacionada con el historial</td>
+</tr>
+<tr>
+    <td>estado_id_estado</td>
+    <td>VARCHAR(30)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Estado relacionado con el historial</td>
+</tr>
+<table id='reserva'>
+<caption>reserva</caption>
+<tr><td colspan='11'>Tabla que guarda las reservas creadas por los clientes.</td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>id_reserva</td>
+    <td>VARCHAR(30)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Identificador unico de la reserva</td>
+</tr>
+<tr>
+    <td>fecha</td>
+    <td>DATE</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Fecha de la reserva</td>
+</tr>
+<tr>
+    <td>descripcion</td>
+    <td>VARCHAR(100)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Descripcion general de la reserva</td>
+</tr>
+<table id='servicios'>
+<caption>servicios</caption>
+<tr><td colspan='11'>Tabla que guarda los servicios que ofrece la empresa.</td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>id_servicios</td>
+    <td>VARCHAR(30)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Identificador unico del servicio</td>
+</tr>
+<tr>
+    <td>tipo_de_servicio</td>
+    <td>VARCHAR(100)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Nombre del tipo de servicio</td>
+</tr>
+<tr>
+    <td>administrador_codadministrador</td>
+    <td>VARCHAR(30)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Administrador responsable del servicio</td>
+</tr>
+<tr>
+    <td>administrador_usuario_id_usuario</td>
+    <td>VARCHAR(10)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Usuario administrador relacionado con el servicio</td>
+</tr>
+<tr>
+    <td>administrador_usuario_tipo_de_documento_id_tipo_documento</td>
+    <td>VARCHAR(3)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Tipo de documento del administrador del servicio</td>
+</tr>
+<table id='servicios_has_reserva'>
+<caption>servicios_has_reserva</caption>
+<tr><td colspan='11'>Tabla intermedia que relaciona servicios con reservas hechas.</td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>servicios_id_servicios</td>
+    <td>VARCHAR(30)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Identificador del servicio relacionado</td>
+</tr>
+<tr>
+    <td>reserva_id_reserva</td>
+    <td>VARCHAR(30)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Identificador de la reserva relacionada</td>
+</tr>
+<table id='tipo_documento'>
+<caption>tipo_documento</caption>
+<tr><td colspan='11'>Tabla que guarda los diferentes tipos de documentos de identidad.</td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>id_tipo_documento</td>
+    <td>VARCHAR(3)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Identificador unico del tipo de documento</td>
+</tr>
+<tr>
+    <td>cedula</td>
+    <td>VARCHAR(10)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Numero de cedula nacional</td>
+</tr>
+<tr>
+    <td>cedula_extranjera</td>
+    <td>VARCHAR(10)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Numero de cedula extranjera</td>
+</tr>
+<table id='trabajador'>
+<caption>trabajador</caption>
+<tr><td colspan='11'>Tabla que guarda los datos de los trabajadores que ofrecen servicios.</td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>codtrabajador</td>
+    <td>VARCHAR(30)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Codigo unico del trabajador</td>
+</tr>
+<tr>
+    <td>usuario_id_usuario</td>
+    <td>VARCHAR(10)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Usuario relacionado con el trabajador</td>
+</tr>
+<tr>
+    <td>usuario_tipo_de_documento_id_tipo_documento</td>
+    <td>VARCHAR(3)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Tipo de documento del trabajador</td>
+</tr>
+<table id='usuario'>
+<caption>usuario</caption>
+<tr><td colspan='11'>Tabla que guarda los datos basicos de los usuarios.</td></tr>
+<tr>
+    <th>Column name</th>
+    <th>DataType</th>
+    <th><abbr title='Primary Key'>PK</abbr></th>
+    <th><abbr title='Not Null'>NN</abbr></th>
+    <th><abbr title='Unique'>UQ</abbr></th>
+    <th><abbr title='Binary'>BIN</abbr></th>
+    <th><abbr title='Unsigned'>UN</abbr></th>
+    <th><abbr title='Zero Fill'>ZF</abbr></th>
+    <th><abbr title='Auto Increment'>AI</abbr></th>
+    <th>Default</th>
+    <th>Comment</th>
+</tr>
+<tr>
+    <td>id_usuario</td>
+    <td>VARCHAR(10)</td>
+    <td>&#10004;</td>
+    <td>&#10004;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td></td>
+    <td>Identificador unico del usuario</td>
+</tr>
+<tr>
+    <td>correo</td>
+    <td>VARCHAR(50)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Correo electronico del usuario</td>
+</tr>
+<tr>
+    <td>telefono</td>
+    <td>VARCHAR(20)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Numero telefonico del usuario</td>
+</tr>
+<tr>
+    <td>nombre</td>
+    <td>TEXT</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Nombre completo del usuario</td>
+</tr>
+<tr>
+    <td>tipo_documento_id_tipo_documento</td>
+    <td>VARCHAR(3)</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td class='attr'>&nbsp;</td>
+    <td>NULL</td>
+    <td>Tipo de documento asociado al usuario</td>
+</tr>
+</table>
+</body>
+</html>
