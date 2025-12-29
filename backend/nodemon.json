@@ -1,0 +1,9 @@
+{
+    "watch": ["src", "index.js", ".env"],
+    "ext": "js,json",
+    "ignore": ["node_modules", "*.log"],
+    "delay": "1000",
+    "env": {
+        "NODE_ENV": "development"
+    }
+    }
