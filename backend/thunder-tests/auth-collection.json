@@ -1,0 +1,176 @@
+    {
+    "clientName": "Thunder Client",
+    "collectionName": "FoamWash - Autenticación",
+    "collectionId": "auth-collection",
+    "dateExported": "2024-12-30",
+    "version": "1.0",
+    "folders": [],
+    "requests": [
+        {
+        "name": "1. Health Check",
+        "method": "GET",
+        "url": "http://localhost:3000/api/health",
+        "headers": [],
+        "body": {},
+        "tests": []
+        },
+        {
+        "name": "2. Register - Cliente",
+        "method": "POST",
+        "url": "http://localhost:3000/api/auth/register",
+        "headers": [
+            {
+            "name": "Content-Type",
+            "value": "application/json"
+            }
+        ],
+        "body": {
+            "type": "json",
+            "raw": "{\n  \"nombre\": \"Juan Pérez\",\n  \"correo\": \"juan.perez@ejemplo.com\",\n  \"password\": \"password123\",\n  \"telefono\": \"3001234567\",\n  \"nDocumento\": \"1234567890\",\n  \"direccion\": \"Calle 123 #45-67, Bogotá\",\n  \"tipoDocumentoId\": 1\n}"
+        },
+        "tests": []
+        },
+        {
+        "name": "3. Register - Admin",
+        "method": "POST",
+        "url": "http://localhost:3000/api/auth/register",
+        "headers": [
+            {
+            "name": "Content-Type",
+            "value": "application/json"
+            }
+        ],
+        "body": {
+            "type": "json",
+            "raw": "{\n  \"nombre\": \"Admin FoamWash\",\n  \"correo\": \"admin@foamwash.com\",\n  \"password\": \"admin123\",\n  \"telefono\": \"3009876543\",\n  \"nDocumento\": \"9876543210\",\n  \"direccion\": \"Oficina Principal FoamWash\",\n  \"tipoDocumentoId\": 1,\n  \"role\": \"admin\"\n}"
+        },
+        "tests": []
+        },
+        {
+        "name": "4. Login - Cliente",
+        "method": "POST",
+        "url": "http://localhost:3000/api/auth/login",
+        "headers": [
+            {
+            "name": "Content-Type",
+            "value": "application/json"
+            }
+        ],
+        "body": {
+            "type": "json",
+            "raw": "{\n  \"correo\": \"juan.perez@ejemplo.com\",\n  \"password\": \"password123\"\n}"
+        },
+        "tests": []
+        },
+        {
+        "name": "5. Login - Admin",
+        "method": "POST",
+        "url": "http://localhost:3000/api/auth/login",
+        "headers": [
+            {
+            "name": "Content-Type",
+            "value": "application/json"
+            }
+        ],
+        "body": {
+            "type": "json",
+            "raw": "{\n  \"correo\": \"admin@foamwash.com\",\n  \"password\": \"admin123\"\n}"
+        },
+        "tests": []
+        },
+        {
+        "name": "6. Get My Profile",
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "headers": [
+            {
+            "name": "Authorization",
+            "value": "Bearer TU_TOKEN_AQUI"
+            }
+        ],
+        "body": {},
+        "tests": []
+        },
+        {
+        "name": "7. Forgot Password",
+        "method": "POST",
+        "url": "http://localhost:3000/api/auth/forgot-password",
+        "headers": [
+            {
+            "name": "Content-Type",
+            "value": "application/json"
+            }
+        ],
+        "body": {
+            "type": "json",
+            "raw": "{\n  \"correo\": \"juan.perez@ejemplo.com\"\n}"
+        },
+        "tests": []
+        },
+        {
+        "name": "8. Reset Password",
+        "method": "POST",
+        "url": "http://localhost:3000/api/auth/reset-password",
+        "headers": [
+            {
+            "name": "Content-Type",
+            "value": "application/json"
+            }
+        ],
+        "body": {
+            "type": "json",
+            "raw": "{\n  \"token\": \"123456\",\n  \"newPassword\": \"newpassword123\",\n  \"confirmPassword\": \"newpassword123\"\n}"
+        },
+        "tests": []
+        },
+        {
+        "name": "9. Change Password",
+        "method": "POST",
+        "url": "http://localhost:3000/api/auth/change-password",
+        "headers": [
+            {
+            "name": "Content-Type",
+            "value": "application/json"
+            },
+            {
+            "name": "Authorization",
+            "value": "Bearer TU_TOKEN_AQUI"
+            }
+        ],
+        "body": {
+            "type": "json",
+            "raw": "{\n  \"currentPassword\": \"password123\",\n  \"newPassword\": \"newpassword456\",\n  \"confirmPassword\": \"newpassword456\"\n}"
+        },
+        "tests": []
+        },
+        {
+        "name": "10. Refresh Token",
+        "method": "POST",
+        "url": "http://localhost:3000/api/auth/refresh",
+        "headers": [
+            {
+            "name": "Content-Type",
+            "value": "application/json"
+            }
+        ],
+        "body": {
+            "type": "json",
+            "raw": "{\n  \"refreshToken\": \"TU_REFRESH_TOKEN_AQUI\"\n}"
+        },
+        "tests": []
+        },
+        {
+        "name": "11. Logout",
+        "method": "POST",
+        "url": "http://localhost:3000/api/auth/logout",
+        "headers": [
+            {
+            "name": "Authorization",
+            "value": "Bearer TU_TOKEN_AQUI"
+            }
+        ],
+        "body": {},
+        "tests": []
+        }
+    ]
+    }
