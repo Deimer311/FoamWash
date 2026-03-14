@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model cotizacion {
+  Id_Cotizacion                             Int        @id @default(autoincrement())
+  Id_usuario                                Int
+  Precio_cotizado                           Decimal    @db.Decimal(10, 2)
+  Cantidad                                  Int
+  Tama_o                                    String     @map("Tamaño") @db.VarChar(45)
+  fecha_cotizacion                          DateTime?  @default(now()) @db.DateTime(0)
+  Id_servicio                               Int?
+  servicio_cotizacion_Id_servicioToservicio servicio?  @relation("cotizacion_Id_servicioToservicio", fields: [Id_servicio], references: [Id_Servicio], map: "fk_cotizacion_servicio")
+  usuario                                   usuario    @relation(fields: [Id_usuario], references: [Id_Usuario], map: "fk_cotizacion_usuario")
+  servicio                                  servicio[]
+
+  @@index([Id_usuario], map: "fk_cotizacion_usuario_idx")
+  @@index([Id_servicio], map: "fk_cotizacion_servicio")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model notificaciones {
+  id_notificaciones        Int       @id @default(autoincrement())
+  descripcion_notificacion String    @db.Text
+  fecha_notificacion       DateTime? @default(now()) @db.DateTime(0)
+  usuario_Id_Usuario       Int
+  usuario                  usuario   @relation(fields: [usuario_Id_Usuario], references: [Id_Usuario], onDelete: Cascade, map: "fk_notificaciones_usuario")
+
+  @@index([usuario_Id_Usuario], map: "fk_notificaciones_usuario_idx")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model observacion {
+  Id_Observaciones Int       @id @default(autoincrement())
+  Observaciones    String?   @db.Text
+  estado           String?   @db.VarChar(45)
+  reserva          reserva[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model reserva {
+  ID_Reserva                                   Int            @id @default(autoincrement())
+  Estado                                       String         @default("Pendiente") @db.VarChar(50)
+  Id_Usuario                                   Int
+  fecha                                        DateTime       @db.Date
+  Hora                                         DateTime       @db.Time(0)
+  Informacion_adicional                        String?        @db.Text
+  observacion_Id_Observaciones                 Int
+  empleado_Id_Usuario                          Int?
+  calificacion                                 calificacion[]
+  usuario_reserva_empleado_Id_UsuarioTousuario usuario?       @relation("reserva_empleado_Id_UsuarioTousuario", fields: [empleado_Id_Usuario], references: [Id_Usuario], map: "fk_reserva_empleado")
+  observacion                                  observacion    @relation(fields: [observacion_Id_Observaciones], references: [Id_Observaciones], map: "fk_reserva_observacion")
+  usuario                                      usuario        @relation(fields: [Id_Usuario], references: [Id_Usuario], map: "fk_reserva_usuario")
+  servicio                                     servicio[]
+
+  @@index([observacion_Id_Observaciones], map: "fk_reserva_observacion_idx")
+  @@index([Id_Usuario], map: "fk_reserva_usuario_idx")
+  @@index([empleado_Id_Usuario], map: "fk_reserva_empleado")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model rol {
+  Id_Rol  Int       @id @default(autoincrement())
+  Rol     String    @db.VarChar(50)
+  usuario usuario[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model servicio {
+  Id_Servicio                                 Int          @id @default(autoincrement())
+  Nombre_Servicio                             String       @db.VarChar(100)
+  Precio                                      Decimal      @db.Decimal(10, 2)
+  descripcion                                 String       @db.Text
+  imagen_url                                  String?      @db.VarChar(255)
+  cotizacion_Id_Cotizacion                    Int?
+  reserva_ID_Reserva                          Int?
+  estado                                      String       @default("activo") @db.VarChar(20)
+  duracion_estimada                           String?      @db.VarChar(50)
+  cotizacion_cotizacion_Id_servicioToservicio cotizacion[] @relation("cotizacion_Id_servicioToservicio")
+  cotizacion                                  cotizacion?  @relation(fields: [cotizacion_Id_Cotizacion], references: [Id_Cotizacion], map: "fk_servicio_cotizacion")
+  reserva                                     reserva?     @relation(fields: [reserva_ID_Reserva], references: [ID_Reserva], map: "fk_servicio_reserva")
+
+  @@index([cotizacion_Id_Cotizacion], map: "fk_servicio_cotizacion_idx")
+  @@index([reserva_ID_Reserva], map: "fk_servicio_reserva_idx")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model tipo_de_documento {
+  idTipo_de_Documento  Int       @id @default(autoincrement())
+  nombre_del_documento String    @unique(map: "nombre_del_documento_UNIQUE") @db.VarChar(50)
+  usuario              usuario[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model usuario {
+  Id_Usuario                                   Int                @id @default(autoincrement())
+  Nombre                                       String?            @db.VarChar(100)
+  Telefono                                     String?            @db.VarChar(15)
+  N_Documento                                  String?            @unique(map: "N_Documento") @db.VarChar(20)
+  Direccion                                    String?            @db.VarChar(100)
+  Correo                                       String?            @unique(map: "Correo") @db.VarChar(100)
+  password_hash                                String?            @db.VarChar(255)
+  estado                                       usuario_estado?    @default(activo)
+  rol_Id_Rol                                   Int?
+  Tipo_de_Documento_idTipo_de_Documento        Int?
+  reset_token                                  String?            @db.VarChar(10)
+  reset_token_expires                          DateTime?          @db.DateTime(0)
+  last_login                                   DateTime?          @db.DateTime(0)
+  fecha_registro                               DateTime?          @default(now()) @db.DateTime(0)
+  access_token                                 String?            @db.Text
+  refresh_token                                String?            @db.Text
+  token_created_at                             DateTime?          @db.DateTime(0)
+  token_expires_at                             DateTime?          @db.DateTime(0)
+  foto_perfil                                  String?            @db.VarChar(255)
+  calificacion                                 calificacion[]
+  cotizacion                                   cotizacion[]
+  empleado                                     empleado[]
+  notificaciones                               notificaciones[]
+  reserva_reserva_empleado_Id_UsuarioTousuario reserva[]          @relation("reserva_empleado_Id_UsuarioTousuario")
+  reserva                                      reserva[]
+  tipo_de_documento                            tipo_de_documento? @relation(fields: [Tipo_de_Documento_idTipo_de_Documento], references: [idTipo_de_Documento], onDelete: Restrict, map: "fk_usuario_Tipo_de_Documento1")
+  rol                                          rol?               @relation(fields: [rol_Id_Rol], references: [Id_Rol], onDelete: Restrict, map: "fk_usuario_rol1")
+
+  @@index([Tipo_de_Documento_idTipo_de_Documento], map: "fk_usuario_Tipo_de_Documento1_idx")
+  @@index([rol_Id_Rol], map: "fk_usuario_rol1_idx")
+  @@index([access_token(length: 255)], map: "idx_access_token")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model calificacion {
+  Id_Calificacion     Int       @id @default(autoincrement())
+  empleado_Id_Usuario Int
+  reserva_ID_Reserva  Int
+  puntaje             Decimal   @db.Decimal(2, 1)
+  comentario          String?   @db.Text
+  es_positivo         Boolean?  @default(true)
+  fecha_calificacion  DateTime? @default(now()) @db.DateTime(0)
+  usuario             usuario   @relation(fields: [empleado_Id_Usuario], references: [Id_Usuario], onUpdate: Restrict, map: "calificacion_ibfk_1")
+  reserva             reserva   @relation(fields: [reserva_ID_Reserva], references: [ID_Reserva], onUpdate: Restrict, map: "calificacion_ibfk_2")
+
+  @@index([empleado_Id_Usuario], map: "empleado_Id_Usuario")
+  @@index([reserva_ID_Reserva], map: "reserva_ID_Reserva")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model empleado {
+  Id_Empleado                  Int       @id @default(autoincrement())
+  usuario_Id_Usuario           Int
+  cargo                        String?   @db.VarChar(100)
+  fecha_nacimiento             DateTime? @db.Date
+  fecha_ingreso                DateTime? @db.Date
+  dias_laborales               String?   @db.VarChar(100)
+  horario                      String?   @db.VarChar(100)
+  especialidades               String?   @db.Text
+  certificaciones              String?   @db.Text
+  contacto_emergencia_nombre   String?   @db.VarChar(100)
+  contacto_emergencia_telefono String?   @db.VarChar(15)
+  usuario                      usuario   @relation(fields: [usuario_Id_Usuario], references: [Id_Usuario], onUpdate: Restrict, map: "empleado_ibfk_1")
+
+  @@index([usuario_Id_Usuario], map: "usuario_Id_Usuario")
+}
+
+enum usuario_estado {
+  activo
+  inactivo
+}

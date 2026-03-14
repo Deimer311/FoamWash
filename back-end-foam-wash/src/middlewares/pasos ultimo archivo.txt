@@ -1,0 +1,73 @@
+//Para migrar este último middleware a NestJS, daremos un salto de calidad. 
+En NestJS no se suele usar express-validator manualmente; en su lugar, se utiliza el ValidationPipe 
+junto con la librería class-validator.Esto permite que la validación ocurra de forma automática
+ basándose en DTOs (Data Transfer Objects), que son clases que definen la forma de los datos.
+ Aquí tienes la implementación:
+
+ 1. El Pipe de Validación GlobalEn lugar de un middleware manual, configuramos el ValidationPipe en tu main.
+ ts para que todos los errores sigan el formato de tu proyecto.TypeScript// main.ts
+
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe, BadRequestException } from '@nestjs/common';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,     // Elimina propiedades que no estén en el DTO (Sanitización básica)
+    forgetUnknown: true, // No lanza error si hay propiedades extra, solo las ignora
+    transform: true,     // Transforma tipos automáticamente (ej: string a number)
+    exceptionFactory: (errors) => {
+      // FORMATEO DE ERRORES (Sustituye a validate de express-validator)
+      const formattedErrors = errors.map(err => ({
+        field: err.property,
+        message: Object.values(err.constraints || {})[0],
+        value: err.value
+      }));
+
+      return new BadRequestException({
+        success: false,
+        error: {
+          code: 'VAL_INVALID_INPUT',
+          message: 'Datos de entrada inválidos',
+          details: formattedErrors
+        }
+      });
+    },
+  }));
+
+  await app.listen(3000);
+}
+
+2. Sanitización (Sustituye a sanitizeBody)Para la limpieza de XSS y caracteres peligrosos, 
+en NestJS lo ideal es usar Decoradores de Transformación dentro de tus DTOs. 
+Necesitarás instalar class-transformer.
+
+Ejemplo de un DTO con Validación y Sanitización:TypeScript// src/usuarios/dto/create-usuario.dto.ts
+
+import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { Transform } from 'class-transformer';
+
+export class CreateUsuarioDto {
+  @IsEmail({}, { message: 'Email inválido' })
+  @Transform(({ value }) => value?.toLowerCase().trim()) // Sanitización
+  correo: string;
+
+  @IsNotEmpty({ message: 'Password requerido' })
+  @MinLength(6, { message: 'Mínimo 6 caracteres' })
+  password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Transform(({ value }) => {
+      // Sustituye a tu lógica de remover tags HTML (XSS prevention)
+      return value?.replace(/<[^>]+>/g, '').trim();
+  })
+  nombre: string;
+}
+3. Uso en el ControladorAhora no necesitas llamar a un middleware validate(loginValidation). Nest lo hace por ti al detectar el tipo del body:TypeScript@Post('registro')
+async create(@Body() createUsuarioDto: CreateUsuarioDto) {
+  // Si llega aquí, los datos ya están VALIDADOS y SANITIZADOS
+  return this.usuariosService.create(createUsuarioDto);
+}
+Resumen de la Carpeta middlewares en NestJS:auth.middleware.js $\rightarrow$ Convertido en AuthGuard.error.middleware.js $\rightarrow$ Convertido en AllExceptionsFilter.roles.middleware.js $\rightarrow$ Integrado dentro del AuthGuard mediante decoradores.validation.middleware.js $\rightarrow$ Sustituido por ValidationPipe global y DTOs.¿Por qué es mejor así?Menos código repetitivo: No tienes que escribir validate(schema) en cada ruta.Tipado fuerte: Al usar DTOs, tienes autocompletado de los datos que vienen del cliente.Mantenimiento: Si cambias una regla de validación, la cambias en la clase DTO, no en un array de middleware perdido en una ruta. 
