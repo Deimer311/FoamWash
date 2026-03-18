@@ -14,7 +14,7 @@ async function bootstrap() {
 
   // 2. Configuración de CORS para permitir que el Frontend se conecte
   app.enableCors({
-    origin: 'http://localhost:5173', // La URL de tu frontend con Vite
+    origin: 'http://localhost:5000', // La URL de tu frontend con Vite
     credentials: true,               // Necesario para que funcionen las cookies/JWT
   });
 
