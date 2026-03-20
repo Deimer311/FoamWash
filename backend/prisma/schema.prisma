@@ -1,0 +1,175 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model TipoDeDocumento {
+  idTipo_de_Documento  Int       @id @default(autoincrement()) @map("idTipo_de_Documento")
+  nombre_del_documento String    @unique(map: "nombre_del_documento_UNIQUE") @map("nombre_del_documento") @db.VarChar(50)
+  usuario              Usuario[]
+
+  @@map("tipo_de_documento")
+}
+
+model Rol {
+  Id_Rol   Int       @id @default(autoincrement()) @map("Id_Rol")
+  Rol      String    @map("Rol") @db.VarChar(50)
+  usuarios Usuario[]
+
+  @@map("rol")
+}
+
+model Usuario {
+  Id_Usuario                             Int              @id @default(autoincrement()) @map("Id_Usuario")
+  Nombre                                 String?          @map("Nombre") @db.VarChar(100)
+  Telefono                               String?          @map("Telefono") @db.VarChar(15)
+  N_Documento                            String?          @unique(map: "N_Documento") @map("N_Documento") @db.VarChar(20)
+  Direccion                              String?          @map("Direccion") @db.VarChar(100)
+  Correo                                 String?          @unique(map: "Correo") @map("Correo") @db.VarChar(100)
+  password_hash                          String?          @map("password_hash") @db.VarChar(255)
+  estado                                 usuario_estado?  @default(activo) @map("estado")
+  rol_Id_Rol                             Int?             @map("rol_Id_Rol")
+  tipo_de_documento_id_tipo_de_documento Int?
+  reset_token                            String?          @map("reset_token") @db.VarChar(10)
+  reset_token_expires                    DateTime?        @map("reset_token_expires") @db.DateTime(0)
+  last_login                             DateTime?        @map("last_login") @db.DateTime(0)
+  fecha_registro                         DateTime?        @default(now()) @map("fecha_registro") @db.DateTime(0)
+  access_token                           String?          @map("access_token") @db.Text
+  refresh_token                          String?          @map("refresh_token") @db.Text
+  token_created_at                       DateTime?        @map("token_created_at") @db.DateTime(0)
+  token_expires_at                       DateTime?        @map("token_expires_at") @db.DateTime(0)
+  foto_perfil                            String?          @map("foto_perfil") @db.VarChar(255)
+  calificaciones                         Calificacion[]
+  cotizaciones                           Cotizacion[]
+  empleado                               Empleado[]
+  notificaciones                         Notificacion[]
+  reservasComoEmpleado                   Reserva[]        @relation("EmpleadoReservas")
+  reservasComoCliente                    Reserva[]        @relation("ClienteReservas")
+  tipo_de_documento                      TipoDeDocumento? @relation(fields: [tipo_de_documento_id_tipo_de_documento], references: [idTipo_de_Documento], onDelete: Restrict, map: "fk_usuario_Tipo_de_Documento1")
+  rol                                    Rol?             @relation(fields: [rol_Id_Rol], references: [Id_Rol], onDelete: Restrict, map: "fk_usuario_rol1")
+
+  @@index([tipo_de_documento_id_tipo_de_documento], map: "fk_usuario_Tipo_de_Documento1_idx")
+  @@index([rol_Id_Rol], map: "fk_usuario_rol1_idx")
+  @@index([access_token(length: 255)], map: "idx_access_token")
+  @@map("usuario")
+}
+
+model Empleado {
+  Id_Empleado                  Int       @id @default(autoincrement()) @map("Id_Empleado")
+  usuario_Id_Usuario           Int       @map("usuario_Id_Usuario")
+  cargo                        String?   @map("cargo") @db.VarChar(100)
+  fecha_nacimiento             DateTime? @map("fecha_nacimiento") @db.Date
+  fecha_ingreso                DateTime? @map("fecha_ingreso") @db.Date
+  dias_laborales               String?   @map("dias_laborales") @db.VarChar(100)
+  horario                      String?   @map("horario") @db.VarChar(100)
+  especialidades               String?   @map("especialidades") @db.Text
+  certificaciones              String?   @map("certificaciones") @db.Text
+  contacto_emergencia_nombre   String?   @map("contacto_emergencia_nombre") @db.VarChar(100)
+  contacto_emergencia_telefono String?   @map("contacto_emergencia_telefono") @db.VarChar(15)
+  usuario                      Usuario   @relation(fields: [usuario_Id_Usuario], references: [Id_Usuario], onUpdate: Restrict, map: "empleado_ibfk_1")
+
+  @@index([usuario_Id_Usuario], map: "usuario_Id_Usuario")
+  @@map("empleado")
+}
+
+model Observacion {
+  Id_Observaciones Int       @id @default(autoincrement()) @map("Id_Observaciones")
+  Observaciones    String?   @map("Observaciones") @db.Text
+  estado           String?   @map("estado") @db.VarChar(45)
+  reservas         Reserva[]
+
+  @@map("observacion")
+}
+
+model Reserva {
+  ID_Reserva                   Int            @id @default(autoincrement()) @map("ID_Reserva")
+  Estado                       String         @default("Pendiente") @map("Estado") @db.VarChar(50)
+  Id_Usuario                   Int            @map("Id_Usuario")
+  fecha                        DateTime       @map("fecha") @db.Date
+  Hora                         DateTime       @map("Hora") @db.Time(0)
+  Informacion_adicional        String?        @map("Informacion_adicional") @db.Text
+  observacion_Id_Observaciones Int            @map("observacion_Id_Observaciones")
+  empleado_Id_Usuario          Int?           @map("empleado_Id_Usuario")
+  calificaciones               Calificacion[]
+  empleado                     Usuario?       @relation("EmpleadoReservas", fields: [empleado_Id_Usuario], references: [Id_Usuario], map: "fk_reserva_empleado")
+  observacion                  Observacion    @relation(fields: [observacion_Id_Observaciones], references: [Id_Observaciones], map: "fk_reserva_observacion")
+  cliente                      Usuario        @relation("ClienteReservas", fields: [Id_Usuario], references: [Id_Usuario], map: "fk_reserva_usuario")
+  servicios                    Servicio[]
+
+  @@index([empleado_Id_Usuario], map: "fk_reserva_empleado")
+  @@index([observacion_Id_Observaciones], map: "fk_reserva_observacion_idx")
+  @@index([Id_Usuario], map: "fk_reserva_usuario_idx")
+  @@map("reserva")
+}
+
+model Servicio {
+  Id_Servicio              Int          @id @default(autoincrement()) @map("Id_Servicio")
+  Nombre_Servicio          String       @map("Nombre_Servicio") @db.VarChar(100)
+  Precio                   Decimal      @map("Precio") @db.Decimal(10, 2)
+  descripcion              String       @map("descripcion") @db.Text
+  imagen_url               String?      @map("imagen_url") @db.VarChar(255)
+  cotizacion_Id_Cotizacion Int?         @map("cotizacion_Id_Cotizacion")
+  reserva_ID_Reserva       Int?         @map("reserva_ID_Reserva")
+  estado                   String       @default("activo") @db.VarChar(20)
+  duracion_estimada        String?      @db.VarChar(50)
+  cotizacionesComoBase     Cotizacion[] @relation("CotizacionServicioBase")
+  cotizacion               Cotizacion?  @relation("ServiciosEnCotizacion", fields: [cotizacion_Id_Cotizacion], references: [Id_Cotizacion], map: "fk_servicio_cotizacion")
+  reserva                  Reserva?     @relation(fields: [reserva_ID_Reserva], references: [ID_Reserva], map: "fk_servicio_reserva")
+
+  @@index([cotizacion_Id_Cotizacion], map: "fk_servicio_cotizacion_idx")
+  @@index([reserva_ID_Reserva], map: "fk_servicio_reserva_idx")
+  @@map("servicio")
+}
+
+model Cotizacion {
+  Id_Cotizacion    Int        @id @default(autoincrement()) @map("Id_Cotizacion")
+  Id_usuario       Int        @map("Id_usuario")
+  Precio_cotizado  Decimal    @map("Precio_cotizado") @db.Decimal(10, 2)
+  Cantidad         Int        @map("Cantidad")
+  Tamaño          String     @map("Tamaño") @db.VarChar(45)
+  fecha_cotizacion DateTime?  @default(now()) @map("fecha_cotizacion") @db.DateTime(0)
+  Id_servicio      Int?       @map("Id_servicio")
+  servicioBase     Servicio?  @relation("CotizacionServicioBase", fields: [Id_servicio], references: [Id_Servicio], map: "fk_cotizacion_servicio")
+  cliente          Usuario    @relation(fields: [Id_usuario], references: [Id_Usuario], map: "fk_cotizacion_usuario")
+  servicios        Servicio[] @relation("ServiciosEnCotizacion")
+
+  @@index([Id_servicio], map: "fk_cotizacion_servicio")
+  @@index([Id_usuario], map: "fk_cotizacion_usuario_idx")
+  @@map("cotizacion")
+}
+
+model Notificacion {
+  id_notificaciones        Int       @id @default(autoincrement()) @map("id_notificaciones")
+  descripcion_notificacion String    @map("descripcion_notificacion") @db.Text
+  fecha_notificacion       DateTime? @default(now()) @map("fecha_notificacion") @db.DateTime(0)
+  usuario_Id_Usuario       Int       @map("usuario_Id_Usuario")
+  usuario                  Usuario   @relation(fields: [usuario_Id_Usuario], references: [Id_Usuario], onDelete: Cascade, map: "fk_notificaciones_usuario")
+
+  @@index([usuario_Id_Usuario], map: "fk_notificaciones_usuario_idx")
+  @@map("notificaciones")
+}
+
+model Calificacion {
+  Id_Calificacion     Int       @id @default(autoincrement()) @map("Id_Calificacion")
+  empleado_Id_Usuario Int       @map("empleado_Id_Usuario")
+  reserva_ID_Reserva  Int       @map("reserva_ID_Reserva")
+  puntaje             Decimal   @map("puntaje") @db.Decimal(2, 1)
+  comentario          String?   @map("comentario") @db.Text
+  es_positivo         Boolean?  @default(true) @map("es_positivo")
+  fecha_calificacion  DateTime? @default(now()) @map("fecha_calificacion") @db.DateTime(0)
+  empleado            Usuario   @relation(fields: [empleado_Id_Usuario], references: [Id_Usuario], onUpdate: Restrict, map: "calificacion_ibfk_1")
+  reserva             Reserva   @relation(fields: [reserva_ID_Reserva], references: [ID_Reserva], onUpdate: Restrict, map: "calificacion_ibfk_2")
+
+  @@index([empleado_Id_Usuario], map: "empleado_Id_Usuario")
+  @@index([reserva_ID_Reserva], map: "reserva_ID_Reserva")
+  @@map("calificacion")
+}
+
+enum usuario_estado {
+  activo
+  inactivo
+}
