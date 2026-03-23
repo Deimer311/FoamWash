@@ -10,7 +10,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // ── Seguridad ────────────────────────────────────────────
-  app.use(helmet());
+  app.use(helmet({
+    crossOriginResourcePolicy: false,
+  }));
 
   // ── Cookie Parser ────────────────────────────────────────
   app.use(cookieParser());
