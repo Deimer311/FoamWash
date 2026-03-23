@@ -5,3 +5,6 @@ buildCommand = "npm ci && npm run build"
 [deploy]
 startCommand = "node dist/main"
 restartPolicyType = "on_failure"
+
+[build.nixpacksPlan.phases.build]
+cacheDirectories = []
