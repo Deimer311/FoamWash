@@ -1,0 +1,192 @@
+/* =============================================================================
+   MAINCONTENT.CSS - ALINEACIÓN HORIZONTAL Y VERTICAL PERFECTA
+   =============================================================================
+   Tanto LeftSection como RightSection están a la misma altura
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   CONTENEDOR PRINCIPAL
+   ----------------------------------------------------------------------------- */
+.main-content-wrapper {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 0;
+    margin: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   CONTENEDOR CENTRADO - ALINEADO CON EL HEADER
+   ----------------------------------------------------------------------------- */
+.main-content-container {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0 50px;  /* ← Mismo padding que el header */
+    box-sizing: border-box;
+}
+
+/* -----------------------------------------------------------------------------
+   GRID PRINCIPAL - Alineación superior para todas las secciones
+   ----------------------------------------------------------------------------- */
+.main-content-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 2fr);
+    gap: 30px;
+    align-items: start;  /* ← CAMBIO: De 'center' a 'start' para alinear arriba */
+    min-height: calc(100vh - 120px);
+    width: 100%;
+}
+
+/* -----------------------------------------------------------------------------
+   SECCIONES - TODAS COMIENZAN A LA MISMA ALTURA
+   ----------------------------------------------------------------------------- */
+.grid-section {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;  /* ← CAMBIO: Todas comienzan desde arriba */
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.left-section {
+    padding: 0 !important;
+    margin: 0 !important;
+    align-items: flex-start;  /* ← Alinea contenido a la izquierda */
+}
+
+.center-section {
+    display: flex;
+    align-items: center;  /* ← Centro sí se mantiene centrado verticalmente */
+    justify-content: center;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.right-section {
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex;
+    align-items: flex-start;  /* ← NUEVO: Alinea al inicio verticalmente */
+    justify-content: center;   /* ← Centra horizontalmente */
+}
+
+/* Asegurar que los elementos hijos no tengan márgenes */
+.left-section > *,
+.right-section > *,
+.center-section > * {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
+/* Pantallas muy grandes (1600px+) */
+@media (min-width: 1600px) {
+    .main-content-container {
+        padding: 0 50px;
+    }
+    
+    .main-content-grid {
+        gap: 40px;
+    }
+}
+
+/* Pantallas grandes (1400px - 1599px) */
+@media (min-width: 1400px) and (max-width: 1599px) {
+    .main-content-container {
+        padding: 0 50px;
+    }
+    
+    .main-content-grid {
+        gap: 35px;
+    }
+}
+
+/* Pantallas medianas-grandes (1200px - 1399px) */
+@media (max-width: 1399px) {
+    .main-content-container {
+        padding: 0 50px;
+    }
+    
+    .main-content-grid {
+        gap: 30px;
+    }
+}
+
+/* Pantallas medianas (900px - 1199px) */
+@media (max-width: 1199px) {
+    .main-content-container {
+        padding: 0 40px;
+    }
+    
+    .main-content-grid {
+        grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1.5fr);
+        gap: 25px;
+    }
+}
+
+/* Tablets (768px - 899px) - Layout vertical */
+@media (max-width: 899px) {
+    .main-content-wrapper {
+        padding: 40px 0;
+    }
+    
+    .main-content-container {
+        padding: 0 30px;
+    }
+    
+    .main-content-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        min-height: auto;
+        align-items: center;  /* En móvil vuelven a estar centradas */
+    }
+    
+    .left-section {
+        order: 1;
+    }
+    
+    .center-section {
+        order: 2;
+    }
+    
+    .right-section {
+        order: 3;
+    }
+}
+
+/* Móviles grandes (481px - 767px) */
+@media (max-width: 767px) {
+    .main-content-wrapper {
+        padding: 30px 0;
+    }
+    
+    .main-content-container {
+        padding: 0 20px;
+    }
+    
+    .main-content-grid {
+        gap: 25px;
+    }
+}
+
+/* Móviles pequeños (hasta 480px) */
+@media (max-width: 480px) {
+    .main-content-wrapper {
+        padding: 20px 0;
+    }
+    
+    .main-content-container {
+        padding: 0 15px;
+    }
+    
+    .main-content-grid {
+        gap: 20px;
+    }
+}

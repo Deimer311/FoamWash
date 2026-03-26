@@ -1,0 +1,164 @@
+:root {
+  --black: #000000;
+  --white: #ffffff;
+  --blue: #008cff;
+  --blue-dark: #223bff;
+  --green: #00ff37;
+  --shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+body {
+  background: var(--white);
+  font-family: system-ui, sans-serif;
+}
+
+.panel-container {
+  max-width: 100vw;
+  margin: auto;
+  padding: 2rem 1rem;
+}
+
+.panel-title {
+  text-align: center;
+  color: var(--blue); 
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* KPIs */
+.kpi-container {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.kpi-card {
+  background: var(--white);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  padding: 1.8rem;
+  min-width: 200px;
+  text-align: center;
+}
+
+.kpi-number {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--blue-dark);
+}
+
+.kpi-label {
+  font-size: 0.9rem;
+}
+
+/* Secciones */
+.section-title {
+  text-align: center;
+  font-size: 1.7rem;
+  color: var(--blue);
+  margin: 3rem 0 1.5rem;
+}
+
+/* Órdenes */
+.orders-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.order-card {
+  background: var(--white);
+  box-shadow: var(--shadow);
+  border-radius: 18px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.order-service {
+  font-weight: bold;
+}
+
+.order-time {
+  font-size: 0.85rem;
+  font-weight: lighter;
+}
+
+.order-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e0e0e0;
+}
+
+/* Empleados */
+.employees-container {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.employee-card {
+  position: relative;
+  background: var(--white);
+  box-shadow: var(--shadow);
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  width: 520px;
+}
+
+.status-dot {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 10px;
+  height: 10px;
+  background: var(--green);
+  border-radius: 50%;
+}
+
+.employee-avatar {
+  width: 80px;
+  height: 80px;
+  background: #e0e0e0;
+  border-radius: 50%;
+}
+
+.employee-info p {
+  font-size: 0.85rem;
+}
+
+.employee-service {
+  display: block;
+  margin-top: 0.5rem;
+  font-weight: bold;
+}
+
+/* Accesos rápidos */
+.actions-container {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  background: var(--blue);
+  color: var(--white);
+  border: none;
+  border-radius: 20px;
+  padding: 0.9rem 1.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.action-btn:hover {
+  background: var(--blue-dark);
+}
