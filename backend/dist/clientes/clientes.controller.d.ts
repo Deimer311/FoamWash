@@ -63,6 +63,7 @@ export declare class ClientesController {
         success: boolean;
         data: {
             Id_Usuario: number;
+            N_Documento: string;
             Correo: string;
             Nombre: string;
             Telefono: string;
@@ -80,5 +81,12 @@ export declare class ClientesController {
             foto_perfil: string;
         };
         message?: undefined;
+    }>;
+    getTiposDocumento(): Promise<{
+        success: boolean;
+        data: {
+            idTipo_de_Documento: number;
+            nombre_del_documento: string;
+        }[];
     }>;
 }

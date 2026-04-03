@@ -9,19 +9,21 @@
 //   Formulario de edición del perfil del administrador.
 // =============================================================================
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import api from '../../services/api';
 
 const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
   const [imagePreview, setImagePreview] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [userId, setUserId] = useState(null);
   const [formData, setFormData] = useState({
-    nombre: 'Juan Pablo Rodríguez',
+    nombre: '',
     cargo: 'Administrador General',
-    cedula: '1.012.345.678',
-    departamento: 'Administración',
-    email: 'admin@foamwash.com',
+    cedula: '',
+    departamento: '',
+    email: '',
     emailAlt: '',
-    telefono: '+57 300 123 4567',
+    telefono: '',
     telefonoAlt: '',
     passwordActual: '',
     passwordNueva: '',
@@ -29,6 +31,31 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
     notifEmail: 'todas',
     notifSMS: 'importantes'
   });
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const res = await api.get('/auth/me');
+        const data = res.data?.data || res.data || {};
+        setUserId(data.Id_Usuario || data.id || null);
+        setFormData(prev => ({
+          ...prev,
+          nombre: data.Nombre || '',
+          correo: data.Correo || '',
+          email: data.Correo || '',
+          telefono: data.Telefono || '',
+          departamento: data.departamento || 'Administración',
+          cedula: data.N_Documento || '',
+          cargo: data.cargo || 'Administrador General'
+        }));
+      } catch (error) {
+        console.error('Error al obtener perfil:', error);
+      }
+    };
+
+    loadUser();
+  }, []);
+
 
   const fileInputRef = useRef(null);
 
@@ -59,10 +86,38 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
+
+    if (!userId) {
+      console.error('No user ID available to update');
+      return;
+    }
+
+    try {
+      const payload = {
+        Nombre: formData.nombre,
+        Correo: formData.email,
+        Telefono: formData.telefono,
+        N_Documento: formData.cedula,
+        direccion: formData.departamento,
+        cargo: formData.cargo
+      };
+
+      const res = await api.put(`/usuarios/${userId}`, payload);
+      if (res.data?.success) {
+        setShowSuccess(true);
+
+        setTimeout(() => {
+          setShowSuccess(false);
+          if (onBackToProfile) onBackToProfile();
+        }, 1500);
+      } else {
+        console.error('Fallo al actualizar usuario:', res.data);
+      }
+    } catch (error) {
+      console.error('Error al guardar perfil:', error);
+    }
   };
 
   return (
@@ -762,15 +817,17 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
               </div>
 
               <div className="button-group">
-                <button type="button" className="btn-cancel" onClick={() => window.history.back()}>Cancelar</button>
-                <button type="button" className="btn-submit" onClick={handleSubmit}>💾 Guardar Cambios</button>
-              </div>
-              
-              {showSuccess && (
-                <div className="success-message active">
-                  ✓ Perfil actualizado correctamente
+                  <button type="button" className="btn-cancel" onClick={() => {
+                    if (onBackToProfile) onBackToProfile();
+                  }}>Cancelar</button>
+                  <button type="button" className="btn-submit" onClick={handleSubmit}>💾 Guardar Cambios</button>
                 </div>
-              )}
+
+                {showSuccess && (
+                  <div className="success-message active">
+                    ✓ Perfil actualizado correctamente
+                  </div>
+                )}
             </div>
           </div>
         </div>

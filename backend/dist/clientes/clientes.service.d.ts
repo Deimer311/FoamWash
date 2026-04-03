@@ -61,8 +61,10 @@ export declare class ClientesService {
         Telefono: string;
         Direccion: string;
         N_Documento: string;
+        tipo_de_documento_id_tipo_de_documento: number;
     }>): Promise<{
         Id_Usuario: number;
+        N_Documento: string;
         Correo: string;
         Nombre: string;
         Telefono: string;
@@ -72,4 +74,8 @@ export declare class ClientesService {
         Id_Usuario: number;
         foto_perfil: string;
     }>;
+    getTiposDocumento(): Promise<{
+        idTipo_de_Documento: number;
+        nombre_del_documento: string;
+    }[]>;
 }

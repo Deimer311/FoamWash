@@ -16,13 +16,33 @@ let EstadisticasService = class EstadisticasService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async getDashboard() {
+    async getDashboard(periodo) {
+        let dateFilter = {};
+        const now = new Date();
+        if (periodo) {
+            switch (periodo) {
+                case 'semanal':
+                    dateFilter = { gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) };
+                    break;
+                case 'mensual':
+                    dateFilter = { gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) };
+                    break;
+                case 'trimestral':
+                    dateFilter = { gte: new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000) };
+                    break;
+                case 'anual':
+                    dateFilter = { gte: new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000) };
+                    break;
+                default:
+                    break;
+            }
+        }
         const [totalClientes, totalReservas, reservasCompletadas, reservasPendientes, ingresos, totalServicios] = await Promise.all([
-            this.prisma.usuario.count({ where: { rol_Id_Rol: 3 } }),
-            this.prisma.reserva.count(),
-            this.prisma.reserva.count({ where: { Estado: 'Completado' } }),
-            this.prisma.reserva.count({ where: { Estado: 'Pendiente' } }),
-            this.prisma.cotizacion.aggregate({ _sum: { Precio_cotizado: true } }),
+            this.prisma.usuario.count({ where: { rol_Id_Rol: 3, ...(periodo ? { fecha_registro: dateFilter } : {}) } }),
+            this.prisma.reserva.count({ where: periodo ? { fecha: dateFilter } : {} }),
+            this.prisma.reserva.count({ where: { Estado: 'Completado', ...(periodo ? { fecha: dateFilter } : {}) } }),
+            this.prisma.reserva.count({ where: { Estado: 'Pendiente', ...(periodo ? { fecha: dateFilter } : {}) } }),
+            this.prisma.cotizacion.aggregate({ _sum: { Precio_cotizado: true }, where: periodo ? {} : {} }),
             this.prisma.servicio.count(),
         ]);
         return {

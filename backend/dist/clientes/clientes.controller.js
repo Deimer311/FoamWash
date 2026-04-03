@@ -38,6 +38,10 @@ let ClientesController = class ClientesController {
         const data = await this.clientesService.updateFoto(id, fotoUrl);
         return { success: true, data };
     }
+    async getTiposDocumento() {
+        const data = await this.clientesService.getTiposDocumento();
+        return { success: true, data };
+    }
 };
 exports.ClientesController = ClientesController;
 __decorate([
@@ -70,6 +74,12 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], ClientesController.prototype, "updateFoto", null);
+__decorate([
+    (0, common_1.Get)('tipos-documento'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ClientesController.prototype, "getTiposDocumento", null);
 exports.ClientesController = ClientesController = __decorate([
     (0, common_1.Controller)('clientes'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

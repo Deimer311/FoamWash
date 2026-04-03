@@ -37,6 +37,8 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
         passwordNueva:    '',
         passwordConfirmar: ''
     });
+    const [tiposDocumento, setTiposDocumento] = useState([]);
+    const [tipoDocId, setTipoDocId] = useState(null);
 
     const fileInputRef = useRef(null);
 
@@ -45,6 +47,22 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
         if (!user?.id) return;
         const cargar = async () => {
             try {
+                // Cargar tipos de documento (con fallback si endpoint no existe o está en mantenimiento)
+                try {
+                    const tiposRes = await api.get('/clientes/tipos-documento');
+                    if (tiposRes.data.success) {
+                        setTiposDocumento(tiposRes.data.data);
+                    }
+                } catch (err) {
+                    console.warn('No se pudo cargar tipos de documento, usando valores por defecto.', err);
+                    setTiposDocumento([
+                        { idTipo_de_Documento: 1, nombre_del_documento: 'CC' },
+                        { idTipo_de_Documento: 2, nombre_del_documento: 'TI' },
+                        { idTipo_de_Documento: 3, nombre_del_documento: 'CE' }
+                    ]);
+                }
+
+                // Cargar perfil
                 const res = await api.get('/clientes/' + user.id + '/perfil');
                 if (res.data.success) {
                     const p = res.data.data;
@@ -55,8 +73,9 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
                         telefono: p.Telefono  || '',
                         direccion: p.Direccion || '',
                         numDoc:   p.N_Documento || '',
-                        tipoDoc:  p.tipo_documento || 'CC'
+                        tipoDoc:  p.tipo_de_documento?.nombre_del_documento || 'CC'
                     }));
+                    setTipoDocId(p.tipo_de_documento_id_tipo_de_documento || null);
                     if (p.foto_perfil) {
                         const url = p.foto_perfil.startsWith('http')
                             ? p.foto_perfil
@@ -86,6 +105,13 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
         setFormData(prev => ({ ...prev, [id || name]: value }));
     };
 
+    const handleTipoDocChange = (e) => {
+        const selectedId = parseInt(e.target.value);
+        const selectedTipo = tiposDocumento.find(t => t.idTipo_de_Documento === selectedId);
+        setTipoDocId(selectedId);
+        setFormData(prev => ({ ...prev, tipoDoc: selectedTipo?.nombre_del_documento || '' }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (formData.passwordNueva && formData.passwordNueva !== formData.passwordConfirmar) {
@@ -100,7 +126,9 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
             await api.put('/clientes/' + user.id + '/perfil', {
                 Nombre:    formData.nombre,
                 Telefono:  formData.telefono,
-                Direccion: formData.direccion
+                Direccion: formData.direccion,
+                N_Documento: formData.numDoc,
+                tipo_de_documento_id_tipo_de_documento: tipoDocId
             });
 
             // Actualizar foto si se seleccionó una nueva (base64 local = nueva foto)
@@ -225,6 +253,21 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
                             <div className="form-group-edit">
                                 <label htmlFor="nombre">Nombre Completo</label>
                                 <input id="nombre" type="text" value={formData.nombre} onChange={handleInputChange} required />
+                            </div>
+                            <div className="form-group-edit">
+                                <label htmlFor="tipoDoc">Tipo de Documento</label>
+                                <select id="tipoDoc" value={tipoDocId || ''} onChange={handleTipoDocChange} required>
+                                    <option value="">Seleccionar...</option>
+                                    {tiposDocumento.map(tipo => (
+                                        <option key={tipo.idTipo_de_Documento} value={tipo.idTipo_de_Documento}>
+                                            {tipo.nombre_del_documento}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="form-group-edit">
+                                <label htmlFor="numDoc">Número de Documento</label>
+                                <input id="numDoc" type="text" value={formData.numDoc} onChange={handleInputChange} required />
                             </div>
                             <div className="form-group-edit">
                                 <label htmlFor="email">Correo Electrónico</label>

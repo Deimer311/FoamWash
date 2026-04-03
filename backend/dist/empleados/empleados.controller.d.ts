@@ -63,6 +63,38 @@ export declare class EmpleadosController {
             };
         }[];
     }>;
+    perfil(id: number): Promise<{
+        success: boolean;
+        data: {
+            Id_Usuario: number;
+            Nombre: string;
+            Correo: string;
+            Telefono: string;
+            Direccion: string;
+            N_Documento: string;
+            foto_perfil: string;
+            tipo_de_documento: {
+                nombre_del_documento: string;
+            };
+            cargo: string;
+            dias_laborales: string;
+            horario: string;
+            especialidades: string;
+            certificaciones: string;
+            fecha_ingreso: Date;
+            fecha_nacimiento: Date;
+        };
+    }>;
+    desempeno(id: number): Promise<{
+        success: boolean;
+        data: {
+            servicios_completados: number;
+            servicios_pendientes: number;
+            calificacion_promedio: string | import("@prisma/client/runtime/library").Decimal;
+            puntualidad: string;
+            comentarios_positivos: number;
+        };
+    }>;
     serviciosHoy(id: number): Promise<{
         success: boolean;
         data: ({

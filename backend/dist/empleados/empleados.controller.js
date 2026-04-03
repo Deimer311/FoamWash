@@ -39,6 +39,14 @@ let EmpleadosController = class EmpleadosController {
         const data = await this.empleadosService.getProductividadGeneral();
         return { success: true, data };
     }
+    async perfil(id) {
+        const data = await this.empleadosService.getPerfil(id);
+        return { success: true, data };
+    }
+    async desempeno(id) {
+        const data = await this.empleadosService.getDesempeno(id);
+        return { success: true, data };
+    }
     async serviciosHoy(id) {
         const data = await this.empleadosService.getReservasHoy(id);
         return { success: true, data, total: data.length };
@@ -80,6 +88,20 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], EmpleadosController.prototype, "productividadGeneral", null);
+__decorate([
+    (0, common_1.Get)(':id/perfil'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], EmpleadosController.prototype, "perfil", null);
+__decorate([
+    (0, common_1.Get)(':id/desempeno'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], EmpleadosController.prototype, "desempeno", null);
 __decorate([
     (0, common_1.Get)(':id/servicios-hoy'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),

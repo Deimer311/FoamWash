@@ -47,34 +47,38 @@ const PerfilTrabajador = ({ onBackToHome, onEditarPerfil, onLogout }) => {
     const fetchDatos = async () => {
         setIsLoading(true);
         setError('');
+
         try {
-            // FIX: /empleados/:id/perfil y /empleados/:id/desempeno no existen.
-            // Usar GET /empleados (lista) para el perfil, y
-            // GET /empleados/:id/servicios-hoy para las reservas de hoy.
-            const [listaRes, reservasRes] = await Promise.all([
-                api.get('/empleados'),
-                api.get(`/empleados/${user.id}/servicios-hoy`)
+            const [perfilRes, desempenoRes, reservasRes] = await Promise.all([
+                api.get(`/empleados/${user.id}/perfil`),
+                api.get(`/empleados/${user.id}/desempeno`),
+                api.get(`/empleados/${user.id}/servicios-hoy`),
             ]);
 
-            const lista = listaRes.data?.data || [];
-            const miPerfil = lista.find(e => e.Id_Usuario === user.id);
-            if (miPerfil) {
-                setPerfil(miPerfil);
+            if (perfilRes.data?.success) {
+                setPerfil(perfilRes.data.data);
             } else {
-                // fallback con datos del contexto de auth
                 setPerfil({ Nombre: user.nombre, Correo: user.email });
             }
 
-            // desempeno no existe en backend: mostrar valores vacíos
-            setDesempeno(null);
+            if (desempenoRes.data?.success) {
+                setDesempeno(desempenoRes.data.data);
+            } else {
+                setDesempeno({ servicios_completados: 0, calificacion_promedio: '—', puntualidad: '—', comentarios_positivos: 0 });
+            }
 
             if (reservasRes.data?.success) {
                 setReservasHoy(reservasRes.data.data || []);
+            } else {
+                setReservasHoy([]);
             }
 
         } catch (err) {
             console.error('❌ Error al cargar perfil:', err);
+            setError('No se pudo cargar el perfil del trabajador.');
             setPerfil({ Nombre: user.nombre, Correo: user.email });
+            setDesempeno({ servicios_completados: 0, calificacion_promedio: '—', puntualidad: '—', comentarios_positivos: 0 });
+            setReservasHoy([]);
         } finally {
             setIsLoading(false);
         }
@@ -178,8 +182,8 @@ const PerfilTrabajador = ({ onBackToHome, onEditarPerfil, onLogout }) => {
                         <div className="profile-role">{perfil?.cargo || 'Empleado'}</div>
 
                         <div className="availability-badge">
-                            <span className="status-dot"></span>
-                            <span>Disponible</span>
+                            <span className={`status-dot ${perfil?.estado === 'activo' ? 'status-active' : 'status-offline'}`}></span>
+                            <span>{perfil?.estado?.toUpperCase() || 'No disponible'}</span>
                         </div>
 
                         {/* Estadísticas del mes desde el backend */}

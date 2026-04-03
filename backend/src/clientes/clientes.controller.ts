@@ -39,4 +39,11 @@ export class ClientesController {
     const data = await this.clientesService.updateFoto(id, fotoUrl);
     return { success: true, data };
   }
+
+  @Get('tipos-documento')
+  async getTiposDocumento() {
+    const data = await this.clientesService.getTiposDocumento();
+    return { success: true, data };
+  }
 }
+

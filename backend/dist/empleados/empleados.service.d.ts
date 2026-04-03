@@ -51,6 +51,32 @@ export declare class EmpleadosService {
         observacion_Id_Observaciones: number;
         empleado_Id_Usuario: number | null;
     })[]>;
+    getPerfil(id: number): Promise<{
+        Id_Usuario: number;
+        Nombre: string;
+        Correo: string;
+        Telefono: string;
+        Direccion: string;
+        N_Documento: string;
+        foto_perfil: string;
+        tipo_de_documento: {
+            nombre_del_documento: string;
+        };
+        cargo: string;
+        dias_laborales: string;
+        horario: string;
+        especialidades: string;
+        certificaciones: string;
+        fecha_ingreso: Date;
+        fecha_nacimiento: Date;
+    }>;
+    getDesempeno(id: number): Promise<{
+        servicios_completados: number;
+        servicios_pendientes: number;
+        calificacion_promedio: string | import("@prisma/client/runtime/library").Decimal;
+        puntualidad: string;
+        comentarios_positivos: number;
+    }>;
     getSinServicios(): Promise<{
         Id_Usuario: number;
         Correo: string;

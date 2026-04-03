@@ -48,7 +48,7 @@ let ClientesService = class ClientesService {
         return this.prisma.usuario.update({
             where: { Id_Usuario: id },
             data,
-            select: { Id_Usuario: true, Nombre: true, Correo: true, Telefono: true, Direccion: true },
+            select: { Id_Usuario: true, Nombre: true, Correo: true, Telefono: true, Direccion: true, N_Documento: true },
         });
     }
     async updateFoto(id, fotoUrl) {
@@ -56,6 +56,11 @@ let ClientesService = class ClientesService {
             where: { Id_Usuario: id },
             data: { foto_perfil: fotoUrl },
             select: { Id_Usuario: true, foto_perfil: true },
+        });
+    }
+    async getTiposDocumento() {
+        return this.prisma.tipoDeDocumento.findMany({
+            select: { idTipo_de_Documento: true, nombre_del_documento: true },
         });
     }
 };

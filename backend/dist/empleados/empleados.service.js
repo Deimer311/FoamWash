@@ -63,6 +63,57 @@ let EmpleadosService = class EmpleadosService {
             orderBy: [{ fecha: 'asc' }, { Hora: 'asc' }],
         });
     }
+    async getPerfil(id) {
+        const usuario = await this.prisma.usuario.findUnique({
+            where: { Id_Usuario: id },
+            include: {
+                tipo_de_documento: { select: { nombre_del_documento: true } },
+                empleado: true,
+            },
+        });
+        if (!usuario)
+            throw new common_1.NotFoundException('Empleado no encontrado');
+        const empleado = usuario.empleado && usuario.empleado.length > 0 ? usuario.empleado[0] : null;
+        return {
+            Id_Usuario: usuario.Id_Usuario,
+            Nombre: usuario.Nombre,
+            Correo: usuario.Correo,
+            Telefono: usuario.Telefono,
+            Direccion: usuario.Direccion,
+            N_Documento: usuario.N_Documento,
+            foto_perfil: usuario.foto_perfil,
+            tipo_de_documento: usuario.tipo_de_documento,
+            cargo: empleado?.cargo || null,
+            dias_laborales: empleado?.dias_laborales || null,
+            horario: empleado?.horario || null,
+            especialidades: empleado?.especialidades || null,
+            certificaciones: empleado?.certificaciones || null,
+            fecha_ingreso: empleado?.fecha_ingreso || null,
+            fecha_nacimiento: empleado?.fecha_nacimiento || null,
+        };
+    }
+    async getDesempeno(id) {
+        const totalCompletados = await this.prisma.reserva.count({
+            where: { empleado_Id_Usuario: id, Estado: 'Completado' },
+        });
+        const totalPendientes = await this.prisma.reserva.count({
+            where: { empleado_Id_Usuario: id, Estado: 'Pendiente' },
+        });
+        const calificacionMediana = await this.prisma.calificacion.aggregate({
+            _avg: { puntaje: true },
+            where: { empleado_Id_Usuario: id },
+        });
+        const comentariosPositivos = await this.prisma.calificacion.count({
+            where: { empleado_Id_Usuario: id, comentario: { contains: 'excelente' } },
+        });
+        return {
+            servicios_completados: totalCompletados,
+            servicios_pendientes: totalPendientes,
+            calificacion_promedio: calificacionMediana._avg?.puntaje ?? '—',
+            puntualidad: '—',
+            comentarios_positivos: comentariosPositivos,
+        };
+    }
     async getSinServicios() {
         return this.prisma.usuario.findMany({
             where: {

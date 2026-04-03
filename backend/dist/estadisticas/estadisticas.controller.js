@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EstadisticasController = void 0;
 const common_1 = require("@nestjs/common");
@@ -19,15 +22,16 @@ let EstadisticasController = class EstadisticasController {
     constructor(estadisticasService) {
         this.estadisticasService = estadisticasService;
     }
-    async getDashboard() {
-        return this.estadisticasService.getDashboard();
+    async getDashboard(periodo) {
+        return this.estadisticasService.getDashboard(periodo);
     }
 };
 exports.EstadisticasController = EstadisticasController;
 __decorate([
     (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)('periodo')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], EstadisticasController.prototype, "getDashboard", null);
 exports.EstadisticasController = EstadisticasController = __decorate([

@@ -10,6 +10,7 @@
 // =============================================================================
 
 import { useState, useEffect } from 'react';
+import api from '../../services/api';
 import './estilos_admin/PerfilAdmin.css';
 import QuickActionsApp from './acciones-rapidas';
 import ConsultasAdmin  from './ConsultasAdmin';
@@ -29,8 +30,35 @@ const PerfilAdmin = ({
     onDashboard
 }) => {
     const [activeModal, setActiveModal] = useState(null);
+    const [user, setUser] = useState({
+        Nombre: 'Administrador',
+        Correo: 'admin@foamwash.com',
+        Telefono: '+57 300 123 4567',
+        cargo: 'Administrador General',
+        departamento: 'Administración',
+        fecha_registro: '2022-01-01'
+    });
 
     useEffect(() => {
+        const fetchCurrentUser = async () => {
+            try {
+                const res = await api.get('/auth/me');
+                const data = res.data?.data || res.data || {};
+                setUser({
+                    Nombre: data.Nombre || data.name || 'Administrador',
+                    Correo: data.Correo || data.email || 'admin@foamwash.com',
+                    Telefono: data.Telefono || data.phone || '+57 300 123 4567',
+                    cargo: data.cargo || 'Administrador General',
+                    departamento: data.departamento || 'Administración',
+                    fecha_registro: data.fecha_registro ? new Date(data.fecha_registro).toLocaleDateString('es-CO') : '1 de Enero, 2022'
+                });
+            } catch (error) {
+                console.error('Error al cargar datos de usuario:', error);
+            }
+        };
+
+        fetchCurrentUser();
+
         const cards = document.querySelectorAll('.detail-card');
         cards.forEach((card, index) => {
             setTimeout(() => {
@@ -117,8 +145,8 @@ const PerfilAdmin = ({
                     {/* ==================== SIDEBAR ==================== */}
                     <div className="profile-sidebar">
                         <div className="profile-photo"></div>
-                        <div className="profile-name">Administrador</div>
-                        <div className="profile-role">Administrador</div>
+                        <div className="profile-name">{user.Nombre || 'Administrador'}</div>
+                        <div className="profile-role">{user.cargo || 'Administrador'}</div>
                         
                         <div className="admin-badges">
     <div
@@ -149,27 +177,27 @@ const PerfilAdmin = ({
                                 <div className="info-grid">
                                     <div className="info-item">
                                         <span className="info-label">Nombre Completo</span>
-                                        <div className="info-value">Juan Pablo Rodríguez</div>
+                                        <div className="info-value">{user.Nombre || 'Administrador'}</div>
                                     </div>
                                     <div className="info-item">
                                         <span className="info-label">Cargo</span>
-                                        <div className="info-value">Administrador General</div>
+                                        <div className="info-value">{user.cargo || 'Administrador General'}</div>
                                     </div>
                                     <div className="info-item">
                                         <span className="info-label">Email Corporativo</span>
-                                        <div className="info-value">admin@foamwash.com</div>
+                                        <div className="info-value">{user.Correo || 'admin@foamwash.com'}</div>
                                     </div>
                                     <div className="info-item">
                                         <span className="info-label">Teléfono</span>
-                                        <div className="info-value">+57 300 123 4567</div>
+                                        <div className="info-value">{user.Telefono || '+57 300 123 4567'}</div>
                                     </div>
                                     <div className="info-item">
                                         <span className="info-label">Departamento</span>
-                                        <div className="info-value">Administración</div>
+                                        <div className="info-value">{user.departamento || 'Administración'}</div>
                                     </div>
                                     <div className="info-item">
                                         <span className="info-label">Fecha de Ingreso</span>
-                                        <div className="info-value">1 de Enero, 2022</div>
+                                        <div className="info-value">{user.fecha_registro || '1 de Enero, 2022'}</div>
                                     </div>
                                 </div>
                             </div>

@@ -38,6 +38,18 @@ export class EmpleadosController {
     return { success: true, data };
   }
 
+  @Get(':id/perfil')
+  async perfil(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.empleadosService.getPerfil(id);
+    return { success: true, data };
+  }
+
+  @Get(':id/desempeno')
+  async desempeno(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.empleadosService.getDesempeno(id);
+    return { success: true, data };
+  }
+
   @Get(':id/servicios-hoy')
   async serviciosHoy(@Param('id', ParseIntPipe) id: number) {
     const data = await this.empleadosService.getReservasHoy(id);

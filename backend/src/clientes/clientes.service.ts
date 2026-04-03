@@ -36,11 +36,11 @@ export class ClientesService {
     return cliente;
   }
 
-  async updatePerfil(id: number, data: Partial<{ Nombre: string; Telefono: string; Direccion: string; N_Documento: string }>) {
+  async updatePerfil(id: number, data: Partial<{ Nombre: string; Telefono: string; Direccion: string; N_Documento: string; tipo_de_documento_id_tipo_de_documento: number }>) {
     return this.prisma.usuario.update({
       where: { Id_Usuario: id },
       data,
-      select: { Id_Usuario: true, Nombre: true, Correo: true, Telefono: true, Direccion: true },
+      select: { Id_Usuario: true, Nombre: true, Correo: true, Telefono: true, Direccion: true, N_Documento: true },
     });
   }
 
@@ -49,6 +49,12 @@ export class ClientesService {
       where: { Id_Usuario: id },
       data: { foto_perfil: fotoUrl },
       select: { Id_Usuario: true, foto_perfil: true },
+    });
+  }
+
+  async getTiposDocumento() {
+    return this.prisma.tipoDeDocumento.findMany({
+      select: { idTipo_de_Documento: true, nombre_del_documento: true },
     });
   }
 }
