@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">foam_wash_betta_app</string>
+    <string name="title_activity_main">foam_wash_betta_app</string>
+    <string name="package_name">com.foam_wash_betta</string>
+    <string name="custom_url_scheme">com.foam_wash_betta</string>
+</resources>
