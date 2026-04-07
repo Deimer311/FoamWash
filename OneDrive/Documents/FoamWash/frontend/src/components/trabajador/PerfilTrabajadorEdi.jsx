@@ -29,10 +29,20 @@ const API_BASE_URL = import.meta.env.VITE_API_URL
     ? import.meta.env.VITE_API_URL.replace('/api', '')
     : 'http://localhost:5000';
 
+const TIPOS_DOCUMENTO = [
+  { id: 1, nombre: 'Cédula de Ciudadanía' },
+  { id: 3, nombre: 'Cédula de Extranjería' },
+  { id: 4, nombre: 'Pasaporte' },
+  { id: 5, nombre: 'NIT' },
+  { id: 6, nombre: 'RUT' },
+  { id: 7, nombre: 'Registro Civil' },
+  { id: 2, nombre: 'Tarjeta de Identidad' },
+];
+
 const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
 
     // ── Contexto de autenticación: obtiene el ID del usuario logueado ────────
-    const { user } = useAuth();
+    const { user, updateUser, refreshUser } = useAuth();
 
     // ── Referencia al input de archivo (foto) para activarlo con click ───────
     const fileInputRef = useRef(null);
@@ -53,7 +63,8 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
     // ── Datos del formulario principal ───────────────────────────────────────
     const [formData, setFormData] = useState({
         nombre:            '',
-        cedula:            '',   // No editable (documento de identidad)
+        cedula:            '',
+        tipoDocId:         1,
         fechaNac:          '',
         cargo:             '',
         email:             '',   // No editable (correo es el login)
@@ -110,6 +121,7 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
                     ...prev,
                     nombre:    d.Nombre        || '',
                     cedula:    d.N_Documento   || '',
+                    tipoDocId: d.tipo_de_documento?.idTipo_de_Documento || 1,
                     fechaNac:  d.fecha_nacimiento
                                 ? d.fecha_nacimiento.split('T')[0]
                                 : '',
@@ -233,8 +245,11 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
             if (archivoFoto) {
                 const formDataFoto = new FormData();
                 formDataFoto.append('foto', archivoFoto);
-
-                await axiosUpload.post(`/empleados/${user.id}/foto`, formDataFoto);
+                const fotoRes = await axiosUpload.post(`/empleados/${user.id}/foto`, formDataFoto);
+                // ── Actualizar foto en el contexto para que se vea de inmediato ──
+                if (fotoRes.data?.data?.foto_perfil) {
+                    updateUser({ foto_perfil: fotoRes.data.data.foto_perfil });
+                }
             }
 
             // ── PASO 2: Construir strings para días y especialidades ───────────
@@ -258,12 +273,18 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
                 Nombre:    formData.nombre,
                 Telefono:  formData.telefono,
                 Direccion: formData.direccion,
+                N_Documento: formData.cedula || undefined,
+                tipo_de_documento_id_tipo_de_documento: formData.tipoDocId ? Number(formData.tipoDocId) : undefined,
             });
 
             // Nota: cargo, fecha_nacimiento, horario, dias_laborales,
             // especialidades y certificaciones no se persisten porque
             // el modelo Usuario del backend no tiene esos campos.
             // Se mantienen visualmente en el formulario para no cambiar el diseño.
+
+            // ✅ FIX: Recargar usuario completo desde el backend para que el Header
+            // reciba foto_perfil actualizada con la URL correcta y sin caché viejo.
+            await refreshUser();
 
             setShowSuccess(true);
             setTimeout(() => {
@@ -644,7 +665,6 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
                                 </div>
                             </div>
 
-                            {/* ── SECCIÓN 2: Información Personal ──────────── */}
                             <div className="form-section">
                                 <h3 className="section-title">👤 Información Personal</h3>
                                 <div className="form-row">
@@ -659,12 +679,6 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
                                         />
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="cedula">Cédula (no editable)</label>
-                                        <input type="text" id="cedula" value={formData.cedula} disabled />
-                                    </div>
-                                </div>
-                                <div className="form-row">
-                                    <div className="form-group">
                                         <label htmlFor="fechaNac">Fecha de Nacimiento</label>
                                         <input
                                             type="date" id="fechaNac"
@@ -672,6 +686,22 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
                                             onChange={handleInputChange}
                                         />
                                     </div>
+                                </div>
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label htmlFor="tipoDocId">Tipo de Documento</label>
+                                        <select id="tipoDocId" value={formData.tipoDocId} onChange={handleInputChange}>
+                                            {TIPOS_DOCUMENTO.map(t => (
+                                                <option key={t.id} value={t.id}>{t.nombre}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="cedula">Número de Documento</label>
+                                        <input type="text" id="cedula" value={formData.cedula} onChange={handleInputChange} placeholder="Ej: 1234567890" />
+                                    </div>
+                                </div>
+                                <div className="form-row">
                                     <div className="form-group">
                                         <label htmlFor="cargo">Cargo</label>
                                         <input

@@ -8,7 +8,7 @@
 // DESCRIPCIÓN:
 //   Página principal de servicios para el cliente autenticado. Muestra el catálogo y permite agendar.
 // =============================================================================
-
+import HeaderCliente from './HeaderCliente'; // ✅ Importación ya presente
 import React, { useState, useEffect } from 'react';
 import { useAuth }    from '../autenticacion/AuthContext';
 import { useCarrito } from '../modales/CarritoContext';
@@ -61,8 +61,6 @@ function ModalConfirmar({ isOpen, onClose, carritoItems, user, onPedidoConfirmad
                 tamano:      i.tamano
             }));
 
-            // 1. Crear reserva -> el backend asigna empleado automaticamente
-            // Verificar que el usuario esté autenticado antes de crear reserva
             const userId = user?.id || user?.Id_Usuario;
             if (!userId) {
                 setErrorMsg('Debes iniciar sesión para confirmar el pedido.');
@@ -81,15 +79,14 @@ function ModalConfirmar({ isOpen, onClose, carritoItems, user, onPedidoConfirmad
             if (!rRes.data.success) throw new Error(rRes.data.message);
             const rData = rRes.data.data;
 
-            // 2. Guardar cotizaciones en BD (backend hace anti-duplicado)
             if (userId) {
                 for (const item of (cotizacion ? cotizacion.servicios : carritoItems)) {
                     await api.post('/cotizaciones', {
                         Id_usuario:      userId,
                         Id_servicio:     item.id,
                         Precio_cotizado: item.precio * item.cantidad,
-                        Cantidad:        item.cantidad,
-                        Tamano:          item.tamano || 'Estandar'
+                        Cantidad:         item.cantidad,
+                        Tamano:           item.tamano || 'Estandar'
                     });
                 }
             }
@@ -229,7 +226,6 @@ const ServiciosClientePage = ({ onBackToHome, onCotizacion, onPerfil }) => {
     const [carritoSnapshot,      setCarritoSnapshot]      = useState([]);
     const [syncMsg,              setSyncMsg]              = useState('');
 
-    // ── 1. Cargar servicios desde BD ─────────────────────────────────────────
     useEffect(() => {
         const cargar = async () => {
             try {
@@ -237,9 +233,8 @@ const ServiciosClientePage = ({ onBackToHome, onCotizacion, onPerfil }) => {
                 if (res.data.success && res.data.data.length > 0) {
                     setServicios(res.data.data.map(s => ({
                         ...s,
-                        // Normalizar campos del backend a los que usa ServiceCardCliente
                         id:          s.Id_Servicio        || s.id,
-                        nombre:      s.Nombre_Servicio    || s.nombre       || 'Sin nombre',
+                        nombre:      s.Nombre_Servicio    || s.nombre         || 'Sin nombre',
                         descripcion: s.Descripcion        || s.descripcion  || '',
                         precio:      Number(s.Precio      || s.precio       || 0),
                         imagen:      s.imagen_url         || IMAGEN_FALLBACK,
@@ -262,7 +257,6 @@ const ServiciosClientePage = ({ onBackToHome, onCotizacion, onPerfil }) => {
         cargar();
     }, []);
 
-    // ── 2. Sincronizar cotizacion local -> BD al iniciar sesion ──────────────
     useEffect(() => {
         if (!user?.id) return;
         const datos = leerCotizacionLocal();
@@ -275,7 +269,6 @@ const ServiciosClientePage = ({ onBackToHome, onCotizacion, onPerfil }) => {
                 : '⚠️ No se pudo sincronizar la cotización.');
             setTimeout(() => setSyncMsg(''), 5000);
         });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.id]);
 
     const serviciosFiltrados = servicios.filter(s => {
@@ -283,14 +276,6 @@ const ServiciosClientePage = ({ onBackToHome, onCotizacion, onPerfil }) => {
         const q = searchQuery.toLowerCase();
         return s.nombre.toLowerCase().includes(q) || (s.descripcion || '').toLowerCase().includes(q);
     });
-
-    const handleCerrarSesion = (e) => {
-        e.preventDefault();
-        if (window.confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-            agregarNotificacion('Cerrando sesión...', 'info');
-            setTimeout(() => { logout(); onBackToHome(); }, 800);
-        }
-    };
 
     const handleAgregarAlCarrito = (servicio) => {
         agregarAlCarrito(servicio);
@@ -307,9 +292,7 @@ const ServiciosClientePage = ({ onBackToHome, onCotizacion, onPerfil }) => {
         setMostrarConfirmacion(true);
     };
 
-    const handlePedidoConfirmado = () => {
-        // El carrito se limplia desde CarritoContext / ConfirmacionModal
-    };
+    const handlePedidoConfirmado = () => { };
 
     return (
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -320,20 +303,13 @@ const ServiciosClientePage = ({ onBackToHome, onCotizacion, onPerfil }) => {
                 </div>
             )}
 
-            <header className="header-banner">
-                <img src="img/ima9.jpg" alt="Fondo encabezado" className="fondo" />
-                <h1 className="logo-header" onClick={onBackToHome} style={{ cursor: 'pointer' }}>FoamWash</h1>
-                <nav className="nav-bar">
-                    <a href="#" className="nav-link" onClick={e => { e.preventDefault(); onBackToHome(); }}>Hogar</a>
-                    <a href="#" className="nav-link" onClick={e => { e.preventDefault(); onCotizacion?.(); }}>Cotización</a>
-                    <a href="#" className="nav-link" style={{ color: 'rgb(133, 198, 255)' }}
-                        onClick={e => { e.preventDefault(); document.querySelector('.services-section')?.scrollIntoView({ behavior: 'smooth' }); }}>
-                        Agendar
-                    </a>
-                    <a href="#" className="nav-link" onClick={e => { e.preventDefault(); onPerfil?.(); }}>Perfil</a>
-                    <a href="#" className="nav-link btn-salir" onClick={handleCerrarSesion}>Cerrar Sesión</a>
-                </nav>
-            </header>
+            {/* ✅ REEMPLAZADO: Ahora usamos HeaderCliente con sus props de navegación */}
+            <HeaderCliente 
+                onBackToHome={onBackToHome}
+                onPerfil={onPerfil}
+                onCotizacion={onCotizacion}
+                activeLink="agendar"
+            />
 
             <main style={{ flex: 1 }}>
                 <section className="search-section">

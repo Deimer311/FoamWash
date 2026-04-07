@@ -9,19 +9,48 @@
 //   Formulario de edición del perfil del administrador.
 // =============================================================================
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
+import { useAuth } from '../autenticacion/AuthContext';
+import api from '../../services/api';
+
+// Instancia axios sin Content-Type fijo para enviar FormData (igual que PerfilTrabajadorEdi)
+const axiosUpload = axios.create({
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+    withCredentials: true,
+});
+
+const API_BASE_URL = import.meta.env.VITE_API_URL
+    ? import.meta.env.VITE_API_URL.replace('/api', '')
+    : 'http://localhost:5000';
+
+const TIPOS_DOCUMENTO = [
+  { id: 1, nombre: 'Cédula de Ciudadanía' },
+  { id: 3, nombre: 'Cédula de Extranjería' },
+  { id: 4, nombre: 'Pasaporte' },
+  { id: 5, nombre: 'NIT' },
+  { id: 6, nombre: 'RUT' },
+  { id: 7, nombre: 'Registro Civil' },
+  { id: 2, nombre: 'Tarjeta de Identidad' },
+];
 
 const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
+  const { user, updateUser, refreshUser } = useAuth();
   const [imagePreview, setImagePreview] = useState(null);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [archivoFoto,  setArchivoFoto]  = useState(null);
+  const [showSuccess,  setShowSuccess]  = useState(false);
+  const [isLoading,    setIsLoading]    = useState(true);
+  const [guardando,    setGuardando]    = useState(false);
+  const [errorMsg,     setErrorMsg]     = useState('');
   const [formData, setFormData] = useState({
-    nombre: 'Juan Pablo Rodríguez',
+    nombre: '',
     cargo: 'Administrador General',
-    cedula: '1.012.345.678',
+    cedula: '',
+    tipoDocId: 1,
     departamento: 'Administración',
-    email: 'admin@foamwash.com',
+    email: '',
     emailAlt: '',
-    telefono: '+57 300 123 4567',
+    telefono: '',
     telefonoAlt: '',
     passwordActual: '',
     passwordNueva: '',
@@ -32,15 +61,46 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
 
   const fileInputRef = useRef(null);
 
+  // ── Cargar datos reales desde GET /usuarios/:id ───────────────────────────
+  useEffect(() => {
+    if (!user?.id) return;
+    const cargar = async () => {
+      try {
+        const res = await api.get(`/usuarios/${user.id}`);
+        if (res.data.success) {
+          const d = res.data.data;
+          setFormData(prev => ({
+            ...prev,
+            nombre:    d.Nombre   || '',
+            email:     d.Correo   || '',
+            telefono:  d.Telefono || '',
+            cedula:    d.N_Documento || '',
+            tipoDocId: d.tipo_de_documento?.idTipo_de_Documento || 1,
+          }));
+          if (d.foto_perfil) {
+            const url = d.foto_perfil.startsWith('http')
+                ? d.foto_perfil
+                : `${API_BASE_URL}${d.foto_perfil}`;
+            setImagePreview(url);
+          }
+        }
+      } catch (err) {
+        console.error('❌ Error al cargar perfil admin:', err);
+        setErrorMsg('No se pudieron cargar los datos del perfil.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    cargar();
+  }, [user?.id]);
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+    setArchivoFoto(file);
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result);
+    reader.readAsDataURL(file);
   };
 
   const handleUploadClick = () => {
@@ -59,11 +119,56 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
+    setErrorMsg('');
+
+    if (formData.passwordNueva && formData.passwordNueva !== formData.passwordConfirmar) {
+      setErrorMsg('Las contraseñas nuevas no coinciden.');
+      return;
+    }
+
+    setGuardando(true);
+    try {
+      // PASO 1: Subir foto si se seleccionó una nueva
+      if (archivoFoto) {
+        const fd = new FormData();
+        fd.append('foto', archivoFoto);
+        await axiosUpload.post(`/usuarios/${user.id}/foto`, fd);
+      }
+
+      // PASO 2: Guardar datos del perfil
+      await api.put(`/usuarios/${user.id}`, {
+        Nombre:   formData.nombre,
+        Telefono: formData.telefono,
+        N_Documento: formData.cedula || undefined,
+        tipo_de_documento_id_tipo_de_documento: formData.tipoDocId ? Number(formData.tipoDocId) : undefined,
+      });
+
+      // ✅ FIX: Recargar usuario completo desde el backend para que el Header
+      // reciba foto_perfil actualizada con la URL correcta y sin caché viejo.
+      await refreshUser();
+
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        if (onBackToProfile) onBackToProfile();
+      }, 2000);
+    } catch (err) {
+      console.error('❌ Error al guardar perfil admin:', err);
+      setErrorMsg('No se pudieron guardar los cambios. Intenta nuevamente.');
+    } finally {
+      setGuardando(false);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <p style={{ fontSize: 18, color: '#666' }}>⏳ Cargando perfil...</p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -589,7 +694,19 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
           <div className="left-panel">
             <div className="current-photo-container">
               <div className="current-photo" id="currentPhoto">
-                {imagePreview ? <img src={imagePreview} alt="Foto actual" style={{width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover'}} /> : ''}
+                {imagePreview
+                    ? <img
+                        src={imagePreview}
+                        alt="Foto actual"
+                        style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+                        onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    : null
+                }
+                <span style={{ fontSize: '64px', display: imagePreview ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>👤</span>
               </div>
               <div className="photo-label">Foto actual</div>
             </div>
@@ -622,6 +739,11 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
             </div>
             
             <div id="profileForm" onSubmit={handleSubmit}>
+              {errorMsg && (
+                <div style={{ background: '#fff0f0', border: '1.5px solid #ffcccc', color: '#c00', padding: '12px 16px', borderRadius: '8px', marginBottom: '20px' }}>
+                  ❌ {errorMsg}
+                </div>
+              )}
               <div className="form-section">
                 <h3 className="section-title">📷 Foto de Perfil</h3>
                 <div className="photo-upload">
@@ -662,12 +784,16 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="cedula">Cédula de Ciudadanía *</label>
-                    <input type="text" id="cedula" value={formData.cedula} onChange={handleInputChange} required />
+                    <label htmlFor="tipoDocId">Tipo de Documento *</label>
+                    <select id="tipoDocId" value={formData.tipoDocId} onChange={handleInputChange}>
+                      {TIPOS_DOCUMENTO.map(t => (
+                        <option key={t.id} value={t.id}>{t.nombre}</option>
+                      ))}
+                    </select>
                   </div>
                   <div className="form-group">
-                    <label htmlFor="departamento">Departamento *</label>
-                    <input type="text" id="departamento" value={formData.departamento} onChange={handleInputChange} required />
+                    <label htmlFor="cedula">Número de Documento *</label>
+                    <input type="text" id="cedula" value={formData.cedula} onChange={handleInputChange} placeholder="Ej: 1234567890" />
                   </div>
                 </div>
               </div>
@@ -762,8 +888,10 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
               </div>
 
               <div className="button-group">
-                <button type="button" className="btn-cancel" onClick={() => window.history.back()}>Cancelar</button>
-                <button type="button" className="btn-submit" onClick={handleSubmit}>💾 Guardar Cambios</button>
+                <button type="button" className="btn-cancel" onClick={() => onBackToProfile ? onBackToProfile() : window.history.back()}>Cancelar</button>
+                <button type="button" className="btn-submit" onClick={handleSubmit} disabled={guardando}>
+                  {guardando ? '⏳ Guardando...' : '💾 Guardar Cambios'}
+                </button>
               </div>
               
               {showSuccess && (

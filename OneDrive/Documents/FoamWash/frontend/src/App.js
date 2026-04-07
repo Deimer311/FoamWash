@@ -62,12 +62,15 @@ const AppContent = () => {
     const { isAuthenticated, user, logout } = useAuth();
     const [currentPage, setCurrentPage] = useState('home');
     
+    // ✅ FIX: Solo redirige al autenticarse por primera vez.
+    // Si dependiera de [user], cada llamada a refreshUser() (al guardar foto)
+    // actualizaría el estado y este effect reenviaría al usuario al dashboard.
     useEffect(() => {
         if (isAuthenticated && user) {
             const redirectPage = user.redirectPage || getDefaultRedirect(user.role);
             setCurrentPage(redirectPage);
         }
-    }, [isAuthenticated, user]);
+    }, [isAuthenticated]);
     
     const goToHome = () => setCurrentPage('home');
     const goToLogin = () => setCurrentPage('login');
@@ -201,6 +204,7 @@ if (role === 'admin') {
                         onBackToHome={goToHome}
                         onGoToServicios={goToServiciosCliente}
                         onPerfil={goToPerfil}
+                        onServicios={goToServiciosCliente}
                     />
                 );
             
@@ -369,7 +373,7 @@ if (role === 'admin') {
                 }
                 return (
                     <PerfilAdminEdi
-                        onBackToProfile={() => setCurrentPage('reportes')}
+                        onBackToProfile={() => setCurrentPage('perfil-admin')}
                         onBackToHome={goToHome}
                     />
                 );
@@ -516,9 +520,9 @@ case 'perfil-trabajador':
                 }
                 return (
                     <PerfilTrabajadorEdi
-                        onBackToProfile={() => setCurrentPage('tareas')}
+                            onBackToProfile={() => setCurrentPage('perfil-trabajador')}
                         onBackToHome={goToHome}
-                    />
+/>
                 );
             
             //==============================================================================

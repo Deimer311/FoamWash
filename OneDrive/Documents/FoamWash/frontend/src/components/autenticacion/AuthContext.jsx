@@ -2,11 +2,11 @@
 // ARCHIVO  : AuthContext.jsx
 // PROYECTO : FoamWash
 // RUTA     : src/components/autenticacion/AuthContext.jsx
-// AUTOR    : Cristian Andrés Criollo Tovar
-// FECHA    : 15-03-2026
-// -----------------------------------------------------------------------------
-// DESCRIPCIÓN:
-//   Contexto global de autenticación. Provee login, logout, register y el estado del usuario a toda la app.
+// FIXES:
+//   ✅ normalizeRole: spread ...rawUser va PRIMERO, campos normalizados DESPUÉS
+//      (antes era al revés → los valores nuevos eran pisados por los originales)
+//   ✅ updateUser: merge simple sin pasar por normalizeRole
+//   ✅ refreshUser: recarga usuario completo desde backend (nuevo export)
 // =============================================================================
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
@@ -22,14 +22,14 @@ export const AuthProvider = ({ children }) => {
     const initialized               = useRef(false);
 
     // =========================================================================
-    // Normaliza el rol del backend al rol que usa el frontend en rutas/guards.
-    // Backend devuelve "empleado" → frontend usa "trabajador"
+    // normalizeRole
+    // ✅ FIX: ...rawUser va PRIMERO para que los campos normalizados siempre
+    // prevalezcan. Antes estaban al final, lo que permitía que claves del
+    // rawUser (como foto_perfil: null) pisaran los valores actualizados.
     // =========================================================================
     const normalizeRole = (rawUser) => {
         if (!rawUser) return null;
-        // El rol puede venir en distintas formas según el endpoint:
-        //   login/register → rawUser.rol  (string directo)
-        //   getMe          → rawUser.rol.Rol (objeto con campo Rol)
+
         const rolStr = (
             rawUser.rol?.Rol ||
             rawUser.rol       ||
@@ -38,7 +38,19 @@ export const AuthProvider = ({ children }) => {
         ).toLowerCase();
 
         const mapped = rolStr === 'empleado' ? 'trabajador' : rolStr;
-        return { ...rawUser, role: mapped };
+
+        return {
+            // Primero los campos crudos (base)
+            ...rawUser,
+            // Luego los normalizados — SIEMPRE sobreescriben lo anterior
+            id:          rawUser.id          ?? rawUser.Id_Usuario,
+            nombre:      rawUser.nombre      ?? rawUser.Nombre,
+            correo:      rawUser.correo      ?? rawUser.Correo,
+            telefono:    rawUser.telefono    ?? rawUser.Telefono    ?? null,
+            direccion:   rawUser.direccion   ?? rawUser.Direccion   ?? null,
+            foto_perfil: rawUser.foto_perfil ?? null,
+            role:        mapped,
+        };
     };
 
     // =========================================================================
@@ -77,7 +89,6 @@ export const AuthProvider = ({ children }) => {
                 return { success: false, message: response.error?.message || 'Error al iniciar sesión' };
             }
 
-            // El backend devuelve: { success, data: { id, nombre, correo, rol, foto_perfil } }
             const rawUser = response.data;
             const normalized = normalizeRole(rawUser);
             setUser(normalized);
@@ -143,6 +154,35 @@ export const AuthProvider = ({ children }) => {
     };
 
     // =========================================================================
+    // UPDATE USER
+    // ✅ FIX: merge directo sin pasar por normalizeRole
+    // normalizeRole forzaba foto_perfil: null si rawUser no tenía el campo,
+    // lo que pisaba actualizaciones parciales como updateUser({ foto_perfil: '/...' })
+    // =========================================================================
+    const updateUser = (campos) => {
+        setUser(prev => {
+            if (!prev) return prev;
+            return { ...prev, ...campos };
+        });
+    };
+
+    // =========================================================================
+    // REFRESH USER (NUEVO)
+    // Recarga el perfil completo desde el backend. Llamar después de guardar
+    // foto o datos del perfil para garantizar consistencia total con la DB.
+    // =========================================================================
+    const refreshUser = async () => {
+        try {
+            const response = await authService.getMe();
+            if (response?.success) {
+                setUser(normalizeRole(response.data));
+            }
+        } catch (err) {
+            console.error('❌ Error al refrescar usuario:', err);
+        }
+    };
+
+    // =========================================================================
     // HELPERS
     // =========================================================================
     const getRedirectByRole = (role) => {
@@ -173,6 +213,8 @@ export const AuthProvider = ({ children }) => {
             login,
             register,
             logout,
+            updateUser,
+            refreshUser,       // ← nuevo: exportado para uso en formularios de perfil
             checkPermission,
             getRedirectPage,
         }}>

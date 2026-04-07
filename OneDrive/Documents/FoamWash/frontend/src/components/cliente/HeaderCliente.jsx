@@ -6,399 +6,165 @@
 // FECHA    : 15-03-2026
 // -----------------------------------------------------------------------------
 // DESCRIPCIÓN:
-//   Barra de navegación del panel del cliente.
+//   Barra de navegación del panel del cliente con avatar de usuario.
+//   Unificado con HeaderAdmin y HeaderEmpleado: API_BASE_URL desde variable
+//   de entorno, cache-busting con timestamp, imgError y useMemo.
 // =============================================================================
 
-import React, { useState } from 'react';
-import { useAuth } from '../autenticacion/AuthContext';  // Asumiendo que tendrás este Context
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { useAuth } from '../autenticacion/AuthContext';
 
-/**
- * COMPONENTE: HeaderCliente
- * 
- * PROPS:
- * @param {function} onBackToHome - Función para volver a la página principal
- * @param {function} onCotizacion - Función para ir a cotización
- * @param {function} onPerfil - Función para ir al perfil
- * 
- * CONCEPTO: Componente de Navegación Autenticado
- * Este componente solo se muestra cuando el usuario está logueado.
- */
-const HeaderCliente = ({ onBackToHome, onCotizacion, onPerfil }) => {
-    
-    // =========================================================================
-    // 1. HOOKS Y ESTADOS
-    // =========================================================================
-    
-    // Obtener datos del usuario y función de logout del contexto
+// ── Base URL del servidor (usa variable de entorno) ───────────────────────────
+const API_BASE_URL = import.meta.env.VITE_API_URL
+    ? import.meta.env.VITE_API_URL.replace('/api', '')
+    : 'http://localhost:5000';
+
+const HeaderCliente = ({ onBackToHome, onCotizacion, onPerfil, onServicios, activeLink }) => {
+
     const { user, logout } = useAuth();
-    
-    // Estado para el menú móvil (responsive)
-    const [menuAbierto, setMenuAbierto] = useState(false);
-    
-    // =========================================================================
-    // 2. MANEJADORES DE EVENTOS
-    // =========================================================================
-    
-    /**
-     * Maneja el clic en "Cerrar Sesión"
-     * 
-     * FLUJO:
-     * 1. Mostrar confirmación (para evitar cierres accidentales)
-     * 2. Si confirma, ejecutar logout()
-     * 3. Redirigir a la página principal
-     */
-    const handleLogout = (e) => {
-        e.preventDefault();  // Evitar navegación del enlace
-        
-        // Mostrar ventana de confirmación
+    const [avatarOpen, setAvatarOpen] = useState(false);
+    const [imgError,   setImgError]   = useState(false);
+    const avatarRef = useRef(null);
+
+    useEffect(() => {
+        const handleClick = (e) => {
+            if (avatarRef.current && !avatarRef.current.contains(e.target)) setAvatarOpen(false);
+        };
+        document.addEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClick);
+    }, []);
+
+    // Resetear error cuando cambia la foto para intentar cargar la nueva
+    useEffect(() => {
+        setImgError(false);
+    }, [user?.foto_perfil]);
+
+    const handleLogout = () => {
         if (window.confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-            // Ejecutar logout (limpia el estado de autenticación)
             logout();
-            
-            // Volver a la página principal
-            if (onBackToHome) {
-                onBackToHome();
-            }
+            if (onBackToHome) onBackToHome();
         }
     };
-    
-    /**
-     * Maneja el scroll hacia la sección de servicios
-     * 
-     * CONCEPTO: scrollIntoView
-     * Método del DOM que hace scroll suave hasta un elemento específico
-     */
+
     const handleAgendar = (e) => {
         e.preventDefault();
-        
-        // Buscar el elemento con clase 'services-section'
-        const servicesSection = document.querySelector('.services-section');
-        
-        if (servicesSection) {
-            // Hacer scroll suave hasta ese elemento
-            servicesSection.scrollIntoView({ 
-                behavior: 'smooth',  // Animación suave
-                block: 'start'       // Alinear al inicio de la vista
-            });
+        if (onServicios) {
+            onServicios();
+            return;
         }
+        const servicesSection = document.querySelector('.services-section');
+        if (servicesSection) servicesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
-    
-    // =========================================================================
-    // 3. ESTILOS
-    // =========================================================================
-    
-    // Estilo del header principal con imagen de fondo
-    const headerStyle = {
-        position: 'relative',
-        width: '100%',
-        height: '180px',
-        
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'white',
-        overflow: 'hidden'
+
+    const getIniciales = () => {
+        if (!user?.nombre) return 'CL';
+        return user.nombre.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
     };
-    
-    // Overlay oscuro sobre el fondo (para mejorar legibilidad)
-    const overlayStyle = {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        background: 'rgba(0, 0, 0, 0.3)',  // Negro semi-transparente
-        zIndex: 1
-    };
-    
-    // Estilo del logo
-    const logoStyle = {
-        position: 'relative',
-        zIndex: 2,  // Aparecer encima del overlay
-        fontSize: '36px',
-        fontWeight: '900',
-        marginBottom: '20px',
-        textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',  // Sombra para legibilidad
-        cursor: 'pointer',
-        transition: 'all 0.3s ease'
-    };
-    
-    // Estilo de la barra de navegación
-    const navBarStyle = {
-        position: 'relative',
-        zIndex: 2,
-        display: 'flex',
-        gap: '40px',  // Espacio entre enlaces
-        alignItems: 'center',
-        flexWrap: 'wrap',  // Permitir que se envuelva en pantallas pequeñas
-        justifyContent: 'center',
-        padding: '0 20px'
-    };
-    
-    // Estilo base de los enlaces
-    const navLinkStyle = {
-        color: 'white',
-        textDecoration: 'none',
-        fontSize: '18px',
-        fontWeight: '600',
-        transition: 'all 0.3s ease',
-        position: 'relative',
-        paddingBottom: '5px',
-        cursor: 'pointer',
-        // Añadir efecto de subrayado con ::after usando hover
-        borderBottom: '2px solid transparent'
-    };
-    
-    // Estilo del enlace activo (Agendar)
-    const navLinkActiveStyle = {
-        ...navLinkStyle,
-        color: 'rgb(133, 198, 255)'  // Color celeste para destacar
-    };
-    
-    // Estilo del botón "Cerrar Sesión" (diferente a los demás enlaces)
-    const logoutButtonStyle = {
-        ...navLinkStyle,
-        background: 'rgba(255, 77, 77, 0.2)',  // Fondo rojo semi-transparente
-        padding: '8px 20px',
-        borderRadius: '20px',
-        border: '2px solid rgba(255, 77, 77, 0.5)',
-        transition: 'all 0.3s ease'
-    };
-    
-    // =========================================================================
-    // 4. RENDERIZADO
-    // =========================================================================
-    /**
-     * ESTRUCTURA HTML:
-     * 
-     * <header> (contenedor principal)
-     *   ├── <div> (overlay oscuro)
-     *   ├── <h1> (logo clickeable)
-     *   └── <nav> (barra de navegación)
-     *         ├── <a> (Hogar)
-     *         ├── <a> (Cotización)
-     *         ├── <a> (Agendar - destacado)
-     *         ├── <a> (Perfil)
-     *         └── <a> (Cerrar Sesión - botón especial)
-     */
-    
+
+    const getLinkStyle = (link) => ({
+        color: activeLink === link ? 'rgb(133, 198, 255)' : undefined
+    });
+
+    // ✅ Cache-busting con timestamp + API_BASE_URL (igual que HeaderAdmin y HeaderEmpleado)
+    const fotoUrl = useMemo(() => {
+        if (!user?.foto_perfil) return null;
+        const base = user.foto_perfil.startsWith('http')
+            ? user.foto_perfil
+            : `${API_BASE_URL}${user.foto_perfil}`;
+        const separator = base.includes('?') ? '&' : '?';
+        return `${base}${separator}t=${Date.now()}`;
+    }, [user?.foto_perfil]);
+
+    const mostrarImagen = fotoUrl && !imgError;
+
     return (
-        <header style={headerStyle}>
-            {/* OVERLAY OSCURO PARA MEJORAR CONTRASTE */}
-            <div style={overlayStyle}></div>
-            
-            {/* LOGO CLICKEABLE - Al hacer clic vuelve al home */}
-            <h1 
-                style={logoStyle}
-                onClick={onBackToHome}
-                // EFECTOS HOVER
-                onMouseEnter={(e) => {
-                    e.target.style.transform = 'scale(1.05)';
-                    e.target.style.color = '#5BC0DE';
-                }}
-                onMouseLeave={(e) => {
-                    e.target.style.transform = 'scale(1)';
-                    e.target.style.color = 'white';
-                }}
-            >
-                FoamWash
-                <span style={{ fontSize: '0.7em' }}>LG</span>
-            </h1>
-            
-            {/* BARRA DE NAVEGACIÓN */}
-            <nav style={navBarStyle}>
-                {/* 
-                    ENLACE: HOGAR
-                    Vuelve a la página principal
-                */}
-                <a 
-                    href="#" 
-                    style={navLinkStyle}
-                    onClick={(e) => {
-                        e.preventDefault();
-                        onBackToHome();
-                    }}
-                    // EFECTOS HOVER
-                    onMouseEnter={(e) => {
-                        e.target.style.color = '#5BC0DE';
-                        e.target.style.transform = 'translateY(-2px)';
-                        e.target.style.borderBottom = '2px solid #5BC0DE';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.target.style.color = 'white';
-                        e.target.style.transform = 'translateY(0)';
-                        e.target.style.borderBottom = '2px solid transparent';
-                    }}
-                >
-                    Hogar
-                </a>
-                
-                {/* 
-                    ENLACE: COTIZACIÓN
-                    Ir a la página de cotización
-                */}
-                <a 
-                    href="#" 
-                    style={navLinkStyle}
-                    onClick={(e) => {
-                        e.preventDefault();
-                        if (onCotizacion) {
-                            onCotizacion();
-                        } else {
-                            alert('Cotización próximamente');
-                        }
-                    }}
-                    onMouseEnter={(e) => {
-                        e.target.style.color = '#5BC0DE';
-                        e.target.style.transform = 'translateY(-2px)';
-                        e.target.style.borderBottom = '2px solid #5BC0DE';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.target.style.color = 'white';
-                        e.target.style.transform = 'translateY(0)';
-                        e.target.style.borderBottom = '2px solid transparent';
-                    }}
-                >
-                    Cotización
-                </a>
-                
-                {/* 
-                    ENLACE: AGENDAR (DESTACADO)
-                    Hace scroll a la sección de servicios
-                    Este enlace está destacado porque es la acción principal
-                */}
-                <a
-                    href="#" 
-                    style={navLinkActiveStyle}  // Estilo diferente (celeste)
-                    onClick={handleAgendar}
-                    onMouseEnter={(e) => {
-                        e.target.style.transform = 'translateY(-2px)';
-                        e.target.style.textShadow = '0 0 10px rgba(133, 198, 255, 0.8)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.target.style.transform = 'translateY(0)';
-                        e.target.style.textShadow = 'none';
-                    }}
-                >
-                    Agendar
-                </a>
-                
-                {/* 
-                    ENLACE: PERFIL
-                    Ir a la página de perfil del usuario
-                */}
-                <a
-                    href="#" 
-                    style={navLinkStyle}
-                    onClick={(e) => {
-                        e.preventDefault();
-                        if (onPerfil) {
-                            onPerfil();
-                        } else {
-                            alert('Perfil próximamente');
-                        }
-                    }}
-                    onMouseEnter={(e) => {
-                        e.target.style.color = '#5BC0DE';
-                        e.target.style.transform = 'translateY(-2px)';
-                        e.target.style.borderBottom = '2px solid #5BC0DE';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.target.style.color = 'white';
-                        e.target.style.transform = 'translateY(0)';
-                        e.target.style.borderBottom = '2px solid transparent';
-                    }}
-                >
-                    Perfil
-                </a>
-                
-                {/* 
-                    BOTÓN: CERRAR SESIÓN
-                    Estilo especial (rojo) para indicar acción destructiva
-                */}
-                <a
-                    href="#" 
-                    style={logoutButtonStyle}
-                    onClick={handleLogout}
-                    onMouseEnter={(e) => {
-                        e.target.style.background = 'rgba(255, 77, 77, 0.4)';
-                        e.target.style.borderColor = 'rgba(255, 77, 77, 0.8)';
-                        e.target.style.transform = 'translateY(-2px)';
-                        e.target.style.boxShadow = '0 4px 15px rgba(255, 77, 77, 0.3)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.target.style.background = 'rgba(255, 77, 77, 0.2)';
-                        e.target.style.borderColor = 'rgba(255, 77, 77, 0.5)';
-                        e.target.style.transform = 'translateY(0)';
-                        e.target.style.boxShadow = 'none';
-                    }}
-                >
-                    Cerrar Sesión
-                </a>
-            </nav>
-        </header>
+        <>
+            <style>{`
+                .cli-avatar-wrap { position: relative; }
+                .cli-avatar-btn {
+                    width: 38px; height: 38px; border-radius: 50%;
+                    border: 2.5px solid rgba(255,255,255,0.5); overflow: hidden;
+                    cursor: pointer; background: linear-gradient(135deg, #5BC0DE, #223BFF);
+                    display: flex; align-items: center; justify-content: center;
+                    color: white; font-size: 13px; font-weight: 700;
+                    transition: all 0.2s; flex-shrink: 0;
+                }
+                .cli-avatar-btn:hover { border-color: white; transform: scale(1.08); }
+                .cli-avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
+                .cli-avatar-dd {
+                    position: absolute; top: calc(100% + 10px); right: 0;
+                    background: white; border-radius: 12px; min-width: 190px;
+                    overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+                    border: 0.5px solid rgba(0,0,0,0.08); z-index: 9999;
+                    animation: cliFadeIn 0.15s ease;
+                }
+                .cli-avatar-header { padding: 14px 18px 10px; border-bottom: 0.5px solid #f0f0f0; }
+                .cli-avatar-name { font-size: 14px; font-weight: 600; color: #222; }
+                .cli-avatar-role { font-size: 12px; color: #888; margin-top: 2px; }
+                .cli-avatar-item {
+                    padding: 11px 18px; font-size: 14px; color: #333;
+                    cursor: pointer; display: flex; align-items: center;
+                    gap: 10px; border-bottom: 0.5px solid #f0f0f0; transition: background 0.15s;
+                }
+                .cli-avatar-item:last-child { border-bottom: none; color: #e53935; }
+                .cli-avatar-item:hover { background: #f5f8ff; }
+                @keyframes cliFadeIn {
+                    from { opacity: 0; transform: translateY(-6px); }
+                    to   { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
+
+            <header className="header-banner" style={{ overflow: 'visible', zIndex: 1000 }}>
+                <img src="/img/ima9.jpg" alt="Fondo encabezado" className="fondo" />
+
+                <h1 className="logo-header" style={{ cursor: 'pointer' }} onClick={onBackToHome}>
+                    FoamWash
+                    <span style={{ fontSize: '0.5em', color: '#D81B9C' }}>CL</span>
+                </h1>
+
+                <nav className="nav-bar">
+                    <a href="#" className="nav-link" style={getLinkStyle('hogar')} onClick={(e) => { e.preventDefault(); onBackToHome(); }}>
+                        Hogar
+                    </a>
+                    <a href="#" className="nav-link" style={getLinkStyle('cotizacion')} onClick={(e) => { e.preventDefault(); if(onCotizacion) onCotizacion(); }}>
+                        Cotización
+                    </a>
+                    <a href="#" className="nav-link" style={getLinkStyle('agendar')} onClick={handleAgendar}>
+                        Agendar
+                    </a>
+
+                    <div className="cli-avatar-wrap" ref={avatarRef}>
+                        <div className="cli-avatar-btn" onClick={() => setAvatarOpen(o => !o)}>
+                            {/* Si la imagen falla, muestra iniciales automáticamente */}
+                            {mostrarImagen
+                                ? <img
+                                    src={fotoUrl}
+                                    alt="Perfil"
+                                    onError={() => setImgError(true)}
+                                  />
+                                : getIniciales()
+                            }
+                        </div>
+
+                        {avatarOpen && (
+                            <div className="cli-avatar-dd">
+                                <div className="cli-avatar-header">
+                                    <div className="cli-avatar-name">{user?.nombre || 'Cliente'}</div>
+                                    <div className="cli-avatar-role">{user?.email || ''}</div>
+                                </div>
+                                <div className="cli-avatar-item" onClick={() => { if(onPerfil) onPerfil(); setAvatarOpen(false); }}>
+                                    👤 Mi perfil
+                                </div>
+                                <div className="cli-avatar-item" onClick={handleLogout}>
+                                    🚪 Cerrar sesión
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </nav>
+            </header>
+        </>
     );
 };
 
 export default HeaderCliente;
-
-// =============================================================================
-// CONCEPTOS CLAVE QUE APRENDISTE:
-// =============================================================================
-//
-// 1. NAVEGACIÓN AUTENTICADA:
-//    - Diferentes opciones según el estado de autenticación
-//    - Enlaces específicos para usuarios logueados
-//
-// 2. CONFIRMACIÓN DE ACCIONES DESTRUCTIVAS:
-//    - window.confirm() para confirmar cerrar sesión
-//    - Evita que el usuario cierre sesión accidentalmente
-//
-// 3. SCROLL PROGRAMÁTICO:
-//    - document.querySelector('.clase')
-//    - elemento.scrollIntoView({ behavior: 'smooth' })
-//    - Útil para navegación dentro de la misma página
-//
-// 4. ESTILOS INLINE CON SPREAD OPERATOR:
-//    - const nuevoEstilo = { ...estiloBase, propiedad: 'valor' }
-//    - Heredar estilos y sobrescribir propiedades específicas
-//
-// 5. Z-INDEX:
-//    - Controla qué elementos aparecen "encima" de otros
-//    - z-index: 1 (overlay) vs z-index: 2 (logo y nav)
-//    - Solo funciona en elementos posicionados (position: relative/absolute/fixed)
-//
-// 6. TEXT-SHADOW:
-//    - textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'
-//    - Mejora la legibilidad de texto sobre fondos complejos
-//    - Formato: desplazamiento-x desplazamiento-y difuminado color
-//
-// 7. EVENTOS EN NAVEGACIÓN:
-//    - e.preventDefault() para evitar comportamiento por defecto
-//    - Esencial en enlaces <a> que no navegan a URLs reales
-//
-// 8. FLEXBOX PARA NAVEGACIÓN:
-//    - display: flex con gap para espaciado uniforme
-//    - flexWrap: 'wrap' para responsive (se envuelve en móviles)
-//    - justifyContent: 'center' para centrar los elementos
-//
-// =============================================================================
-//
-// DIFERENCIAS CON EL HEADER PÚBLICO:
-// =============================================================================
-//
-// HEADER PÚBLICO (no logueado):
-// - Enlaces: Inicio, Servicios
-// - Botón: "Iniciar Sesión"
-// - No muestra información del usuario
-//
-// HEADER CLIENTE (logueado):
-// - Enlaces: Hogar, Cotización, Agendar, Perfil
-// - Botón: "Cerrar Sesión" (estilo rojo)
-// - Puede mostrar nombre del usuario
-// - Acceso a funcionalidades protegidas
-//
-// =============================================================================

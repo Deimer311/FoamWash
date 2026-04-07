@@ -255,8 +255,8 @@ const RightSection = () => {
                     display: 'flex',
                     gap: '10px',
                     padding: '8px 16px',
-                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                    backdropFilter: 'blur(10px)',
+                    backgroundColor: 'transparent',
+                    backdropFilter: 'none',
                     borderRadius: '20px'
                 }}>
                     {slides.map((_, index) => (

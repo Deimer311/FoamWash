@@ -1,68 +1,604 @@
-.empleados-container {
-  padding: 40px;
+/* =============================================================================
+   ARCHIVO  : CrudEmpleados.css
+   PROYECTO : FoamWash
+   RUTA     : src/components/admin/estilos_admin/CrudEmpleados.css
+   REVISADO : Deimer — Tarea 4 (Ajuste de diseño frontend)
+   -----------------------------------------------------------------------------
+   CORRECCIONES APLICADAS:
+   - Grid centrado con justify-content: center
+   - Tarjetas con animación de entrada escalonada
+   - Avatar con fallback de iniciales
+   - Badge de cargo sobre la foto
+   - Vista detalle con banner azul y avatar flotante
+   - Colores de contraste y tipografía mejorada
+   ============================================================================= */
+
+/* ── Variables ───────────────────────────────────────────────────────────────── */
+:root {
+  --fw-blue:        #0a84ff;
+  --fw-blue-dark:   #0060d0;
+  --fw-blue-light:  #e8f3ff;
+  --fw-bg:          #f0f4ff;
+  --fw-white:       #ffffff;
+  --fw-text-dark:   #1a2540;
+  --fw-text-mid:    #4a5a80;
+  --fw-text-muted:  #8898b3;
+  --fw-danger:      #e03030;
+  --fw-danger-bg:   #fff0f0;
+  --fw-radius-sm:   10px;
+  --fw-radius-md:   16px;
+  --fw-radius-lg:   24px;
+  --fw-shadow-sm:   0 4px 16px rgba(10, 50, 120, 0.08);
+  --fw-shadow-md:   0 8px 32px rgba(10, 50, 120, 0.14);
+  --fw-shadow-lg:   0 16px 48px rgba(10, 50, 120, 0.18);
+  --fw-transition:  0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Contenedor principal ────────────────────────────────────────────────────── */
+.crud-container {
+  min-height: 100vh;
+  background: var(--fw-bg);
+  font-family: 'Outfit', 'Segoe UI', sans-serif;
+}
+
+.crud-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Encabezado ──────────────────────────────────────────────────────────────── */
+.crud-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--fw-blue);
+  letter-spacing: -0.5px;
+  margin: 0 0 6px;
   text-align: center;
 }
 
-.empleados-title {
-  color: #0a84ff;
-  margin-bottom: 30px;
+.crud-subtitle {
+  font-size: 14px;
+  color: var(--fw-text-muted);
+  margin: 0 0 32px;
+  text-align: center;
 }
 
-.cards-wrapper {
-  position: relative;
-  width: 320px;
-  height: 420px;
-  margin: auto;
-}
-
-.employee-card {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 20px;
-  background: white;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
-  transition: all 0.4s ease;
+/* ── Botón agregar ───────────────────────────────────────────────────────────── */
+.btn-agregar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--fw-blue), var(--fw-blue-dark));
+  color: var(--fw-white);
+  border: none;
+  border-radius: 50px;
+  padding: 13px 32px;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  overflow: hidden;
+  margin-bottom: 40px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 20px rgba(10, 132, 255, 0.35);
+  font-family: inherit;
 }
 
-/* TARJETA PRINCIPAL */
-.employee-card.main {
-  z-index: 3;
-  padding: 20px;
+.btn-agregar:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(10, 132, 255, 0.45);
 }
 
-.employee-card.main img {
+.btn-agregar:active {
+  transform: translateY(-1px);
+}
+
+/* ── Grid de tarjetas — CENTRADO ─────────────────────────────────────────────── */
+.empleados-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
   width: 100%;
-  border-radius: 15px;
-  margin-bottom: 15px;
+  max-width: 960px;
+  justify-content: center;    /* ← Corrección principal de centrado */
 }
 
-.employee-card.main h3 {
-  margin: 10px 0;
+/* ── Tarjeta ─────────────────────────────────────────────────────────────────── */
+.empleado-card {
+  background: var(--fw-white);
+  border-radius: var(--fw-radius-md);
+  overflow: hidden;
+  box-shadow: var(--fw-shadow-sm);
+  transition: transform var(--fw-transition), box-shadow 0.3s ease;
+  cursor: pointer;
+  animation: cardEntrada 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-/* TARJETAS LATERALES */
-.employee-card.side {
-  background: #0a84ff;
-  z-index: 1;
-  transform: translateX(35px);
-  opacity: 0.7;
+@keyframes cardEntrada {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-/* EFECTO DESCRIPCIÓN */
-.employee-card.flipped {
-  background: #0a84ff;
-  color: white;
-  padding: 30px;
+.empleado-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--fw-shadow-lg);
 }
 
-.employee-description {
+/* ── Contenedor de foto con badge ────────────────────────────────────────────── */
+.empleado-foto-container {
+  position: relative;
+  width: 100%;
+  height: 190px;
+  background: linear-gradient(140deg, #ddeaff, #c8daff);
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.empleado-foto {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--fw-white);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+  transition: transform 0.3s ease;
+}
+
+.empleado-card:hover .empleado-foto {
+  transform: scale(1.07);
+}
+
+/* ── Avatar con iniciales (fallback sin foto) ────────────────────────────────── */
+.avatar-initials {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 4px solid var(--fw-white);
+  background: linear-gradient(135deg, var(--fw-blue), var(--fw-blue-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--fw-white);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.empleado-card:hover .avatar-initials {
+  transform: scale(1.07);
+}
+
+/* ── Badge de cargo sobre la foto ────────────────────────────────────────────── */
+.cargo-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--fw-blue-dark);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(4px);
+}
+
+/* ── Info de la tarjeta ──────────────────────────────────────────────────────── */
+.empleado-info {
+  padding: 14px 16px 6px;
+  text-align: center;
+}
+
+.empleado-nombre {
   font-size: 15px;
-  line-height: 1.5;
+  font-weight: 700;
+  color: var(--fw-text-dark);
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.empleado-cargo,
+.empleado-especialidad {
+  font-size: 12px;
+  color: var(--fw-text-muted);
+  margin: 0;
+}
+
+/* ── Acciones de la tarjeta ──────────────────────────────────────────────────── */
+.empleado-acciones {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 10px 14px 14px;
+}
+
+.btn-editar,
+.btn-eliminar {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--fw-radius-sm);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.btn-editar  { background: var(--fw-blue-light); }
+.btn-eliminar{ background: var(--fw-danger-bg); }
+
+.btn-editar:hover,
+.btn-eliminar:hover {
+  transform: scale(1.18);
+  opacity: 0.85;
+}
+
+/* ── Skeleton loader ─────────────────────────────────────────────────────────── */
+.loading-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+  width: 100%;
+  max-width: 960px;
+}
+
+.skeleton {
+  height: 280px;
+  border-radius: var(--fw-radius-md);
+  background: linear-gradient(90deg, #e0e8f8 25%, #eef3ff 50%, #e0e8f8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   VISTA DETALLE
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.detalle-empleado {
+  width: 100%;
+  max-width: 720px;
+  animation: cardEntrada 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.btn-volver {
+  background: none;
+  border: 1.5px solid #c8d8f0;
+  border-radius: 50px;
+  padding: 9px 22px;
+  font-size: 14px;
+  color: var(--fw-text-mid);
+  cursor: pointer;
+  margin-bottom: 28px;
+  transition: background 0.2s ease;
+  font-family: inherit;
+  display: block;
+}
+
+.btn-volver:hover {
+  background: var(--fw-blue-light);
+  border-color: var(--fw-blue);
+  color: var(--fw-blue);
+}
+
+.detalle-container {
+  background: var(--fw-white);
+  border-radius: var(--fw-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--fw-shadow-md);
+}
+
+/* Banner azul superior */
+.detalle-banner {
+  background: linear-gradient(135deg, #1a6fff 0%, #0a50c8 100%);
+  height: 130px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* Avatar flotante sobre el banner */
+.detalle-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid var(--fw-white);
+  position: absolute;
+  bottom: -60px;
+  box-shadow: var(--fw-shadow-md);
+}
+
+/* Iniciales en detalle */
+.detalle-avatar.avatar-initials {
+  width: 120px;
+  height: 120px;
+  font-size: 40px;
+  border: 5px solid var(--fw-white);
+  position: absolute;
+  bottom: -60px;
+  box-shadow: var(--fw-shadow-md);
+}
+
+/* Cuerpo del detalle */
+.detalle-info-card {
+  padding: 80px 36px 36px;
+  text-align: center;
+}
+
+.detalle-nombre {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--fw-text-dark);
+  margin: 0 0 6px;
+}
+
+.detalle-cargo-badge {
+  display: inline-block;
+  background: var(--fw-blue-light);
+  color: var(--fw-blue-dark);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 16px;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  margin-bottom: 20px;
+}
+
+.detalle-descripcion {
+  font-size: 14px;
+  color: var(--fw-text-mid);
+  line-height: 1.7;
+  margin-bottom: 28px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Grid de datos */
+.detalle-datos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  text-align: left;
+  margin-bottom: 32px;
+}
+
+.dato-item {
+  background: var(--fw-bg);
+  border-radius: var(--fw-radius-sm);
+  padding: 14px 16px;
+}
+
+.dato-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--fw-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+
+.dato-valor {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fw-text-dark);
+}
+
+/* Acciones del detalle */
+.detalle-acciones {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-editar-detalle {
+  padding: 11px 30px;
+  background: var(--fw-blue-light);
+  color: var(--fw-blue);
+  border: none;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+  font-family: inherit;
+}
+
+.btn-eliminar-detalle {
+  padding: 11px 30px;
+  background: var(--fw-danger-bg);
+  color: var(--fw-danger);
+  border: none;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+  font-family: inherit;
+}
+
+.btn-editar-detalle:hover  { background: #d0e8ff; transform: scale(1.03); }
+.btn-eliminar-detalle:hover{ background: #ffe0e0; transform: scale(1.03); }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 60, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeOverlay 0.2s ease;
+  backdrop-filter: blur(3px);
+}
+
+@keyframes fadeOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-content-empleado {
+  background: var(--fw-white);
+  border-radius: var(--fw-radius-lg);
+  padding: 36px;
+  width: 100%;
+  max-width: 520px;
+  position: relative;
+  animation: cardEntrada 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: var(--fw-bg);
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fw-text-mid);
+  transition: background 0.2s ease;
+}
+
+.modal-close:hover { background: #dde6f8; }
+
+.modal-titulo {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--fw-text-dark);
+  margin: 0 0 24px;
+}
+
+/* Campos del formulario */
+.form-group-modal {
+  margin-bottom: 16px;
+  flex: 1;
+}
+
+.form-group-modal label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--fw-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.form-group-modal input,
+.form-group-modal textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1.5px solid #dde6f8;
+  border-radius: var(--fw-radius-sm);
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--fw-text-dark);
+  background: #f8faff;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  resize: vertical;
+}
+
+.form-group-modal input:focus,
+.form-group-modal textarea:focus {
+  border-color: var(--fw-blue);
+  background: var(--fw-white);
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* Botones del modal */
+.modal-botones {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.btn-cancelar {
+  padding: 10px 24px;
+  background: var(--fw-bg);
+  color: var(--fw-text-mid);
+  border: none;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-family: inherit;
+}
+
+.btn-guardar {
+  padding: 10px 28px;
+  background: linear-gradient(135deg, var(--fw-blue), var(--fw-blue-dark));
+  color: var(--fw-white);
+  border: none;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(10, 132, 255, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  font-family: inherit;
+}
+
+.btn-cancelar:hover { background: #dde6f8; }
+.btn-guardar:hover  { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(10, 132, 255, 0.45); }
+
+/* ── Responsive ──────────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .crud-content        { padding: 24px 16px; }
+  .empleados-grid      { grid-template-columns: 1fr 1fr; gap: 14px; }
+  .detalle-datos       { grid-template-columns: 1fr 1fr; }
+  .form-row            { grid-template-columns: 1fr; }
+  .modal-content-empleado { padding: 24px 20px; }
+}
+
+@media (max-width: 400px) {
+  .empleados-grid { grid-template-columns: 1fr; }
 }

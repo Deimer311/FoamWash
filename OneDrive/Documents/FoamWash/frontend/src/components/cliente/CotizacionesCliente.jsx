@@ -15,6 +15,7 @@ import { useCarrito } from '../modales/CarritoContext';
 import ServiceCardCliente   from './ServiceCardCliente';
 import Footer               from '../comun/Footer1';
 import BotonCarritoFlotante from '../modales/BotonCarritoFlotante';
+import HeaderCliente        from './HeaderCliente';
 import api                  from '../../services/api';
 import { guardarCotizacionLocal } from '../../services/cotizacionStorage';
 import './estilos_cliente/estilos_cotizar_cliente.css';
@@ -334,7 +335,7 @@ const ConfirmationModal = ({ carrito, total, onCerrar, onActualizarDetalle, onCo
 // ─────────────────────────────────────────────────────────────────────────────
 // COMPONENTE PRINCIPAL
 // ─────────────────────────────────────────────────────────────────────────────
-export default function CotizacionesCliente({ onBackToHome, onGoToServicios, onPerfil }) {
+export default function CotizacionesCliente({ onBackToHome, onGoToServicios, onPerfil, onServicios }) {
     const { user, logout }   = useAuth();
     const { carrito, agregarAlCarrito, actualizarCantidad, actualizarDetalle } = useCarrito();
 
@@ -426,26 +427,31 @@ export default function CotizacionesCliente({ onBackToHome, onGoToServicios, onP
     };
 
     return (
-        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <>
+        <style>{`
+            @keyframes gradientShift {
+                0%   { background-position: 0% 50%; }
+                50%  { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+        `}</style>
+        <div style={{
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            background: 'linear-gradient(135deg, #f0f4ff 0%, #e8f4fd 50%, #f0f0ff 100%)',
+            backgroundSize: '400% 400%',
+            animation: 'gradientShift 12s ease infinite'
+        }}>
 
-            {/* ==================== HEADER CON BANNER ==================== */}
-            <header className="header-banner">
-                <img src="/img/ima9.jpg" alt="Fondo encabezado" className="fondo" />
-                <h1 className="logo-header" onClick={onBackToHome} style={{ cursor: 'pointer' }}>FoamWash</h1>
-                <nav className="nav-bar">
-                    <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); onBackToHome(); }}>Hogar</a>
-                    <a href="#" className="nav-link" style={{ color: 'rgb(133, 198, 255)' }} onClick={(e) => e.preventDefault()}>Cotización</a>
-                    <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); onGoToServicios?.(); }}>Agendar</a>
-                    {user && (
-                        <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); onPerfil?.(); }}>Perfil</a>
-                    )}
-                    {user ? (
-                        <a href="#" className="nav-link btn-salir" onClick={handleCerrarSesion}>Cerrar Sesión</a>
-                    ) : (
-                        <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); onBackToHome(); }}>Iniciar Sesión</a>
-                    )}
-                </nav>
-            </header>
+            {/* ==================== HEADER ==================== */}
+            <HeaderCliente
+                onBackToHome={onBackToHome}
+                onCotizacion={() => {}}
+                onPerfil={onPerfil}
+                onServicios={onGoToServicios}
+                activeLink="cotizacion"
+            />
 
             {/* ==================== CONTENIDO PRINCIPAL ==================== */}
             <main style={{ flex: 1 }}>
@@ -516,5 +522,6 @@ export default function CotizacionesCliente({ onBackToHome, onGoToServicios, onP
                 />
             )}
         </div>
+        </>
     );
 }

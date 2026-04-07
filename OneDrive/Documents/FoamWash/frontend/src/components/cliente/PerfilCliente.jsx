@@ -12,6 +12,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../autenticacion/AuthContext';
 import api from '../../services/api';
+import HeaderCliente from './HeaderCliente';
 import './estilos_cliente/PerfilCliente.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL
@@ -23,7 +24,6 @@ const PerfilCliente = ({ onBackToHome, onCotizacion, onServicios, onEditarPerfil
     const [perfil,   setPerfil]   = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error,    setError]    = useState('');
-
     // ── Cargar datos reales del usuario ───────────────────────────────────────
     useEffect(() => {
         if (!user?.id) return;
@@ -43,9 +43,10 @@ const PerfilCliente = ({ onBackToHome, onCotizacion, onServicios, onEditarPerfil
                 setIsLoading(false);
             }
         };
+        
 
         cargar();
-    }, [user?.id]);
+}, [user?.id, user?.foto_perfil]); //
 
     // ── Animación de tarjetas ─────────────────────────────────────────────────
     useEffect(() => {
@@ -95,22 +96,18 @@ const PerfilCliente = ({ onBackToHome, onCotizacion, onServicios, onEditarPerfil
     }
 
     const stats = perfil?.stats || {};
-    const fotoUrl = getFotoUrl(perfil?.foto_perfil);
+    const fotoUrl = getFotoUrl(user?.foto_perfil);
 
     return (
         <div style={{ background: '#f5f5f5', minHeight: '100vh' }}>
             {/* ── HEADER ── */}
-            <header className="header-banner">
-                <img src="/img/ima9.jpg" alt="Fondo encabezado" className="fondo" />
-                <h1 className="logo-header" onClick={onBackToHome} style={{ cursor: 'pointer' }}>FoamWash</h1>
-                <nav className="nav-bar">
-                    <a href="#" className="nav-link" onClick={e => { e.preventDefault(); onBackToHome(); }}>Hogar</a>
-                    <a href="#" className="nav-link" onClick={e => { e.preventDefault(); onCotizacion(); }}>Cotización</a>
-                    <a href="#" className="nav-link" onClick={e => { e.preventDefault(); onServicios(); }}>Agendar</a>
-                    <a href="#" className="nav-link" style={{ color: 'rgb(133, 198, 255)' }} onClick={e => e.preventDefault()}>Perfil</a>
-                    <a href="#" className="nav-link btn-salir" onClick={handleCerrarSesion}>Cerrar Sesión</a>
-                </nav>
-            </header>
+            <HeaderCliente
+                onBackToHome={onBackToHome}
+                onCotizacion={onCotizacion}
+                onPerfil={onEditarPerfil}
+                onServicios={onServicios}
+                activeLink="perfil"
+            />
 
             {/* ── CONTENIDO ── */}
             <div className="main-content">

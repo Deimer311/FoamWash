@@ -223,7 +223,11 @@ const PerfilTrabajador = ({ onBackToHome, onEditarPerfil, onLogout }) => {
                                         <div className="info-value">{perfil?.Nombre || '—'}</div>
                                     </div>
                                     <div className="info-item">
-                                        <span className="info-label">Cédula</span>
+                                        <span className="info-label">Tipo de Documento</span>
+                                        <div className="info-value">{perfil?.tipo_de_documento?.nombre_del_documento || '—'}</div>
+                                    </div>
+                                    <div className="info-item">
+                                        <span className="info-label">Número de Documento</span>
                                         <div className="info-value">{perfil?.N_Documento || '—'}</div>
                                     </div>
                                     <div className="info-item">

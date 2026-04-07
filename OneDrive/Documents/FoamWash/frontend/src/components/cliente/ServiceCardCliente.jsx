@@ -225,7 +225,7 @@ const ServiceCardCliente = ({ servicio, onNotificacion }) => {
                             top: '50%',
                             left: '50%',
                             transform: 'translate(-50%, -50%)',
-                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            backgroundColor: 'transparent',
                             width: '50px',
                             height: '50px',
                             borderRadius: '50%',
@@ -236,7 +236,7 @@ const ServiceCardCliente = ({ servicio, onNotificacion }) => {
                             animation: 'pulseZoom 1.5s ease-in-out infinite',
                             boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
                         }}>
-                            🔍
+                            
                         </div>
                     )}
                     

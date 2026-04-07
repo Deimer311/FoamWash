@@ -6,11 +6,11 @@
     }
 
     body {
-        font-family: 'Arial', 'Segoe UI', sans-serif;
-        min-height: 100vh;
-        overflow-x: hidden;
-        background: #f5f5f5;
-    }
+    font-family: 'Kanit', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background: transparent;
+}
 
     /* ==================== HEADER CON IMAGEN DE FONDO ==================== */
     .header-banner {
@@ -113,7 +113,7 @@
 
     /* ==================== SECCIÓN DE BÚSQUEDA ==================== */
     .search-section {
-        background: white;
+        background: transparent;
         padding: 40px 20px;
         display: flex;
         justify-content: center;
@@ -160,7 +160,7 @@
     /* ==================== SECCIÓN DE SERVICIOS ==================== */
     .services-section {
         padding: 60px 40px;
-        background: white;
+        background: transparent ;
     }
 
     .section-title {

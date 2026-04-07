@@ -10,11 +10,16 @@
 // =============================================================================
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '../autenticacion/AuthContext';
+import api from '../../services/api';
 import './estilos_admin/PerfilAdmin.css';
 import QuickActionsApp from './acciones-rapidas';
 import ConsultasAdmin  from './ConsultasAdmin';
 
-// ✅ AGREGADO: onConsultas en los parámetros
+const API_BASE_URL = import.meta.env.VITE_API_URL
+    ? import.meta.env.VITE_API_URL.replace('/api', '')
+    : 'http://localhost:5000';
+
 const PerfilAdmin = ({ 
     onBackToHome, 
     onCrudUsuarios, 
@@ -28,7 +33,31 @@ const PerfilAdmin = ({
     onConsultas,
     onDashboard
 }) => {
+    const { user } = useAuth();
     const [activeModal, setActiveModal] = useState(null);
+    const [perfil, setPerfil]           = useState(null);
+
+    // ── Cargar datos reales del admin desde GET /usuarios/:id ─────────────────
+    useEffect(() => {
+        if (!user?.id) return;
+        const cargar = async () => {
+            try {
+                const res = await api.get(`/usuarios/${user.id}`);
+                if (res.data.success) setPerfil(res.data.data);
+            } catch (err) {
+                console.error('❌ Error al cargar perfil admin:', err);
+            }
+        };
+        cargar();
+    }, [user?.id]);
+
+    const getFotoUrl = (foto) => {
+        if (!foto) return null;
+        if (foto.startsWith('http')) return foto;
+        return `${API_BASE_URL}${foto}`;
+    };
+
+    const fotoUrl = getFotoUrl(perfil?.foto_perfil);
 
     useEffect(() => {
         const cards = document.querySelectorAll('.detail-card');
@@ -116,8 +145,22 @@ const PerfilAdmin = ({
                 <div className="profile-container">
                     {/* ==================== SIDEBAR ==================== */}
                     <div className="profile-sidebar">
-                        <div className="profile-photo"></div>
-                        <div className="profile-name">Administrador</div>
+                        <div className="profile-photo">
+                            {fotoUrl
+                                ? <img
+                                    src={fotoUrl}
+                                    alt="Foto perfil"
+                                    style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+                                    onError={(e) => {
+                                        e.target.style.display = 'none';
+                                        e.target.nextSibling.style.display = 'block';
+                                    }}
+                                  />
+                                : null
+                            }
+                            <span style={{ fontSize: '3rem', display: fotoUrl ? 'none' : 'block' }}>👤</span>
+                        </div>
+                        <div className="profile-name">{perfil?.Nombre || 'Administrador'}</div>
                         <div className="profile-role">Administrador</div>
                         
                         <div className="admin-badges">
@@ -149,19 +192,27 @@ const PerfilAdmin = ({
                                 <div className="info-grid">
                                     <div className="info-item">
                                         <span className="info-label">Nombre Completo</span>
-                                        <div className="info-value">Juan Pablo Rodríguez</div>
+                                        <div className="info-value">{perfil?.Nombre || '—'}</div>
                                     </div>
                                     <div className="info-item">
                                         <span className="info-label">Cargo</span>
                                         <div className="info-value">Administrador General</div>
                                     </div>
                                     <div className="info-item">
+                                        <span className="info-label">Tipo de Documento</span>
+                                        <div className="info-value">{perfil?.tipo_de_documento?.nombre_del_documento || '—'}</div>
+                                    </div>
+                                    <div className="info-item">
+                                        <span className="info-label">Número de Documento</span>
+                                        <div className="info-value">{perfil?.N_Documento || '—'}</div>
+                                    </div>
+                                    <div className="info-item">
                                         <span className="info-label">Email Corporativo</span>
-                                        <div className="info-value">admin@foamwash.com</div>
+                                        <div className="info-value">{perfil?.Correo || '—'}</div>
                                     </div>
                                     <div className="info-item">
                                         <span className="info-label">Teléfono</span>
-                                        <div className="info-value">+57 300 123 4567</div>
+                                        <div className="info-value">{perfil?.Telefono || '—'}</div>
                                     </div>
                                     <div className="info-item">
                                         <span className="info-label">Departamento</span>
