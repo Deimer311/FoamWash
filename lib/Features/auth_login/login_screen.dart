@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:foamwash/Features/auth_login/register_screen.dart';
 import 'package:foamwash/Api/api_constants.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:foamwash/Features/auth_login/providers/auth_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -57,52 +54,27 @@ class _LoginScreenState extends State<LoginScreen>
       return;
     }
     setState(() { _isLoading = true; _message = ''; });
+    
     try {
-      final response = await http.post(
-        Uri.parse(ApiConstants.loginEndpoint),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'correo': email,
-          'password': password,
-        }),
-      );
+      // Usamos el AuthProvider que ahora maneja el Repositorio y Data Source
+      await context.read<AuthProvider>().login(email, password);
       
       if (!mounted) return;
       setState(() => _isLoading = false);
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = json.decode(response.body);
-        final String token = data['token'] ?? '';
-        
-        // Guardar token y email localmente
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', token);
-        await prefs.setString('userEmail', email);
-        await prefs.setBool('isLogged', true);
-
-        // Extraer y guardar cookie_token si viene en los headers (para evitar Error 401)
-        final rawCookie = response.headers['set-cookie'];
-        if (rawCookie != null) {
-          await prefs.setString('cookie_token', rawCookie);
-        }
-
-        // Actualizar AuthProvider
-        if (mounted) {
-          context.read<AuthProvider>().login(email, password); // Esto actualiza el estado interno
-
-          // Redirección basada en el correo
-          if (email == 'admin@gmail.com') {
-            Navigator.pushReplacementNamed(context, '/admin_dashboard');
-          } else {
-            Navigator.pushReplacementNamed(context, '/scheduling');
-          }
-        }
+      // Redirección basada en el correo (se mantiene la lógica de negocio en la vista por ahora)
+      if (email == 'admin@gmail.com') {
+        Navigator.pushReplacementNamed(context, '/admin_dashboard');
       } else {
-        setState(() { _message = 'Credenciales incorrectas. Intenta de nuevo.'; _isError = true; });
+        Navigator.pushReplacementNamed(context, '/scheduling');
       }
     } catch (e) {
       if (!mounted) return;
-      setState(() { _isLoading = false; _message = 'Error de conexión: $e'; _isError = true; });
+      setState(() { 
+        _isLoading = false; 
+        _message = 'Credenciales incorrectas o error de conexión.'; 
+        _isError = true; 
+      });
     }
   }
 

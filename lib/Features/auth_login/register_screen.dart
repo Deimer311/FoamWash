@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:foamwash/Features/auth_login/login_screen.dart';
 import 'package:foamwash/Api/api_constants.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:foamwash/Features/auth_login/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -74,29 +74,33 @@ class _RegisterScreenState extends State<RegisterScreen>
     setState(() { _isLoading = true; _message = ''; });
 
     try {
-      final response = await http.post(
-        Uri.parse(ApiConstants.registerEndpoint),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'correo':    emailController.text.trim(),
-          'nombre':    fullNameController.text.trim(),
-          'telefono':  phone,
-          'direccion': addressController.text.trim().isEmpty
-              ? 'Sin dirección especificada'
-              : addressController.text.trim(),
-          'password':  passwordController.text,
-        }),
+      await context.read<AuthProvider>().register(
+        email: emailController.text.trim(),
+        nombre: fullNameController.text.trim(),
+        telefono: phone,
+        direccion: addressController.text.trim().isEmpty
+            ? 'Sin dirección especificada'
+            : addressController.text.trim(),
+        password: passwordController.text,
       );
+      
       if (!mounted) return;
-      setState(() => _isLoading = false);
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        setState(() { _message = '¡Usuario registrado correctamente!'; _isError = false; });
-      } else {
-        setState(() { _message = 'Error al registrar. Intenta de nuevo.'; _isError = true; });
-      }
-    } catch (_) {
+      setState(() { 
+        _isLoading = false;
+        _message = '¡Usuario registrado correctamente!'; 
+        _isError = false; 
+      });
+      
+      // Opcional: Navegar al login después de un registro exitoso
+      // Future.delayed(Duration(seconds: 2), () => Navigator.pop(context));
+      
+    } catch (e) {
       if (!mounted) return;
-      setState(() { _isLoading = false; _message = 'Error de conexión. Verifica tu red.'; _isError = true; });
+      setState(() { 
+        _isLoading = false; 
+        _message = 'Error al registrar: $e'; 
+        _isError = true; 
+      });
     }
   }
 

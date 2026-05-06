@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foamwash/Features/Comun/service_model.dart';
+import 'package:foamwash/Features/Services/data/models/service_model.dart';
 import 'package:foamwash/theme.dart';
 import 'package:foamwash/Features/Services/controllers/scheduling_controller.dart';
 

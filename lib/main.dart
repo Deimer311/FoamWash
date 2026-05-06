@@ -10,6 +10,9 @@ import 'package:foamwash/Features/auth_login/providers/auth_provider.dart';
 import 'package:foamwash/Features/Admin/views/admin_dashboard_view.dart';
 import 'package:foamwash/Features/Admin/views/admin_agenda_view.dart';
 
+import 'package:foamwash/Features/auth_login/data/data_sources/auth_remote_data_source.dart';
+import 'package:foamwash/Features/auth_login/data/repositories/auth_repository.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -19,9 +22,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Instanciamos las dependencias (puedes usar GetIt en el futuro para esto)
+    final authDataSource = AuthRemoteDataSource();
+    final authRepository = AuthRepository(remoteDataSource: authDataSource);
+
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()..checkAuthStatus()),
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider(repository: authRepository)..checkAuthStatus(),
+        ),
         ChangeNotifierProvider(create: (_) => ServicesProvider()),
       ],
       child: MaterialApp(

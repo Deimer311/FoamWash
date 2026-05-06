@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:foamwash/Features/Comun/service_model.dart';
+import 'package:foamwash/Features/Services/data/models/service_model.dart';
 import 'package:foamwash/Api/api_constants.dart';
 
 class ApiService {

@@ -1,36 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:foamwash/Features/auth_login/data/repositories/auth_repository.dart';
+import 'package:foamwash/Features/auth_login/data/models/user_model.dart';
 
 class AuthProvider extends ChangeNotifier {
+  final AuthRepository _repository;
+  
   bool _isAuthenticated = false;
   String? _userEmail;
+  String _userRole = '';
+  UserModel? _user;
+
+  AuthProvider({required AuthRepository repository}) : _repository = repository;
 
   bool get isAuthenticated => _isAuthenticated;
   String? get userEmail => _userEmail;
-  bool get isAdmin => _userEmail == 'admin@gmail.com';
+  String get userRole => _userRole;
+  UserModel? get user => _user;
+  bool get isAdmin => _userEmail == 'admin@gmail.com' || _userRole == 'admin';
 
-  // Lógica de inicio de sesión real debe integrarse aquí
+  /// Lógica de inicio de sesión utilizando el Repositorio
   Future<void> login(String email, String password) async {
-    // Aquí iría tu código de login HTTP...
-    // Simulación:
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLogged', true);
-    await prefs.setString('userEmail', email);
-    
-    _isAuthenticated = true;
-    _userEmail = email;
-    notifyListeners();
+    try {
+      final userModel = await _repository.login(email, password);
+      
+      _user = userModel;
+      _isAuthenticated = true;
+      _userEmail = email;
+
+      // Leer el rol guardado por el repositorio
+      final prefs = await SharedPreferences.getInstance();
+      _userRole = prefs.getString('userRole') ?? '';
+
+      notifyListeners();
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<void> logout() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.clear();
+      await _repository.logout();
       _isAuthenticated = false;
       _userEmail = null;
+      _user = null;
       notifyListeners();
     } catch (e) {
-      print('Error al limpiar SharedPreferences: $e');
+      print('Error al cerrar sesión: $e');
+    }
+  }
+
+  /// Registro de un nuevo usuario
+  Future<void> register({
+    required String email,
+    required String nombre,
+    required String telefono,
+    required String direccion,
+    required String password,
+  }) async {
+    try {
+      await _repository.register(
+        email: email,
+        nombre: nombre,
+        telefono: telefono,
+        direccion: direccion,
+        password: password,
+      );
+    } catch (e) {
+      rethrow;
     }
   }
 
@@ -39,6 +76,7 @@ class AuthProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     _isAuthenticated = prefs.getBool('isLogged') ?? false;
     _userEmail = prefs.getString('userEmail');
+    _userRole = prefs.getString('userRole') ?? '';
     notifyListeners();
   }
 }
