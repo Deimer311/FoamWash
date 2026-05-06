@@ -1,0 +1,153 @@
+.agenda-container {
+  padding: 2rem;
+  background: #ffffff;
+}
+
+.agenda-title {
+  text-align: center;
+  color: #0a1435;
+  font-size: 28px;
+  margin-bottom: 1.5rem;
+}
+
+.agenda-controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.agenda-controls button {
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  border: none;
+  background: #e6efff;
+  cursor: pointer;
+}
+
+.agenda-controls .active {
+  background: #008cff;
+  color: #fff;
+}
+
+/* SEMANA */
+.agenda-grid {
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr);
+  gap: 8px;
+}
+
+.hours-column,
+.day-column {
+  background: #e6efff;
+  border-radius: 12px;
+}
+
+.hour-header,
+.day-header {
+  text-align: center;
+  padding: 0.5rem;
+  font-weight: bold;
+}
+
+.hour-cell,
+.day-cell {
+  min-height: 60px;
+  padding: 4px;
+}
+
+/* ORDEN */
+.order-card {
+  background: #223bff;
+  color: #fff;
+  border-radius: 10px;
+  padding: 6px 8px;
+  font-size: 12px;
+  position: relative;
+  cursor: pointer;
+}
+
+.order-card:hover .order-hover {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.order-hover {
+  position: absolute;
+  top: -10px;
+  left: 105%;
+  width: 200px;
+  background: #ffffff;
+  color: #000;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  opacity: 0;
+  transform: scale(0.9);
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+/* MES */
+.agenda-month {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.month-day {
+  background: #e6efff;
+  border-radius: 14px;
+  padding: 1rem;
+  text-align: center;
+}
+
+/* BOTÓN */
+.create-order-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #008cff;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 14px 22px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 20px;
+  width: 320px;
+}
+
+.modal input,
+.modal select {
+  width: 100%;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-actions .primary {
+  background: #008cff;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+}

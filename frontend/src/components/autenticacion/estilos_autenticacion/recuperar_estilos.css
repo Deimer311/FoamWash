@@ -1,0 +1,360 @@
+/* =============================================================================
+   RECUPERAR CONTRASEÑA — ESTILOS PREMIUM FoamWash
+   Diseño unificado con el sistema de diseño del cliente
+   ============================================================================= */
+
+:root {
+    --primary:       #1a56ff;
+    --primary-dark:  #1240cc;
+    --secondary:     #7c3aed;
+    --text-dark:     #0a1435;
+    --text-medium:   #555;
+    --text-light:    #999;
+    --error-red:     #ef4444;
+    --success-green: #16a34a;
+    --white:         #ffffff;
+    --bg:            #f6f7fb;
+    --border:        #e0e4ef;
+}
+
+/* ── Fondo ─────────────────────────────────────────────────────────────────── */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+    position: relative;
+    /* Sin background: lo maneja index.css (#f0f4f8).
+       El div .recuperar-background con position:fixed cubre toda la pantalla. */
+}
+
+.recuperar-container {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    overflow: hidden;
+    font-family: 'Kanit', sans-serif;
+}
+
+.recuperar-background {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: url("../../../public/fondo.png");
+    background-size: cover;
+    background-position: center;
+    z-index: -2;
+}
+
+.recuperar-background::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(8, 16, 46, 0.55);
+    backdrop-filter: blur(2px);
+}
+
+/* ── Contenido ─────────────────────────────────────────────────────────────── */
+.recuperar-content {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    z-index: 1;
+}
+
+/* ── Logo ──────────────────────────────────────────────────────────────────── */
+.recuperar-logo {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.logo-link {
+    text-decoration: none;
+    display: inline-block;
+    transition: opacity 0.2s;
+}
+.logo-link:hover { opacity: 0.85; }
+
+.recuperar-logo h1 {
+    color: #fff;
+    font-size: 2.4rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin: 0;
+    font-family: 'Kanit', sans-serif;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+.recuperar-logo h1 span {
+    font-size: 14px;
+    font-weight: 700;
+    color: #d81b9c;
+    vertical-align: super;
+    margin-left: 2px;
+}
+
+/* ── Card principal ─────────────────────────────────────────────────────────── */
+.recuperar-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 36px 32px 32px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+    border: 1px solid rgba(255,255,255,0.08);
+    animation: rcFadeUp 0.45s cubic-bezier(.34,1.56,.64,1);
+}
+
+@keyframes rcFadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Indicador de pasos ─────────────────────────────────────────────────────── */
+.step-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+}
+
+.step-number {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: #f0f2ff;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    font-family: 'Kanit', sans-serif;
+    border: 2px solid #e0e4ef;
+    transition: all 0.3s ease;
+}
+
+.step.active .step-number {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(26,86,255,0.35);
+    transform: scale(1.08);
+}
+
+.step.completed .step-number {
+    background: linear-gradient(135deg, var(--success-green), #15803d);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(22,163,74,0.3);
+}
+
+.step-label {
+    font-size: 11px;
+    color: var(--text-light);
+    font-weight: 500;
+    text-align: center;
+    font-family: 'Kanit', sans-serif;
+    letter-spacing: 0.2px;
+    transition: color 0.3s;
+}
+
+.step.active .step-label {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.step-line {
+    height: 2px;
+    flex: 1;
+    background: #e0e4ef;
+    margin: 0 8px;
+    position: relative;
+    top: -16px;
+    border-radius: 2px;
+}
+
+/* ── Contenido del paso ─────────────────────────────────────────────────────── */
+.step-content { text-align: center; }
+
+.fade-in {
+    animation: rcFadeIn 0.4s ease;
+}
+@keyframes rcFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.step-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin: 0 0 8px 0;
+    font-family: 'Kanit', sans-serif;
+    letter-spacing: -0.3px;
+}
+
+.step-description {
+    font-size: 14px;
+    color: var(--text-medium);
+    line-height: 1.6;
+    margin: 0 0 24px 0;
+    font-family: 'Kanit', sans-serif;
+}
+.step-description strong { color: var(--primary); font-weight: 700; }
+
+/* ── Form group ─────────────────────────────────────────────────────────────── */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* ── Inputs ─────────────────────────────────────────────────────────────────── */
+.input-field {
+    width: 100%;
+    padding: 13px 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: 'Kanit', sans-serif;
+    color: var(--text-dark);
+    background: #f8f9ff;
+    outline: none;
+    transition: border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+    box-sizing: border-box;
+}
+.input-field::placeholder { color: #bbb; }
+.input-field:focus {
+    border-color: var(--primary);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(26,86,255,0.10);
+}
+.input-field:hover { border-color: #b0b8d4; }
+
+/* Código OTP centrado */
+.code-input {
+    text-align: center;
+    font-size: 28px;
+    letter-spacing: 0.7rem;
+    font-weight: 700;
+    color: var(--primary);
+    background: #f0f4ff;
+    border-color: #c7d2fe;
+}
+.code-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(26,86,255,0.12);
+}
+
+/* ── Error ──────────────────────────────────────────────────────────────────── */
+.error-message {
+    background: #fef2f2;
+    color: var(--error-red);
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: 'Kanit', sans-serif;
+    border-left: 3px solid var(--error-red);
+    text-align: left;
+    animation: rcShake 0.4s ease-in-out;
+}
+@keyframes rcShake {
+    0%, 100% { transform: translateX(0); }
+    25%       { transform: translateX(-8px); }
+    75%       { transform: translateX(8px); }
+}
+
+/* ── Link container ─────────────────────────────────────────────────────────── */
+.link-container {
+    text-align: center;
+    margin: 4px 0;
+}
+.text-link {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Kanit', sans-serif;
+    cursor: pointer;
+    padding: 6px 8px;
+    transition: color 0.2s, transform 0.2s;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 6px;
+}
+.text-link:hover {
+    color: var(--primary-dark);
+    transform: translateX(-3px);
+    text-decoration: underline;
+}
+
+/* ── Botón principal ────────────────────────────────────────────────────────── */
+.submit-button {
+    width: 100%;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Kanit', sans-serif;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    box-shadow: 0 4px 16px rgba(26,86,255,0.30);
+    margin-top: 4px;
+    position: relative;
+    overflow: hidden;
+}
+.submit-button::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.12) 50%, transparent 65%);
+    background-size: 200% 100%;
+    background-position: -100% 0;
+    transition: background-position 0.45s ease;
+    border-radius: inherit;
+}
+.submit-button:hover::before { background-position: 200% 0; }
+.submit-button:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.07);
+    box-shadow: 0 8px 24px rgba(26,86,255,0.38);
+}
+.submit-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(26,86,255,0.25);
+}
+.submit-button:disabled {
+    background: linear-gradient(135deg, #9ba8c0, #bcc0cc);
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .recuperar-container { padding: 1rem; }
+    .recuperar-card { padding: 28px 22px 24px; }
+    .recuperar-logo h1 { font-size: 2rem; }
+    .step-title { font-size: 19px; }
+    .step-number { width: 36px; height: 36px; font-size: 13px; }
+    .step-label { font-size: 10px; }
+    .code-input { letter-spacing: 0.5rem; font-size: 22px; }
+}
+
+@media (max-width: 400px) {
+    .step-label { display: none; }
+    .step-line  { margin: 0 4px; }
+}

@@ -1,0 +1,457 @@
+/* =============================================================================
+   PerfilTrabajador.css — FoamWash Premium
+   Mismo estándar visual que PerfilCliente.css / PerfilAdmin.css
+   ============================================================================= */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Kanit', sans-serif;
+    background: #f6f7fb;
+    min-height: 100vh;
+}
+
+/* ==================== LAYOUT PRINCIPAL ==================== */
+.tu-clase {
+    background: linear-gradient(135deg, #0066ff, #00b8ff);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 102, 255, 0.35);
+    border: none;
+}
+
+.pt-main {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 156px 40px 80px;
+}
+
+.pt-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 28px;
+    animation: ptFadeUp 0.5s ease-out;
+}
+
+@keyframes ptFadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ==================== SIDEBAR ==================== */
+.pt-sidebar {
+    position: sticky;
+    top: 120px;
+    height: 540px;
+    background: linear-gradient(160deg, #1a56ff 0%, #7c3aed 100%);
+    border-radius: 20px;
+    padding: 36px 28px;
+    color: #fff;
+    box-shadow: 0 12px 40px rgba(26,86,255,0.28);
+    overflow: hidden;
+    text-align: center;
+}
+
+.pt-sidebar::before,
+.pt-sidebar::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    pointer-events: none;
+}
+.pt-sidebar::before {
+    width: 200px; height: 200px;
+    top: -60px; right: -60px;
+    animation: ptSideFloat 7s ease-in-out infinite;
+}
+.pt-sidebar::after {
+    width: 130px; height: 130px;
+    bottom: -40px; left: -40px;
+    animation: ptSideFloat 9s ease-in-out infinite reverse;
+}
+@keyframes ptSideFloat {
+    0%, 100% { transform: translate(0,0) scale(1); }
+    50%       { transform: translate(8px,-12px) scale(1.08); }
+}
+
+/* ── Foto ── */
+.pt-photo {
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    border: 3px solid rgba(255,255,255,0.5);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    background: rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 44px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+.pt-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.pt-name {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+    font-family: 'Kanit', sans-serif;
+}
+
+.pt-role {
+    display: inline-block;
+    padding: 4px 16px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+    font-family: 'Kanit', sans-serif;
+}
+
+/* ── Badge disponibilidad ── */
+.pt-availability {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(6px);
+    border-radius: 14px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Kanit', sans-serif;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.pt-status-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 0 0 rgba(34,197,94,0.7);
+    animation: ptPulse 2s ease-in-out infinite;
+    flex-shrink: 0;
+}
+@keyframes ptPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.7); }
+    50%       { box-shadow: 0 0 0 7px rgba(34,197,94,0); }
+}
+
+/* ── Stats ── */
+.pt-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 22px;
+    position: relative;
+    z-index: 1;
+}
+
+.pt-stat {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 14px 10px;
+    border-radius: 14px;
+    text-align: center;
+    transition: background 0.25s ease, transform 0.25s ease;
+    backdrop-filter: blur(6px);
+}
+.pt-stat:hover {
+    background: rgba(255,255,255,0.20);
+    transform: translateY(-2px);
+}
+
+.pt-stat-num {
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+    letter-spacing: -0.5px;
+}
+
+.pt-stat-lbl {
+    font-size: 10px;
+    opacity: 0.78;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: 'Kanit', sans-serif;
+}
+
+.pt-edit-btn {
+    width: 100%;
+    padding: 13px;
+    background: rgba(255,255,255,0.95);
+    color: #1a56ff;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Kanit', sans-serif;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    transition: all 0.25s ease;
+}
+.pt-edit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    background: #fff;
+}
+
+/* ==================== PANEL DERECHO ==================== */
+.pt-right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+
+/* ==================== CARDS ==================== */
+.pt-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 28px;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: box-shadow 0.28s ease, transform 0.28s ease, opacity 0.4s ease;
+}
+.pt-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.pt-card:hover {
+    box-shadow: 0 8px 28px rgba(26,86,255,0.10);
+    transform: translateY(-2px);
+}
+
+.pt-card-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #0a1435;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Kanit', sans-serif;
+}
+
+.pt-card-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, #1a56ff, #7c3aed);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+/* ==================== INFO GRID ==================== */
+.pt-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+.pt-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.pt-info-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-family: 'Kanit', sans-serif;
+}
+
+.pt-info-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111;
+    padding: 10px 14px;
+    background: #f6f7fb;
+    border-radius: 9px;
+    border-left: 3px solid #1a56ff;
+    font-family: 'Kanit', sans-serif;
+    word-break: break-word;
+}
+
+/* ==================== HORARIO ==================== */
+.pt-schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pt-schedule-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: #f8f9ff;
+    border-radius: 12px;
+    border: 1px solid #eef0f8;
+    transition: all 0.22s ease;
+}
+.pt-schedule-item:hover {
+    background: #f0f2ff;
+    border-color: rgba(26,86,255,0.15);
+    transform: translateX(3px);
+}
+
+.pt-schedule-icon {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, #1a56ff, #7c3aed);
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.pt-schedule-content { flex: 1; min-width: 0; }
+.pt-schedule-content h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 2px;
+    font-family: 'Kanit', sans-serif;
+}
+.pt-schedule-content p {
+    font-size: 12px;
+    color: #999;
+    font-family: 'Kanit', sans-serif;
+}
+
+.pt-schedule-status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Kanit', sans-serif;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.pt-status-upcoming   { background: #fef9c3; color: #a16207; }
+.pt-status-inprogress { background: #dcfce7; color: #15803d; }
+
+/* ==================== DESEMPEÑO ==================== */
+.pt-perf-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.pt-perf-card {
+    text-align: center;
+    padding: 20px 12px;
+    background: linear-gradient(135deg, #f6f7fb 0%, #eef0f8 100%);
+    border-radius: 14px;
+    border: 1px solid rgba(26,86,255,0.06);
+    transition: all 0.25s ease;
+}
+.pt-perf-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 18px rgba(26,86,255,0.12);
+}
+
+.pt-perf-icon { font-size: 28px; margin-bottom: 10px; }
+
+.pt-perf-value {
+    font-size: 26px;
+    font-weight: 800;
+    color: #1a56ff;
+    margin-bottom: 6px;
+    font-family: 'Kanit', sans-serif;
+    letter-spacing: -0.5px;
+}
+
+.pt-perf-label {
+    font-size: 11px;
+    color: #777;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-family: 'Kanit', sans-serif;
+}
+
+/* ==================== CERTIFICACIONES ==================== */
+.pt-cert-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pt-cert-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: #f6f7fb;
+    border-radius: 12px;
+    border-left: 3px solid #1a56ff;
+    transition: all 0.22s ease;
+}
+.pt-cert-item:hover {
+    background: #eef2ff;
+    transform: translateX(3px);
+}
+
+.pt-cert-icon { font-size: 26px; flex-shrink: 0; }
+
+.pt-cert-info h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111;
+    font-family: 'Kanit', sans-serif;
+}
+.pt-cert-info p {
+    font-size: 12px;
+    color: #999;
+    font-family: 'Kanit', sans-serif;
+    margin-top: 2px;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+    .pt-container { grid-template-columns: 260px 1fr; gap: 20px; }
+    .pt-main { padding: 140px 24px 60px; }
+    .pt-perf-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+    .pt-container { grid-template-columns: 1fr; }
+    .pt-sidebar { position: static; padding: 28px 24px; }
+    .pt-info-grid { grid-template-columns: 1fr; }
+    .pt-perf-grid { grid-template-columns: repeat(2, 1fr); }
+    .pt-main { padding: 120px 16px 60px; }
+}
+
+@media (max-width: 480px) {
+    .pt-card { padding: 20px 18px; }
+    .pt-perf-grid { grid-template-columns: 1fr 1fr; }
+}

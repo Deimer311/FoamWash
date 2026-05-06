@@ -1,0 +1,479 @@
+/* ==================== 1. RESET Y CONFIGURACIÓN BASE ==================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial Black', Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+    position: relative;
+    /* Sin background: lo maneja index.css (#f0f4f8).
+       El div .background con position:fixed cubre toda la pantalla
+       con la imagen, tapando ese gris. */
+}
+
+/* ==================== 2. FONDO — IGUAL QUE EL INDEX ==================== */
+
+/* Imagen de fondo idéntica al index */
+.background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../../../public/fondo.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -2;
+}
+
+/* Overlay oscuro — mismo gradiente que .hero-overlay en header.css */
+.hero-overlay {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(126, 184, 255, 0.25) 0%, 
+        rgba(126, 184, 255, 0.15) 50%,
+        rgba(10, 25, 60, 0.70) 100% /* Oscurecemos el final para que el footer resalte */
+    );
+    z-index: 1;
+}
+
+/* Partículas decorativas flotantes — misma atmósfera que el canvas del index */
+.background::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 15% 25%, rgba(26, 86, 255, 0.18) 0%, transparent 40%),
+        radial-gradient(circle at 85% 75%, rgba(124, 58, 237, 0.14) 0%, transparent 40%);
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* ==================== 3. LOGO ==================== */
+
+.logo-header {
+    top: 30px;
+    font-size: 32px;
+    font-weight: 900;
+    color: white;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+    z-index: 10;
+    text-decoration: none;
+    letter-spacing: -0.5px;
+    /* Sutil brillo azul en el logo, igual que la paleta del index */
+    filter: drop-shadow(0 0 20px rgba(126, 184, 255, 0.3));
+    transition: filter 0.3s ease;
+}
+
+.logo-header:hover {
+    filter: drop-shadow(0 0 28px rgba(126, 184, 255, 0.5));
+}
+
+/* ==================== 4. TARJETA PRINCIPAL (CARD-WRAPPER) ==================== */
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    position: relative;
+    z-index: 10;
+}
+
+.card-wrapper {
+    display: flex;
+    width: 800px;
+    max-width: 95%;
+    height: 500px;
+    border-radius: 24px;
+    /* Glassmorphism sutil — coherente con el backdrop del header del index */
+    box-shadow:
+        0 24px 64px rgba(0, 0, 0, 0.45),
+        0 0 0 1px rgba(255, 255, 255, 0.07);
+    overflow: hidden;
+    z-index: 5;
+    position: relative;
+    /* Micro-animación de entrada */
+    animation: cardIn 0.55s cubic-bezier(0.34, 1.26, 0.64, 1) both;
+}
+
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Las dos mitades */
+.card-side {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Mitad izquierda — formulario con glassmorphism */
+.form-side {
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* Mitad derecha — toggle */
+.toggle-side {
+    background-color: transparent;
+}
+
+/* ==================== 5. LÓGICA DE TRANSICIÓN Y COLOR ==================== */
+
+.toggle-side::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    /* Gradiente mejorado: blanco puro → azul del index */
+    background: linear-gradient(
+        to right,
+        #ffffff 0%, #ffffff 50%,
+        #1a56ff 50%, #3b82f6 100%
+    );
+    transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+    transform: translateX(-50%);
+}
+
+.card-wrapper.register-active .toggle-side::before {
+    transform: translateX(0%);
+}
+
+/* Contenido toggle */
+.toggle-content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    transition: transform 0.55s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.4s;
+    z-index: 10;
+}
+
+.login-active-content {
+    transform: translateX(0);
+    color: white;
+}
+
+.register-active-content {
+    transform: translateX(100%);
+    opacity: 0;
+    color: #1a1a4e;
+}
+
+.card-wrapper.register-active .login-active-content {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+.card-wrapper.register-active .register-active-content {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* Contenido formulario */
+.form-content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    transition: transform 0.55s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.4s;
+}
+
+.login-view  { transform: translateX(0); opacity: 1; }
+.register-view { transform: translateX(100%); opacity: 0; }
+
+.card-wrapper.register-active .login-view    { transform: translateX(-100%); opacity: 0; }
+.card-wrapper.register-active .register-view { transform: translateX(0); opacity: 1; }
+
+/* ==================== 6. COMPONENTES ==================== */
+
+.title {
+    font-size: 26px;
+    font-weight: 900;
+    margin-bottom: 24px;
+    /* Gradiente en el título para dar carácter — tono azul del index */
+    background: linear-gradient(135deg, #0a1435 0%, #1a56ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.3px;
+}
+
+.toggle-title {
+    font-size: 26px;
+    font-weight: 900;
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
+}
+
+.toggle-text {
+    font-size: 15px;
+    font-weight: normal;
+    line-height: 1.5;
+    margin-bottom: 28px;
+    opacity: 0.9;
+}
+
+/* Botón toggle — outline blanco sobre azul del index */
+.toggle-button {
+    background: rgba(255, 255, 255, 0.95);
+    color: #1a56ff;
+    border: none;
+    padding: 11px 32px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    font-family: 'Kanit', Arial, sans-serif;
+}
+
+.toggle-button:hover {
+    background: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* ── Formularios e Inputs ── */
+
+.form {
+    width: 100%;
+    max-width: 280px;
+    margin-top: 6px;
+}
+
+.input-group {
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+/* Input mejorado — coherente con los del perfil */
+.input-field {
+    width: 100%;
+    padding: 13px 18px;
+    border: 1.5px solid #e0e4ef;
+    border-radius: 12px;
+    font-size: 14px;
+    color: #111;
+    outline: none;
+    background: #f8f9ff;
+    font-weight: 400;
+    font-family: 'Kanit', Arial, sans-serif;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.input-field::placeholder {
+    color: #aab;
+}
+
+.input-field:focus {
+    border-color: #1a56ff;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(26, 86, 255, 0.09);
+}
+
+/* Ajustes para el formulario de Registro */
+.register-view .input-group { margin-bottom: 10px; }
+.register-view .input-field  { padding: 11px 16px; font-size: 13px; }
+.register-view .submit-button { margin-top: 12px; }
+
+/* Enlace olvidé contraseña */
+.forgot-password {
+    text-align: right;
+    width: 100%;
+    max-width: 280px;
+    margin-bottom: 20px;
+    margin-top: -4px;
+}
+
+.forgot-link {
+    font-size: 12px;
+    color: #1a56ff;
+    text-decoration: none;
+    font-family: 'Kanit', Arial, sans-serif;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.forgot-link:hover { color: #0e40d9; text-decoration: underline; }
+
+/* Botón submit — mismo azul del index */
+.submit-button {
+    width: 100%;
+    background: linear-gradient(135deg, #1a56ff 0%, #3b82f6 100%);
+    color: white;
+    border: none;
+    padding: 13px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Kanit', Arial, sans-serif;
+    letter-spacing: 0.2px;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 16px rgba(26, 86, 255, 0.35);
+}
+
+.submit-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(26, 86, 255, 0.45);
+    filter: brightness(1.06);
+}
+
+.submit-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Mensajes de éxito / error */
+.message-area {
+    width: 100%;
+    max-width: 280px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: 'Kanit', Arial, sans-serif;
+    font-weight: 500;
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.success-message {
+    background: #dcfce7;
+    color: #15803d;
+    border-left: 3px solid #22c55e;
+}
+
+.error-message {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-left: 3px solid #ef4444;
+}
+
+/* ── Iconos Sociales ── */
+
+.social-icons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.social-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    text-decoration: none;
+    color: white;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.social-icon:hover {
+    transform: scale(1.12) translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+}
+
+.facebook  { background: #3b5998; }
+.whatsapp  { background: #25d366; }
+.instagram { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); overflow: hidden; }
+
+.social-icon svg { fill: white; width: 22px; height: 22px; }
+
+/* ==================== 7. RESPONSIVE ==================== */
+
+@media (max-width: 850px) {
+    .card-wrapper {
+        width: 400px;
+        height: auto;
+        flex-direction: column;
+        overflow: visible;
+    }
+
+    .card-side {
+        width: 100%;
+        height: auto;
+        min-height: 250px;
+    }
+
+    .toggle-side {
+        order: -1;
+        padding: 40px 30px;
+        border-radius: 24px 24px 0 0;
+        background: linear-gradient(135deg, #1a56ff, #3b82f6);
+        color: white;
+    }
+
+    .toggle-side::before { content: none; }
+
+    .form-side {
+        border-radius: 0 0 24px 24px;
+        padding-top: 50px;
+        padding-bottom: 50px;
+        min-height: 500px;
+    }
+
+    .card-wrapper.register-active .toggle-side {
+        background: white;
+        color: #1a1a4e;
+        border-bottom: 1px solid #eef0f8;
+    }
+
+    .form-content, .toggle-content {
+        position: static;
+        transform: none;
+        opacity: 1;
+        transition: none;
+    }
+
+    .register-view, .register-active-content { display: none; }
+
+    .card-wrapper.register-active .register-view,
+    .card-wrapper.register-active .register-active-content { display: flex; }
+
+    .card-wrapper.register-active .login-view,
+    .card-wrapper.register-active .login-active-content { display: none; }
+}
+
+@media (max-width: 480px) {
+    .card-wrapper { width: 100%; border-radius: 20px; }
+    .toggle-side  { border-radius: 20px 20px 0 0; }
+    .form-side    { border-radius: 0 0 20px 20px; }
+    .logo-header  { font-size: 26px; }
+}
