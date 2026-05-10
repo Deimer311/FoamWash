@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/Api/api_constants.dart';
 import 'package:foamwash/Features/auth_login/login_screen.dart';
+import '../widgets/admin_drawer.dart';
 
 class AdminDashboardView extends StatefulWidget {
   const AdminDashboardView({super.key});
@@ -108,39 +109,9 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _bgField,
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: _primaryDark),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  CircleAvatar(backgroundColor: Colors.white, radius: 24, child: Icon(Icons.person, color: _primaryDark)),
-                  SizedBox(height: 12),
-                  Text('Administrador', style: TextStyle(color: Colors.white, fontFamily: 'Kanit', fontSize: 18)),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.calendar_month, color: _primary),
-              title: const Text('Agenda', style: TextStyle(fontFamily: 'Kanit', fontSize: 16)),
-              onTap: () {
-                Navigator.pop(context); // Cerrar el drawer
-                Navigator.pushNamed(context, '/admin_agenda');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.redAccent),
-              title: const Text('Cerrar sesión', style: TextStyle(fontFamily: 'Kanit', fontSize: 16, color: Colors.redAccent)),
-              onTap: _logout,
-            ),
-          ],
-        ),
-      ),
+      endDrawer: AdminDrawer(),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: _primaryDark,
         elevation: 0,
         title: RichText(
@@ -156,7 +127,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
           Builder(
             builder: (context) => IconButton(
               icon: const Icon(Icons.menu, color: Colors.white, size: 28),
-              onPressed: () => Scaffold.of(context).openDrawer(),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
             ),
           ),
           Padding(
@@ -229,7 +200,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                         const SizedBox(height: 32),
                         
                         // ── EMPLEADOS ACTIVOS ──
-                        _buildSectionHeader('Empleados activos', Icons.people_outline, onAction: () {}),
+                        _buildSectionHeader('Empleados activos', Icons.people_outline, onAction: () => Navigator.pushNamed(context, '/admin_empleados')),
                         const SizedBox(height: 12),
                         _buildEmpleadosList(),
                       ],

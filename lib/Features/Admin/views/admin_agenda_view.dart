@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/Api/api_constants.dart';
+import '../widgets/admin_drawer.dart';
 
 class AdminAgendaView extends StatefulWidget {
   const AdminAgendaView({super.key});
@@ -87,7 +88,9 @@ class _AdminAgendaViewState extends State<AdminAgendaView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _bgField,
+      endDrawer: AdminDrawer(),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: _primaryDark,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -95,6 +98,15 @@ class _AdminAgendaViewState extends State<AdminAgendaView> {
           'Agenda de Reservas',
           style: TextStyle(fontFamily: 'Kanit', fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white),
         ),
+        actions: [
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white, size: 28),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: _primary))

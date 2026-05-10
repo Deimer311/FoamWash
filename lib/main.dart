@@ -9,6 +9,10 @@ import 'package:foamwash/Features/Services/providers/services_provider.dart';
 import 'package:foamwash/Features/auth_login/providers/auth_provider.dart';
 import 'package:foamwash/Features/Admin/views/admin_dashboard_view.dart';
 import 'package:foamwash/Features/Admin/views/admin_agenda_view.dart';
+import 'package:foamwash/Features/Admin/views/admin_empleados_view.dart';
+import 'package:foamwash/Features/Admin/views/admin_usuarios_view.dart';
+import 'package:foamwash/Features/Admin/providers/empleados_provider.dart';
+import 'package:foamwash/Features/Admin/providers/usuarios_provider.dart';
 
 import 'package:foamwash/Features/auth_login/data/data_sources/auth_remote_data_source.dart';
 import 'package:foamwash/Features/auth_login/data/repositories/auth_repository.dart';
@@ -32,6 +36,8 @@ class MyApp extends StatelessWidget {
           create: (_) => AuthProvider(repository: authRepository)..checkAuthStatus(),
         ),
         ChangeNotifierProvider(create: (_) => ServicesProvider()),
+        ChangeNotifierProvider(create: (_) => EmpleadosProvider()),
+        ChangeNotifierProvider(create: (_) => UsuariosProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -48,6 +54,8 @@ class MyApp extends StatelessWidget {
           '/scheduling': (context) => const SchedulingView(),
           '/admin_dashboard': (context) => const AdminDashboardView(),
           '/admin_agenda': (context) => const AdminAgendaView(),
+          '/admin_empleados': (context) => const AdminEmpleadosView(),
+          '/admin_usuarios': (context) => const AdminUsuariosView(),
         },
       ),
     );
