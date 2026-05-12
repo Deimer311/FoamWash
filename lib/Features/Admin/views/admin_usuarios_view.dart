@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/usuarios_provider.dart';
 import '../widgets/admin_drawer.dart';
 import '../widgets/add_usuario_dialog.dart';
+import '../widgets/edit_usuario_dialog.dart';
 
 class AdminUsuariosView extends StatefulWidget {
   const AdminUsuariosView({super.key});
@@ -28,6 +29,36 @@ class _AdminUsuariosViewState extends State<AdminUsuariosView> {
     );
   }
 
+  void _confirmarEliminar(dynamic user) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmar eliminación'),
+        content: Text('¿Estás seguro de que deseas eliminar a ${user['Nombre']}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () {
+              context.read<UsuariosProvider>().deleteUsuario(user['Id_Usuario']);
+              Navigator.pop(context);
+            },
+            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _mostrarDialogoEditar(dynamic user) {
+    showDialog(
+      context: context,
+      builder: (context) => EditUsuarioDialog(usuario: user),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     const Color primaryDark = Color(0xFF15192C);
@@ -35,7 +66,7 @@ class _AdminUsuariosViewState extends State<AdminUsuariosView> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      endDrawer: AdminDrawer(),
+      endDrawer: const AdminDrawer(),
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: primaryDark,
@@ -160,27 +191,31 @@ class _AdminUsuariosViewState extends State<AdminUsuariosView> {
                 Row(
                   children: [
                     Text(
-                      '#${user['N_Documento'] ?? '0000'}',
+                      '#${user['Id_Usuario'] ?? index}',
                       style: const TextStyle(fontSize: 10, color: Colors.grey),
                     ),
                     const SizedBox(width: 8),
-                    Text(
-                      user['Correo'] ?? '',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1A56FF),
+                    Expanded(
+                      child: Text(
+                        user['Nombre'] ?? 'Sin nombre',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1A56FF),
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ),
                     const SizedBox(width: 10),
-                    const Text(
-                      '123456', // Placeholder de la imagen
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                    Text(
+                      user['Telefono'] ?? 'Sin tel',
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
                 Text(
-                  user['Correo'] ?? '', // El email aparece de nuevo en la imagen
+                  user['Correo'] ?? '',
                   style: const TextStyle(fontSize: 10, color: Colors.blueGrey),
                 ),
               ],
@@ -188,13 +223,11 @@ class _AdminUsuariosViewState extends State<AdminUsuariosView> {
           ),
           IconButton(
             icon: const Icon(Icons.edit_note, color: Colors.blueAccent),
-            onPressed: () {},
+            onPressed: () => _mostrarDialogoEditar(user),
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-            onPressed: () {
-              context.read<UsuariosProvider>().deleteUsuario(user['Id_Usuario']);
-            },
+            onPressed: () => _confirmarEliminar(user),
           ),
         ],
       ),

@@ -75,6 +75,45 @@ class UsuariosProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> updateUsuario(int id, Map<String, dynamic> data) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+      final cookieToken = prefs.getString('cookie_token');
+
+      Map<String, String> headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+      if (cookieToken != null) headers['Cookie'] = cookieToken;
+
+      final response = await http.put(
+        Uri.parse('${ApiConstants.getUsuariosEndpoint}/$id'),
+        headers: headers,
+        body: json.encode(data),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        await fetchUsuarios();
+        return true;
+      } else {
+        final errorData = json.decode(response.body);
+        _error = errorData['message'] ?? 'Error al actualizar usuario';
+        return false;
+      }
+    } catch (e) {
+      _error = 'Error de conexión: $e';
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<bool> crearUsuario({
     required String nombre,
     required String correo,

@@ -10,7 +10,7 @@ class ServiceModel {
   @JsonKey(name: 'Nombre_Servicio')
   final String nombreServicio;
 
-  @JsonKey(name: 'Precio')
+  @JsonKey(name: 'Precio', fromJson: _precioFromJson)
   final String precio;
 
   @JsonKey(name: 'descripcion')
@@ -19,7 +19,7 @@ class ServiceModel {
   @JsonKey(name: 'imagen_url')
   final String? imagenUrl;
 
-  @JsonKey(name: 'estado')
+  @JsonKey(name: 'estado', defaultValue: 'activo')
   final String estado;
 
   @JsonKey(name: 'duracion_estimada')
@@ -31,9 +31,14 @@ class ServiceModel {
     required this.precio,
     required this.descripcion,
     this.imagenUrl,
-    required this.estado,
+    this.estado = 'activo',
     this.duracionEstimada,
   });
+
+  static String _precioFromJson(dynamic value) {
+    if (value == null) return '0.00';
+    return value.toString();
+  }
 
   factory ServiceModel.fromJson(Map<String, dynamic> json) => _$ServiceModelFromJson(json);
 

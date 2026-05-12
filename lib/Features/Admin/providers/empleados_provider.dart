@@ -25,13 +25,19 @@ class EmpleadosProvider with ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
+      final cookieToken = prefs.getString('cookie_token');
+
+      Map<String, String> headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+      if (cookieToken != null && cookieToken.isNotEmpty) {
+        headers['Cookie'] = cookieToken;
+      }
 
       final response = await http.get(
         Uri.parse(ApiConstants.getEmpleadosEndpoint),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
+        headers: headers,
       );
 
       if (response.statusCode == 200) {
@@ -64,10 +70,21 @@ class EmpleadosProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      // Usamos el endpoint de registro, pero inyectamos el role = 'empleado'
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+      final cookieToken = prefs.getString('cookie_token');
+
+      Map<String, String> headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+      if (cookieToken != null && cookieToken.isNotEmpty) {
+        headers['Cookie'] = cookieToken;
+      }
+
       final response = await http.post(
         Uri.parse(ApiConstants.registerEndpoint),
-        headers: {'Content-Type': 'application/json'},
+        headers: headers,
         body: json.encode({
           'nombre': nombre,
           'correo': correo,
