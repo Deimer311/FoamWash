@@ -5,6 +5,7 @@ import 'package:foamwash/Features/Services/controllers/scheduling_controller.dar
 import 'package:foamwash/Features/Services/providers/services_provider.dart';
 import 'package:foamwash/Features/auth_login/providers/auth_provider.dart';
 import 'package:foamwash/Features/Services/widgets/service_card.dart';
+import 'package:foamwash/Features/Services/widgets/footer_widget.dart';
 
 // Vista principal de agendamiento para usuarios autenticados.
 // Construye el catalogo de servicios dinamicamente consumiendo el API a traves de FutureBuilder.
@@ -38,7 +39,6 @@ class _SchedulingViewState extends State<SchedulingView> {
         child: Column(
           children: [
             _buildAppBar(),
-            _buildSearchBar(),
             Expanded(
               child: _buildServicesList(),
             ),
@@ -120,93 +120,216 @@ class _SchedulingViewState extends State<SchedulingView> {
   Widget _buildAppBar() {
     return Container(
       color: AppTheme.appBarDark,
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
-            'FoamWashCL',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+          // ── Logo FW (badge cuadrado redondeado, igual al web) ──
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              gradient: AppTheme.buttonGradient,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Center(
+              child: Text(
+                'FW',
+                style: TextStyle(
+                  fontFamily: 'Kanit',
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  letterSpacing: 0.5,
+                ),
+              ),
             ),
           ),
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.menu, color: Colors.white, size: 28),
-                onPressed: () {
-                  _scaffoldKey.currentState?.openDrawer();
-                },
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-              const SizedBox(width: 16),
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  shape: BoxShape.circle,
+          const SizedBox(width: 10),
+
+          // ── Título FoamWash^CL ──
+          RichText(
+            text: const TextSpan(
+              children: [
+                TextSpan(
+                  text: 'FoamWash',
+                  style: TextStyle(
+                    fontFamily: 'Kanit',
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    letterSpacing: 0.2,
+                  ),
                 ),
-                child: const Icon(Icons.person, color: Colors.grey, size: 20),
+                TextSpan(
+                  text: 'CL',
+                  style: TextStyle(
+                    fontFamily: 'Kanit',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF93C5FD), // azul claro como en el web
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const Spacer(),
+
+          // ── Icono menu hamburguesa ──
+          GestureDetector(
+            onTap: () => _scaffoldKey.currentState?.openDrawer(),
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              child: const Icon(Icons.menu_rounded,
+                  color: Colors.white70, size: 24),
+            ),
+          ),
+          const SizedBox(width: 10),
+
+          // ── Avatar circular (igual al web) ──
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.10),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white.withOpacity(0.25),
+                width: 1.5,
               ),
-            ],
-          )
+            ),
+            child: const Icon(
+              Icons.person_rounded,
+              color: Colors.white70,
+              size: 20,
+            ),
+          ),
         ],
       ),
     );
   }
 
+
   Widget _buildSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
       child: TextField(
+        style: const TextStyle(
+            fontFamily: 'Kanit',
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            color: AppTheme.darkText),
         decoration: InputDecoration(
-          hintText: 'Buscar servicios',
-          hintStyle: const TextStyle(color: AppTheme.greyText, fontSize: 14),
+          hintText: 'Buscar servicios: muebles, colchones, tapicería, carros...',
+          hintStyle: const TextStyle(
+              fontFamily: 'Kanit',
+              color: AppTheme.greyText,
+              fontSize: 13,
+              fontWeight: FontWeight.w400),
+          // Icono de búsqueda a la derecha (igual que el web)
+          suffixIcon: const Padding(
+            padding: EdgeInsets.only(right: 14),
+            child: Icon(Icons.search_rounded,
+                color: AppTheme.greyText, size: 20),
+          ),
+          suffixIconConstraints:
+              const BoxConstraints(minWidth: 44, minHeight: 44),
           filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+          fillColor: const Color(0xFFF8FAFF),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 14, horizontal: 22),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
+            borderRadius: BorderRadius.circular(40),
+            borderSide: BorderSide(color: Colors.grey.shade200, width: 1.5),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 2),
+            borderRadius: BorderRadius.circular(40),
+            borderSide:
+                const BorderSide(color: AppTheme.primaryBlue, width: 1.8),
           ),
         ),
       ),
     );
   }
 
+
   Widget _buildServicesList() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 16.0),
-          child: Text(
-            'Nuestros Servicios',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-              color: AppTheme.darkText,
+    return Consumer<ServicesProvider>(
+      builder: (context, provider, child) {
+        return CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: _buildSearchBar(),
             ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        Expanded(
-          child: Consumer<ServicesProvider>(
-            builder: (context, provider, child) {
-              if (provider.isLoading) {
-                return const Center(
+            SliverToBoxAdapter(
+              child: Container(
+                color: AppTheme.backgroundWhite,
+                padding: const EdgeInsets.fromLTRB(20, 28, 20, 20),
+                child: Column(
+                  children: [
+                    const Text(
+                      'Nuestros Servicios',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Kanit',
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
+                        color: AppTheme.darkText,
+                        letterSpacing: -0.5,
+                        height: 1.1,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 0,
+                      children: const [
+                        Text('Profesionales certificados',
+                            style: TextStyle(
+                              fontFamily: 'Kanit',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF94A3B8),
+                            )),
+                        Text(' · ',
+                            style: TextStyle(
+                                fontSize: 12, color: AppTheme.greyText)),
+                        Text('Productos ecológicos',
+                            style: TextStyle(
+                              fontFamily: 'Kanit',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF94A3B8),
+                            )),
+                        Text(' · ',
+                            style: TextStyle(
+                                fontSize: 12, color: AppTheme.greyText)),
+                        Text('Garantía de satisfacción',
+                            style: TextStyle(
+                              fontFamily: 'Kanit',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF94A3B8),
+                            )),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (provider.isLoading)
+              const SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(
                   child: CircularProgressIndicator(color: AppTheme.primaryBlue),
-                );
-              } else if (provider.error != null) {
-                return Center(
+                ),
+              )
+            else if (provider.error != null)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -226,32 +349,38 @@ class _SchedulingViewState extends State<SchedulingView> {
                       )
                     ],
                   ),
-                );
-              } else if (provider.services.isEmpty) {
-                return const Center(
+                ),
+              )
+            else if (provider.services.isEmpty)
+              const SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(
                   child: Text(
                     'No hay servicios disponibles en este momento.',
                     style: TextStyle(color: AppTheme.greyText),
                   ),
-                );
-              }
-
-              final services = provider.services;
-              return ListView.builder(
+                ),
+              )
+            else
+              SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                itemCount: services.length,
-                itemBuilder: (context, index) {
-                  return ServiceCard(
-                    service: services[index],
-                    isGuest: false,
-                    controller: _controller,
-                  );
-                },
-              );
-            },
-          ),
-        ),
-      ],
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => ServiceCard(
+                      service: provider.services[index],
+                      isGuest: false,
+                      controller: _controller,
+                    ),
+                    childCount: provider.services.length,
+                  ),
+                ),
+              ),
+            const SliverToBoxAdapter(
+              child: AppFooter(),
+            ),
+          ],
+        );
+      },
     );
   }
 }

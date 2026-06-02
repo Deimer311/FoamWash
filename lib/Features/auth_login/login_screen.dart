@@ -91,33 +91,10 @@ class _LoginScreenState extends State<LoginScreen>
               fit: BoxFit.cover,
             ),
           ),
-          // Overlay azul degradado — idéntico al hero-overlay del web
+          // Overlay azul oscuro para dar protagonismo a los contenedores
           Positioned.fill(
             child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0x407EB8FF),  // rgba(126,184,255,0.25)
-                    Color(0x267EB8FF),  // rgba(126,184,255,0.15)
-                    Color(0xB20A193C),  // rgba(10,25,60,0.70)
-                  ],
-                  stops: [0.0, 0.5, 1.0],
-                ),
-              ),
-            ),
-          ),
-          // Manchas decorativas radiales (background::after)
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: RadialGradient(
-                  center: Alignment(-0.7, -0.5),
-                  radius: 0.8,
-                  colors: [Color(0x2E1A56FF), Colors.transparent],
-                ),
-              ),
+              color: const Color(0xCC071230), // azul muy oscuro, ~80% opacidad
             ),
           ),
 
@@ -125,11 +102,15 @@ class _LoginScreenState extends State<LoginScreen>
           SafeArea(
             child: FadeTransition(
               opacity: _fadeIn,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 36),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height,
+                ),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 36),
 
                     // Logo FoamWash
                     const Text(
@@ -289,6 +270,7 @@ class _LoginScreenState extends State<LoginScreen>
               ),
             ),
           ),
+        ),
         ],
       ),
     );

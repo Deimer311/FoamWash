@@ -61,6 +61,12 @@ class AdminDrawer extends StatelessWidget {
             title: 'Usuarios',
             route: '/admin_usuarios',
           ),
+          _buildItem(
+            context,
+            icon: Icons.analytics_outlined,
+            title: 'Reportes',
+            route: '/admin_reportes',
+          ),
           const Spacer(),
           const Divider(height: 1),
           ListTile(

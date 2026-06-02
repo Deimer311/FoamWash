@@ -1,11 +1,16 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/Features/auth_login/data/data_sources/auth_remote_data_source.dart';
 import 'package:foamwash/Features/auth_login/data/models/user_model.dart';
+import 'package:foamwash/core/cache/secure_storage_service.dart';
 
 class AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
+  final SecureStorageService secureStorageService;
 
-  AuthRepository({required this.remoteDataSource});
+  AuthRepository({
+    required this.remoteDataSource,
+    required this.secureStorageService,
+  });
 
   /// Maneja el flujo de login: Petición -> Almacenamiento local -> Retorno de Modelo
   Future<UserModel> login(String email, String password) async {
@@ -20,18 +25,19 @@ class AuthRepository {
     // El usuario viene dentro de 'data' (no 'user')
     final Map<String, dynamic> userData = data['data'] ?? {};
 
-    // Guardar información en SharedPreferences (Persistencia)
+    // Guardar tokens y cookies confidenciales de forma segura
+    await secureStorageService.write('token', token);
+    
+    final rawCookie = headers['set-cookie'];
+    if (rawCookie != null) {
+      await secureStorageService.write('cookie_token', rawCookie);
+    }
+
+    // Guardar información no confidencial de persistencia en SharedPreferences (Persistencia)
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('token', token);
     await prefs.setString('userEmail', email);
     await prefs.setString('userRole', userData['rol'] ?? '');
     await prefs.setBool('isLogged', true);
-
-    // Guardar cookie si existe (importante en tu backend para evitar 401)
-    final rawCookie = headers['set-cookie'];
-    if (rawCookie != null) {
-      await prefs.setString('cookie_token', rawCookie);
-    }
 
     // Construimos el UserModel con los campos que devuelve la API
     return UserModel(
@@ -44,6 +50,10 @@ class AuthRepository {
   }
 
   Future<void> logout() async {
+    // Limpiar almacenamiento cifrado
+    await secureStorageService.clearAll();
+
+    // Limpiar preferencias generales
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
   }

@@ -4,6 +4,7 @@ import '../providers/usuarios_provider.dart';
 import '../widgets/admin_drawer.dart';
 import '../widgets/add_usuario_dialog.dart';
 import '../widgets/edit_usuario_dialog.dart';
+import 'package:foamwash/core/utils/security_utils.dart';
 
 class AdminUsuariosView extends StatefulWidget {
   const AdminUsuariosView({super.key});
@@ -16,9 +17,16 @@ class _AdminUsuariosViewState extends State<AdminUsuariosView> {
   @override
   void initState() {
     super.initState();
+    SecurityUtils.secureScreen();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<UsuariosProvider>().fetchUsuarios();
     });
+  }
+
+  @override
+  void dispose() {
+    SecurityUtils.clearSecureScreen();
+    super.dispose();
   }
 
   void _mostrarDialogoAgregar() {

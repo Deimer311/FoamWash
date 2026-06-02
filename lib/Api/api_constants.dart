@@ -1,13 +1,16 @@
 class ApiConstants {
-  // NOTA: Usa '10.0.2.2' en lugar de la IP si pruebas en emulador Android
-  // Si pruebas en un dispositivo físico, usa la IP de tu computadora (ej: '192.168.80.28')
-  static const String baseUrl = 'http://192.168.137.8:5000/api';
+  // Obtenemos la URL del backend en tiempo de compilación para no dejarla hardcodeada.
+  // Ejemplo: flutter run --dart-define=BACKEND_URL=https://api.foamwash.com/api
+  static const String baseUrl = String.fromEnvironment(
+    'BACKEND_URL',
+    defaultValue: 'http://192.168.137.148:5000/api',
+  );
 
-  
 
 
 
 
+     
 
 
 

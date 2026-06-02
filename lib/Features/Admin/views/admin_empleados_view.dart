@@ -4,6 +4,7 @@ import '../providers/empleados_provider.dart';
 import '../widgets/empleado_flip_card.dart';
 import '../widgets/add_empleado_dialog.dart';
 import '../widgets/admin_drawer.dart';
+import 'package:foamwash/core/utils/security_utils.dart';
 
 class AdminEmpleadosView extends StatefulWidget {
   const AdminEmpleadosView({super.key});
@@ -16,9 +17,16 @@ class _AdminEmpleadosViewState extends State<AdminEmpleadosView> {
   @override
   void initState() {
     super.initState();
+    SecurityUtils.secureScreen();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<EmpleadosProvider>().fetchEmpleados();
     });
+  }
+
+  @override
+  void dispose() {
+    SecurityUtils.clearSecureScreen();
+    super.dispose();
   }
 
   void _mostrarDialogoAgregar() {

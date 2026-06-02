@@ -39,6 +39,19 @@ dependencies:
   provider: ^6.1.5+1
   json_annotation: ^4.9.0
   freezed_annotation: ^2.4.4
+  intl: ^0.20.2
+  fpdart: ^1.2.0
+  equatable: ^2.0.8
+  internet_connection_checker_plus: ^3.0.0
+  dio: ^5.9.2
+  dio_cache_interceptor: ^3.5.1
+  dio_cache_interceptor_hive_store: ^4.0.0
+  hive_flutter: ^1.1.0
+  cached_network_image: ^3.4.1
+  connectivity_plus: ^7.1.1
+  path_provider: ^2.1.5
+  flutter_secure_storage: ^9.2.2
+  no_screenshot: ^1.1.0
 
 dev_dependencies:
   flutter_test:
@@ -60,14 +73,22 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - assets/fondo.png
+    - assets/
+    - assets/gallery/
 
   fonts:
     - family: Kanit
       fonts:
         - asset: assets/fonts/Kanit-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Kanit-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Kanit-SemiBold.ttf
+          weight: 600
         - asset: assets/fonts/Kanit-Bold.ttf
           weight: 700
+        - asset: assets/fonts/Kanit-ExtraBold.ttf
+          weight: 800
         - asset: assets/fonts/Kanit-Black.ttf
           weight: 900
   # To add assets to your application, add an assets section, like this:

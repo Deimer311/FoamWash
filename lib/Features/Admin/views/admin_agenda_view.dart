@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/Api/api_constants.dart';
 import '../widgets/admin_drawer.dart';
+import 'package:foamwash/core/utils/security_utils.dart';
 
 class AdminAgendaView extends StatefulWidget {
   const AdminAgendaView({super.key});
@@ -27,8 +28,15 @@ class _AdminAgendaViewState extends State<AdminAgendaView> {
   @override
   void initState() {
     super.initState();
+    SecurityUtils.secureScreen();
     _checkAccess();
     _fetchData();
+  }
+
+  @override
+  void dispose() {
+    SecurityUtils.clearSecureScreen();
+    super.dispose();
   }
 
   Future<void> _checkAccess() async {

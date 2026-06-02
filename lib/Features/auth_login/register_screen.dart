@@ -117,31 +117,10 @@ class _RegisterScreenState extends State<RegisterScreen>
               fit: BoxFit.cover,
             ),
           ),
+          // Overlay azul oscuro para dar protagonismo a los contenedores
           Positioned.fill(
             child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0x407EB8FF),
-                    Color(0x267EB8FF),
-                    Color(0xB20A193C),
-                  ],
-                  stops: [0.0, 0.5, 1.0],
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: RadialGradient(
-                  center: Alignment(-0.7, -0.5),
-                  radius: 0.8,
-                  colors: [Color(0x2E1A56FF), Colors.transparent],
-                ),
-              ),
+              color: const Color(0xCC071230), // azul muy oscuro, ~80% opacidad
             ),
           ),
 
@@ -149,11 +128,15 @@ class _RegisterScreenState extends State<RegisterScreen>
           SafeArea(
             child: FadeTransition(
               opacity: _fadeIn,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 36),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height,
+                ),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 36),
 
                     // Logo
                     const Text(
@@ -313,15 +296,12 @@ class _RegisterScreenState extends State<RegisterScreen>
               ),
             ),
           ),
+        ),
         ],
       ),
     );
   }
 }
-
-// =============================================================================
-// WIDGETS REUTILIZABLES (duplicados aquí por independencia de archivos)
-// =============================================================================
 
 class _InputField extends StatelessWidget {
   final TextEditingController controller;

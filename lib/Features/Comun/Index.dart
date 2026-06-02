@@ -1,73 +1,43 @@
 // =============================================================================
 // ARCHIVO  : index_screen.dart
 // PROYECTO : FoamWash
-// DESCRIPCIÓN: Vista principal del home — Rediseño minimalista mobile-first
-//              inspirado en el mockup web (Header.jsx + MainContent.jsx)
+// DESCRIPCIÓN: Vista principal — réplica exacta del diseño objetivo
 // =============================================================================
 
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:foamwash/Features/auth_login/login_screen.dart';
 import 'package:foamwash/Features/auth_login/providers/auth_provider.dart';
 
 // ─────────────────────────── PALETA ───────────────────────────
-const _kBlue       = Color(0xFF1A56FF);
-const _kBlueDark   = Color(0xFF0E40D9);
-const _kBlueSoft   = Color(0xFF7EB8FF);
-const _kOverlay    = Color(0x80000000);
-const _kWhite      = Colors.white;
-const _kTextLight  = Color(0xCCFFFFFF);
-const _kTextMuted  = Color(0x80FFFFFF);
-const _kNavBg      = Color(0xD90A1437);   // rgba(10,20,55,0.85)
-const _kFooterBg   = Color(0xBF05080D);   // rgba(5,12,35,0.75)
-const _kFbBlue     = Color(0xFF1877F2);
-const _kWaGreen    = Color(0xFF25D366);
-const _kKanit      = 'Kanit';
-
-// ─────────────────────── DATOS SLIDES ─────────────────────────
-class _SlideData {
-  final String title;
-  final String body;
-  const _SlideData({required this.title, required this.body});
-}
-
-const _slides = [
-  _SlideData(
-    title: 'Lavados González',
-    body: 'Lavados y Limpieza profunda... Ofrecemos servicios de limpieza profunda, cuidando cada material con profesionalismo y delicadeza.',
-  ),
-  _SlideData(
-    title: 'Visión',
-    body: 'Queremos convertirnos en la empresa con mayor clientela en limpieza. Para 2026 aumentar nuestra clientela al doble de la actual.',
-  ),
-  _SlideData(
-    title: 'Misión',
-    body: 'Ser líderes en soluciones de limpieza para el hogar y la industria, con enfoque en la calidad y la sostenibilidad.',
-  ),
-];
+const _kBlue      = Color(0xFF1A56FF);
+const _kBlueSoft  = Color(0xFF7EB8FF);
+const _kWhite     = Colors.white;
+const _kTextLight = Color(0xCCFFFFFF);
+const _kTextMuted = Color(0x80FFFFFF);
+const _kNavBg     = Color(0xD90A1437);
+const _kFooterBg  = Color(0xBF05080D);
+const _kFbBlue    = Color(0xFF1877F2);
+const _kWaGreen   = Color(0xFF25D366);
+const _kKanit     = 'Kanit';
 
 // ─────────────────────── DATOS GALERÍA ────────────────────────
+// Agrega tus imágenes en assets/gallery/ y declara el path aquí
 class _GalleryItem {
-  final String imageUrl;
+  final String assetPath;
   final String title;
-  const _GalleryItem({required this.imageUrl, required this.title});
+  const _GalleryItem({required this.assetPath, required this.title});
 }
 
 const _gallery = [
-  _GalleryItem(
-    imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600',
-    title: 'Lavado de muebles',
-  ),
-  _GalleryItem(
-    imageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?w=600',
-    title: 'Lavado de colchones',
-  ),
-  _GalleryItem(
-    imageUrl: 'https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?w=600',
-    title: 'Limpieza sillas de comedor',
-  ),
+  _GalleryItem(assetPath: 'assets/imag1.jpg',   title: 'Lavado de muebles'),
+  _GalleryItem(assetPath: 'assets/imag2.jpg',   title: 'Limpieza de sillas de comedor'),
+  _GalleryItem(assetPath: 'assets/imag6.jpg',   title: 'Desinfección profunda'),
+  _GalleryItem(assetPath: 'assets/imag4.jpg', title: 'Lavado de alfombras'),
+  _GalleryItem(assetPath: 'assets/imag7.jpg',    title: 'Limpieza de Alfombras'),
 ];
 
 const _waNumber = '573144368571';
@@ -86,68 +56,36 @@ class IndexScreen extends StatefulWidget {
 class _IndexScreenState extends State<IndexScreen>
     with TickerProviderStateMixin {
 
-  // ── Slides de texto ──
-  int   _slideIndex = 0;
-  Timer? _slideTimer;
-  late AnimationController _slideAnim;
-  late Animation<double>   _slideFade;
-  late Animation<Offset>   _slideOffset;
-
-  // ── Galería ──
-  int   _galleryIndex = 0;
+  int    _galleryIndex = 0;
   Timer? _galleryTimer;
   late AnimationController _galleryAnim;
   late Animation<double>   _galleryFade;
 
-  // ── Shimmer de fondo ──
   late AnimationController _shimmerAnim;
 
-  // ── Modal WhatsApp ──
-  bool   _showWaModal = false;
-  final  _msgController = TextEditingController();
+  bool  _showWaModal = false;
+  final _msgController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
 
-    // Slide texto
-    _slideAnim = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 600));
-    _slideFade   = CurvedAnimation(parent: _slideAnim, curve: Curves.easeOut);
-    _slideOffset = Tween<Offset>(begin: const Offset(0, 0.12), end: Offset.zero)
-        .animate(CurvedAnimation(parent: _slideAnim, curve: Curves.easeOut));
-    _slideAnim.forward();
-    _slideTimer =
-        Timer.periodic(const Duration(seconds: 7), (_) => _nextSlide());
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+    ));
 
-    // Galería
     _galleryAnim = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 700));
+        vsync: this, duration: const Duration(milliseconds: 600));
     _galleryFade =
         CurvedAnimation(parent: _galleryAnim, curve: Curves.easeInOut);
     _galleryAnim.forward();
     _galleryTimer =
         Timer.periodic(const Duration(seconds: 5), (_) => _nextGallery());
 
-    // Shimmer
     _shimmerAnim =
         AnimationController(vsync: this, duration: const Duration(seconds: 4))
           ..repeat();
-  }
-
-  void _nextSlide() {
-    _slideAnim.reverse().then((_) {
-      setState(() => _slideIndex = (_slideIndex + 1) % _slides.length);
-      _slideAnim.forward();
-    });
-  }
-
-  void _goToSlide(int i) {
-    if (i == _slideIndex) return;
-    _slideAnim.reverse().then((_) {
-      setState(() => _slideIndex = i);
-      _slideAnim.forward();
-    });
   }
 
   void _nextGallery() {
@@ -167,16 +105,13 @@ class _IndexScreenState extends State<IndexScreen>
 
   @override
   void dispose() {
-    _slideTimer?.cancel();
     _galleryTimer?.cancel();
-    _slideAnim.dispose();
     _galleryAnim.dispose();
     _shimmerAnim.dispose();
     _msgController.dispose();
     super.dispose();
   }
 
-  // ─────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -184,44 +119,44 @@ class _IndexScreenState extends State<IndexScreen>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // ── Fondo hero ──
+          // Fondo hero con imagen
           _HeroBackground(shimmer: _shimmerAnim),
 
-          // ── Overlay oscuro ──
-          Container(color: _kOverlay),
-
-          // ── Overlay azulado (igual que en la web) ──
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0x407EB8FF),
-                  Color(0x267EB8FF),
-                  Color(0xB20A193C),
-                ],
-                stops: [0.0, 0.5, 1.0],
-              ),
+          // Overlay azul oscuro — mismo que login_screen
+          Positioned.fill(
+            child: Container(
+              color: const Color(0xCC071230),
             ),
           ),
 
-          // ── Layout fijo: header | centro | footer ──
+          // Layout principal
           SafeArea(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _buildHeader(context),
+
+                // Cuerpo distribuido con Spacer para que respiren
                 Expanded(
-                  child: Center(
-                    child: _buildHeroContent(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Spacer(flex: 3),
+                      _buildHeroText(),
+                      const Spacer(flex: 3),
+                      _buildCTAButton(),
+                      const Spacer(flex: 3),
+                      _buildGallerySection(),
+                      const Spacer(flex: 4),
+                    ],
                   ),
                 ),
+
                 _buildFooter(),
               ],
             ),
           ),
 
-          // ── Modal WhatsApp ──
           if (_showWaModal) _buildWaModal(),
         ],
       ),
@@ -229,123 +164,119 @@ class _IndexScreenState extends State<IndexScreen>
   }
 
   // ══════════════════════════════════════════════
-  //  HEADER  —  logo centrado + login a la derecha
+  //  HEADER
   // ══════════════════════════════════════════════
   Widget _buildHeader(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, auth, child) {
         return Container(
-          height: 64,
           decoration: const BoxDecoration(
             color: _kNavBg,
             border: Border(
               bottom: BorderSide(color: Color(0x14FFFFFF), width: 1),
             ),
           ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Logo centrado
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'FoamWash',
-                    style: TextStyle(
-                      fontFamily: _kKanit,
-                      color: _kWhite,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.5,
-                    ),
+              Positioned(
+                left: 0,
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.10),
+                    border: Border.all(color: Colors.white.withOpacity(0.20)),
                   ),
-                  Text(
-                    'LG',
-                    style: TextStyle(
-                      fontFamily: _kKanit,
-                      color: _kBlueSoft,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
+                  child: const Icon(Icons.phone_rounded,
+                      color: _kBlueSoft, size: 18),
+                ),
+              ),
+
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        'FoamWash',
+                        style: TextStyle(
+                          fontFamily: _kKanit,
+                          color: _kWhite,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 2),
+                        child: Text(
+                          'LG',
+                          style: TextStyle(
+                            fontFamily: _kKanit,
+                            color: _kBlueSoft,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  GestureDetector(
+                    onTap: () {
+                      if (auth.isAuthenticated) {
+                        auth.logout();
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        );
+                      }
+                    },
+                    child: Text(
+                      auth.isAuthenticated ? 'Cerrar sesión' : 'Iniciar sesión',
+                      style: const TextStyle(
+                        fontFamily: _kKanit,
+                        color: _kWhite,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ),
                 ],
               ),
 
-              // Icono teléfono a la izquierda
-              Positioned(
-                left: 16,
-                child: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.10),
-                    border: Border.all(color: Colors.white.withOpacity(0.15)),
-                  ),
-                  child: Icon(Icons.phone_rounded, color: _kBlueSoft, size: 16),
-                ),
-              ),
-
-              // Botones a la derecha
-              Positioned(
-                right: 16,
-                child: Row(
-                  children: [
-                    if (auth.isAdmin)
-                      GestureDetector(
-                        onTap: () => Navigator.pushNamed(context, '/admin_dashboard'),
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                          decoration: BoxDecoration(
-                            color: _kBlue.withOpacity(0.3),
-                            border: Border.all(color: _kBlueSoft, width: 1.5),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Text(
-                            'Panel Admin',
-                            style: TextStyle(
-                              fontFamily: _kKanit,
-                              color: _kWhite,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
+              if (auth.isAdmin)
+                Positioned(
+                  right: 0,
+                  child: GestureDetector(
+                    onTap: () =>
+                        Navigator.pushNamed(context, '/admin_dashboard'),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: _kBlue.withOpacity(0.3),
+                        border: Border.all(color: _kBlueSoft, width: 1.5),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                    GestureDetector(
-                      onTap: () {
-                        if (auth.isAuthenticated) {
-                          auth.logout();
-                        } else {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => LoginScreen()),
-                          );
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                              color: Colors.white.withOpacity(0.4), width: 1.5),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          auth.isAuthenticated ? 'Cerrar sesión' : 'Iniciar sesión',
-                          style: TextStyle(
-                            fontFamily: _kKanit,
-                            color: _kWhite,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 0.3,
-                          ),
+                      child: const Text(
+                        'Panel Admin',
+                        style: TextStyle(
+                          fontFamily: _kKanit,
+                          color: _kWhite,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
             ],
           ),
         );
@@ -354,54 +285,100 @@ class _IndexScreenState extends State<IndexScreen>
   }
 
   // ══════════════════════════════════════════════
-  //  HERO CONTENT  —  texto + dots + botón CTA
+  //  TEXTO HERO
   // ══════════════════════════════════════════════
-  Widget _buildHeroContent() {
-    return const _CTAButton();
+  Widget _buildHeroText() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text(
+            'Expertos en limpieza de mobiliario',
+            style: TextStyle(
+              fontFamily: _kKanit,
+              color: _kWhite,
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              height: 1.15,
+            ),
+          ),
+          SizedBox(height: 10),
+          Text(
+            'Dejamos impecables tus sofás, colchones,\nsillas y alfombras sin salir de casa.',
+            style: TextStyle(
+              fontFamily: _kKanit,
+              color: _kTextLight,
+              fontSize: 15,
+              fontWeight: FontWeight.w400,
+              height: 1.55,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // ══════════════════════════════════════════════
-  //  GALERÍA
+  //  BOTÓN CTA
   // ══════════════════════════════════════════════
-  Widget _buildGallerySection() {
-    final item = _gallery[_galleryIndex];
+  Widget _buildCTAButton() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Label "GALERÍA"
-          Row(
-            children: [
-              Container(
-                width: 3,
-                height: 14,
-                margin: const EdgeInsets.only(right: 8),
-                decoration: BoxDecoration(
-                  color: _kBlueSoft,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              Text(
-                'GALERÍA',
-                style: TextStyle(
-                  fontFamily: _kKanit,
-                  color: _kBlueSoft,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 2,
-                ),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: GestureDetector(
+        onTap: () {},
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 13),
+          decoration: BoxDecoration(
+            color: _kBlue,
+            borderRadius: BorderRadius.circular(50),
+            boxShadow: [
+              BoxShadow(
+                color: _kBlue.withOpacity(0.45),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          child: const Center(
+            child: Text(
+              'Ver servicios',
+              style: TextStyle(
+                fontFamily: _kKanit,
+                color: _kWhite,
+                fontSize: 30,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.2,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
-          // Imagen principal
+  // ══════════════════════════════════════════════
+  //  GALERÍA — imágenes locales, tú las agregas
+  // ══════════════════════════════════════════════
+  Widget _buildGallerySection() {
+    final item = _gallery[_galleryIndex];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        children: [
           GestureDetector(
-            onTap: () {
-              final next = (_galleryIndex + 1) % _gallery.length;
-              _goToGallery(next);
+            onHorizontalDragEnd: (details) {
+              if (details.primaryVelocity == null) return;
+              if (details.primaryVelocity! < -200) {
+                _goToGallery((_galleryIndex + 1) % _gallery.length);
+              } else if (details.primaryVelocity! > 200) {
+                _goToGallery(
+                    (_galleryIndex - 1 + _gallery.length) % _gallery.length);
+              }
             },
+            onTap: () => _goToGallery((_galleryIndex + 1) % _gallery.length),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: SizedBox(
@@ -410,63 +387,72 @@ class _IndexScreenState extends State<IndexScreen>
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
+                    // ── PON TUS FOTOS EN assets/gallery/ ──
                     FadeTransition(
                       opacity: _galleryFade,
-                      child: Image.network(
-                        item.imageUrl,
+                      child: Image.asset(
+                        item.assetPath,
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => Container(
-                          color: Colors.grey[850],
+                          // Placeholder hasta que agregues tus imágenes
+                          color: const Color(0xFF0D1B3E),
                           child: const Center(
-                              child: Icon(Icons.image,
-                                  color: Colors.white38, size: 40)),
+                            child: Icon(
+                              Icons.add_photo_alternate_outlined,
+                              color: Colors.white24,
+                              size: 48,
+                            ),
+                          ),
                         ),
                       ),
                     ),
+
                     // Gradiente inferior
                     Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
+                      bottom: 0, left: 0, right: 0,
                       child: Container(
                         height: 90,
                         decoration: const BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
-                            colors: [Color(0xCC000000), Colors.transparent],
+                            colors: [Color(0xEE000000), Colors.transparent],
                           ),
                         ),
                       ),
                     ),
+
                     // Título
                     Positioned(
-                      bottom: 14,
-                      left: 16,
-                      child: Text(
-                        item.title,
-                        style: const TextStyle(
-                          fontFamily: _kKanit,
-                          color: _kWhite,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
+                      bottom: 14, left: 16,
+                      child: FadeTransition(
+                        opacity: _galleryFade,
+                        child: Text(
+                          item.title,
+                          style: const TextStyle(
+                            fontFamily: _kKanit,
+                            color: _kWhite,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
+
                     // Contador
                     Positioned(
-                      top: 10,
-                      right: 12,
+                      top: 12, right: 14,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 9, vertical: 3),
+                            horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.black.withOpacity(0.50),
+                          borderRadius: BorderRadius.circular(14),
                         ),
                         child: Text(
                           '${_galleryIndex + 1} / ${_gallery.length}',
                           style: const TextStyle(
+                            fontFamily: _kKanit,
                             color: _kWhite,
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -479,36 +465,10 @@ class _IndexScreenState extends State<IndexScreen>
               ),
             ),
           ),
-          const SizedBox(height: 10),
 
-          // Dots galería
-          Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(_gallery.length, (i) {
-                final active = i == _galleryIndex;
-                return GestureDetector(
-                  onTap: () => _goToGallery(i),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
-                    width: active ? 22 : 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: active
-                          ? _kWhite
-                          : Colors.white.withOpacity(0.35),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                );
-              }),
-            ),
-          ),
+          const SizedBox(height: 12),
 
-          const SizedBox(height: 10),
-
-          // Miniaturas
+          // Dots
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(_gallery.length, (i) {
@@ -516,42 +476,27 @@ class _IndexScreenState extends State<IndexScreen>
               return GestureDetector(
                 onTap: () => _goToGallery(i),
                 child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: 88,
-                  height: 54,
+                  duration: const Duration(milliseconds: 300),
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  width: active ? 22 : 8,
+                  height: 8,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: active ? _kBlueSoft : Colors.transparent,
-                      width: 2.5,
-                    ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Opacity(
-                      opacity: active ? 1.0 : 0.5,
-                      child: Image.network(
-                        _gallery[i].imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          color: Colors.grey[800],
-                        ),
-                      ),
-                    ),
+                    color: active
+                        ? _kWhite
+                        : Colors.white.withOpacity(0.35),
+                    borderRadius: BorderRadius.circular(4),
                   ),
                 ),
               );
             }),
           ),
-          const SizedBox(height: 8),
         ],
       ),
     );
   }
 
   // ══════════════════════════════════════════════
-  //  FOOTER  —  redes sociales + copyright
+  //  FOOTER
   // ══════════════════════════════════════════════
   Widget _buildFooter() {
     return Container(
@@ -561,38 +506,32 @@ class _IndexScreenState extends State<IndexScreen>
           top: BorderSide(color: Color(0x14FFFFFF), width: 1),
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Botones sociales
           Row(
             children: [
-              // Facebook
               _SocialButton(
                 color: _kFbBlue,
                 icon: Icons.facebook_rounded,
                 onTap: () {
-                  // Abrir Facebook — usa url_launcher en producción
+                  // launchUrl(Uri.parse(_fbUrl));
                 },
               ),
               const SizedBox(width: 10),
-
-              // WhatsApp
               _SocialButton(
                 color: _kWaGreen,
-                svgPath: 'whatsapp',
+                icon: Icons.chat_rounded,
                 onTap: () => setState(() => _showWaModal = true),
               ),
             ],
           ),
-
-          // Copyright
-          Flexible(
+          const Flexible(
             child: Text(
               '© 2025 Lavados González. Todos los derechos reservados.',
               textAlign: TextAlign.right,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: _kKanit,
                 color: _kTextMuted,
                 fontSize: 10,
@@ -614,7 +553,7 @@ class _IndexScreenState extends State<IndexScreen>
         color: Colors.black54,
         child: Center(
           child: GestureDetector(
-            onTap: () {}, // evitar cierre al tocar dentro
+            onTap: () {},
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 24),
               padding: const EdgeInsets.all(24),
@@ -633,16 +572,14 @@ class _IndexScreenState extends State<IndexScreen>
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header modal
                   Row(
                     children: [
-                      Icon(Icons.chat_rounded,
-                          color: _kWaGreen, size: 22),
+                      const Icon(Icons.chat_rounded, color: _kWaGreen, size: 22),
                       const SizedBox(width: 10),
-                      Expanded(
+                      const Expanded(
                         child: Text(
                           'Enviar mensaje por WhatsApp',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: _kKanit,
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -651,14 +588,13 @@ class _IndexScreenState extends State<IndexScreen>
                         ),
                       ),
                       GestureDetector(
-                        onTap: () =>
-                            setState(() => _showWaModal = false),
+                        onTap: () => setState(() => _showWaModal = false),
                         child: Container(
                           width: 30,
                           height: 30,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            color: const Color(0xFFF0F0F0),
+                            color: Color(0xFFF0F0F0),
                           ),
                           child: const Icon(Icons.close,
                               size: 16, color: Color(0xFF666666)),
@@ -667,8 +603,6 @@ class _IndexScreenState extends State<IndexScreen>
                     ],
                   ),
                   const SizedBox(height: 16),
-
-                  // Textarea
                   TextField(
                     controller: _msgController,
                     maxLines: 4,
@@ -690,8 +624,8 @@ class _IndexScreenState extends State<IndexScreen>
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(
-                            color: _kWaGreen, width: 1.5),
+                        borderSide:
+                            const BorderSide(color: _kWaGreen, width: 1.5),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -701,14 +635,11 @@ class _IndexScreenState extends State<IndexScreen>
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Acciones
                   Row(
                     children: [
                       Expanded(
                         child: GestureDetector(
-                          onTap: () =>
-                              setState(() => _showWaModal = false),
+                          onTap: () => setState(() => _showWaModal = false),
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
@@ -777,7 +708,6 @@ class _IndexScreenState extends State<IndexScreen>
 
   void _sendWhatsApp() {
     final msg = Uri.encodeComponent(_msgController.text.trim());
-    // En producción: usar url_launcher
     // launchUrl(Uri.parse('https://wa.me/$_waNumber?text=$msg'));
     setState(() {
       _showWaModal = false;
@@ -787,7 +717,7 @@ class _IndexScreenState extends State<IndexScreen>
 }
 
 // =============================================================================
-// WIDGET: Fondo Hero con efecto shimmer azul
+// FONDO HERO
 // =============================================================================
 class _HeroBackground extends StatelessWidget {
   final AnimationController shimmer;
@@ -801,18 +731,12 @@ class _HeroBackground extends StatelessWidget {
         return Stack(
           fit: StackFit.expand,
           children: [
-            // Imagen principal
             Image.asset(
               'assets/fondo.png',
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Image.network(
-                'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900',
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
-                    Container(color: Colors.black),
-              ),
+              errorBuilder: (_, __, ___) =>
+                  Container(color: const Color(0xFF05080D)),
             ),
-            // Shimmer azul sutil (top-right)
             Positioned(
               top: -120 + 80 * math.sin(shimmer.value * math.pi * 2),
               right: -80,
@@ -822,10 +746,7 @@ class _HeroBackground extends StatelessWidget {
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
-                    colors: [
-                      Color(0x2C7EB8FF),
-                      Colors.transparent,
-                    ],
+                    colors: [Color(0x2C7EB8FF), Colors.transparent],
                   ),
                 ),
               ),
@@ -838,39 +759,29 @@ class _HeroBackground extends StatelessWidget {
 }
 
 // =============================================================================
-// WIDGETS AUXILIARES (Faltantes en la copia previa)
+// BOTÓN SOCIAL
 // =============================================================================
-
-class _CTAButton extends StatelessWidget {
-  const _CTAButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {},
-      child: const Text('Comenzar'),
-    );
-  }
-}
-
 class _SocialButton extends StatelessWidget {
   final Color color;
-  final IconData? icon;
-  final String? svgPath;
+  final IconData icon;
   final VoidCallback onTap;
 
   const _SocialButton({
     required this.color,
-    this.icon,
-    this.svgPath,
+    required this.icon,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon(icon ?? Icons.link, color: color),
-      onPressed: onTap,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        child: Icon(icon, color: Colors.white, size: 18),
+      ),
     );
   }
 }

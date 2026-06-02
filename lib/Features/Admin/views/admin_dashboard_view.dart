@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/Api/api_constants.dart';
 import 'package:foamwash/Features/auth_login/login_screen.dart';
 import '../widgets/admin_drawer.dart';
+import 'package:foamwash/core/utils/security_utils.dart';
 
 class AdminDashboardView extends StatefulWidget {
   const AdminDashboardView({super.key});
@@ -21,8 +22,15 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
   @override
   void initState() {
     super.initState();
+    SecurityUtils.secureScreen();
     _checkAccess();
     _fetchData();
+  }
+
+  @override
+  void dispose() {
+    SecurityUtils.clearSecureScreen();
+    super.dispose();
   }
 
   Future<void> _checkAccess() async {

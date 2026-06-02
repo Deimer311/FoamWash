@@ -71,10 +71,11 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // Verifica el estado inicial
+  // Verifica el estado inicial basándose en la existencia de un token seguro
   Future<void> checkAuthStatus() async {
+    final token = await _repository.secureStorageService.read('token');
     final prefs = await SharedPreferences.getInstance();
-    _isAuthenticated = prefs.getBool('isLogged') ?? false;
+    _isAuthenticated = token != null && token.isNotEmpty;
     _userEmail = prefs.getString('userEmail');
     _userRole = prefs.getString('userRole') ?? '';
     notifyListeners();

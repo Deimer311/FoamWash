@@ -1,3 +1,5 @@
+import com.android.build.gradle.BaseExtension
+
 allprojects {
     repositories {
         google()
@@ -17,6 +19,25 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
+}
+
+subprojects {
+    plugins.withId("com.android.library") {
+        extensions.configure<BaseExtension> {
+            if (namespace.isNullOrEmpty()) {
+                namespace = project.group.toString().takeIf { it.isNotBlank() } 
+                            ?: "com.example.${project.name.replace("-", ".")}"
+            }
+        }
+    }
+    plugins.withId("com.android.application") {
+        extensions.configure<BaseExtension> {
+            if (namespace.isNullOrEmpty()) {
+                namespace = project.group.toString().takeIf { it.isNotBlank() } 
+                            ?: "com.example.${project.name.replace("-", ".")}"
+            }
+        }
+    }
 }
 
 tasks.register<Delete>("clean") {
