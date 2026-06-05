@@ -6,6 +6,7 @@ import 'package:foamwash/Api/api_constants.dart';
 import 'package:foamwash/Features/auth_login/login_screen.dart';
 import '../widgets/admin_drawer.dart';
 import 'package:foamwash/core/utils/security_utils.dart';
+import 'package:foamwash/core/cache/secure_storage_service.dart';
 
 class AdminDashboardView extends StatefulWidget {
   const AdminDashboardView({super.key});
@@ -49,9 +50,9 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
     });
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token') ?? '';
-      final cookieToken = prefs.getString('cookie_token');
+      final secureStorage = SecureStorageService();
+      final token = await secureStorage.read('token') ?? '';
+      final cookieToken = await secureStorage.read('cookie_token');
 
       // Preparar los headers. Si existe una cookie guardada del login, se inyecta aqui para evitar el Error 401
       Map<String, String> headers = {
@@ -90,9 +91,10 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
   }
 
   Future<void> _logout() async {
+    final secureStorage = SecureStorageService();
+    await secureStorage.clearAll();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('token');
-    await prefs.remove('cookie_token');
+    await prefs.clear();
     if (!mounted) return;
     Navigator.pushReplacementNamed(context, '/login');
   }

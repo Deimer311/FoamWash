@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/Api/api_constants.dart';
+import 'package:foamwash/core/cache/secure_storage_service.dart';
 
 class UsuariosProvider extends ChangeNotifier {
   List<dynamic> _usuarios = [];
@@ -19,9 +20,9 @@ class UsuariosProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token') ?? '';
-      final cookieToken = prefs.getString('cookie_token');
+      final secureStorage = SecureStorageService();
+      final token = await secureStorage.read('token') ?? '';
+      final cookieToken = await secureStorage.read('cookie_token');
 
       Map<String, String> headers = {
         'Content-Type': 'application/json',
@@ -52,9 +53,9 @@ class UsuariosProvider extends ChangeNotifier {
 
   Future<void> deleteUsuario(int id) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token') ?? '';
-      final cookieToken = prefs.getString('cookie_token');
+      final secureStorage = SecureStorageService();
+      final token = await secureStorage.read('token') ?? '';
+      final cookieToken = await secureStorage.read('cookie_token');
 
       Map<String, String> headers = {
         'Content-Type': 'application/json',
@@ -81,9 +82,9 @@ class UsuariosProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token') ?? '';
-      final cookieToken = prefs.getString('cookie_token');
+      final secureStorage = SecureStorageService();
+      final token = await secureStorage.read('token') ?? '';
+      final cookieToken = await secureStorage.read('cookie_token');
 
       Map<String, String> headers = {
         'Content-Type': 'application/json',

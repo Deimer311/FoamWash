@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/Api/api_constants.dart';
 import '../widgets/admin_drawer.dart';
 import 'package:foamwash/core/utils/security_utils.dart';
+import 'package:foamwash/core/cache/secure_storage_service.dart';
 
 class AdminAgendaView extends StatefulWidget {
   const AdminAgendaView({super.key});
@@ -55,9 +56,9 @@ class _AdminAgendaViewState extends State<AdminAgendaView> {
     });
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token') ?? '';
-      final cookieToken = prefs.getString('cookie_token');
+      final secureStorage = SecureStorageService();
+      final token = await secureStorage.read('token') ?? '';
+      final cookieToken = await secureStorage.read('cookie_token');
 
       Map<String, String> headers = {
         'Content-Type': 'application/json',
