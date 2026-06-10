@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:foamwash/theme.dart';
+import 'package:foamwash/core/services/fcm_service.dart';
 import 'package:foamwash/Features/Comun/Index.dart';
 import 'package:foamwash/Features/auth_login/login_screen.dart';
 import 'package:foamwash/Features/auth_login/register_screen.dart';
@@ -20,7 +23,23 @@ import 'package:foamwash/Features/auth_login/data/data_sources/auth_remote_data_
 import 'package:foamwash/Features/auth_login/data/repositories/auth_repository.dart';
 import 'package:foamwash/core/cache/secure_storage_service.dart';
 
-void main() {
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print("Mensaje de FCM recibido en segundo plano: ${message.messageId}");
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  try {
+    await Firebase.initializeApp();
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    await FCMService.initialize();
+  } catch (e) {
+    print('Error al inicializar Firebase/FCM: $e');
+  }
+
   runApp(const MyApp());
 }
 

@@ -30,4 +30,6 @@ class ApiConstants {
   static const String getReservasEndpoint = '$baseUrl/reservas';
   static const String getEmpleadosEndpoint = '$baseUrl/empleados';
   static const String getUsuariosEndpoint = '$baseUrl/usuarios';
+  // Endpoint para guardar el token FCM del dispositivo en el backend
+  static const String saveFcmTokenEndpoint = '$baseUrl/usuarios/fcm-token';
 }

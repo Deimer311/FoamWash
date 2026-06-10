@@ -1,7 +1,10 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/Features/auth_login/data/data_sources/auth_remote_data_source.dart';
 import 'package:foamwash/Features/auth_login/data/models/user_model.dart';
 import 'package:foamwash/core/cache/secure_storage_service.dart';
+import 'package:foamwash/Api/api_constants.dart';
 
 class AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
@@ -40,13 +43,48 @@ class AuthRepository {
     await prefs.setBool('isLogged', true);
 
     // Construimos el UserModel con los campos que devuelve la API
-    return UserModel(
+    final user = UserModel(
       idUsuario: userData['id'] ?? 0,
       nombre: userData['nombre'] ?? '',
       correo: userData['correo'] ?? email,
       rolId: null,
       fotoPerfil: userData['foto_perfil'],
     );
+
+    // Enviar el token FCM al backend automáticamente tras el login
+    await _sendFcmTokenToBackend(
+      authToken: token,
+      userId: user.idUsuario,
+    );
+
+    return user;
+  }
+
+  /// Envía el token FCM guardado en SecureStorage al backend para
+  /// asociarlo con el usuario autenticado.
+  Future<void> _sendFcmTokenToBackend({
+    required String authToken,
+    required int userId,
+  }) async {
+    try {
+      final fcmToken = await secureStorageService.read('fcm_token');
+      if (fcmToken == null || fcmToken.isEmpty) return;
+
+      await http.post(
+        Uri.parse(ApiConstants.saveFcmTokenEndpoint),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $authToken',
+        },
+        body: jsonEncode({
+          'usuario_id': userId,
+          'fcm_token': fcmToken,
+        }),
+      );
+    } catch (e) {
+      // No interrumpir el login si falla el envío del token FCM
+      print('[FCM] Error al enviar token al backend: $e');
+    }
   }
 
   Future<void> logout() async {
