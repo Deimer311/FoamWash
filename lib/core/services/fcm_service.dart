@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:developer' as developer;
+import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/core/cache/secure_storage_service.dart';
 
 class FCMService {
@@ -15,8 +18,12 @@ class FCMService {
     importance: Importance.max,
   );
 
+  static GlobalKey<NavigatorState>? navigatorKey;
+
   /// Inicializa los servicios de Firebase Cloud Messaging y las notificaciones locales.
-  static Future<void> initialize() async {
+  static Future<void> initialize(GlobalKey<NavigatorState> navKey) async {
+    navigatorKey = navKey;
+
     // 1. Solicitar permisos de notificación
     await requestPermission();
 
@@ -42,6 +49,14 @@ class FCMService {
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         // Manejar el clic en la notificación local si la app está en primer plano
         developer.log('Clic en notificación local: ${response.payload}');
+        if (response.payload != null && response.payload!.isNotEmpty) {
+          try {
+            final Map<String, dynamic> data = jsonDecode(response.payload!);
+            _handleNotificationRoute(data);
+          } catch (e) {
+            developer.log('Error al decodificar payload de notificación local: $e');
+          }
+        }
       },
     );
 
@@ -78,7 +93,7 @@ class FCMService {
               priority: Priority.high,
             ),
           ),
-          payload: message.data.toString(),
+          payload: jsonEncode(message.data),
         );
       }
     });
@@ -86,8 +101,100 @@ class FCMService {
     // 5. Configurar el escuchador cuando se abre la app desde una notificación (en segundo plano)
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       developer.log('Se abrió la aplicación desde una notificación FCM: ${message.data}');
-      // Aquí puedes agregar lógica para navegar a una pantalla específica, ej. reservas
+      _handleNotificationRoute(message.data);
     });
+
+    // 6. Configurar la notificación inicial si la app se abrió desde un estado terminado
+    FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
+      if (message != null) {
+        developer.log('La app se abrió desde un estado terminado vía FCM: ${message.data}');
+        Future.delayed(const Duration(milliseconds: 500), () {
+          _handleNotificationRoute(message.data);
+        });
+      }
+    });
+  }
+
+  /// Maneja la redirección de pantallas basada en el payload de la notificación.
+  static void _handleNotificationRoute(Map<String, dynamic> data) {
+    if (navigatorKey == null) {
+      developer.log('navigatorKey es nulo. No se puede realizar la redirección.');
+      return;
+    }
+
+    final type = data['type'];
+    developer.log('Procesando navegación para notificación de tipo: $type');
+
+    switch (type) {
+      case 'reporte_semanal':
+        navigatorKey!.currentState?.pushNamed('/admin_reportes');
+        break;
+      case 'nueva_reserva':
+      case 'reserva_cancelada':
+        _redirectBasedOnRole('/admin_agenda', '/scheduling');
+        break;
+      case 'nuevo_servicio':
+        navigatorKey!.currentState?.pushNamed('/scheduling');
+        break;
+      default:
+        // Por defecto redirigir al Home o dejar en la vista actual si no se reconoce
+        navigatorKey!.currentState?.pushNamed('/home');
+        break;
+    }
+  }
+
+  /// Redirige al usuario a una pantalla u otra dependiendo de su rol almacenado.
+  static Future<void> _redirectBasedOnRole(String adminRoute, String defaultRoute) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final role = prefs.getString('userRole') ?? '';
+      if (role.toLowerCase().trim() == 'admin') {
+        navigatorKey!.currentState?.pushNamed(adminRoute);
+      } else {
+        navigatorKey!.currentState?.pushNamed(defaultRoute);
+      }
+    } catch (e) {
+      developer.log('Error al obtener rol para redirección: $e');
+      navigatorKey!.currentState?.pushNamed(defaultRoute);
+    }
+  }
+
+  /// Se suscribe a los temas correspondientes del rol e ID del usuario al iniciar sesión o abrir la app.
+  static Future<void> subscribeToRoleTopics(String role, int userId) async {
+    try {
+      // Suscribirse a temas generales basados en el rol
+      if (role.isNotEmpty) {
+        final cleanRole = role.toLowerCase().trim();
+        await _messaging.subscribeToTopic('topic_$cleanRole');
+        developer.log('Suscrito exitosamente al tema: topic_$cleanRole');
+      }
+
+      // Suscribirse a tema privado del usuario
+      if (userId > 0) {
+        await _messaging.subscribeToTopic('user_$userId');
+        developer.log('Suscrito exitosamente al tema privado: user_$userId');
+      }
+    } catch (e) {
+      developer.log('Error al suscribirse a temas por rol: $e');
+    }
+  }
+
+  /// Se desuscribe de los temas del rol e ID del usuario al cerrar sesión.
+  static Future<void> unsubscribeFromRoleTopics(String role, int userId) async {
+    try {
+      if (role.isNotEmpty) {
+        final cleanRole = role.toLowerCase().trim();
+        await _messaging.unsubscribeFromTopic('topic_$cleanRole');
+        developer.log('Desuscrito exitosamente del tema: topic_$cleanRole');
+      }
+
+      if (userId > 0) {
+        await _messaging.unsubscribeFromTopic('user_$userId');
+        developer.log('Desuscrito exitosamente del tema privado: user_$userId');
+      }
+    } catch (e) {
+      developer.log('Error al desuscribirse de temas por rol: $e');
+    }
   }
 
   /// Solicita permisos de notificación al usuario.

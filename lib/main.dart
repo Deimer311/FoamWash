@@ -16,6 +16,7 @@ import 'package:foamwash/Features/Admin/views/admin_agenda_view.dart';
 import 'package:foamwash/Features/Admin/views/admin_empleados_view.dart';
 import 'package:foamwash/Features/Admin/views/admin_usuarios_view.dart';
 import 'package:foamwash/Features/Admin/views/admin_reportes_view.dart';
+import 'package:foamwash/Features/Admin/views/admin_servicios_view.dart';
 import 'package:foamwash/Features/Admin/providers/empleados_provider.dart';
 import 'package:foamwash/Features/Admin/providers/usuarios_provider.dart';
 
@@ -29,13 +30,15 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Mensaje de FCM recibido en segundo plano: ${message.messageId}");
 }
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   try {
     await Firebase.initializeApp();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    await FCMService.initialize();
+    await FCMService.initialize(navigatorKey);
   } catch (e) {
     print('Error al inicializar Firebase/FCM: $e');
   }
@@ -66,6 +69,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UsuariosProvider()),
       ],
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         home: const IndexScreen(),
@@ -80,6 +84,7 @@ class MyApp extends StatelessWidget {
           '/admin_empleados': (context) => const AdminEmpleadosView(),
           '/admin_usuarios': (context) => const AdminUsuariosView(),
           '/admin_reportes': (context) => AdminReportesView(),
+          '/admin_servicios': (context) => const AdminServiciosView(),
         },
       ),
     );

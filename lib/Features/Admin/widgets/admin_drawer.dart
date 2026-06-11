@@ -63,6 +63,12 @@ class AdminDrawer extends StatelessWidget {
           ),
           _buildItem(
             context,
+            icon: Icons.cleaning_services_outlined,
+            title: 'Servicios',
+            route: '/admin_servicios',
+          ),
+          _buildItem(
+            context,
             icon: Icons.analytics_outlined,
             title: 'Reportes',
             route: '/admin_reportes',

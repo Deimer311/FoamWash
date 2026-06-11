@@ -40,6 +40,7 @@ class AuthRepository {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('userEmail', email);
     await prefs.setString('userRole', userData['rol'] ?? '');
+    await prefs.setInt('userId', userData['id'] ?? 0);
     await prefs.setBool('isLogged', true);
 
     // Construimos el UserModel con los campos que devuelve la API

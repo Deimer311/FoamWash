@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/Features/auth_login/data/repositories/auth_repository.dart';
 import 'package:foamwash/Features/auth_login/data/models/user_model.dart';
+import 'package:foamwash/core/services/fcm_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthRepository _repository;
@@ -32,6 +33,9 @@ class AuthProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       _userRole = prefs.getString('userRole') ?? '';
 
+      // Suscribirse a temas FCM según rol y userId
+      await FCMService.subscribeToRoleTopics(_userRole, userModel.idUsuario);
+
       notifyListeners();
     } catch (e) {
       rethrow;
@@ -40,10 +44,17 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> logout() async {
     try {
+      // Desuscribirse de temas FCM antes de limpiar almacenamiento
+      final prefs = await SharedPreferences.getInstance();
+      final role = prefs.getString('userRole') ?? '';
+      final userId = prefs.getInt('userId') ?? 0;
+      await FCMService.unsubscribeFromRoleTopics(role, userId);
+
       await _repository.logout();
       _isAuthenticated = false;
       _userEmail = null;
       _user = null;
+      _userRole = '';
       notifyListeners();
     } catch (e) {
       print('Error al cerrar sesión: $e');
@@ -78,6 +89,19 @@ class AuthProvider extends ChangeNotifier {
     _isAuthenticated = token != null && token.isNotEmpty;
     _userEmail = prefs.getString('userEmail');
     _userRole = prefs.getString('userRole') ?? '';
+    final userId = prefs.getInt('userId') ?? 0;
+
+    if (_isAuthenticated) {
+      _user = UserModel(
+        idUsuario: userId,
+        nombre: '',
+        correo: _userEmail ?? '',
+        rolId: null,
+      );
+      // Auto-suscripción en reinicios si la sesión sigue activa
+      await FCMService.subscribeToRoleTopics(_userRole, userId);
+    }
+
     notifyListeners();
   }
 }
