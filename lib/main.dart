@@ -12,6 +12,7 @@ import 'package:foamwash/Features/Services/views/scheduling_view.dart';
 import 'package:foamwash/Features/Services/providers/services_provider.dart';
 import 'package:foamwash/Features/auth_login/providers/auth_provider.dart';
 import 'package:foamwash/Features/Admin/views/admin_dashboard_view.dart';
+import 'package:foamwash/Features/Empleado/views/empleado_agenda_view.dart';
 import 'package:foamwash/Features/Admin/views/admin_agenda_view.dart';
 import 'package:foamwash/Features/Admin/views/admin_empleados_view.dart';
 import 'package:foamwash/Features/Admin/views/admin_usuarios_view.dart';
@@ -85,6 +86,7 @@ class MyApp extends StatelessWidget {
           '/admin_usuarios': (context) => const AdminUsuariosView(),
           '/admin_reportes': (context) => AdminReportesView(),
           '/admin_servicios': (context) => const AdminServiciosView(),
+          '/empleado_agenda': (context) => const EmpleadoAgendaView(),
         },
       ),
     );

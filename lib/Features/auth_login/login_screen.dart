@@ -62,9 +62,12 @@ class _LoginScreenState extends State<LoginScreen>
       if (!mounted) return;
       setState(() => _isLoading = false);
 
-      // Redirección basada en el correo (se mantiene la lógica de negocio en la vista por ahora)
-      if (email == 'admin@gmail.com') {
+      // Redirección basada en el rol del usuario
+      final role = context.read<AuthProvider>().userRole;
+      if (email == 'admin@gmail.com' || role == 'admin') {
         Navigator.pushReplacementNamed(context, '/admin_dashboard');
+      } else if (role == 'trabajador' || role == 'empleado') {
+        Navigator.pushReplacementNamed(context, '/empleado_agenda');
       } else {
         Navigator.pushReplacementNamed(context, '/scheduling');
       }
