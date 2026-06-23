@@ -9,8 +9,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:foamwash/Features/auth_login/login_screen.dart';
-import 'package:foamwash/Features/auth_login/providers/auth_provider.dart';
+import 'package:foamwash/Features/Autenticacion/login_screen.dart';
+import 'package:foamwash/Features/Autenticacion/providers/auth_provider.dart';
 
 // ─────────────────────────── PALETA ───────────────────────────
 const _kBlue      = Color(0xFF1A56FF);
@@ -227,27 +227,37 @@ class _IndexScreenState extends State<IndexScreen>
                     ],
                   ),
                   const SizedBox(height: 3),
-                  GestureDetector(
-                    onTap: () {
-                      if (auth.isAuthenticated) {
-                        auth.logout();
-                      } else {
+                  if (auth.isAuthenticated)
+                    GestureDetector(
+                      onTap: () => auth.logout(),
+                      child: const Text(
+                        'Cerrar sesión',
+                        style: TextStyle(
+                          fontFamily: _kKanit,
+                          color: _kWhite,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    )
+                  else
+                    GestureDetector(
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => const LoginScreen()),
                         );
-                      }
-                    },
-                    child: Text(
-                      auth.isAuthenticated ? 'Cerrar sesión' : 'Iniciar sesión',
-                      style: const TextStyle(
-                        fontFamily: _kKanit,
-                        color: _kWhite,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w400,
+                      },
+                      child: const Text(
+                        'Iniciar sesión',
+                        style: TextStyle(
+                          fontFamily: _kKanit,
+                          color: _kWhite,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
 
@@ -326,7 +336,7 @@ class _IndexScreenState extends State<IndexScreen>
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: GestureDetector(
-        onTap: () {},
+        onTap: () => Navigator.pushNamed(context, '/cotizador'),
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 13),

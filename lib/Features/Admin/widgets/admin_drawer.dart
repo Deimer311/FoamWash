@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:foamwash/Features/auth_login/providers/auth_provider.dart';
+import 'package:foamwash/Features/Autenticacion/providers/auth_provider.dart';
 
 class AdminDrawer extends StatelessWidget {
   const AdminDrawer({super.key});

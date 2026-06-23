@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:foamwash/Features/auth_login/register_screen.dart';
+import 'package:foamwash/Features/Autenticacion/register_screen.dart';
 import 'package:foamwash/Api/api_constants.dart';
 import 'package:provider/provider.dart';
-import 'package:foamwash/Features/auth_login/providers/auth_provider.dart';
+import 'package:foamwash/Features/Autenticacion/providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

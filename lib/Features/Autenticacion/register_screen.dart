@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:foamwash/Features/auth_login/login_screen.dart';
+import 'package:foamwash/Features/Autenticacion/login_screen.dart';
 import 'package:foamwash/Api/api_constants.dart';
-import 'package:foamwash/Features/auth_login/providers/auth_provider.dart';
+import 'package:foamwash/Features/Autenticacion/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {

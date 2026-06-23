@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "1010644927158",
-    "project_id": "foamwash-de424",
-    "storage_bucket": "foamwash-de424.firebasestorage.app"
+    "project_number": "961096037194",
+    "project_id": "foamwash-ad625",
+    "storage_bucket": "foamwash-ad625.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1010644927158:android:ae582349e919643f9f9c17",
+        "mobilesdk_app_id": "1:961096037194:android:af779264ad1c0764f687b3",
         "android_client_info": {
           "package_name": "com.example.foamwash"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAzseHprmekrfWCh3eIflFLeC7QZQARdGw"
+          "current_key": "AIzaSyDhbieRHRFUQeYr0oQEAHd_JAfIXu7KE_k"
         }
       ],
       "services": {

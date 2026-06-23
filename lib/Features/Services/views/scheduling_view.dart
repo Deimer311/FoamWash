@@ -3,9 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:foamwash/theme.dart';
 import 'package:foamwash/Features/Services/controllers/scheduling_controller.dart';
 import 'package:foamwash/Features/Services/providers/services_provider.dart';
-import 'package:foamwash/Features/auth_login/providers/auth_provider.dart';
+import 'package:foamwash/Features/Autenticacion/providers/auth_provider.dart';
+import 'package:foamwash/Features/Cart/providers/cart_provider.dart';
 import 'package:foamwash/Features/Services/widgets/service_card.dart';
-import 'package:foamwash/Features/Services/widgets/footer_widget.dart';
 
 // Vista principal de agendamiento para usuarios autenticados.
 // Construye el catalogo de servicios dinamicamente consumiendo el API a traves de FutureBuilder.
@@ -39,6 +39,7 @@ class _SchedulingViewState extends State<SchedulingView> {
         child: Column(
           children: [
             _buildAppBar(),
+            _buildSearchBar(),
             Expanded(
               child: _buildServicesList(),
             ),
@@ -77,32 +78,56 @@ class _SchedulingViewState extends State<SchedulingView> {
               ],
             ),
           ),
+          // ── Mismo orden y nombres que el header web (Inicio, Cotizar, Agendar) ──
           ListTile(
-            leading: const Icon(Icons.request_quote, color: AppTheme.primaryBlue),
-            title: const Text('Cotizar', style: TextStyle(fontWeight: FontWeight.w600)),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.home, color: AppTheme.primaryBlue),
-            title: const Text('Home', style: TextStyle(fontWeight: FontWeight.w600)),
+            leading: const Icon(Icons.home_outlined, color: AppTheme.primaryBlue),
+            title: const Text('Inicio', style: TextStyle(fontWeight: FontWeight.w600)),
             onTap: () {
               Navigator.pop(context);
               Navigator.pushReplacementNamed(context, '/home');
             },
           ),
           ListTile(
-            leading: const Icon(Icons.person, color: AppTheme.primaryBlue),
+            leading: const Icon(Icons.description_outlined, color: AppTheme.primaryBlue),
+            title: const Text('Cotizar', style: TextStyle(fontWeight: FontWeight.w600)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/cotizador');
+            },
+          ),
+          ListTile(
+            selected: true,
+            selectedTileColor: AppTheme.primaryBlue.withOpacity(0.08),
+            leading: const Icon(Icons.build_outlined, color: AppTheme.primaryBlue),
+            title: const Text('Agendar', style: TextStyle(fontWeight: FontWeight.w700)),
+            // Ya estamos en la vista de Agendar: solo cierra el drawer.
+            onTap: () => Navigator.pop(context),
+          ),
+          const Divider(),
+          // ── Mismos accesos que el dropdown de avatar en el header web ──
+          ListTile(
+            leading: const Icon(Icons.person_outline, color: AppTheme.primaryBlue),
             title: const Text('Perfil', style: TextStyle(fontWeight: FontWeight.w600)),
             onTap: () {
               Navigator.pop(context);
+              Navigator.pushNamed(context, '/perfilCliente');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.event_note_outlined, color: AppTheme.primaryBlue),
+            title: const Text('Mis Agendamientos', style: TextStyle(fontWeight: FontWeight.w600)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/agendamientos');
             },
           ),
           const Divider(),
           ListTile(
-            leading: const Icon(Icons.logout, color: Colors.redAccent),
-            title: const Text('Cerrar Sesión', style: TextStyle(fontWeight: FontWeight.w600)),
+            leading: const Icon(Icons.logout_rounded, color: Color(0xFFFF6B6B)),
+            title: const Text(
+              'Cerrar Sesión',
+              style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFFFF6B6B)),
+            ),
             onTap: () async {
               Navigator.pop(context);
               await context.read<AuthProvider>().logout();
@@ -120,216 +145,132 @@ class _SchedulingViewState extends State<SchedulingView> {
   Widget _buildAppBar() {
     return Container(
       color: AppTheme.appBarDark,
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // ── Logo FW (badge cuadrado redondeado, igual al web) ──
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              gradient: AppTheme.buttonGradient,
-              borderRadius: BorderRadius.circular(10),
+          const Text(
+            'FoamWashCL',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
-            child: const Center(
-              child: Text(
-                'FW',
-                style: TextStyle(
-                  fontFamily: 'Kanit',
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  letterSpacing: 0.5,
-                ),
+          ),
+          Row(
+            children: [
+              Consumer<CartProvider>(
+                builder: (context, cart, child) {
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.shopping_cart, color: Colors.white, size: 26),
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/cart');
+                        },
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                      if (cart.itemCount > 0)
+                        Positioned(
+                          right: -4,
+                          top: -4,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.redAccent,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              cart.itemCount.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
               ),
-            ),
-          ),
-          const SizedBox(width: 10),
-
-          // ── Título FoamWash^CL ──
-          RichText(
-            text: const TextSpan(
-              children: [
-                TextSpan(
-                  text: 'FoamWash',
-                  style: TextStyle(
-                    fontFamily: 'Kanit',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    letterSpacing: 0.2,
-                  ),
-                ),
-                TextSpan(
-                  text: 'CL',
-                  style: TextStyle(
-                    fontFamily: 'Kanit',
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF93C5FD), // azul claro como en el web
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const Spacer(),
-
-          // ── Icono menu hamburguesa ──
-          GestureDetector(
-            onTap: () => _scaffoldKey.currentState?.openDrawer(),
-            child: Container(
-              padding: const EdgeInsets.all(6),
-              child: const Icon(Icons.menu_rounded,
-                  color: Colors.white70, size: 24),
-            ),
-          ),
-          const SizedBox(width: 10),
-
-          // ── Avatar circular (igual al web) ──
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.10),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white.withOpacity(0.25),
-                width: 1.5,
+              const SizedBox(width: 16),
+              IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white, size: 28),
+                onPressed: () {
+                  _scaffoldKey.currentState?.openDrawer();
+                },
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               ),
-            ),
-            child: const Icon(
-              Icons.person_rounded,
-              color: Colors.white70,
-              size: 20,
-            ),
-          ),
+              const SizedBox(width: 16),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.person, color: Colors.grey, size: 20),
+              ),
+            ],
+          )
         ],
       ),
     );
   }
 
-
   Widget _buildSearchBar() {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
       child: TextField(
-        style: const TextStyle(
-            fontFamily: 'Kanit',
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: AppTheme.darkText),
         decoration: InputDecoration(
-          hintText: 'Buscar servicios: muebles, colchones, tapicería, carros...',
-          hintStyle: const TextStyle(
-              fontFamily: 'Kanit',
-              color: AppTheme.greyText,
-              fontSize: 13,
-              fontWeight: FontWeight.w400),
-          // Icono de búsqueda a la derecha (igual que el web)
-          suffixIcon: const Padding(
-            padding: EdgeInsets.only(right: 14),
-            child: Icon(Icons.search_rounded,
-                color: AppTheme.greyText, size: 20),
-          ),
-          suffixIconConstraints:
-              const BoxConstraints(minWidth: 44, minHeight: 44),
+          hintText: 'Buscar servicios',
+          hintStyle: const TextStyle(color: AppTheme.greyText, fontSize: 14),
           filled: true,
-          fillColor: const Color(0xFFF8FAFF),
-          contentPadding:
-              const EdgeInsets.symmetric(vertical: 14, horizontal: 22),
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(40),
-            borderSide: BorderSide(color: Colors.grey.shade200, width: 1.5),
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide(color: Colors.grey.shade300, width: 1.5),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(40),
-            borderSide:
-                const BorderSide(color: AppTheme.primaryBlue, width: 1.8),
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 2),
           ),
         ),
       ),
     );
   }
 
-
   Widget _buildServicesList() {
-    return Consumer<ServicesProvider>(
-      builder: (context, provider, child) {
-        return CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: _buildSearchBar(),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.0),
+          child: Text(
+            'Nuestros Servicios',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              color: AppTheme.darkText,
             ),
-            SliverToBoxAdapter(
-              child: Container(
-                color: AppTheme.backgroundWhite,
-                padding: const EdgeInsets.fromLTRB(20, 28, 20, 20),
-                child: Column(
-                  children: [
-                    const Text(
-                      'Nuestros Servicios',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Kanit',
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.darkText,
-                        letterSpacing: -0.5,
-                        height: 1.1,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 0,
-                      children: const [
-                        Text('Profesionales certificados',
-                            style: TextStyle(
-                              fontFamily: 'Kanit',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF94A3B8),
-                            )),
-                        Text(' · ',
-                            style: TextStyle(
-                                fontSize: 12, color: AppTheme.greyText)),
-                        Text('Productos ecológicos',
-                            style: TextStyle(
-                              fontFamily: 'Kanit',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF94A3B8),
-                            )),
-                        Text(' · ',
-                            style: TextStyle(
-                                fontSize: 12, color: AppTheme.greyText)),
-                        Text('Garantía de satisfacción',
-                            style: TextStyle(
-                              fontFamily: 'Kanit',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF94A3B8),
-                            )),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (provider.isLoading)
-              const SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
+            textAlign: TextAlign.center,
+          ),
+        ),
+        Expanded(
+          child: Consumer<ServicesProvider>(
+            builder: (context, provider, child) {
+              if (provider.isLoading) {
+                return const Center(
                   child: CircularProgressIndicator(color: AppTheme.primaryBlue),
-                ),
-              )
-            else if (provider.error != null)
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
+                );
+              } else if (provider.error != null) {
+                return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -349,38 +290,32 @@ class _SchedulingViewState extends State<SchedulingView> {
                       )
                     ],
                   ),
-                ),
-              )
-            else if (provider.services.isEmpty)
-              const SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
+                );
+              } else if (provider.services.isEmpty) {
+                return const Center(
                   child: Text(
                     'No hay servicios disponibles en este momento.',
                     style: TextStyle(color: AppTheme.greyText),
                   ),
-                ),
-              )
-            else
-              SliverPadding(
+                );
+              }
+
+              final services = provider.services;
+              return ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => ServiceCard(
-                      service: provider.services[index],
-                      isGuest: false,
-                      controller: _controller,
-                    ),
-                    childCount: provider.services.length,
-                  ),
-                ),
-              ),
-            const SliverToBoxAdapter(
-              child: AppFooter(),
-            ),
-          ],
-        );
-      },
+                itemCount: services.length,
+                itemBuilder: (context, index) {
+                  return ServiceCard(
+                    service: services[index],
+                    isGuest: false,
+                    controller: _controller,
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
