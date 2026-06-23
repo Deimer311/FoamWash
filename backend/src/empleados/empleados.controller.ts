@@ -9,15 +9,12 @@ import { extname } from 'path';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { EmpleadosService } from './empleados.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller('empleados') // → /api/empleados
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('admin', 'empleado') // Administradores y empleados pueden acceder
+@UseGuards(JwtAuthGuard)
 @ApiTags('Empleados')
 export class EmpleadosController {
-  constructor(private empleadosService: EmpleadosService) {}
+  constructor(private empleadosService: EmpleadosService) { }
 
   @Get()
   @ApiOperation({ summary: 'Obtener todos los empleados' })
@@ -47,6 +44,20 @@ export class EmpleadosController {
     return { success: true, data };
   }
 
+  @Get(':id/perfil')
+  @ApiOperation({ summary: 'Obtener perfil completo del empleado (usuario + empleado + relaciones)' })
+  async perfilCompleto(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.empleadosService.getPerfilCompleto(id);
+    return { success: true, data };
+  }
+
+  @Get(':id/desempeno')
+  @ApiOperation({ summary: 'Obtener métricas de desempeño reales del empleado' })
+  async desempeno(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.empleadosService.getDesempeno(id);
+    return { success: true, data };
+  }
+
   @Get(':id/servicios-hoy')
   @ApiOperation({ summary: 'Obtener servicios de hoy del empleado' })
   async serviciosHoy(@Param('id', ParseIntPipe) id: number) {
@@ -58,6 +69,27 @@ export class EmpleadosController {
   @ApiOperation({ summary: 'Obtener agenda semanal del empleado' })
   async agendaSemanal(@Param('id', ParseIntPipe) id: number) {
     const data = await this.empleadosService.getReservasSemana(id);
+    return { success: true, data, total: data.length };
+  }
+
+  @Get(':id/historial')
+  @ApiOperation({ summary: 'Obtener historial completo de servicios del empleado (RF14)' })
+  async historial(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.empleadosService.getHistorial(id);
+    return { success: true, data, total: data.length };
+  }
+
+  @Get(':id/completados')
+  @ApiOperation({ summary: 'Obtener servicios completados del empleado' })
+  async completados(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.empleadosService.getCompletados(id);
+    return { success: true, data, total: data.length };
+  }
+
+  @Get(':id/pendientes')
+  @ApiOperation({ summary: 'Obtener servicios pendientes del empleado' })
+  async pendientes(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.empleadosService.getPendientes(id);
     return { success: true, data, total: data.length };
   }
 

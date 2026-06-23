@@ -1,10 +1,11 @@
 // src/reservas/reservas.service.ts
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { sendServiceConfirmationEmail } from '../common/utils/email.util';
 
 @Injectable()
 export class ReservasService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   // GET /api/reservas
   async findAll() {
@@ -129,20 +130,54 @@ export class ReservasService {
 
     const reserva = await this.prisma.reserva.create({
       data: {
-        Estado:                data.Estado ?? 'Pendiente',
-        fecha:                 fechaISO,
-        Hora:                  horaISO,
+        Estado: data.Estado ?? 'Pendiente',
+        fecha: fechaISO,
+        Hora: horaISO,
         Informacion_adicional: data.Informacion_adicional,
-        cliente:   { connect: { Id_Usuario: data.Id_Usuario } },
-        empleado:  empleadoId
-                     ? { connect: { Id_Usuario: empleadoId } }
-                     : undefined,
+        cliente: { connect: { Id_Usuario: data.Id_Usuario } },
+        empleado: empleadoId
+          ? { connect: { Id_Usuario: empleadoId } }
+          : undefined,
         observacion: observacionData,
       },
       include: {
         empleado: { select: { Nombre: true, Id_Usuario: true } },
+        cliente: true,
       },
     });
+
+    // Calcular total
+    let total = 0;
+    if (data.servicios && data.servicios.length > 0) {
+      const servicioIds = data.servicios.map(s => s.Id_Servicio);
+      const serviciosDb = await this.prisma.servicio.findMany({
+        where: { Id_Servicio: { in: servicioIds } },
+      });
+      total = data.servicios.reduce((sum, reqSvc) => {
+         const dbSvc = serviciosDb.find(s => s.Id_Servicio === reqSvc.Id_Servicio);
+         return sum + (dbSvc ? Number(dbSvc.Precio) * (reqSvc.cantidad || 1) : 0);
+      }, 0);
+    }
+
+    // Enviar correo si el cliente tiene correo
+    if (reserva.cliente && reserva.cliente.Correo) {
+      const dateFormatter = new Intl.DateTimeFormat('es-CO', { 
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+        timeZone: 'America/Bogota'
+      });
+      const timeFormatter = new Intl.DateTimeFormat('es-CO', { 
+        hour: '2-digit', minute: '2-digit',
+        timeZone: 'America/Bogota'
+      });
+
+      await sendServiceConfirmationEmail(reserva.cliente.Correo, {
+        id: `PED-${reserva.ID_Reserva}`,
+        fecha: reserva.fecha ? dateFormatter.format(new Date(reserva.fecha)) : 'Fecha no especificada',
+        hora: reserva.Hora ? timeFormatter.format(new Date(reserva.Hora)) : 'Hora no especificada',
+        direccion: reserva.cliente.Direccion || 'No especificada',
+        total: total
+      }).catch(err => console.error('Error al enviar correo de confirmación:', err));
+    }
 
     return {
       success: true,
@@ -173,10 +208,38 @@ export class ReservasService {
   async updateEstado(id: number, estado: string) {
     const exists = await this.prisma.reserva.findUnique({ where: { ID_Reserva: id } });
     if (!exists) throw new NotFoundException('Reserva no encontrada');
-    return this.prisma.reserva.update({
+
+    const updatedReserva = await this.prisma.reserva.update({
       where: { ID_Reserva: id },
       data: { Estado: estado },
+      include: {
+        cliente: true,
+        servicios: true,
+      }
     });
+
+    if (estado === 'Confirmado' && updatedReserva.cliente && updatedReserva.cliente.Correo) {
+      const total = updatedReserva.servicios.reduce((sum, s) => sum + Number(s.Precio || 0), 0);
+
+      const dateFormatter = new Intl.DateTimeFormat('es-CO', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+        timeZone: 'America/Bogota'
+      });
+      const timeFormatter = new Intl.DateTimeFormat('es-CO', {
+        hour: '2-digit', minute: '2-digit',
+        timeZone: 'America/Bogota'
+      });
+
+      await sendServiceConfirmationEmail(updatedReserva.cliente.Correo, {
+        id: `PED-${updatedReserva.ID_Reserva}`,
+        fecha: dateFormatter.format(new Date(updatedReserva.fecha)),
+        hora: timeFormatter.format(new Date(updatedReserva.Hora)),
+        direccion: updatedReserva.cliente.Direccion || 'No especificada',
+        total: total
+      }).catch(err => console.error('Error al enviar correo de confirmación (empleado):', err));
+    }
+
+    return updatedReserva;
   }
 
   // DELETE /api/reservas/:id

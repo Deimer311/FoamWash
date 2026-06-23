@@ -41,10 +41,46 @@ export class UsuariosService {
         foto_perfil: true,
         rol: true,
         tipo_de_documento: true,
+        reservasComoCliente: {
+          include: {
+            servicios: true,
+            observacion: true,
+          },
+          orderBy: { fecha: 'desc' },
+        },
       },
     });
     if (!user) throw new NotFoundException('Usuario no encontrado');
-    return user;
+
+    // Calcular estadísticas reales de reservas
+    const reservas = user.reservasComoCliente ?? [];
+    const total_reservas = reservas.length;
+    const completadas = reservas.filter(r => r.Estado === 'Completado').length;
+    const pendientes  = reservas.filter(r => r.Estado === 'Pendiente' || r.Estado === 'Confirmado').length;
+
+    // Promedio de calificaciones de las reservas completadas
+    const calificacionesIds = reservas.map(r => r.ID_Reserva);
+    let calificacion_promedio: string | number = '—';
+    if (calificacionesIds.length > 0) {
+      const cals = await this.prisma.calificacion.findMany({
+        where: { reserva_ID_Reserva: { in: calificacionesIds } },
+        select: { puntaje: true },
+      });
+      if (cals.length > 0) {
+        const suma = cals.reduce((s, c) => s + Number(c.puntaje), 0);
+        calificacion_promedio = (suma / cals.length).toFixed(1);
+      }
+    }
+
+    return {
+      ...user,
+      stats: {
+        total_reservas,
+        completadas,
+        pendientes,
+        calificacion_promedio,
+      },
+    };
   }
 
   async update(id: number, data: any) {
@@ -80,6 +116,49 @@ export class UsuariosService {
       updateData.tipo_de_documento_id_tipo_de_documento = data.tipo_de_documento_id_tipo_de_documento;
     }
 
+    // ✅ Actualizar datos de Empleado si aplica
+    const hasEmpleadoFields =
+      data.cargo !== undefined ||
+      data.fecha_nacimiento !== undefined ||
+      data.fecha_ingreso !== undefined ||
+      data.dias_laborales !== undefined ||
+      data.horario !== undefined ||
+      data.especialidades !== undefined ||
+      data.certificaciones !== undefined;
+
+    if (hasEmpleadoFields && exists.rol_Id_Rol === 2) {
+      const empleadoData: any = {};
+      if (data.cargo !== undefined) empleadoData.cargo = data.cargo;
+      if (data.fecha_nacimiento !== undefined) {
+        empleadoData.fecha_nacimiento = data.fecha_nacimiento ? new Date(data.fecha_nacimiento) : null;
+      }
+      if (data.fecha_ingreso !== undefined) {
+        empleadoData.fecha_ingreso = data.fecha_ingreso ? new Date(data.fecha_ingreso) : null;
+      }
+      if (data.dias_laborales !== undefined) empleadoData.dias_laborales = data.dias_laborales;
+      if (data.horario !== undefined) empleadoData.horario = data.horario;
+      if (data.especialidades !== undefined) empleadoData.especialidades = data.especialidades;
+      if (data.certificaciones !== undefined) empleadoData.certificaciones = data.certificaciones;
+
+      const existingEmp = await this.prisma.empleado.findFirst({
+        where: { usuario_Id_Usuario: id },
+      });
+
+      if (existingEmp) {
+        await this.prisma.empleado.update({
+          where: { Id_Empleado: existingEmp.Id_Empleado },
+          data: empleadoData,
+        });
+      } else {
+        await this.prisma.empleado.create({
+          data: {
+            ...empleadoData,
+            usuario_Id_Usuario: id,
+          },
+        });
+      }
+    }
+
     return this.prisma.usuario.update({
       where: { Id_Usuario: id },
       data: updateData,
@@ -105,9 +184,8 @@ export class UsuariosService {
   async softDelete(id: number) {
     const exists = await this.prisma.usuario.findUnique({ where: { Id_Usuario: id } });
     if (!exists) throw new NotFoundException('Usuario no encontrado');
-    return this.prisma.usuario.update({
+    return this.prisma.usuario.delete({
       where: { Id_Usuario: id },
-      data: { estado: 'inactivo' },
     });
   }
 

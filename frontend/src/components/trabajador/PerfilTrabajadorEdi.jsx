@@ -77,9 +77,8 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
     const fetchPerfil = async () => {
         setIsLoading(true);
         try {
-            const res = await api.get('/empleados');
-            const lista = res.data?.data || [];
-            const d = lista.find(e => e.Id_Usuario === user.id);
+            const res = await api.get(`/empleados/${user.id}/perfil`);
+            const d = res.data?.data;
 
             if (d) {
                 setFormData(prev => ({
@@ -195,12 +194,40 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
                 }
             }
 
+            // Convertir días laborales de booleano a string separado por comas
+            const diasArr = [];
+            if (diasLaborales.lunes) diasArr.push('lunes');
+            if (diasLaborales.martes) diasArr.push('martes');
+            if (diasLaborales.miercoles) diasArr.push('miércoles');
+            if (diasLaborales.jueves) diasArr.push('jueves');
+            if (diasLaborales.viernes) diasArr.push('viernes');
+            if (diasLaborales.sabado) diasArr.push('sábado');
+            const diasLaboralesStr = diasArr.join(', ');
+
+            // Convertir especialidades de booleano a string separado por comas
+            const espsArr = [];
+            if (especialidades.sofas) espsArr.push('sofás');
+            if (especialidades.colchones) espsArr.push('colchones');
+            if (especialidades.sillas) espsArr.push('sillas');
+            if (especialidades.tapiceria) espsArr.push('tapicería');
+            const especialidadesStr = espsArr.join(', ');
+
+            // Formatear horario
+            const horarioStr = `${formData.horaInicio} - ${formData.horaFin}`;
+
             await api.put(`/usuarios/${user.id}`, {
                 Nombre:    formData.nombre,
                 Telefono:  formData.telefono,
                 Direccion: formData.direccion,
                 N_Documento: formData.cedula || undefined,
                 tipo_de_documento_id_tipo_de_documento: formData.tipoDocId ? Number(formData.tipoDocId) : undefined,
+                // Campos específicos de Empleado procesados por el backend:
+                cargo:     formData.cargo || undefined,
+                fecha_nacimiento: formData.fechaNac || undefined,
+                dias_laborales:  diasLaboralesStr || undefined,
+                horario:         horarioStr || undefined,
+                especialidades:  especialidadesStr || undefined,
+                certificaciones: certificaciones || undefined,
             });
 
             await refreshUser();

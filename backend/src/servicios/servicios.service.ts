@@ -14,6 +14,8 @@ export class ServiciosService {
         Precio: true,
         descripcion: true,
         imagen_url: true,
+        estado: true,
+        duracion_estimada: true,
       },
       orderBy: { Nombre_Servicio: 'asc' },
     });

@@ -32,3 +32,72 @@ export async function sendResetCode(correo: string, codigo: string): Promise<voi
     `,
   });
 }
+
+export interface ReservationDetails {
+  id: string;
+  fecha: string;
+  hora: string;
+  direccion: string;
+  total: number;
+}
+
+export async function sendServiceConfirmationEmail(correo: string, details: ReservationDetails): Promise<void> {
+  const transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.EMAIL_PORT || '587'),
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const formatter = new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0,
+  });
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM || `"Foam Wash" <${process.env.EMAIL_USER}>`,
+    to: correo,
+    subject: '🎉 ¡Tu pedido ha sido confirmado! - Foam Wash',
+    html: `
+      <div style="font-family: 'Inter', Arial, sans-serif; background-color: #f8f9fa; padding: 40px 20px;">
+        <div style="max-width: 500px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+          
+          <div style="padding: 40px 30px 20px; text-align: center;">
+            <div style="width: 80px; height: 80px; background-color: #f3f0ff; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 40px;">
+              🎉
+            </div>
+            
+            <h1 style="color: #111827; font-size: 24px; font-weight: 800; margin: 0 0 10px;">¡Pedido confirmado!</h1>
+            <p style="color: #6b7280; font-size: 14px; font-weight: 600; margin: 0 0 30px;">ID: ${details.id}</p>
+            
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 20px;">
+              <p style="margin: 0 0 12px; font-size: 14px; color: #334155;">
+                <span style="display: inline-block; width: 24px;">📅</span> <strong>Fecha:</strong> <span style="color: #64748b;">${details.fecha}</span>
+              </p>
+              <p style="margin: 0 0 12px; font-size: 14px; color: #334155;">
+                <span style="display: inline-block; width: 24px;">⏰</span> <strong>Hora:</strong> <span style="color: #64748b;">${details.hora}</span>
+              </p>
+              <p style="margin: 0; font-size: 14px; color: #334155;">
+                <span style="display: inline-block; width: 24px;">📍</span> <strong>Dirección:</strong> <span style="color: #64748b;">${details.direccion}</span>
+              </p>
+            </div>
+
+            <div style="background-color: #f5f3ff; border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+              <span style="color: #4b5563; font-weight: 600;">Total</span>
+              <span style="color: #6d28d9; font-size: 24px; font-weight: 800;">${formatter.format(details.total)}</span>
+            </div>
+
+            <a href="#" style="display: block; background-color: #6d28d9; color: #ffffff; text-decoration: none; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 16px; text-align: center;">
+              ¡Listo!
+            </a>
+          </div>
+
+        </div>
+      </div>
+    `,
+  });
+}

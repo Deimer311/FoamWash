@@ -32,28 +32,28 @@ const AgendaEmpleado = ({ onGoPanelEmpleado, onGoAgendaEmpleado, onGoPerfil }) =
       let endpoint;
       if (filtro === 'hoy') {
         endpoint = `/empleados/${user.id}/servicios-hoy`;
-      } else {
+      } else if (filtro === 'semana') {
         endpoint = `/empleados/${user.id}/agenda-semanal`;
+      } else if (filtro === 'completadas') {
+        endpoint = `/empleados/${user.id}/completados`;
+      } else if (filtro === 'pendientes') {
+        endpoint = `/empleados/${user.id}/pendientes`;
       }
       const response = await api.get(endpoint);
       if (response.data.success) {
-        let data = response.data.data || [];
-        if (filtro === 'completadas') {
-          data = data.filter(r => r.Estado === 'Completado');
-        } else if (filtro === 'pendientes') {
-          data = data.filter(r => r.Estado === 'Pendiente' || r.Estado === 'En Proceso');
-        }
+        const data = response.data.data || [];
         const normalized = data.map(r => ({
           id:            r.ID_Reserva,
           cliente:       r.cliente?.Nombre              || 'Sin nombre',
           servicio:      r.servicios?.[0]?.Nombre_Servicio || 'Sin servicio',
+          servicios:     r.servicios || [],
           fecha:         r.fecha ? new Date(r.fecha).toLocaleDateString('es-CO') : '—',
           direccion:     r.cliente?.Direccion            || 'Sin dirección',
           telefono:      r.cliente?.Telefono             || 'Sin teléfono',
           estado:        r.Estado,
-          hora:          r.Hora,
-          precio:        r.servicios?.[0]?.Precio        || null,
-          observaciones: r.Informacion_adicional         || '',
+          hora:          r.Hora ? new Date(r.Hora).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }) : 'N/A',
+          precio:        r.servicios?.reduce((s, sv) => s + Number(sv.Precio || 0), 0) || null,
+          observaciones: r.observacion?.Observaciones || r.Informacion_adicional || '',
         }));
         setOrdenes(normalized);
       }
@@ -66,6 +66,7 @@ const AgendaEmpleado = ({ onGoPanelEmpleado, onGoAgendaEmpleado, onGoPerfil }) =
   };
 
   const handleCambiarEstado = async (reservaId, nuevoEstado) => {
+
     try {
       await api.patch(`/reservas/${reservaId}/estado`, { estado: nuevoEstado });
       fetchReservas(filtroActivo);
