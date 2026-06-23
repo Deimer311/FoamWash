@@ -3,24 +3,8 @@ class ApiConstants {
   // Ejemplo: flutter run --dart-define=BACKEND_URL=https://api.foamwash.com/api
   static const String baseUrl = String.fromEnvironment(
     'BACKEND_URL',
-    defaultValue: 'http://192.168.1.40:5000/api',
+    defaultValue: 'http://192.168.40.41:5000/api',
   );
-
-
-
-
-
-     
-
-
-
-
-
-
-
-
-
-
   // Endpoints de Autenticación
   static const String loginEndpoint = '$baseUrl/auth/login';
   static const String registerEndpoint = '$baseUrl/auth/register';

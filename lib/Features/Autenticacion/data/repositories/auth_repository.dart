@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:foamwash/Features/auth_login/data/data_sources/auth_remote_data_source.dart';
-import 'package:foamwash/Features/auth_login/data/models/user_model.dart';
+import 'package:foamwash/Features/Autenticacion/data/data_sources/auth_remote_data_source.dart';
+import 'package:foamwash/Features/Autenticacion/data/models/user_model.dart';
 import 'package:foamwash/core/cache/secure_storage_service.dart';
 import 'package:foamwash/Api/api_constants.dart';
 
@@ -40,7 +40,6 @@ class AuthRepository {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('userEmail', email);
     await prefs.setString('userRole', userData['rol'] ?? '');
-    await prefs.setString('userName', userData['nombre'] ?? '');
     await prefs.setInt('userId', userData['id'] ?? 0);
     await prefs.setBool('isLogged', true);
 

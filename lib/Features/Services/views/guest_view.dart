@@ -73,20 +73,30 @@ class _GuestViewState extends State<GuestView> {
               ],
             ),
           ),
+          // ── Mismo orden y nombres que el header web (Inicio, Cotizar, Agendar) ──
           ListTile(
-            leading: const Icon(Icons.request_quote, color: AppTheme.primaryBlue),
-            title: const Text('Cotizar', style: TextStyle(fontWeight: FontWeight.w600)),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.home, color: AppTheme.primaryBlue),
-            title: const Text('Home', style: TextStyle(fontWeight: FontWeight.w600)),
+            leading: const Icon(Icons.home_outlined, color: AppTheme.primaryBlue),
+            title: const Text('Inicio', style: TextStyle(fontWeight: FontWeight.w600)),
             onTap: () {
               Navigator.pop(context);
               Navigator.pushReplacementNamed(context, '/home');
             },
+          ),
+          ListTile(
+            leading: const Icon(Icons.description_outlined, color: AppTheme.primaryBlue),
+            title: const Text('Cotizar', style: TextStyle(fontWeight: FontWeight.w600)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/cotizador');
+            },
+          ),
+          ListTile(
+            selected: true,
+            selectedTileColor: AppTheme.primaryBlue.withOpacity(0.08),
+            leading: const Icon(Icons.build_outlined, color: AppTheme.primaryBlue),
+            title: const Text('Agendar', style: TextStyle(fontWeight: FontWeight.w700)),
+            // Ya estamos en el catálogo de servicios (vista Agendar): solo cierra el drawer.
+            onTap: () => Navigator.pop(context),
           ),
           const Divider(),
           ListTile(

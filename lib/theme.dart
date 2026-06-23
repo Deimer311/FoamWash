@@ -12,6 +12,12 @@ class AppTheme {
 
   // Azul primario idéntico al web
   static const Color primaryBlue       = Color(0xFF1A4BFF);
+  static const Color heroBlue          = Color(0xFF1A56FF);
+  static const Color navBackground     = Color(0xD90A1437);
+  static const Color footerBackground  = Color(0xBF05080D);
+  static const Color successGreen      = Color(0xFF16A34A);
+  static const Color warningOrange     = Color(0xFFF59E0B);
+  static const Color errorRed          = Color(0xFFDC2626);
   static const Color primaryBlueDark   = Color(0xFF1338CC);
 
   // Morado del degradado del botón
@@ -47,29 +53,34 @@ class AppTheme {
 
   // ─── Sombras premium ──────────────────────────────────────────────────────
   static List<BoxShadow> get cardShadow => [
-    BoxShadow(
-      color: const Color(0xFF1A4BFF).withOpacity(0.08),
-      blurRadius: 24,
-      offset: const Offset(0, 8),
-      spreadRadius: 0,
-    ),
-    BoxShadow(
-      color: Colors.black.withOpacity(0.04),
-      blurRadius: 8,
-      offset: const Offset(0, 2),
-      spreadRadius: 0,
-    ),
-  ];
+  BoxShadow(
+    color: const Color(0xFF1A4BFF).withOpacity(0.08),
+    blurRadius: 24,
+    offset: const Offset(0, 8),
+    spreadRadius: 0,
+  ),
+  BoxShadow(
+    color: Colors.black.withOpacity(0.04),
+    blurRadius: 8,
+    offset: const Offset(0, 2),
+    spreadRadius: 0,
+  ),
+];
 
-  static List<BoxShadow> get buttonShadow => [
-    BoxShadow(
-      color: primaryBlue.withOpacity(0.35),
-      blurRadius: 16,
-      offset: const Offset(0, 6),
-      spreadRadius: 0,
-    ),
-  ];
+static BoxDecoration get premiumCard => BoxDecoration(
+  color: cardWhite,
+  borderRadius: BorderRadius.circular(radiusCard),
+  boxShadow: cardShadow,
+);
 
+static List<BoxShadow> get buttonShadow => [
+  BoxShadow(
+    color: primaryBlue.withOpacity(0.35),
+    blurRadius: 16,
+    offset: const Offset(0, 6),
+    spreadRadius: 0,
+  ),
+];
   // ─── Border radius ────────────────────────────────────────────────────────
   static const double radiusCard   = 20.0;
   static const double radiusButton = 14.0;

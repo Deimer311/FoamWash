@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:foamwash/Features/auth_login/data/repositories/auth_repository.dart';
-import 'package:foamwash/Features/auth_login/data/models/user_model.dart';
+import 'package:foamwash/Features/Autenticacion/data/repositories/auth_repository.dart';
+import 'package:foamwash/Features/Autenticacion/data/models/user_model.dart';
 import 'package:foamwash/core/services/fcm_service.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -48,17 +48,26 @@ class AuthProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final role = prefs.getString('userRole') ?? '';
       final userId = prefs.getInt('userId') ?? 0;
-      await FCMService.unsubscribeFromRoleTopics(role, userId);
-
-      await _repository.logout();
-      _isAuthenticated = false;
-      _userEmail = null;
-      _user = null;
-      _userRole = '';
-      notifyListeners();
+      try {
+        await FCMService.unsubscribeFromRoleTopics(role, userId);
+      } catch (e) {
+        print('FCM unsubscribe failed during logout: $e');
+      }
     } catch (e) {
-      print('Error al cerrar sesión: $e');
+      print('Error reading prefs during logout: $e');
     }
+
+    try {
+      await _repository.logout();
+    } catch (e) {
+      print('Repository logout failed: $e');
+    }
+
+    _isAuthenticated = false;
+    _userEmail = null;
+    _user = null;
+    _userRole = '';
+    notifyListeners();
   }
 
   /// Registro de un nuevo usuario
@@ -84,22 +93,31 @@ class AuthProvider extends ChangeNotifier {
 
   // Verifica el estado inicial basándose en la existencia de un token seguro
   Future<void> checkAuthStatus() async {
-    final token = await _repository.secureStorageService.read('token');
-    final prefs = await SharedPreferences.getInstance();
-    _isAuthenticated = token != null && token.isNotEmpty;
-    _userEmail = prefs.getString('userEmail');
-    _userRole = prefs.getString('userRole') ?? '';
-    final userId = prefs.getInt('userId') ?? 0;
+    try {
+      final token = await _repository.secureStorageService.read('token');
+      final prefs = await SharedPreferences.getInstance();
+      _isAuthenticated = token != null && token.isNotEmpty;
+      _userEmail = prefs.getString('userEmail');
+      _userRole = prefs.getString('userRole') ?? '';
+      final userId = prefs.getInt('userId') ?? 0;
 
-    if (_isAuthenticated) {
-      _user = UserModel(
-        idUsuario: userId,
-        nombre: '',
-        correo: _userEmail ?? '',
-        rolId: null,
-      );
-      // Auto-suscripción en reinicios si la sesión sigue activa
-      await FCMService.subscribeToRoleTopics(_userRole, userId);
+      if (_isAuthenticated) {
+        _user = UserModel(
+          idUsuario: userId,
+          nombre: '',
+          correo: _userEmail ?? '',
+          rolId: null,
+        );
+        // Auto-suscripción en reinicios si la sesión sigue activa
+        try {
+          await FCMService.subscribeToRoleTopics(_userRole, userId);
+        } catch (e) {
+          print('FCM subscribe failed: $e');
+        }
+      }
+    } catch (e) {
+      print('Error checking auth status: $e');
+      _isAuthenticated = false;
     }
 
     notifyListeners();
