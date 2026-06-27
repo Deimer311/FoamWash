@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/trabajador_drawer.dart';
 import 'package:foamwash/Api/api_constants.dart';
+import 'package:provider/provider.dart';
+import 'package:foamwash/Features/Autenticacion/providers/auth_provider.dart';
 import 'package:foamwash/core/cache/secure_storage_service.dart';
 
 // Nombres en español para días y meses
@@ -251,6 +253,8 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
   @override
   Widget build(BuildContext context) {
     final today = _formatFechaEspanol(DateTime.now());
+    final auth = Provider.of<AuthProvider>(context);
+    final userFoto = auth.user?.fotoPerfil;
 
     return Scaffold(
       backgroundColor: _bgPage,
@@ -311,7 +315,21 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
               onPressed: () => Scaffold.of(context).openEndDrawer(),
             ),
           ),
-          const SizedBox(width: 8),
+          Padding(
+            padding: const EdgeInsets.only(right: 16, left: 8),
+            child: CircleAvatar(
+              backgroundColor: const Color(0xFFD9D9D9),
+              radius: 18,
+              backgroundImage: userFoto != null && userFoto.isNotEmpty
+                  ? NetworkImage(userFoto.startsWith('http')
+                      ? userFoto
+                      : '${ApiConstants.baseUrl.replaceAll('/api', '')}$userFoto')
+                  : null,
+              child: (userFoto == null || userFoto.isEmpty)
+                  ? const Icon(Icons.person, color: Colors.white, size: 24)
+                  : null,
+            ),
+          ),
         ],
       ),
       body: SafeArea(

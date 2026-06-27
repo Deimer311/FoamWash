@@ -7,9 +7,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/Features/Comun/widgets/fw_perfil_widgets.dart';
 import 'package:foamwash/core/cache/secure_storage_service.dart';
 import 'package:foamwash/Features/Admin/views/perfil_admin_edit.dart';
+import 'package:foamwash/Features/Admin/views/admin_dashboard_view.dart';
 
 // =============================================================================
 // MODELO
@@ -107,9 +109,21 @@ class _PerfilAdminScreenState extends State<PerfilAdminScreen> {
     setState(() => _isLoading = true);
     try {
       final secureStorage = SecureStorageService();
+      final prefs = await SharedPreferences.getInstance();
       final token = await secureStorage.read('token') ?? '';
+      
+      // Intentar obtener el ID desde el widget, y si está vacío, desde prefs localmente.
+      String safeUserId = widget.userId;
+      if (safeUserId.isEmpty) {
+        safeUserId = (prefs.getInt('userId') ?? 0).toString();
+      }
+
+      if (safeUserId == '0' || safeUserId.isEmpty) {
+        throw Exception('ID de usuario no disponible para cargar el perfil.');
+      }
+
       final res = await http.get(
-        Uri.parse('${widget.apiBaseUrl}/api/usuarios/${widget.userId}'),
+        Uri.parse('${widget.apiBaseUrl}/api/usuarios/$safeUserId'),
         headers: {
           'Authorization': 'Bearer $token',
           'ngrok-skip-browser-warning': 'true',
@@ -151,19 +165,28 @@ class _PerfilAdminScreenState extends State<PerfilAdminScreen> {
     );
   }
 
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: FWColors.background,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Navigator.pushNamedAndRemoveUntil(context, '/admin_dashboard', (route) => false);
+      },
+      child: Scaffold(
+        backgroundColor: FWColors.background,
       appBar: AppBar(
         backgroundColor: const Color(0xFF0E1330),
         elevation: 0,
-        leading: widget.onBackToHome != null
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: widget.onBackToHome,
-              )
-            : null,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/admin_dashboard',
+              (route) => false,
+            );
+          },
+        ),
         title: Row(
           children: const [
             Text('FoamWash',
@@ -203,6 +226,7 @@ class _PerfilAdminScreenState extends State<PerfilAdminScreen> {
                 ),
               ),
             ),
+      ),
     );
   }
 

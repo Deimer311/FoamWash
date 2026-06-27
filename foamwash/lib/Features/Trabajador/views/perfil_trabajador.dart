@@ -7,9 +7,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/Features/Comun/widgets/fw_perfil_widgets.dart';
 import 'package:foamwash/core/cache/secure_storage_service.dart';
 import 'package:foamwash/Features/Trabajador/views/perfil_trabajador_edit.dart';
+import 'package:foamwash/Features/Trabajador/views/agenda_trabajador.dart';
 
 // =============================================================================
 // MODELOS
@@ -187,13 +189,24 @@ class _PerfilTrabajadorScreenState extends State<PerfilTrabajadorScreen> {
     });
     try {
       final secureStorage = SecureStorageService();
+      final prefs = await SharedPreferences.getInstance();
       final token = await secureStorage.read('token') ?? '';
+
+      String safeUserId = widget.userId;
+      if (safeUserId.isEmpty) {
+        safeUserId = (prefs.getInt('userId') ?? 0).toString();
+      }
+
+      if (safeUserId == '0' || safeUserId.isEmpty) {
+        throw Exception('ID de usuario no disponible para cargar el perfil.');
+      }
+
       final headers = {
         'Authorization': 'Bearer $token',
         'ngrok-skip-browser-warning': 'true',
       };
       final base = widget.apiBaseUrl;
-      final id = widget.userId;
+      final id = safeUserId;
       final results = await Future.wait([
         http.get(Uri.parse('$base/api/empleados/$id/perfil'), headers: headers),
         http.get(Uri.parse('$base/api/empleados/$id/desempeno'), headers: headers),
@@ -247,16 +260,28 @@ class _PerfilTrabajadorScreenState extends State<PerfilTrabajadorScreen> {
     );
   }
 
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: FWColors.background,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Navigator.pushNamedAndRemoveUntil(context, '/empleado_agenda', (route) => false);
+      },
+      child: Scaffold(
+        backgroundColor: FWColors.background,
       appBar: AppBar(
         backgroundColor: const Color(0xFF0E1330),
         elevation: 0,
-        leading: widget.onBackToHome != null
-            ? IconButton(icon: const Icon(Icons.arrow_back, color: Colors.white), onPressed: widget.onBackToHome)
-            : null,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/empleado_agenda',
+              (route) => false,
+            );
+          },
+        ),
         title: Row(
           children: const [
             Text('FoamWash', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18)),
@@ -269,6 +294,7 @@ class _PerfilTrabajadorScreenState extends State<PerfilTrabajadorScreen> {
         ],
       ),
       body: _buildBody(),
+      ),
     );
   }
 
@@ -466,19 +492,25 @@ class _PerfilTrabajadorScreenState extends State<PerfilTrabajadorScreen> {
       title: 'Desempeño del Mes',
       spaceBetween: false,
       children: [
-        GridView.count(
-          crossAxisCount: 2,
+        GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: 1.15,
-          children: [
-            _PerfCard(icono: '⭐', valor: _desempeno?.calificacionPromedio?.toStringAsFixed(1), etiqueta: 'Calificación Promedio', mensajeVacio: 'Este trabajador aún no tiene calificaciones.'),
-            _PerfCard(icono: '✅', valor: _desempeno?.serviciosMes?.toString(), etiqueta: 'Servicios Completados', mensajeVacio: 'No hay servicios completados durante este mes.'),
-            const _PerfCard(icono: '⏱️', valor: null, etiqueta: 'Puntualidad', mensajeVacio: 'No disponible: el sistema no registra la hora real de inicio.'),
-            _PerfCard(icono: '💬', valor: _desempeno?.comentarios?.toString(), etiqueta: 'Comentarios', mensajeVacio: 'No existen comentarios registrados.'),
-          ],
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            mainAxisExtent: 160,
+          ),
+          itemCount: 4,
+          itemBuilder: (context, index) {
+            switch(index) {
+              case 0: return _PerfCard(icono: '⭐', valor: _desempeno?.calificacionPromedio?.toStringAsFixed(1), etiqueta: 'Calificación Promedio', mensajeVacio: 'Este trabajador aún no tiene calificaciones.');
+              case 1: return _PerfCard(icono: '✅', valor: _desempeno?.serviciosMes?.toString(), etiqueta: 'Servicios Completados', mensajeVacio: 'No hay servicios completados durante este mes.');
+              case 2: return const _PerfCard(icono: '⏱️', valor: null, etiqueta: 'Puntualidad', mensajeVacio: 'No disponible: el sistema no registra la hora real de inicio.');
+              case 3: return _PerfCard(icono: '💬', valor: _desempeno?.comentarios?.toString(), etiqueta: 'Comentarios', mensajeVacio: 'No existen comentarios registrados.');
+              default: return const SizedBox();
+            }
+          },
         ),
       ],
     );

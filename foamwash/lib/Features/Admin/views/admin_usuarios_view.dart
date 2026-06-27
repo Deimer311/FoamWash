@@ -5,6 +5,7 @@ import '../widgets/admin_drawer.dart';
 import '../widgets/add_usuario_dialog.dart';
 import '../widgets/edit_usuario_dialog.dart';
 import 'package:foamwash/core/utils/security_utils.dart';
+import 'package:foamwash/Features/Admin/views/admin_dashboard_view.dart';
 
 class AdminUsuariosView extends StatefulWidget {
   const AdminUsuariosView({super.key});
@@ -79,6 +80,14 @@ class _AdminUsuariosViewState extends State<AdminUsuariosView> {
         automaticallyImplyLeading: false,
         backgroundColor: primaryDark,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const AdminDashboardView()),
+            (route) => false,
+          ),
+        ),
         title: RichText(
           text: const TextSpan(
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),

@@ -52,31 +52,62 @@ class _SchedulingViewState extends State<SchedulingView> {
   }
 
   Widget _buildDrawer() {
+    final auth = Provider.of<AuthProvider>(context);
+    final user = auth.user;
+    final isLogged = auth.isAuthenticated;
+    final userName = user?.nombre ?? 'Modo Invitado';
+    final userFoto = user?.fotoPerfil;
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.only(top: 60, bottom: 20, left: 20),
+            decoration: const BoxDecoration(
               color: AppTheme.appBarDark,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                if (isLogged)
+                  CircleAvatar(
+                    backgroundColor: Colors.white,
+                    radius: 30,
+                    backgroundImage: userFoto != null && userFoto.isNotEmpty
+                        ? NetworkImage(userFoto.startsWith('http') 
+                            ? userFoto 
+                            : '${ApiConstants.baseUrl.replaceAll('/api', '')}$userFoto')
+                        : null,
+                    child: (userFoto == null || userFoto.isEmpty)
+                        ? const Icon(Icons.person, color: AppTheme.appBarDark, size: 40)
+                        : null,
+                  )
+                else
+                  const Text(
+                    'FoamWash',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                const SizedBox(height: 15),
                 Text(
-                  'FoamWash',
-                  style: TextStyle(
+                  userName,
+                  style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 8),
-                Text(
-                  'Menú principal',
-                  style: TextStyle(color: Colors.white70),
-                )
+                if (isLogged && user?.correo != null)
+                  Text(
+                    user!.correo,
+                    style: const TextStyle(color: Colors.white70),
+                  )
               ],
             ),
           ),

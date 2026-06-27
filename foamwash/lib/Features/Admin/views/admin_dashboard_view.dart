@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/Api/api_constants.dart';
+import 'package:provider/provider.dart';
+import 'package:foamwash/Features/Autenticacion/providers/auth_provider.dart';
 import 'package:foamwash/Features/Autenticacion/login_screen.dart';
 import '../widgets/admin_drawer.dart';
 import 'package:foamwash/core/utils/security_utils.dart';
@@ -19,6 +21,7 @@ class AdminDashboardView extends StatefulWidget {
 class _AdminDashboardViewState extends State<AdminDashboardView> {
   List<dynamic> _reservas = [];
   List<dynamic> _empleados = [];
+  int _totalClientesInDB = 0;
   bool _isLoading = true;
   String? _error;
 
@@ -77,6 +80,11 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
         headers: headers,
       );
 
+      final responseUsuarios = await http.get(
+        Uri.parse(ApiConstants.getUsuariosEndpoint),
+        headers: headers,
+      );
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(response.body);
         List<dynamic> emps = [];
@@ -85,22 +93,47 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
           emps = dataEmps['data'] ?? dataEmps;
         }
 
-        setState(() {
-          _reservas = data['data'] ?? data;
-          _empleados = emps;
-          _isLoading = false;
-        });
+        int countClientes = 0;
+        if (responseUsuarios.statusCode == 200 || responseUsuarios.statusCode == 201) {
+          final dataUsers = json.decode(responseUsuarios.body);
+          final List usersList = dataUsers['data'] ?? dataUsers;
+          for (var u in usersList) {
+            // El backend retorna { rol: { Rol: 'cliente' } }
+            final rolData = u['rol'];
+            if (rolData != null && rolData is Map) {
+              final String nombreRol = (rolData['Rol'] ?? '').toString().toLowerCase();
+              if (nombreRol == 'cliente' || u['rol_Id_Rol'] == 3 || u['rol_id_Rol'] == 3) {
+                countClientes++;
+              }
+            } else if (u['rol_Id_Rol'] == 3 || u['rol_id_Rol'] == 3) {
+               countClientes++;
+            }
+          }
+        }
+
+        if (mounted) {
+          setState(() {
+            _reservas = data['data'] ?? data;
+            _empleados = emps;
+            _totalClientesInDB = countClientes;
+            _isLoading = false;
+          });
+        }
       } else {
+        if (mounted) {
+          setState(() {
+            _error = 'Error al cargar las reservas. Código: ${response.statusCode}';
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
         setState(() {
-          _error = 'Error al cargar las reservas. Código: ${response.statusCode}';
+          _error = 'Error de conexión: $e';
           _isLoading = false;
         });
       }
-    } catch (e) {
-      setState(() {
-        _error = 'Error de conexión: $e';
-        _isLoading = false;
-      });
     }
   }
 
@@ -121,8 +154,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
 
   // Funciones de calculo para el Panel de Control
   int _getTotalClientes() {
-    final clientes = _reservas.map((r) => r['cliente']?['Id_Usuario'] ?? r['cliente']?['id'] ?? r['cliente']?['ID_Usuario']).where((id) => id != null).toSet();
-    return clientes.length;
+    return _totalClientesInDB;
   }
   
   int _getPendientes() {
@@ -162,6 +194,9 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = Provider.of<AuthProvider>(context);
+    final userFoto = auth.user?.fotoPerfil;
+
     return Scaffold(
       backgroundColor: _bgField,
       endDrawer: AdminDrawer(),
@@ -189,9 +224,17 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
             padding: const EdgeInsets.only(right: 16, left: 8),
             child: GestureDetector(
               onTap: _logout,
-              child: const CircleAvatar(
-                backgroundColor: Color(0xFFD9D9D9),
+              child: CircleAvatar(
+                backgroundColor: const Color(0xFFD9D9D9),
                 radius: 18,
+                backgroundImage: userFoto != null && userFoto.isNotEmpty
+                    ? NetworkImage(userFoto.startsWith('http')
+                        ? userFoto
+                        : '${ApiConstants.baseUrl.replaceAll('/api', '')}$userFoto')
+                    : null,
+                child: (userFoto == null || userFoto.isEmpty)
+                    ? const Icon(Icons.person, color: Colors.white, size: 24)
+                    : null,
               ),
             ),
           )
@@ -455,6 +498,10 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
         final clienteTelf = r['cliente']?['Telefono'] ?? '3123038407';
         final clienteDir = r['cliente']?['Direccion'] ?? 'Dirección desconocida';
         final estado = r['Estado'] ?? 'Pendiente';
+        final servicios = (r['servicios'] as List?) ?? [];
+        final servicioNombre = servicios.isNotEmpty
+            ? servicios.map((s) => s['Nombre_Servicio'] ?? 'Servicio').join(', ')
+            : 'Sin servicio';
 
         // Obtener iniciales para el avatar
         String initials = 'CP';
@@ -541,7 +588,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '$clienteNombre - 1970-', // "1970-" placeholder igual a la imagen
+                      '$clienteNombre - $servicioNombre',
                       style: TextStyle(
                         fontFamily: 'Kanit',
                         fontSize: 11,

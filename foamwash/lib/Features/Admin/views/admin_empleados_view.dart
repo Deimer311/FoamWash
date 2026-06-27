@@ -5,6 +5,7 @@ import '../widgets/empleado_flip_card.dart';
 import '../widgets/add_empleado_dialog.dart';
 import '../widgets/admin_drawer.dart';
 import 'package:foamwash/core/utils/security_utils.dart';
+import 'package:foamwash/Features/Admin/views/admin_dashboard_view.dart';
 
 class AdminEmpleadosView extends StatefulWidget {
   const AdminEmpleadosView({super.key});
@@ -45,6 +46,14 @@ class _AdminEmpleadosViewState extends State<AdminEmpleadosView> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFF15192C),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const AdminDashboardView()),
+            (route) => false,
+          ),
+        ),
         title: RichText(
           text: const TextSpan(
             children: [

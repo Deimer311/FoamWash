@@ -6,6 +6,7 @@ import 'package:foamwash/Api/api_constants.dart';
 import '../widgets/admin_drawer.dart';
 import 'package:foamwash/core/utils/security_utils.dart';
 import 'package:foamwash/core/cache/secure_storage_service.dart';
+import 'package:foamwash/Features/Admin/views/admin_dashboard_view.dart';
 
 
 
@@ -125,6 +126,14 @@ class _AdminAgendaViewState extends State<AdminAgendaView> {
         backgroundColor: _primaryDark,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const AdminDashboardView()),
+            (route) => false,
+          ),
+        ),
         title: const Text(
           'Agenda de Reservas',
           style: TextStyle(fontFamily: 'Kanit', fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white),

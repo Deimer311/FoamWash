@@ -52,7 +52,18 @@ class _AgendamientosViewState extends State<AgendamientosView> {
         final body = jsonDecode(res.body);
         if (body['success'] == true) {
           setState(() {
-            _reservas = body['data'] ?? [];
+            final now = DateTime.now();
+            final allReservas = List<Map<String, dynamic>>.from(body['data'] ?? []);
+            _reservas = allReservas.where((r) {
+              final status = r['Estado'];
+              if (status == 'Completado' || status == 'Finalizado' || status == 'Cancelado') {
+                final fechaObj = r['fecha'] != null ? DateTime.tryParse(r['fecha'].toString()) : null;
+                if (fechaObj != null && now.difference(fechaObj).inDays > 7) {
+                  return false;
+                }
+              }
+              return true;
+            }).toList();
             _isLoading = false;
           });
           return;
