@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:foamwash/Features/Autenticacion/providers/auth_provider.dart';
+import 'package:foamwash/Api/api_constants.dart';
 
 class TrabajadorDrawer extends StatelessWidget {
   const TrabajadorDrawer({super.key});
@@ -8,7 +9,10 @@ class TrabajadorDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const Color primaryDark = Color(0xFF15192C);
-    const Color primaryBlue = Color(0xFF1A56FF);
+    final auth = Provider.of<AuthProvider>(context);
+    final user = auth.user;
+    final userName = user?.nombre ?? 'Trabajador';
+    final userFoto = user?.fotoPerfil;
 
     return Drawer(
       backgroundColor: Colors.white,
@@ -20,18 +24,25 @@ class TrabajadorDrawer extends StatelessWidget {
             decoration: const BoxDecoration(
               color: primaryDark,
             ),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CircleAvatar(
                   backgroundColor: Colors.white,
                   radius: 30,
-                  child: Icon(Icons.person, color: primaryDark, size: 40),
+                  backgroundImage: userFoto != null && userFoto.isNotEmpty
+                      ? NetworkImage(userFoto.startsWith('http') 
+                          ? userFoto 
+                          : '${ApiConstants.baseUrl.replaceAll('/api', '')}$userFoto')
+                      : null,
+                  child: (userFoto == null || userFoto.isEmpty)
+                      ? const Icon(Icons.person, color: primaryDark, size: 40)
+                      : null,
                 ),
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
                 Text(
-                  'Trabajador',
-                  style: TextStyle(
+                  userName,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 22,
                     fontWeight: FontWeight.bold,

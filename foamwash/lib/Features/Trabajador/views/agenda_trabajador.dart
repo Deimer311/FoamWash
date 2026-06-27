@@ -761,13 +761,17 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
                           Icon(Icons.access_time_rounded,
                               size: 13, color: _textMuted),
                           const SizedBox(width: 4),
-                          Text(
-                            '$horaStr${_activeFilter != 0 ? '  •  $fechaStr' : ''}',
-                            style: TextStyle(
-                              fontFamily: _font,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: _primary,
+                          Expanded(
+                            child: Text(
+                              '$horaStr${_activeFilter != 0 ? '  •  $fechaStr' : ''}',
+                              style: TextStyle(
+                                fontFamily: _font,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: _primary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -886,16 +890,19 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
     
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+        return SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Handle
               Center(
@@ -927,7 +934,9 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
               const SizedBox(height: 20),
             ],
           ),
-        );
+        ),
+      ),
+    );
       }
     );
   }

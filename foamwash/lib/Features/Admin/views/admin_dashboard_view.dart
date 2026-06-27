@@ -147,9 +147,11 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
       if (fechaStr != null) {
         final d = DateTime.tryParse(fechaStr);
         if (d != null && d.month == now.month && d.year == now.year) {
-          if (r['servicios'] != null) {
-            for (var s in r['servicios']) {
-              total += double.tryParse((s['Precio'] ?? 0).toString()) ?? 0.0;
+          if (r['Estado'] == 'Completado' || r['Estado'] == 'Finalizado') {
+            if (r['servicios'] != null) {
+              for (var s in r['servicios']) {
+                total += double.tryParse((s['Precio'] ?? 0).toString()) ?? 0.0;
+              }
             }
           }
         }
