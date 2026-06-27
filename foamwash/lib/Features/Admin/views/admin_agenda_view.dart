@@ -27,6 +27,7 @@ class AdminAgendaView extends StatefulWidget {
 
 class _AdminAgendaViewState extends State<AdminAgendaView> {
   String _currentView = 'hoy'; // hoy, semana, mes
+  String _statusFilter = 'Todos'; // Todos, Pendiente, Aceptado, En Camino, En Proceso, Completado, Cancelado
   List<dynamic> _reservas = [];
   List<dynamic> _empleados = [];
   bool _isLoading = true;
@@ -158,6 +159,7 @@ class _AdminAgendaViewState extends State<AdminAgendaView> {
                   onRefresh: _fetchData,
                   child: Column(
                     children: [
+                      _buildStatusFilter(),
                       _buildViewToggle(),
                       Expanded(
                         child: _buildReservasList(),
@@ -190,6 +192,33 @@ class _AdminAgendaViewState extends State<AdminAgendaView> {
           _buildToggleBtn('Semana', 'semana'),
           _buildToggleBtn('Mes', 'mes'),
         ],
+      ),
+    );
+  }
+
+  Widget _buildStatusFilter() {
+    final filters = ['Todos', 'Pendiente', 'En Proceso', 'Completado', 'Cancelado'];
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: Row(
+        children: filters.map((f) {
+          final isActive = _statusFilter == f;
+          return Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: ChoiceChip(
+              label: Text(f, style: TextStyle(fontFamily: 'Kanit', color: isActive ? Colors.white : _textColor)),
+              selected: isActive,
+              selectedColor: _primary,
+              backgroundColor: Colors.white,
+              onSelected: (selected) {
+                if (selected) {
+                  setState(() => _statusFilter = f);
+                }
+              },
+            ),
+          );
+        }).toList(),
       ),
     );
   }
@@ -231,7 +260,7 @@ class _AdminAgendaViewState extends State<AdminAgendaView> {
     final todayStr = now.toIso8601String().split('T')[0];
 
     final filtered = _reservas.where((r) {
-      if (r['Estado'] == 'Cancelado') return false; // Filtramos canceladas por ahora
+      if (_statusFilter != 'Todos' && r['Estado'] != _statusFilter) return false;
       final fechaStr = r['fecha']?.toString().split('T')[0];
       if (_currentView == 'hoy') {
         return fechaStr == todayStr;

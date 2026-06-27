@@ -6,6 +6,7 @@ import '../widgets/admin_drawer.dart';
 import '../widgets/add_servicio_dialog.dart';
 import '../widgets/edit_servicio_dialog.dart';
 import 'package:foamwash/core/utils/security_utils.dart';
+import 'package:foamwash/Api/api_constants.dart';
 
 class AdminServiciosView extends StatefulWidget {
   const AdminServiciosView({super.key});
@@ -204,7 +205,6 @@ class _AdminServiciosViewState extends State<AdminServiciosView> {
   }
 
   Widget _buildServiceCard(ServiceModel servicio) {
-    final hasNetworkImage = servicio.imagenUrl != null && servicio.imagenUrl!.startsWith('http');
 
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
@@ -228,17 +228,28 @@ class _AdminServiciosViewState extends State<AdminServiciosView> {
             child: SizedBox(
               height: 190,
               width: double.infinity,
-              child: hasNetworkImage
-                  ? Image.network(
-                      servicio.imagenUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => _buildImagePlaceholder(),
-                    )
-                  : Image.asset(
-                      'assets/fondo.png',
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => _buildImagePlaceholder(),
-                    ),
+              child: Builder(builder: (context) {
+                final raw = servicio.imagenUrl ?? '';
+                String imageUrl = raw;
+                if (raw.isNotEmpty && !raw.startsWith('http')) {
+                  final base = ApiConstants.baseUrl.endsWith('/api')
+                      ? ApiConstants.baseUrl.substring(0, ApiConstants.baseUrl.length - 4)
+                      : ApiConstants.baseUrl;
+                  imageUrl = '$base$raw';
+                }
+                if (imageUrl.startsWith('http')) {
+                  return Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => _buildImagePlaceholder(),
+                  );
+                }
+                return Image.asset(
+                  'assets/fondo.png',
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => _buildImagePlaceholder(),
+                );
+              }),
             ),
           ),
           // Contenido de texto y botones

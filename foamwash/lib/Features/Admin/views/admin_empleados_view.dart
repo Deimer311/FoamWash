@@ -131,7 +131,7 @@ class _AdminEmpleadosViewState extends State<AdminEmpleadosView> {
                             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
-                              childAspectRatio: 0.75,
+                              childAspectRatio: 0.65,
                               crossAxisSpacing: 20,
                               mainAxisSpacing: 20,
                             ),

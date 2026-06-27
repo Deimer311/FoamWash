@@ -16,11 +16,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private prisma: PrismaService,
   ) {
     super({
-      // Extraer token de la COOKIE (igual que antes: req.cookies.accessToken)
+      // Extraer token de la COOKIE o del Header Authorization
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
           return request?.cookies?.accessToken ?? null;
         },
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
       ignoreExpiration: false,
       secretOrKey: configService.get<string>('JWT_SECRET'),
@@ -31,7 +32,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   // Este método se ejecuta después de verificar el JWT
   // Equivale al bloque "verificar usuario en BD" de auth.middleware.js
   async validate(request: Request, payload: any) {
-    const token = request?.cookies?.accessToken;
+    let token = request?.cookies?.accessToken;
+    
+    // Si no hay cookie, intentar extraer del header Authorization
+    if (!token && request.headers.authorization) {
+      const authHeader = request.headers.authorization;
+      if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+      }
+    }
 
     const user = await this.prisma.usuario.findFirst({
       where: {

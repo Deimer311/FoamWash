@@ -5,14 +5,6 @@ export declare class EmpleadosController {
     findAll(): Promise<{
         success: boolean;
         data: {
-            Id_Usuario: number;
-            Nombre: string;
-            Telefono: string;
-            N_Documento: string;
-            Direccion: string;
-            Correo: string;
-            estado: import(".prisma/client").$Enums.usuario_estado;
-            foto_perfil: string;
             empleado: {
                 cargo: string;
                 fecha_nacimiento: Date;
@@ -24,6 +16,14 @@ export declare class EmpleadosController {
                 contacto_emergencia_nombre: string;
                 contacto_emergencia_telefono: string;
             }[];
+            Id_Usuario: number;
+            N_Documento: string;
+            Correo: string;
+            Nombre: string;
+            Telefono: string;
+            Direccion: string;
+            estado: import(".prisma/client").$Enums.usuario_estado;
+            foto_perfil: string;
             tipo_de_documento: {
                 idTipo_de_Documento: number;
                 nombre_del_documento: string;
@@ -34,9 +34,9 @@ export declare class EmpleadosController {
         success: boolean;
         data: {
             Id_Usuario: number;
+            Correo: string;
             Nombre: string;
             Telefono: string;
-            Correo: string;
         }[];
     }>;
     serviciosFinalizados(): Promise<{
@@ -56,7 +56,6 @@ export declare class EmpleadosController {
                 descripcion: string;
                 imagen_url: string | null;
                 cotizacion_Id_Cotizacion: number | null;
-                reserva_ID_Reserva: number | null;
                 duracion_estimada: string | null;
             }[];
         } & {
@@ -93,6 +92,7 @@ export declare class EmpleadosController {
             estado: import(".prisma/client").$Enums.usuario_estado;
             fecha_registro: Date;
             tipo_de_documento: {
+                idTipo_de_Documento: number;
                 nombre_del_documento: string;
             };
             rol: {
@@ -145,6 +145,30 @@ export declare class EmpleadosController {
         total: number;
     }>;
     agendaSemanal(id: number): Promise<{
+        success: boolean;
+        data: ({
+            cliente: {
+                Nombre: string;
+                Telefono: string;
+                Direccion: string;
+            };
+            servicios: {
+                Nombre_Servicio: string;
+                Precio: import("@prisma/client/runtime/library").Decimal;
+            }[];
+        } & {
+            Id_Usuario: number;
+            fecha: Date;
+            ID_Reserva: number;
+            Estado: string;
+            Hora: Date;
+            Informacion_adicional: string | null;
+            observacion_Id_Observaciones: number;
+            empleado_Id_Usuario: number | null;
+        })[];
+        total: number;
+    }>;
+    agendaMensual(id: number): Promise<{
         success: boolean;
         data: ({
             cliente: {

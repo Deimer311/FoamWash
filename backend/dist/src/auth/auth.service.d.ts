@@ -37,20 +37,20 @@ export declare class AuthService {
         message: string;
     }>;
     getMe(userId: number): Promise<{
-        tipo_de_documento: {
-            idTipo_de_Documento: number;
-            nombre_del_documento: string;
-        };
         rol: {
             Rol: string;
             Id_Rol: number;
         };
+        tipo_de_documento: {
+            idTipo_de_Documento: number;
+            nombre_del_documento: string;
+        };
         Id_Usuario: number;
+        N_Documento: string | null;
+        Correo: string | null;
         Nombre: string | null;
         Telefono: string | null;
-        N_Documento: string | null;
         Direccion: string | null;
-        Correo: string | null;
         estado: import(".prisma/client").$Enums.usuario_estado | null;
         rol_Id_Rol: number | null;
         tipo_de_documento_id_tipo_de_documento: number | null;

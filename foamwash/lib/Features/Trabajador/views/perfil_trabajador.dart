@@ -8,6 +8,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:foamwash/Features/Comun/widgets/fw_perfil_widgets.dart';
+import 'package:foamwash/core/cache/secure_storage_service.dart';
+import 'package:foamwash/Features/Trabajador/views/perfil_trabajador_edit.dart';
 
 // =============================================================================
 // MODELOS
@@ -146,7 +148,7 @@ class PerfilTrabajadorScreen extends StatefulWidget {
   final String apiBaseUrl;
   final String userId;
 
-  final VoidCallback? onEditarPerfil;
+  final Future<void> Function()? onEditarPerfil;
   final VoidCallback? onLogout;
   final VoidCallback? onBackToHome;
 
@@ -184,12 +186,18 @@ class _PerfilTrabajadorScreenState extends State<PerfilTrabajadorScreen> {
       _error = null;
     });
     try {
+      final secureStorage = SecureStorageService();
+      final token = await secureStorage.read('token') ?? '';
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'ngrok-skip-browser-warning': 'true',
+      };
       final base = widget.apiBaseUrl;
       final id = widget.userId;
       final results = await Future.wait([
-        http.get(Uri.parse('$base/api/empleados/$id/perfil')),
-        http.get(Uri.parse('$base/api/empleados/$id/desempeno')),
-        http.get(Uri.parse('$base/api/empleados/$id/servicios-hoy')),
+        http.get(Uri.parse('$base/api/empleados/$id/perfil'), headers: headers),
+        http.get(Uri.parse('$base/api/empleados/$id/desempeno'), headers: headers),
+        http.get(Uri.parse('$base/api/empleados/$id/servicios-hoy'), headers: headers),
       ]);
 
       final perfilBody = json.decode(results[0].body);
@@ -210,10 +218,12 @@ class _PerfilTrabajadorScreenState extends State<PerfilTrabajadorScreen> {
       }
     } catch (e) {
       _error = 'No se pudo cargar la información del perfil. Verifica la conexión con el servidor.';
-      print('❌ Error al cargar el perfil del trabajador: $e');
+      debugPrint('Error al cargar el perfil del trabajador: $e');
     } finally {
-      setState(() => _isLoading = false);
-      fwAnimarEntrada(_visible, setState, mounted: () => mounted);
+      if (mounted) {
+        setState(() => _isLoading = false);
+        fwAnimarEntrada(_visible, setState, mounted: () => mounted);
+      }
     }
   }
 
@@ -383,7 +393,19 @@ class _PerfilTrabajadorScreenState extends State<PerfilTrabajadorScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: widget.onEditarPerfil,
+                  onPressed: () async {
+                    // Navegar directamente y recargar si hubo cambios
+                    final updated = await Navigator.push<bool>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PerfilTrabajadorEditScreen(
+                          apiBaseUrl: widget.apiBaseUrl,
+                          userId: widget.userId,
+                        ),
+                      ),
+                    );
+                    if (updated == true) _cargarDatos();
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: FWColors.primaryBlue,
@@ -528,21 +550,27 @@ class _StatSidebar extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Text(
-              valor ?? mensajeVacio,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: valor != null ? 22 : 11,
-                fontWeight: FontWeight.w800,
-                fontStyle: valor != null ? FontStyle.normal : FontStyle.italic,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                valor ?? mensajeVacio,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: valor != null ? 22 : 11,
+                  fontWeight: FontWeight.w800,
+                  fontStyle: valor != null ? FontStyle.normal : FontStyle.italic,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
-            Text(
-              etiqueta.toUpperCase(),
-              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 0.4),
-              textAlign: TextAlign.center,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                etiqueta.toUpperCase(),
+                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 0.4),
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
         ),
@@ -568,15 +596,19 @@ class _PerfCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(icono, style: const TextStyle(fontSize: 22)),
-          const SizedBox(height: 8),
-          Text(
-            valor ?? mensajeVacio,
-            textAlign: TextAlign.center,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: valor != null
-                ? const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: FWColors.textDark)
-                : const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF), fontStyle: FontStyle.italic),
+          const SizedBox(height: 4),
+          Expanded(
+            child: Center(
+              child: Text(
+                valor ?? mensajeVacio,
+                textAlign: TextAlign.center,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: valor != null
+                    ? const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: FWColors.textDark)
+                    : const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF), fontStyle: FontStyle.italic),
+              ),
+            ),
           ),
           const SizedBox(height: 4),
           Text(etiqueta, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, color: FWColors.textMuted, fontWeight: FontWeight.w600)),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../widgets/trabajador_drawer.dart';
 import 'package:foamwash/Api/api_constants.dart';
 import 'package:foamwash/core/cache/secure_storage_service.dart';
 
@@ -154,6 +155,38 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
     }
   }
 
+  Future<void> _actualizarEstado(int reservaId, String nuevoEstado) async {
+    try {
+      final secureStorage = SecureStorageService();
+      final token = await secureStorage.read('token') ?? '';
+      
+      final url = Uri.parse('${ApiConstants.baseUrl}/reservas/$reservaId/estado');
+      final res = await http.patch(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({'estado': nuevoEstado}),
+      );
+      
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Estado actualizado'), backgroundColor: Colors.green),
+        );
+        _fetchData(); // Recargar datos
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al actualizar estado'), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error de red: $e'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
   // ── Cálculo de estadísticas ───────────────────────────────
   int get _countHoy => _serviciosHoy.length;
 
@@ -167,7 +200,7 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
       .length;
 
   int get _countPendientes => _serviciosMes
-      .where((r) => r['Estado'] == 'Pendiente')
+      .where((r) => r['Estado'] != 'Completado' && r['Estado'] != 'Finalizado' && r['Estado'] != 'Cancelado')
       .length;
 
   // ── Lista filtrada ────────────────────────────────────────
@@ -191,7 +224,7 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
         break;
       case 4:
         base = _serviciosMes
-            .where((r) => r['Estado'] == 'Pendiente')
+            .where((r) => r['Estado'] != 'Completado' && r['Estado'] != 'Finalizado' && r['Estado'] != 'Cancelado')
             .toList();
         break;
       default:
@@ -221,6 +254,66 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
 
     return Scaffold(
       backgroundColor: _bgPage,
+      endDrawer: const TrabajadorDrawer(),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: _primaryDark,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [_primary, Color(0xFF3B82F6)],
+                ),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Center(
+                child: Text(
+                  'FW',
+                  style: TextStyle(
+                    fontFamily: _font,
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'FoamWash',
+              style: TextStyle(
+                fontFamily: _font,
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            Text(
+              ' EM',
+              style: TextStyle(
+                fontFamily: _font,
+                color: Colors.white.withOpacity(0.5),
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white, size: 28),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: SafeArea(
         child: FadeTransition(
           opacity: _fadeIn,
@@ -234,7 +327,6 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
                       color: _primary,
                       child: CustomScrollView(
                         slivers: [
-                          SliverToBoxAdapter(child: _buildAppBar()),
                           SliverToBoxAdapter(child: _buildHeader(today)),
                           SliverToBoxAdapter(child: _buildSearchBar()),
                           SliverToBoxAdapter(child: _buildStatsCards()),
@@ -258,112 +350,6 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
                       ),
                     ),
         ),
-      ),
-    );
-  }
-
-  // ══════════════════════════════════════════════════════════
-  //  APP BAR
-  // ══════════════════════════════════════════════════════════
-  Widget _buildAppBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: const BoxDecoration(
-        color: _primaryDark,
-        border: Border(
-          bottom: BorderSide(color: Color(0x14FFFFFF), width: 1),
-        ),
-      ),
-      child: Row(
-        children: [
-          // Logo
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [_primary, Color(0xFF3B82F6)],
-              ),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Center(
-              child: Text(
-                'FW',
-                style: TextStyle(
-                  fontFamily: _font,
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          const Text(
-            'FoamWash',
-            style: TextStyle(
-              fontFamily: _font,
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          Text(
-            'EM',
-            style: TextStyle(
-              fontFamily: _font,
-              color: Colors.white.withOpacity(0.5),
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const Spacer(),
-          // Botón Agenda
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.white.withOpacity(0.2)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(Icons.calendar_today_rounded,
-                    color: Colors.white, size: 15),
-                SizedBox(width: 6),
-                Text(
-                  'Agenda',
-                  style: TextStyle(
-                    fontFamily: _font,
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          // Avatar
-          GestureDetector(
-            onTap: () => _showLogoutDialog(),
-            child: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF3B82F6), _primary],
-                ),
-                border: Border.all(
-                    color: Colors.white.withOpacity(0.3), width: 2),
-              ),
-              child: const Icon(Icons.person_rounded,
-                  color: Colors.white, size: 18),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -531,7 +517,7 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: SizedBox(
-        height: 115,
+        height: 120,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
           itemCount: stats.length,
@@ -707,21 +693,24 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
       pillIcon = Icons.access_time_rounded;
     }
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: _cardBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border(left: BorderSide(color: borderColor, width: 4)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Padding(
+    return InkWell(
+      onTap: () => _showEstadoModal(reserva),
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: _cardBg,
+          borderRadius: BorderRadius.circular(16),
+          border: Border(left: BorderSide(color: borderColor, width: 4)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -759,7 +748,7 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
                         clienteNombre,
                         style: const TextStyle(
                           fontFamily: _font,
-                          fontSize: 15,
+                          fontSize: 17,
                           fontWeight: FontWeight.w800,
                           color: _textDark,
                         ),
@@ -776,8 +765,8 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
                             '$horaStr${_activeFilter != 0 ? '  •  $fechaStr' : ''}',
                             style: TextStyle(
                               fontFamily: _font,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
                               color: _primary,
                             ),
                           ),
@@ -803,8 +792,8 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
                         estado,
                         style: TextStyle(
                           fontFamily: _font,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
                           color: pillText,
                         ),
                       ),
@@ -825,8 +814,9 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
                     clienteDir,
                     style: TextStyle(
                       fontFamily: _font,
-                      fontSize: 12,
-                      color: _textMuted,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: _textDark.withOpacity(0.8),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -840,8 +830,9 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
                   clienteTelf,
                   style: TextStyle(
                     fontFamily: _font,
-                    fontSize: 12,
-                    color: _textMuted,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: _textDark.withOpacity(0.8),
                   ),
                 ),
               ],
@@ -862,17 +853,116 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
                           ),
                           child: Text(
                             s['Nombre_Servicio'] ?? '',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: _font,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF64748B),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: _textDark.withOpacity(0.8),
                             ),
                           ),
                         ))
                     .toList(),
               ),
             ],
+          ],
+        ),
+      ),
+    ),
+    );
+  }
+
+  void _showEstadoModal(dynamic reserva) {
+    final id = reserva['ID_Reserva'];
+    if (id == null) return;
+    
+    final cliente = reserva['cliente'] ?? {};
+    final clienteNombre = cliente['Nombre'] ?? 'Sin nombre';
+    final serviciosList = (reserva['servicios'] as List?) ?? [];
+    final serviciosNombres = serviciosList.isEmpty 
+        ? 'Sin servicio asignado' 
+        : serviciosList.map((s) => s['Nombre_Servicio'] ?? '').join(', ');
+        
+    final estadoActual = reserva['Estado'] ?? 'Pendiente';
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Handle
+              Center(
+                child: Container(
+                  width: 40, height: 4,
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE0E4EF),
+                    borderRadius: BorderRadius.circular(4)
+                  ),
+                ),
+              ),
+              const Text('Modificar Estado de Orden', 
+                style: TextStyle(fontFamily: _font, fontSize: 18, fontWeight: FontWeight.bold, color: _textDark)),
+              const SizedBox(height: 16),
+              Text('Servicio: $serviciosNombres', style: const TextStyle(fontFamily: _font, fontSize: 14, color: _textDark)),
+              const SizedBox(height: 4),
+              Text('Cliente: $clienteNombre', style: const TextStyle(fontFamily: _font, fontSize: 14, color: _textDark)),
+              const SizedBox(height: 24),
+              const Text('Nuevo Estado:', style: TextStyle(fontFamily: _font, fontSize: 13, fontWeight: FontWeight.w600, color: _textMuted)),
+              const SizedBox(height: 12),
+              // Opciones
+              _buildEstadoOption(id, 'Pendiente', Icons.access_time_rounded, const Color(0xFFF59E0B), estadoActual),
+              _buildEstadoOption(id, 'Confirmado', Icons.thumb_up_rounded, const Color(0xFF06B6D4), estadoActual),
+              _buildEstadoOption(id, 'En Camino', Icons.directions_car_rounded, const Color(0xFF8B5CF6), estadoActual),
+              _buildEstadoOption(id, 'En Proceso', Icons.autorenew_rounded, const Color(0xFF1A56FF), estadoActual),
+              _buildEstadoOption(id, 'Completado', Icons.check_circle_rounded, const Color(0xFF22C55E), estadoActual),
+              _buildEstadoOption(id, 'Cancelado', Icons.cancel_rounded, const Color(0xFFE11D48), estadoActual),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      }
+    );
+  }
+
+  Widget _buildEstadoOption(int id, String estado, IconData icon, Color color, String estadoActual) {
+    final isSelected = estado.toLowerCase() == estadoActual.toLowerCase();
+    return InkWell(
+      onTap: () {
+        Navigator.pop(context);
+        _actualizarEstado(id, estado);
+      },
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: isSelected ? color : const Color(0xFFE0E4EF)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 20),
+            const SizedBox(width: 12),
+            Text(
+              estado,
+              style: TextStyle(
+                fontFamily: _font,
+                fontSize: 15,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? color : _textDark,
+              ),
+            ),
+            const Spacer(),
+            if (isSelected) Icon(Icons.check, color: color, size: 20),
           ],
         ),
       ),

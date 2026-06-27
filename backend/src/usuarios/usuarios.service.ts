@@ -95,6 +95,22 @@ export class UsuariosService {
     if (data.Direccion   !== undefined) updateData.Direccion   = data.Direccion;
     if (data.foto_perfil !== undefined) updateData.foto_perfil = data.foto_perfil;
 
+    // ✅ Permitir edición de Correo con validación de duplicado
+    if (data.Correo !== undefined) {
+      if (data.Correo) {
+        const duplicado = await this.prisma.usuario.findFirst({
+          where: {
+            Correo: data.Correo,
+            NOT: { Id_Usuario: id },
+          },
+        });
+        if (duplicado) throw new ConflictException('El correo ya está registrado en otro usuario');
+        updateData.Correo = data.Correo;
+      } else {
+        updateData.Correo = null;
+      }
+    }
+
     // ✅ Tarea 7 — permitir edición de cédula con validación de duplicado
     if (data.N_Documento !== undefined) {
       const duplicado = await this.prisma.usuario.findFirst({
@@ -129,12 +145,31 @@ export class UsuariosService {
     if (hasEmpleadoFields && exists.rol_Id_Rol === 2) {
       const empleadoData: any = {};
       if (data.cargo !== undefined) empleadoData.cargo = data.cargo;
+      
       if (data.fecha_nacimiento !== undefined) {
-        empleadoData.fecha_nacimiento = data.fecha_nacimiento ? new Date(data.fecha_nacimiento) : null;
+        if (!data.fecha_nacimiento || data.fecha_nacimiento.toString().trim() === '' || data.fecha_nacimiento === 'Invalid Date') {
+          empleadoData.fecha_nacimiento = null;
+        } else {
+          const d = new Date(data.fecha_nacimiento);
+          if (isNaN(d.getTime())) {
+            throw new BadRequestException('Fecha de nacimiento no es válida');
+          }
+          empleadoData.fecha_nacimiento = d;
+        }
       }
+
       if (data.fecha_ingreso !== undefined) {
-        empleadoData.fecha_ingreso = data.fecha_ingreso ? new Date(data.fecha_ingreso) : null;
+        if (!data.fecha_ingreso || data.fecha_ingreso.toString().trim() === '' || data.fecha_ingreso === 'Invalid Date') {
+          empleadoData.fecha_ingreso = null;
+        } else {
+          const d = new Date(data.fecha_ingreso);
+          if (isNaN(d.getTime())) {
+            throw new BadRequestException('Fecha de ingreso no es válida');
+          }
+          empleadoData.fecha_ingreso = d;
+        }
       }
+
       if (data.dias_laborales !== undefined) empleadoData.dias_laborales = data.dias_laborales;
       if (data.horario !== undefined) empleadoData.horario = data.horario;
       if (data.especialidades !== undefined) empleadoData.especialidades = data.especialidades;

@@ -48,7 +48,7 @@ let ClientesService = class ClientesService {
         return this.prisma.usuario.update({
             where: { Id_Usuario: id },
             data,
-            select: { Id_Usuario: true, Nombre: true, Correo: true, Telefono: true, Direccion: true },
+            select: { Id_Usuario: true, Nombre: true, Correo: true, Telefono: true, Direccion: true, N_Documento: true },
         });
     }
     async updateFoto(id, fotoUrl) {

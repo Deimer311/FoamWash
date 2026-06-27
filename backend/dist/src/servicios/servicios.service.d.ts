@@ -19,7 +19,6 @@ export declare class ServiciosService {
         descripcion: string;
         imagen_url: string | null;
         cotizacion_Id_Cotizacion: number | null;
-        reserva_ID_Reserva: number | null;
         duracion_estimada: string | null;
     }>;
     create(data: {
@@ -35,7 +34,6 @@ export declare class ServiciosService {
         descripcion: string;
         imagen_url: string | null;
         cotizacion_Id_Cotizacion: number | null;
-        reserva_ID_Reserva: number | null;
         duracion_estimada: string | null;
     }>;
     update(id: number, data: Partial<{
@@ -51,7 +49,6 @@ export declare class ServiciosService {
         descripcion: string;
         imagen_url: string | null;
         cotizacion_Id_Cotizacion: number | null;
-        reserva_ID_Reserva: number | null;
         duracion_estimada: string | null;
     }>;
     remove(id: number): Promise<{
@@ -62,20 +59,19 @@ export declare class ServiciosService {
         descripcion: string;
         imagen_url: string | null;
         cotizacion_Id_Cotizacion: number | null;
-        reserva_ID_Reserva: number | null;
         duracion_estimada: string | null;
     }>;
     masSolicitados(): Promise<({
-        reserva: {
-            ID_Reserva: number;
-            Estado: string;
+        reservas: {
             Id_Usuario: number;
             fecha: Date;
+            ID_Reserva: number;
+            Estado: string;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
             empleado_Id_Usuario: number | null;
-        };
+        }[];
     } & {
         estado: string;
         Id_Servicio: number;
@@ -84,11 +80,10 @@ export declare class ServiciosService {
         descripcion: string;
         imagen_url: string | null;
         cotizacion_Id_Cotizacion: number | null;
-        reserva_ID_Reserva: number | null;
         duracion_estimada: string | null;
     })[]>;
     programadosHoy(): Promise<({
-        reserva: {
+        reservas: ({
             empleado: {
                 Nombre: string;
             };
@@ -96,15 +91,15 @@ export declare class ServiciosService {
                 Nombre: string;
             };
         } & {
-            ID_Reserva: number;
-            Estado: string;
             Id_Usuario: number;
             fecha: Date;
+            ID_Reserva: number;
+            Estado: string;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
             empleado_Id_Usuario: number | null;
-        };
+        })[];
     } & {
         estado: string;
         Id_Servicio: number;
@@ -113,7 +108,6 @@ export declare class ServiciosService {
         descripcion: string;
         imagen_url: string | null;
         cotizacion_Id_Cotizacion: number | null;
-        reserva_ID_Reserva: number | null;
         duracion_estimada: string | null;
     })[]>;
 }

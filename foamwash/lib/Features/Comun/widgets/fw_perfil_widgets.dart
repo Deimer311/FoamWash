@@ -89,10 +89,52 @@ class FWAvatar extends StatelessWidget {
             ? Image.network(
                 fotoUrl,
                 fit: BoxFit.cover,
+                headers: const {'ngrok-skip-browser-warning': 'true'},
                 errorBuilder: (_, __, ___) =>
                     Icon(fallbackIcon, size: size * 0.45, color: Colors.white),
               )
             : Icon(fallbackIcon, size: size * 0.45, color: Colors.white),
+      ),
+    );
+  }
+}
+
+/// Foto de perfil circular editable (con un icono de cámara superpuesto).
+class FWEditableAvatar extends StatelessWidget {
+  final String fotoUrl;
+  final IconData fallbackIcon;
+  final double size;
+  final VoidCallback onTap;
+
+  const FWEditableAvatar({
+    super.key,
+    required this.fotoUrl,
+    required this.onTap,
+    this.fallbackIcon = Icons.person,
+    this.size = 100,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
+        children: [
+          FWAvatar(fotoUrl: fotoUrl, fallbackIcon: fallbackIcon, size: size),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: FWColors.primaryBlue,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+            ),
+          ),
+        ],
       ),
     );
   }

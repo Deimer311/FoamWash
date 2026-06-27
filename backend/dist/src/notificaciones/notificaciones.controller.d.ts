@@ -9,10 +9,10 @@ export declare class NotificacionesController {
                 Nombre: string;
             };
         } & {
+            usuario_Id_Usuario: number;
             id_notificaciones: number;
             descripcion_notificacion: string;
             fecha_notificacion: Date | null;
-            usuario_Id_Usuario: number;
         })[];
     }>;
 }

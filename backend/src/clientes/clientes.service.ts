@@ -36,11 +36,18 @@ export class ClientesService {
     return cliente;
   }
 
-  async updatePerfil(id: number, data: Partial<{ Nombre: string; Telefono: string; Direccion: string; N_Documento: string }>) {
+  async updatePerfil(id: number, data: Partial<{ 
+    Nombre: string; 
+    Telefono: string; 
+    Direccion: string; 
+    N_Documento: string; 
+    Correo: string;
+    tipo_de_documento_id_tipo_de_documento: number;
+  }>) {
     return this.prisma.usuario.update({
       where: { Id_Usuario: id },
       data,
-      select: { Id_Usuario: true, Nombre: true, Correo: true, Telefono: true, Direccion: true },
+      select: { Id_Usuario: true, Nombre: true, Correo: true, Telefono: true, Direccion: true, N_Documento: true },
     });
   }
 

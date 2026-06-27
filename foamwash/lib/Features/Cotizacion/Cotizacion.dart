@@ -108,7 +108,11 @@ String _formatearMoneda(double v) {
 
 String _imagenCompleta(String path) {
   if (path.startsWith('http')) return path;
-  return '${ApiConstants.baseUrl}$path';
+  final base = ApiConstants.baseUrl.replaceAll(RegExp(r'/api$'), '');
+  String safePath = path.startsWith('/') ? path : '/$path';
+  // Redirigir antiguas URLs de /img/ hacia la nueva carpeta /uploads/ del servidor.
+  safePath = safePath.replaceFirst('/img/', '/uploads/');
+  return '$base$safePath';
 }
 
 const List<String> _horariosDisponibles = [
@@ -1059,7 +1063,10 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 480, maxHeight: 560),
+        constraints: BoxConstraints(
+          maxWidth: 480, 
+          maxHeight: MediaQuery.of(context).size.height * 0.8
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1077,12 +1084,13 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
             const Divider(height: 1),
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              child: Wrap(
+                alignment: WrapAlignment.end,
+                spacing: 8,
+                runSpacing: 8,
                 children: [
                   if (_stage > 0 && _stage < 3)
                     TextButton(onPressed: () => setState(() => _stage--), child: const Text('← Volver')),
-                  const SizedBox(width: 8),
                   if (_stage < 2)
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),

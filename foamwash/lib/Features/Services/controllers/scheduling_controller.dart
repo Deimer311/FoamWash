@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/Api/api_constants.dart';
 import 'package:foamwash/Features/Services/data/models/voucher_model.dart';
+import 'package:foamwash/core/cache/secure_storage_service.dart';
 
 class SchedulingController {
   // Configuración de la URL de tu backend
@@ -51,9 +52,10 @@ class SchedulingController {
     required String hora,
   }) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token') ?? '';
-      final cookie = prefs.getString('cookie_token');
+      final prefs = await SharedPreferences.getInstance(); // for user_vouchers later
+      final secureStorage = SecureStorageService();
+      final token = await secureStorage.read('token') ?? '';
+      final cookie = await secureStorage.read('cookie_token');
       
       final Map<String, String> headers = {
         'Content-Type': 'application/json',
@@ -68,14 +70,13 @@ class SchedulingController {
       
       // Realizamos la petición HTTP POST
       final response = await http.post(
-        Uri.parse('$apiUrl/solicitudes/multiple'),
+        Uri.parse('$apiUrl/reservas'),
         headers: headers,
         body: jsonEncode({
-          'serviceIds': serviceIds,
-          'direccion': direccion,
-          'tamanoMuebles': tamanoMuebles,
+          'servicios': serviceIds.map((id) => {'Id_Servicio': int.parse(id)}).toList(),
+          'Informacion_adicional': 'Dirección: $direccion. Tamaño muebles: $tamanoMuebles',
           'fecha': fecha,
-          'hora': hora,
+          'Hora': hora,
         }),
       );
 

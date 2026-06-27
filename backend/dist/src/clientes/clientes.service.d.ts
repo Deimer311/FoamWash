@@ -39,14 +39,13 @@ export declare class ClientesService {
                 descripcion: string;
                 imagen_url: string | null;
                 cotizacion_Id_Cotizacion: number | null;
-                reserva_ID_Reserva: number | null;
                 duracion_estimada: string | null;
             }[];
         } & {
             Id_Usuario: number;
+            fecha: Date;
             ID_Reserva: number;
             Estado: string;
-            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -61,8 +60,11 @@ export declare class ClientesService {
         Telefono: string;
         Direccion: string;
         N_Documento: string;
+        Correo: string;
+        tipo_de_documento_id_tipo_de_documento: number;
     }>): Promise<{
         Id_Usuario: number;
+        N_Documento: string;
         Correo: string;
         Nombre: string;
         Telefono: string;

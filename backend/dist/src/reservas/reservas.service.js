@@ -57,15 +57,33 @@ let ReservasService = class ReservasService {
                 rol_Id_Rol: 2,
                 estado: 'activo',
             },
-            select: { Id_Usuario: true, Nombre: true },
+            select: {
+                Id_Usuario: true,
+                Nombre: true,
+                empleado: { select: { dias_laborales: true } }
+            },
         });
         if (empleadosActivos.length === 0)
+            return null;
+        const dias = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+        const diaReserva = dias[fecha.getDay()];
+        const empleadosDisponibles = empleadosActivos.filter(emp => {
+            if (!emp.empleado || emp.empleado.length === 0)
+                return true;
+            const diasLaborales = (emp.empleado[0].dias_laborales || '')
+                .toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (!diasLaborales)
+                return true;
+            return diasLaborales.includes(diaReserva);
+        });
+        if (empleadosDisponibles.length === 0)
             return null;
         const fechaInicio = new Date(fecha);
         fechaInicio.setHours(0, 0, 0, 0);
         const fechaFin = new Date(fecha);
         fechaFin.setHours(23, 59, 59, 999);
-        const cargaPorEmpleado = await Promise.all(empleadosActivos.map(async (emp) => {
+        const cargaPorEmpleado = await Promise.all(empleadosDisponibles.map(async (emp) => {
             const cantidad = await this.prisma.reserva.count({
                 where: {
                     empleado_Id_Usuario: emp.Id_Usuario,
@@ -73,10 +91,10 @@ let ReservasService = class ReservasService {
                     Estado: { notIn: ['Cancelado'] },
                 },
             });
-            return { id: emp.Id_Usuario, nombre: emp.Nombre, carga: cantidad };
+            return { empId: emp.Id_Usuario, reservasEnElDia: cantidad };
         }));
-        cargaPorEmpleado.sort((a, b) => a.carga - b.carga);
-        return cargaPorEmpleado[0].id;
+        cargaPorEmpleado.sort((a, b) => a.reservasEnElDia - b.reservasEnElDia);
+        return cargaPorEmpleado[0].empId;
     }
     async create(data) {
         let fechaISO = undefined;
@@ -112,10 +130,14 @@ let ReservasService = class ReservasService {
                     ? { connect: { Id_Usuario: empleadoId } }
                     : undefined,
                 observacion: observacionData,
+                servicios: data.servicios && data.servicios.length > 0
+                    ? { connect: data.servicios.map(s => ({ Id_Servicio: s.Id_Servicio })) }
+                    : undefined,
             },
             include: {
                 empleado: { select: { Nombre: true, Id_Usuario: true } },
                 cliente: true,
+                servicios: true,
             },
         });
         let total = 0;
@@ -189,6 +211,35 @@ let ReservasService = class ReservasService {
                 direccion: updatedReserva.cliente.Direccion || 'No especificada',
                 total: total
             }).catch(err => console.error('Error al enviar correo de confirmación (empleado):', err));
+        }
+        else if (['En Camino', 'En Progreso', 'Completado'].includes(estado) && updatedReserva.cliente && updatedReserva.cliente.Correo) {
+            await (0, email_util_1.sendServiceUpdateEmail)(updatedReserva.cliente.Correo, {
+                id: `PED-${updatedReserva.ID_Reserva}`,
+                estado: estado,
+            }).catch(err => console.error('Error al enviar correo de actualización de estado:', err));
+        }
+        return updatedReserva;
+    }
+    async cancelarReserva(id, motivo) {
+        const exists = await this.prisma.reserva.findUnique({ where: { ID_Reserva: id } });
+        if (!exists)
+            throw new common_1.NotFoundException('Reserva no encontrada');
+        const updatedReserva = await this.prisma.reserva.update({
+            where: { ID_Reserva: id },
+            data: { Estado: 'Cancelado' },
+            include: { cliente: true }
+        });
+        if (updatedReserva.cliente && updatedReserva.cliente.Correo) {
+            const dateFormatter = new Intl.DateTimeFormat('es-CO', {
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+                timeZone: 'America/Bogota'
+            });
+            const { sendCancellationEmail } = await Promise.resolve().then(() => require('../common/utils/email.util'));
+            await sendCancellationEmail(updatedReserva.cliente.Correo, {
+                id: `PED-${updatedReserva.ID_Reserva}`,
+                fecha: dateFormatter.format(new Date(updatedReserva.fecha)),
+                motivo: motivo
+            }).catch(err => console.error('Error al enviar correo de cancelación:', err));
         }
         return updatedReserva;
     }

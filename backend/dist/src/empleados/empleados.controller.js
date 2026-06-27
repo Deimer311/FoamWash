@@ -56,6 +56,10 @@ let EmpleadosController = class EmpleadosController {
         const data = await this.empleadosService.getReservasSemana(id);
         return { success: true, data, total: data.length };
     }
+    async agendaMensual(id) {
+        const data = await this.empleadosService.getReservasMes(id);
+        return { success: true, data, total: data.length };
+    }
     async historial(id) {
         const data = await this.empleadosService.getHistorial(id);
         return { success: true, data, total: data.length };
@@ -137,6 +141,14 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], EmpleadosController.prototype, "agendaSemanal", null);
+__decorate([
+    (0, common_1.Get)(':id/agenda-mensual'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtener agenda mensual del empleado' }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], EmpleadosController.prototype, "agendaMensual", null);
 __decorate([
     (0, common_1.Get)(':id/historial'),
     (0, swagger_1.ApiOperation)({ summary: 'Obtener historial completo de servicios del empleado (RF14)' }),

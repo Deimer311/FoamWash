@@ -5,9 +5,6 @@ export declare class ClientesController {
     getPerfil(id: number): Promise<{
         success: boolean;
         data: {
-            rol: {
-                Rol: string;
-            };
             Id_Usuario: number;
             N_Documento: string;
             Correo: string;
@@ -19,12 +16,12 @@ export declare class ClientesController {
             fecha_registro: Date;
             foto_perfil: string;
             cotizaciones: {
+                fecha_cotizacion: Date | null;
                 Id_Cotizacion: number;
                 Id_usuario: number;
                 Precio_cotizado: import("@prisma/client/runtime/library").Decimal;
                 Cantidad: number;
                 Tamaño: string;
-                fecha_cotizacion: Date | null;
                 Id_servicio: number | null;
             }[];
             reservasComoCliente: ({
@@ -41,14 +38,13 @@ export declare class ClientesController {
                     descripcion: string;
                     imagen_url: string | null;
                     cotizacion_Id_Cotizacion: number | null;
-                    reserva_ID_Reserva: number | null;
                     duracion_estimada: string | null;
                 }[];
             } & {
                 Id_Usuario: number;
+                fecha: Date;
                 ID_Reserva: number;
                 Estado: string;
-                fecha: Date;
                 Hora: Date;
                 Informacion_adicional: string | null;
                 observacion_Id_Observaciones: number;
@@ -57,12 +53,16 @@ export declare class ClientesController {
             tipo_de_documento: {
                 nombre_del_documento: string;
             };
+            rol: {
+                Rol: string;
+            };
         };
     }>;
     updatePerfil(id: number, body: any): Promise<{
         success: boolean;
         data: {
             Id_Usuario: number;
+            N_Documento: string;
             Correo: string;
             Nombre: string;
             Telefono: string;

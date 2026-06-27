@@ -13,7 +13,10 @@ class AuthRemoteDataSource {
     try {
       final response = await client.post(
         Uri.parse(ApiConstants.loginEndpoint),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
         body: jsonEncode({
           'correo': email,
           'password': password,
@@ -46,7 +49,10 @@ class AuthRemoteDataSource {
     try {
       final response = await client.post(
         Uri.parse(ApiConstants.registerEndpoint),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+        },
         body: jsonEncode({
           'correo': email,
           'nombre': nombre,

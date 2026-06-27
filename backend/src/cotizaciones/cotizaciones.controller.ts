@@ -1,6 +1,6 @@
 // src/cotizaciones/cotizaciones.controller.ts
 import { Controller, Get, Post, Body, UseGuards, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { CotizacionesService } from './cotizaciones.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -29,6 +29,7 @@ export class CotizacionesController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Crear una nueva cotización' })
+  @ApiBody({ schema: { example: { "Total": 45000, "servicios": [1, 2] } } })
   async create(@Body() body: any, @Req() req: any) {
     const data = await this.cotizacionesService.create({ ...body, Id_usuario: req.user.id });
     return { success: true, data };
@@ -37,6 +38,7 @@ export class CotizacionesController {
   @Post('sincronizar')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Sincronizar cotizaciones' })
+  @ApiBody({ schema: { example: { "items": [{ "Id_Servicio": 1, "cantidad": 1 }] } } })
   async sincronizar(@Body('items') items: any[], @Req() req: any) {
     const data = await this.cotizacionesService.sincronizar(items, req.user.id);
     return { success: true, sincronizados: data.length, data };

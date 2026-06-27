@@ -16,21 +16,65 @@ let EstadisticasService = class EstadisticasService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async getDashboard() {
-        const [totalClientes, totalReservas, reservasCompletadas, reservasPendientes, ingresos, totalServicios] = await Promise.all([
-            this.prisma.usuario.count({ where: { rol_Id_Rol: 3 } }),
-            this.prisma.reserva.count(),
-            this.prisma.reserva.count({ where: { Estado: 'Completado' } }),
-            this.prisma.reserva.count({ where: { Estado: 'Pendiente' } }),
-            this.prisma.cotizacion.aggregate({ _sum: { Precio_cotizado: true } }),
+    async getDashboard(periodo) {
+        const today = new Date();
+        let startDate = new Date('2000-01-01');
+        if (periodo) {
+            switch (periodo.toLowerCase()) {
+                case 'semanal':
+                    startDate = new Date(today);
+                    startDate.setDate(today.getDate() - today.getDay());
+                    break;
+                case 'mensual':
+                    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    break;
+                case 'trimestral':
+                    startDate = new Date(today.getFullYear(), today.getMonth() - 3, 1);
+                    break;
+                case 'semestral':
+                    startDate = new Date(today.getFullYear(), today.getMonth() - 6, 1);
+                    break;
+                case 'anual':
+                    startDate = new Date(today.getFullYear(), 0, 1);
+                    break;
+            }
+        }
+        const [totalReservas, reservasCompletadas, reservasPendientes, totalServicios, reservasIngresos] = await Promise.all([
+            this.prisma.reserva.count({
+                where: { fecha: { gte: startDate } }
+            }),
+            this.prisma.reserva.count({
+                where: {
+                    Estado: { in: ['Completado', 'Finalizado'] },
+                    fecha: { gte: startDate }
+                }
+            }),
+            this.prisma.reserva.count({
+                where: {
+                    Estado: { notIn: ['Completado', 'Finalizado', 'Cancelado'] },
+                    fecha: { gte: startDate }
+                }
+            }),
             this.prisma.servicio.count(),
+            this.prisma.reserva.findMany({
+                where: { fecha: { gte: startDate } },
+                include: { servicios: true }
+            }),
         ]);
+        const clientesUnicos = new Set(reservasIngresos.map(r => r.Id_Usuario));
+        const totalClientes = clientesUnicos.size;
+        const ingresosTotales = reservasIngresos.reduce((sum, res) => {
+            if (res.Estado !== 'Completado' && res.Estado !== 'Finalizado')
+                return sum;
+            const sumaServicios = res.servicios.reduce((sSum, serv) => sSum + Number(serv.Precio || 0), 0);
+            return sum + sumaServicios;
+        }, 0);
         return {
             Total_Clientes: totalClientes,
             Total_Reservas: totalReservas,
             Reservas_Completadas: reservasCompletadas,
             Reservas_Pendientes: reservasPendientes,
-            Ingresos_Totales: ingresos._sum.Precio_cotizado || 0,
+            Ingresos_Totales: ingresosTotales,
             Servicios_Ofrecidos: totalServicios,
         };
     }

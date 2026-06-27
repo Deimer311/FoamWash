@@ -3,7 +3,7 @@ import { Controller, Get, Put, Post, Param, Body, UseGuards, ParseIntPipe, Uploa
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { ClientesService } from './clientes.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -26,6 +26,7 @@ export class ClientesController {
 
   @Put(':id/perfil')
   @ApiOperation({ summary: 'Actualizar el perfil del cliente' })
+  @ApiBody({ schema: { example: { "Nombre": "Carlos Cliente", "Telefono": "3201112233", "Direccion": "Avenida 7" } } })
   async updatePerfil(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
     const data = await this.clientesService.updatePerfil(id, body);
     return { success: true, data };

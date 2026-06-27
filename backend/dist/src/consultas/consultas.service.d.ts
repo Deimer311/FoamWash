@@ -19,9 +19,9 @@ export declare class ConsultasService {
         Correo: string;
         Nombre: string;
         reservasComoCliente: {
+            fecha: Date;
             ID_Reserva: number;
             Estado: string;
-            fecha: Date;
             servicios: {
                 estado: string;
                 Id_Servicio: number;
@@ -30,7 +30,6 @@ export declare class ConsultasService {
                 descripcion: string;
                 imagen_url: string | null;
                 cotizacion_Id_Cotizacion: number | null;
-                reserva_ID_Reserva: number | null;
                 duracion_estimada: string | null;
             }[];
         }[];
@@ -47,9 +46,9 @@ export declare class ConsultasService {
         }[];
     } & {
         Id_Usuario: number;
+        fecha: Date;
         ID_Reserva: number;
         Estado: string;
-        fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
         observacion_Id_Observaciones: number;
@@ -63,9 +62,9 @@ export declare class ConsultasService {
         };
     } & {
         Id_Usuario: number;
+        fecha: Date;
         ID_Reserva: number;
         Estado: string;
-        fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
         observacion_Id_Observaciones: number;
@@ -75,9 +74,9 @@ export declare class ConsultasService {
         _count: {
             servicios: number;
         };
+        fecha: Date;
         ID_Reserva: number;
         Estado: string;
-        fecha: Date;
     }[]>;
     reservasPorCliente(): Promise<{
         Id_Usuario: number;
@@ -91,9 +90,9 @@ export declare class ConsultasService {
         Id_Usuario: number;
         Nombre: string;
         reservasComoEmpleado: {
+            fecha: Date;
             ID_Reserva: number;
             Estado: string;
-            fecha: Date;
         }[];
     }[]>;
     empleadosSinServicios(): Promise<{
@@ -115,9 +114,9 @@ export declare class ConsultasService {
         }[];
     } & {
         Id_Usuario: number;
+        fecha: Date;
         ID_Reserva: number;
         Estado: string;
-        fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
         observacion_Id_Observaciones: number;
@@ -141,9 +140,9 @@ export declare class ConsultasService {
             Correo: string;
             Nombre: string;
             reservasComoCliente: {
+                fecha: Date;
                 ID_Reserva: number;
                 Estado: string;
-                fecha: Date;
                 servicios: {
                     estado: string;
                     Id_Servicio: number;
@@ -152,7 +151,6 @@ export declare class ConsultasService {
                     descripcion: string;
                     imagen_url: string | null;
                     cotizacion_Id_Cotizacion: number | null;
-                    reserva_ID_Reserva: number | null;
                     duracion_estimada: string | null;
                 }[];
             }[];
@@ -165,9 +163,9 @@ export declare class ConsultasService {
             };
         } & {
             Id_Usuario: number;
+            fecha: Date;
             ID_Reserva: number;
             Estado: string;
-            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -177,9 +175,9 @@ export declare class ConsultasService {
             _count: {
                 servicios: number;
             };
+            fecha: Date;
             ID_Reserva: number;
             Estado: string;
-            fecha: Date;
         }[];
         consulta7_reservasPorCliente: {
             Id_Usuario: number;

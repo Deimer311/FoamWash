@@ -2,16 +2,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:foamwash/core/utils/security_utils.dart';
+import '../widgets/admin_drawer.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
-// NOTA: Reemplaza esto con tu cliente real de API (Dio, Http, etc.)
-// Simulamos el servicio 'api' de tu proyecto FoamWash.
-class ApiMock {
-  static Future<Map<String, dynamic>> get(String endpoint) async {
-    // Aquí iría tu lógica real: await http.get(Uri.parse('BASE_URL' + endpoint));
-    await Future.delayed(const Duration(milliseconds: 600));
-    return {};
-  }
-}
+// Eliminada clase ApiMock, ahora usamos http real.
+import 'package:http/http.dart' as http;
+import 'package:foamwash/Api/api_constants.dart';
+import 'package:foamwash/core/cache/secure_storage_service.dart';
 
 class AdminReportesView extends StatefulWidget {
   final VoidCallback? onGoDashboard;
@@ -66,79 +65,21 @@ class _AdminReportesViewState extends State<AdminReportesView> {
   Future<void> _fetchData() async {
     setState(() => _loading = true);
     try {
-      // 1. Obtener Estadísticas / KPIs
-      final estadisticasRes = await ApiMock.get(
-        '/estadisticas?periodo=$_periodoActivo',
-      );
-      final kpis = estadisticasRes['data'] ?? estadisticasRes ?? {};
+      final secureStorage = SecureStorageService();
+      final token = await secureStorage.read('token') ?? '';
+      final baseUrl = ApiConstants.baseUrl;
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
 
-      // 2. Obtener Productividad de Empleados
-      final empleadosRes = await ApiMock.get(
-        '/empleados/productividad/general',
-      );
-      final List empleados = empleadosRes['data'] ?? empleadosRes ?? [];
+      final results = await Future.wait([
+        http.get(Uri.parse('$baseUrl/estadisticas?periodo=$_periodoActivo'), headers: headers),
+        http.get(Uri.parse('$baseUrl/empleados/productividad/general'), headers: headers),
+        http.get(Uri.parse('$baseUrl/servicios/analytics/mas-solicitados'), headers: headers),
+        http.get(Uri.parse('$baseUrl/reservas'), headers: headers),
+      ]);
 
-      // 3. Obtener Servicios más solicitados
-      final serviciosRes = await ApiMock.get(
-        '/servicios/analytics/mas-solicitados',
-      );
-      final List servicios = serviciosRes['data'] ?? serviciosRes ?? [];
-
-      // 4. Obtener Cotizaciones para el gráfico de barras
-      final cotizacionesRes = await ApiMock.get('/cotizaciones');
-      final List cotizaciones =
-          cotizacionesRes['data'] ?? cotizacionesRes ?? [];
-
-      // --- Procesamiento de lógica de fechas intacta ---
-      final now = DateTime.now();
-      DateTime startDate = DateTime.now();
-      String groupBy = 'month';
-
-      if (_periodoActivo == 'semanal') {
-        startDate = now.subtract(const Duration(days: 7));
-        groupBy = 'day';
-      } else if (_periodoActivo == 'mensual') {
-        startDate = DateTime(now.year, now.month - 1, now.day);
-        groupBy = 'week';
-      } else if (_periodoActivo == 'trimestral') {
-        startDate = DateTime(now.year, now.month - 3, now.day);
-        groupBy = 'month';
-      } else if (_periodoActivo == 'anual') {
-        startDate = DateTime(now.year - 1, now.month, now.day);
-        groupBy = 'month';
-      }
-
-      Map<String, double> ingresosPorPeriodo = {};
-
-      for (var cot in cotizaciones) {
-        final fechaStr =
-            cot['fecha_cotizacion'] ?? cot['fecha'] ?? cot['createdAt'];
-        if (fechaStr == null) continue;
-        final d = DateTime.parse(fechaStr);
-
-        if (d.isAfter(startDate) || d.isAtSameMomentAs(startDate)) {
-          String key;
-          if (groupBy == 'day') {
-            key =
-                "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
-          } else if (groupBy == 'week') {
-            final firstDayOfWeek = d.subtract(Duration(days: d.weekday - 1));
-            key =
-                "${firstDayOfWeek.year}-${firstDayOfWeek.month.toString().padLeft(2, '0')}-${firstDayOfWeek.day.toString().padLeft(2, '0')}";
-          } else {
-            key = "${d.year}-${d.month.toString().padLeft(2, '0')}";
-          }
-
-          final precio =
-              double.tryParse(
-                (cot['Precio_cotizado'] ?? cot['Precio'] ?? 0).toString(),
-              ) ??
-              0.0;
-          ingresosPorPeriodo[key] = (ingresosPorPeriodo[key] ?? 0.0) + precio;
-        }
-      }
-
-      // Mapear colores alternos para servicios
       final List<Color> colorsList = [
         const Color(0xFF0066FF),
         const Color(0xFF00C853),
@@ -147,50 +88,120 @@ class _AdminReportesViewState extends State<AdminReportesView> {
         const Color(0xFF7C3AED),
       ];
 
-      setState(() {
-        _estadisticas = {
-          'serviciosRealizados':
-              kpis['Reservas_Completadas'] ?? kpis['precio_total'] ?? 0,
-          'ingresosTotal':
-              double.tryParse(
-                (kpis['Ingresos_Totales'] ?? kpis['ingresos'] ?? 0.0)
-                    .toString(),
-              ) ??
-              0.0,
-          'clientesAtendidos': kpis['Total_Clientes'] ?? 0,
-          'satisfaccion':
-              double.tryParse((kpis['satisfaccion'] ?? 95).toString()) ?? 95.0,
-        };
+      Map<String, dynamic> newEstadisticas = {
+        'serviciosRealizados': 0,
+        'ingresosTotal': 0.0,
+        'clientesAtendidos': 0,
+        'satisfaccion': 95.0,
+      };
+      List<Map<String, dynamic>> newRendimiento = [];
+      List<Map<String, dynamic>> newServicios = [];
+      List<Map<String, dynamic>> newVentas = [];
 
-        _rendimientoEmpleados = empleados.map((emp) {
-          final count = emp['_count']?['reservasComoEmpleado'] ?? 0;
+      if (results[0].statusCode == 200 || results[0].statusCode == 201) {
+        final estData = jsonDecode(results[0].body);
+        // El endpoint /estadisticas devuelve el objeto directo (sin wrapper data)
+        newEstadisticas = {
+          'serviciosRealizados': estData['Reservas_Completadas'] ?? estData['data']?['Reservas_Completadas'] ?? 0,
+          'ingresosTotal': double.tryParse((estData['Ingresos_Totales'] ?? estData['data']?['Ingresos_Totales'] ?? 0).toString()) ?? 0.0,
+          'clientesAtendidos': estData['Total_Clientes'] ?? estData['data']?['Total_Clientes'] ?? 0,
+          'satisfaccion': 95.0,
+        };
+      }
+
+      if (results[1].statusCode == 200 || results[1].statusCode == 201) {
+        final prodData = jsonDecode(results[1].body);
+        final list = prodData['data'] as List? ?? [];
+        newRendimiento = list.map((e) {
+          final count = e['_count']?['reservasComoEmpleado'] ?? 0;
           return {
-            'nombre': emp['Nombre'] ?? 'Empleado ${emp['Id_Usuario']}',
+            'nombre': e['Nombre'] ?? 'Empleado',
             'servicios': count,
             'satisfaccion': 90.0 + (count * 0.1),
           };
         }).toList();
+      }
 
+      if (results[2].statusCode == 200 || results[2].statusCode == 201) {
+        final servData = jsonDecode(results[2].body);
+        // El endpoint puede devolver una lista directa o {data: [...]}
+        final rawList = servData is List ? servData : (servData['data'] as List? ?? []);
         int idx = 0;
-        _serviciosPorTipo = servicios.map((serv) {
-          final count = serv['_count']?['reserva'] is List
-              ? (serv['_count']?['reserva'] as List).length
-              : (serv['_count']?['reserva'] ?? 0);
+        newServicios = rawList.map((serv) {
+          final count = serv['reserva'] is List ? (serv['reserva'] as List).length : 0;
           final color = colorsList[idx % colorsList.length];
           idx++;
           return {
-            'nombre': serv['Nombre_Servicio'] ?? serv['nombre'] ?? 'Servicio',
+            'nombre': serv['Nombre_Servicio'] ?? 'Servicio',
             'cantidad': count,
             'color': color,
           };
         }).toList();
+      }
 
-        _ventasPorMes = ingresosPorPeriodo.entries.map((e) {
+      if (results[3].statusCode == 200 || results[3].statusCode == 201) {
+        final resData = jsonDecode(results[3].body);
+        // findAll() devuelve { success, data: [...] }
+        final List reservas = resData['data'] ?? (resData is List ? resData : []);
+        
+        final now = DateTime.now();
+        DateTime startDate = now;
+        String groupBy = 'month';
+
+        if (_periodoActivo == 'semanal') {
+          startDate = now.subtract(const Duration(days: 7));
+          groupBy = 'day';
+        } else if (_periodoActivo == 'mensual') {
+          startDate = DateTime(now.year, now.month - 1, now.day);
+          groupBy = 'week';
+        } else if (_periodoActivo == 'trimestral') {
+          startDate = DateTime(now.year, now.month - 3, now.day);
+          groupBy = 'month';
+        } else if (_periodoActivo == 'semestral') {
+          startDate = DateTime(now.year, now.month - 6, now.day);
+          groupBy = 'month';
+        } else if (_periodoActivo == 'anual') {
+          startDate = DateTime(now.year - 1, now.month, now.day);
+          groupBy = 'month';
+        }
+
+        Map<String, double> ingresosPorPeriodo = {};
+        for (var res in reservas) {
+          final fechaStr = res['fecha'];
+          if (fechaStr == null) continue;
+          final d = DateTime.tryParse(fechaStr);
+          if (d != null && (d.isAfter(startDate) || d.isAtSameMomentAs(startDate))) {
+            if (res['Estado'] != 'Completado' && res['Estado'] != 'Finalizado') continue;
+            String key;
+            if (groupBy == 'day') {
+              key = "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
+            } else if (groupBy == 'week') {
+              final firstDayOfWeek = d.subtract(Duration(days: d.weekday - 1));
+              key = "${firstDayOfWeek.year}-${firstDayOfWeek.month.toString().padLeft(2, '0')}-${firstDayOfWeek.day.toString().padLeft(2, '0')}";
+            } else {
+              key = "${d.year}-${d.month.toString().padLeft(2, '0')}";
+            }
+            
+            double precio = 0.0;
+            if (res['servicios'] != null) {
+              for (var s in res['servicios']) {
+                precio += double.tryParse((s['Precio'] ?? 0).toString()) ?? 0.0;
+              }
+            }
+            ingresosPorPeriodo[key] = (ingresosPorPeriodo[key] ?? 0.0) + precio;
+          }
+        }
+        newVentas = ingresosPorPeriodo.entries.map((e) {
           return {'periodo': e.key, 'valor': e.value};
         }).toList();
-        _ventasPorMes.sort(
-          (a, b) => (a['periodo'] as String).compareTo(b['periodo'] as String),
-        );
+        newVentas.sort((a, b) => (a['periodo'] as String).compareTo(b['periodo'] as String));
+      }
+
+      setState(() {
+        _estadisticas = newEstadisticas;
+        _rendimientoEmpleados = newRendimiento;
+        _serviciosPorTipo = newServicios;
+        _ventasPorMes = newVentas;
       });
     } catch (e) {
       debugPrint('Error fetching report data: $e');
@@ -206,7 +217,7 @@ class _AdminReportesViewState extends State<AdminReportesView> {
         _rendimientoEmpleados = [];
       });
     } finally {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -220,6 +231,26 @@ class _AdminReportesViewState extends State<AdminReportesView> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F4F8),
+      endDrawer: AdminDrawer(),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: const Color(0xFF0A1435), // Match _primaryDark
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
+          'Reportes',
+          style: TextStyle(fontFamily: 'Kanit', fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white),
+        ),
+        actions: [
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white, size: 28),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
@@ -243,25 +274,29 @@ class _AdminReportesViewState extends State<AdminReportesView> {
                     ),
                   ),
                   const SizedBox(width: 14),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        'Reportes y Análisis',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A2540),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          'Reportes y Análisis',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1A2540),
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      Text(
-                        'Visualiza el rendimiento de tu empresa',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Color(0xFF8898b3),
+                        Text(
+                          'Visualiza el rendimiento de tu empresa',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF8898b3),
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -278,7 +313,7 @@ class _AdminReportesViewState extends State<AdminReportesView> {
                     border: Border.all(color: const Color(0xFFE0E8F5)),
                   ),
                   child: Row(
-                    children: ['semanal', 'mensual', 'trimestral', 'anual'].map(
+                    children: ['semanal', 'mensual', 'trimestral', 'semestral', 'anual'].map(
                       (p) {
                         final isSelected = _periodoActivo == p;
                         return GestureDetector(
@@ -385,6 +420,8 @@ class _AdminReportesViewState extends State<AdminReportesView> {
                           ? 'Mensuales'
                           : _periodoActivo == 'trimestral'
                           ? 'Trimestrales'
+                          : _periodoActivo == 'semestral'
+                          ? 'Semestrales'
                           : 'Anuales'}',
                   child: _ventasPorMes.isEmpty
                       ? const Center(
@@ -684,48 +721,49 @@ class _AdminReportesViewState extends State<AdminReportesView> {
           ),
         ),
       ),
-      // --- FooterAdmin Reemplazado por el BottomNavigationBar estándar de Flutter ---
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 3, // El índice activo de Reportes
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFF0066FF),
-        unselectedItemColor: const Color(0xFF8898b3),
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              widget.onGoDashboard?.call();
-              break;
-            case 1:
-              widget.onGoAgenda?.call();
-              break;
-            case 2:
-              widget.onGoEmpleados?.call();
-              break;
-            case 3:
-              widget.onGoReportes?.call();
-              break;
-            case 4:
-              widget.onGoPerfil?.call();
-              break;
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'Agenda',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.badge), label: 'Empleados'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.analytics),
-            label: 'Reportes',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-        ],
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _generarPDF,
+        backgroundColor: const Color(0xFF0066FF),
+        icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
+        label: const Text('Exportar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
+    );
+  }
+
+  Future<void> _generarPDF() async {
+    final pdf = pw.Document();
+    
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Header(level: 0, child: pw.Text('Reporte FoamWash - $_periodoActivo'.toUpperCase())),
+              pw.SizedBox(height: 20),
+              pw.Text('Estadisticas Principales', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18)),
+              pw.SizedBox(height: 10),
+              pw.Text('Servicios Realizados: ${_estadisticas['serviciosRealizados']}'),
+              pw.Text('Ingresos Totales: \$${_estadisticas['ingresosTotal'].toStringAsFixed(0)}'),
+              pw.Text('Clientes Atendidos: ${_estadisticas['clientesAtendidos']}'),
+              pw.SizedBox(height: 20),
+              pw.Text('Desglose de Ingresos', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18)),
+              pw.SizedBox(height: 10),
+              ..._ventasPorMes.map((v) => pw.Text('${v['label']}: \$${v['valor'].toStringAsFixed(0)}')).toList(),
+              pw.SizedBox(height: 20),
+              pw.Text('Servicios mas solicitados', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 18)),
+              pw.SizedBox(height: 10),
+              ..._serviciosPorTipo.map((s) => pw.Text('${s['Nombre_Servicio']}: ${s['cantidad']} solicitudes')).toList(),
+            ],
+          );
+        },
+      ),
+    );
+
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+      name: 'Reporte_FoamWash_$_periodoActivo.pdf',
     );
   }
 

@@ -60,14 +60,13 @@ export declare class UsuariosController {
                 descripcion: string;
                 imagen_url: string | null;
                 cotizacion_Id_Cotizacion: number | null;
-                reserva_ID_Reserva: number | null;
                 duracion_estimada: string | null;
             }[];
         } & {
             Id_Usuario: number;
-            fecha: Date;
             ID_Reserva: number;
             Estado: string;
+            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -107,14 +106,13 @@ export declare class UsuariosController {
                     descripcion: string;
                     imagen_url: string | null;
                     cotizacion_Id_Cotizacion: number | null;
-                    reserva_ID_Reserva: number | null;
                     duracion_estimada: string | null;
                 }[];
             } & {
                 Id_Usuario: number;
-                fecha: Date;
                 ID_Reserva: number;
                 Estado: string;
+                fecha: Date;
                 Hora: Date;
                 Informacion_adicional: string | null;
                 observacion_Id_Observaciones: number;

@@ -8,6 +8,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:foamwash/Features/Comun/widgets/fw_perfil_widgets.dart';
+import 'package:foamwash/core/cache/secure_storage_service.dart';
+import 'package:foamwash/Features/Admin/views/perfil_admin_edit.dart';
 
 // =============================================================================
 // MODELO
@@ -19,6 +21,7 @@ class AdminPerfil {
   final String? correo;
   final String? telefono;
   final String? fotoPerfil;
+  final DateTime? fechaRegistro;
 
   AdminPerfil({
     this.nombre,
@@ -27,9 +30,14 @@ class AdminPerfil {
     this.correo,
     this.telefono,
     this.fotoPerfil,
+    this.fechaRegistro,
   });
 
   factory AdminPerfil.fromJson(Map<String, dynamic> json) {
+    DateTime? parseFecha(dynamic v) {
+      if (v == null) return null;
+      return DateTime.tryParse(v.toString());
+    }
     return AdminPerfil(
       nombre: json['Nombre']?.toString(),
       tipoDocumento: json['tipo_de_documento']?['nombre_del_documento']?.toString(),
@@ -37,6 +45,7 @@ class AdminPerfil {
       correo: json['Correo']?.toString(),
       telefono: json['Telefono']?.toString(),
       fotoPerfil: json['foto_perfil']?.toString(),
+      fechaRegistro: parseFecha(json['fecha_registro']),
     );
   }
 }
@@ -64,7 +73,7 @@ class PerfilAdminScreen extends StatefulWidget {
   final String apiBaseUrl;
   final String userId;
 
-  final VoidCallback? onEditarPerfil;
+  final Future<void> Function()? onEditarPerfil;
   final VoidCallback? onLogout;
   final VoidCallback? onBackToHome;
   final VoidCallback? onDashboard; // tap en el badge "Acceso Total"
@@ -97,8 +106,14 @@ class _PerfilAdminScreenState extends State<PerfilAdminScreen> {
   Future<void> _cargarPerfil() async {
     setState(() => _isLoading = true);
     try {
+      final secureStorage = SecureStorageService();
+      final token = await secureStorage.read('token') ?? '';
       final res = await http.get(
         Uri.parse('${widget.apiBaseUrl}/api/usuarios/${widget.userId}'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'ngrok-skip-browser-warning': 'true',
+        },
       );
       if (res.statusCode == 200) {
         final body = json.decode(res.body);
@@ -107,10 +122,12 @@ class _PerfilAdminScreenState extends State<PerfilAdminScreen> {
         }
       }
     } catch (e) {
-      print('❌ Error al cargar perfil admin: $e');
+      debugPrint('Error al cargar perfil admin: $e');
     } finally {
-      setState(() => _isLoading = false);
-      fwAnimarEntrada(_visible, setState, mounted: () => mounted);
+      if (mounted) {
+        setState(() => _isLoading = false);
+        fwAnimarEntrada(_visible, setState, mounted: () => mounted);
+      }
     }
   }
 
@@ -261,7 +278,19 @@ class _PerfilAdminScreenState extends State<PerfilAdminScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: widget.onEditarPerfil,
+                  onPressed: () async {
+                    // Navegar a la pantalla de edición y recargar si hubo cambios
+                    final updated = await Navigator.push<bool>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PerfilAdminEditScreen(
+                          apiBaseUrl: widget.apiBaseUrl,
+                          userId: widget.userId,
+                        ),
+                      ),
+                    );
+                    if (updated == true) _cargarPerfil();
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: FWColors.primaryBlue,
@@ -291,7 +320,7 @@ class _PerfilAdminScreenState extends State<PerfilAdminScreen> {
         FWInfoField(label: 'Email Corporativo', value: _perfil?.correo),
         FWInfoField(label: 'Teléfono', value: _perfil?.telefono),
         const FWInfoField(label: 'Departamento', value: 'Administración'),
-        const FWInfoField(label: 'Fecha de Ingreso', value: '1 de Enero, 2022'),
+        FWInfoField(label: 'Miembro Desde', value: fwFormatFecha(_perfil?.fechaRegistro)),
       ],
     );
   }

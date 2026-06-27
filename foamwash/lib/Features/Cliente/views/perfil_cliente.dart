@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:foamwash/Features/Comun/widgets/fw_perfil_widgets.dart';
+import 'package:foamwash/core/cache/secure_storage_service.dart';
 
 // =============================================================================
 // MODELO DE DATOS
@@ -50,7 +51,7 @@ class ClientePerfil {
       direccion: json['Direccion']?.toString(),
       fotoPerfil: json['foto_perfil']?.toString(),
       miembroDesde: parseFecha(json['created_at'] ?? json['fecha_registro']),
-      ultimoAcceso: parseFecha(json['ultimo_acceso']),
+      ultimoAcceso: parseFecha(json['ultimo_acceso'] ?? json['last_login']),
     );
   }
 }
@@ -75,7 +76,7 @@ class ActividadItem {
 class PerfilClienteScreen extends StatefulWidget {
   final String apiBaseUrl;
   final String userId;
-  final VoidCallback? onEditarPerfil;
+  final Future<void> Function()? onEditarPerfil;
   final VoidCallback? onLogout;
   final VoidCallback? onBackToHome;
 
@@ -112,13 +113,37 @@ class _PerfilClienteScreenState extends State<PerfilClienteScreen> {
       _error = null;
     });
     try {
+      final secureStorage = SecureStorageService();
+      final token = await secureStorage.read('token') ?? '';
       final res = await http.get(
         Uri.parse('${widget.apiBaseUrl}/api/usuarios/${widget.userId}'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'ngrok-skip-browser-warning': 'true',
+        },
       );
       if (res.statusCode == 200) {
         final body = json.decode(res.body);
         if (body['success'] == true) {
           _perfil = ClientePerfil.fromJson(body['data']);
+          final data = body['data'];
+          if (data != null && data['reservasComoCliente'] != null) {
+            final list = data['reservasComoCliente'] as List;
+            _actividad = list.map((item) {
+              final servicios = item['servicios'] as List? ?? [];
+              final nombres = servicios.map((s) => s['Nombre_Servicio']).join(', ');
+              final fecha = item['fecha'] != null 
+                  ? DateTime.parse(item['fecha']).toIso8601String().split('T')[0]
+                  : 'Sin fecha';
+              final estado = item['Estado']?.toString().toLowerCase() ?? 'pendiente';
+              return ActividadItem(
+                icono: '🧼',
+                titulo: nombres.isEmpty ? 'Servicio' : nombres,
+                fecha: fecha,
+                estado: estado,
+              );
+            }).toList();
+          }
         }
       }
     } catch (e) {
@@ -303,7 +328,12 @@ class _PerfilClienteScreenState extends State<PerfilClienteScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: widget.onEditarPerfil,
+                  onPressed: () async {
+                    if (widget.onEditarPerfil != null) {
+                      await widget.onEditarPerfil!();
+                      _cargarPerfil();
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: FWColors.primaryBlue,

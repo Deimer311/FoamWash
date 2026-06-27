@@ -33,7 +33,11 @@ let ReservasController = class ReservasController {
         const data = await this.reservasService.findOne(id);
         return { success: true, data };
     }
-    async create(body) {
+    async create(req, body) {
+        const userId = req.user?.id;
+        if (userId && !body.Id_Usuario) {
+            body.Id_Usuario = userId;
+        }
         const data = await this.reservasService.create(body);
         return { success: true, message: 'Reserva creada exitosamente', data };
     }
@@ -44,6 +48,12 @@ let ReservasController = class ReservasController {
     async updateEstado(id, estado) {
         const data = await this.reservasService.updateEstado(id, estado);
         return { success: true, message: 'Estado actualizado', data };
+    }
+    async cancelarReserva(id, motivo) {
+        if (!motivo)
+            motivo = 'Cancelado por el administrador sin especificar motivo';
+        const data = await this.reservasService.cancelarReserva(id, motivo);
+        return { success: true, message: 'Reserva cancelada y correo enviado', data };
     }
     async remove(id) {
         await this.reservasService.remove(id);
@@ -77,14 +87,28 @@ __decorate([
 __decorate([
     (0, common_1.Post)(),
     (0, swagger_1.ApiOperation)({ summary: 'Crear una nueva reserva' }),
-    __param(0, (0, common_1.Body)()),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            example: {
+                "fecha": "2024-12-24",
+                "Hora": "14:30",
+                "Informacion_adicional": "Lavado con cera por favor",
+                "servicios": [
+                    { "Id_Servicio": 1, "cantidad": 1, "tamano": "Automovil" }
+                ]
+            }
+        }
+    }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], ReservasController.prototype, "create", null);
 __decorate([
     (0, common_1.Put)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Actualizar una reserva' }),
+    (0, swagger_1.ApiBody)({ schema: { example: { "Estado": "Confirmado", "Informacion_adicional": "Llegaré 10 mins tarde" } } }),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -94,12 +118,23 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':id/estado'),
     (0, swagger_1.ApiOperation)({ summary: 'Actualizar estado de la reserva' }),
+    (0, swagger_1.ApiBody)({ schema: { example: { "estado": "En Camino" } } }),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)('estado')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, String]),
     __metadata("design:returntype", Promise)
 ], ReservasController.prototype, "updateEstado", null);
+__decorate([
+    (0, common_1.Delete)(':id/cancelar'),
+    (0, swagger_1.ApiOperation)({ summary: 'Cancelar una reserva con motivo' }),
+    (0, swagger_1.ApiBody)({ schema: { example: { "motivo": "El cliente canceló por lluvia" } } }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)('motivo')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, String]),
+    __metadata("design:returntype", Promise)
+], ReservasController.prototype, "cancelarReserva", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Eliminar una reserva' }),
@@ -112,6 +147,7 @@ exports.ReservasController = ReservasController = __decorate([
     (0, common_1.Controller)('reservas'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, swagger_1.ApiTags)('Reservas'),
+    (0, swagger_1.ApiBearerAuth)(),
     __metadata("design:paramtypes", [reservas_service_1.ReservasService])
 ], ReservasController);
 //# sourceMappingURL=reservas.controller.js.map

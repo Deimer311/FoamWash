@@ -30,9 +30,9 @@ export declare class ConsultasController {
             Correo: string;
             Nombre: string;
             reservasComoCliente: {
+                fecha: Date;
                 ID_Reserva: number;
                 Estado: string;
-                fecha: Date;
                 servicios: {
                     estado: string;
                     Id_Servicio: number;
@@ -41,7 +41,6 @@ export declare class ConsultasController {
                     descripcion: string;
                     imagen_url: string | null;
                     cotizacion_Id_Cotizacion: number | null;
-                    reserva_ID_Reserva: number | null;
                     duracion_estimada: string | null;
                 }[];
             }[];
@@ -62,9 +61,9 @@ export declare class ConsultasController {
             }[];
         } & {
             Id_Usuario: number;
+            fecha: Date;
             ID_Reserva: number;
             Estado: string;
-            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -82,9 +81,9 @@ export declare class ConsultasController {
             };
         } & {
             Id_Usuario: number;
+            fecha: Date;
             ID_Reserva: number;
             Estado: string;
-            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -98,9 +97,9 @@ export declare class ConsultasController {
             _count: {
                 servicios: number;
             };
+            fecha: Date;
             ID_Reserva: number;
             Estado: string;
-            fecha: Date;
         }[];
     }>;
     c7(): Promise<{
@@ -122,9 +121,9 @@ export declare class ConsultasController {
             Id_Usuario: number;
             Nombre: string;
             reservasComoEmpleado: {
+                fecha: Date;
                 ID_Reserva: number;
                 Estado: string;
-                fecha: Date;
             }[];
         }[];
     }>;
@@ -154,9 +153,9 @@ export declare class ConsultasController {
             }[];
         } & {
             Id_Usuario: number;
+            fecha: Date;
             ID_Reserva: number;
             Estado: string;
-            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -183,9 +182,9 @@ export declare class ConsultasController {
                 Correo: string;
                 Nombre: string;
                 reservasComoCliente: {
+                    fecha: Date;
                     ID_Reserva: number;
                     Estado: string;
-                    fecha: Date;
                     servicios: {
                         estado: string;
                         Id_Servicio: number;
@@ -194,7 +193,6 @@ export declare class ConsultasController {
                         descripcion: string;
                         imagen_url: string | null;
                         cotizacion_Id_Cotizacion: number | null;
-                        reserva_ID_Reserva: number | null;
                         duracion_estimada: string | null;
                     }[];
                 }[];
@@ -207,9 +205,9 @@ export declare class ConsultasController {
                 };
             } & {
                 Id_Usuario: number;
+                fecha: Date;
                 ID_Reserva: number;
                 Estado: string;
-                fecha: Date;
                 Hora: Date;
                 Informacion_adicional: string | null;
                 observacion_Id_Observaciones: number;
@@ -219,9 +217,9 @@ export declare class ConsultasController {
                 _count: {
                     servicios: number;
                 };
+                fecha: Date;
                 ID_Reserva: number;
                 Estado: string;
-                fecha: Date;
             }[];
             consulta7_reservasPorCliente: {
                 Id_Usuario: number;

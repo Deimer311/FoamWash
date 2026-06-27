@@ -113,15 +113,13 @@ model Servicio {
   descripcion              String       @map("descripcion") @db.Text
   imagen_url               String?      @map("imagen_url") @db.VarChar(255)
   cotizacion_Id_Cotizacion Int?         @map("cotizacion_Id_Cotizacion")
-  reserva_ID_Reserva       Int?         @map("reserva_ID_Reserva")
   estado                   String       @default("activo") @db.VarChar(20)
   duracion_estimada        String?      @db.VarChar(50)
   cotizacionesComoBase     Cotizacion[] @relation("CotizacionServicioBase")
   cotizacion               Cotizacion?  @relation("ServiciosEnCotizacion", fields: [cotizacion_Id_Cotizacion], references: [Id_Cotizacion], map: "fk_servicio_cotizacion")
-  reserva                  Reserva?     @relation(fields: [reserva_ID_Reserva], references: [ID_Reserva], map: "fk_servicio_reserva")
+  reservas                 Reserva[]
 
   @@index([cotizacion_Id_Cotizacion], map: "fk_servicio_cotizacion_idx")
-  @@index([reserva_ID_Reserva], map: "fk_servicio_reserva_idx")
   @@map("servicio")
 }
 

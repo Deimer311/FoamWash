@@ -41,6 +41,7 @@ class AuthRepository {
     await prefs.setString('userEmail', email);
     await prefs.setString('userRole', userData['rol'] ?? '');
     await prefs.setInt('userId', userData['id'] ?? 0);
+    await prefs.setString('userFoto', userData['foto_perfil'] ?? '');
     await prefs.setBool('isLogged', true);
 
     // Construimos el UserModel con los campos que devuelve la API

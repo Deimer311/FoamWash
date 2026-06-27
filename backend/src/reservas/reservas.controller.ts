@@ -1,6 +1,6 @@
 // src/reservas/reservas.controller.ts
-import { Controller, Get, Post, Put, Patch, Delete, Param, Body, UseGuards, ParseIntPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { Controller, Get, Post, Put, Patch, Delete, Param, Body, UseGuards, ParseIntPipe, Req } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { ReservasService } from './reservas.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -8,6 +8,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 @Controller('reservas') // → /api/reservas
 @UseGuards(JwtAuthGuard)
 @ApiTags('Reservas')
+@ApiBearerAuth()
 export class ReservasController {
   constructor(private reservasService: ReservasService) {}
 
@@ -34,13 +35,32 @@ export class ReservasController {
 
   @Post()
   @ApiOperation({ summary: 'Crear una nueva reserva' })
-  async create(@Body() body: any) {
+  @ApiBody({
+    schema: {
+      example: {
+        "fecha": "2024-12-24",
+        "Hora": "14:30",
+        "Informacion_adicional": "Lavado con cera por favor",
+        "servicios": [
+          { "Id_Servicio": 1, "cantidad": 1, "tamano": "Automovil" }
+        ]
+      }
+    }
+  })
+  async create(@Req() req: any, @Body() body: any) {
+    // Inyectar el Id_Usuario del token JWT al cuerpo de la petición
+    // req.user viene del JwtAuthGuard y contiene 'id' según jwt.strategy.ts
+    const userId = req.user?.id;
+    if (userId && !body.Id_Usuario) {
+      body.Id_Usuario = userId;
+    }
     const data = await this.reservasService.create(body);
     return { success: true, message: 'Reserva creada exitosamente', data };
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Actualizar una reserva' })
+  @ApiBody({ schema: { example: { "Estado": "Confirmado", "Informacion_adicional": "Llegaré 10 mins tarde" } } })
   async update(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
     const data = await this.reservasService.update(id, body);
     return { success: true, message: 'Reserva actualizada exitosamente', data };
@@ -48,9 +68,19 @@ export class ReservasController {
 
   @Patch(':id/estado')
   @ApiOperation({ summary: 'Actualizar estado de la reserva' })
+  @ApiBody({ schema: { example: { "estado": "En Camino" } } })
   async updateEstado(@Param('id', ParseIntPipe) id: number, @Body('estado') estado: string) {
     const data = await this.reservasService.updateEstado(id, estado);
     return { success: true, message: 'Estado actualizado', data };
+  }
+
+  @Delete(':id/cancelar')
+  @ApiOperation({ summary: 'Cancelar una reserva con motivo' })
+  @ApiBody({ schema: { example: { "motivo": "El cliente canceló por lluvia" } } })
+  async cancelarReserva(@Param('id', ParseIntPipe) id: number, @Body('motivo') motivo: string) {
+    if (!motivo) motivo = 'Cancelado por el administrador sin especificar motivo';
+    const data = await this.reservasService.cancelarReserva(id, motivo);
+    return { success: true, message: 'Reserva cancelada y correo enviado', data };
   }
 
   @Delete(':id')

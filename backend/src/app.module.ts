@@ -4,8 +4,6 @@
 // ============================================================
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
@@ -24,11 +22,7 @@ import { NotificacionesModule } from './notificaciones/notificaciones.module';
     // Variables de entorno disponibles globalmente
     ConfigModule.forRoot({ isGlobal: true }),
 
-    // Servir archivos estáticos (carpeta uploads) — igual que antes
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
-      serveRoot: '/uploads',
-    }),
+
 
     // Módulo de Prisma (conexión a la BD)
     PrismaModule,

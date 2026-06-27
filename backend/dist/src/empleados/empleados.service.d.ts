@@ -3,14 +3,6 @@ export declare class EmpleadosService {
     private prisma;
     constructor(prisma: PrismaService);
     findAll(): Promise<{
-        Id_Usuario: number;
-        Nombre: string;
-        Telefono: string;
-        N_Documento: string;
-        Direccion: string;
-        Correo: string;
-        estado: import(".prisma/client").$Enums.usuario_estado;
-        foto_perfil: string;
         empleado: {
             cargo: string;
             fecha_nacimiento: Date;
@@ -22,6 +14,14 @@ export declare class EmpleadosService {
             contacto_emergencia_nombre: string;
             contacto_emergencia_telefono: string;
         }[];
+        Id_Usuario: number;
+        N_Documento: string;
+        Correo: string;
+        Nombre: string;
+        Telefono: string;
+        Direccion: string;
+        estado: import(".prisma/client").$Enums.usuario_estado;
+        foto_perfil: string;
         tipo_de_documento: {
             idTipo_de_Documento: number;
             nombre_del_documento: string;
@@ -68,11 +68,31 @@ export declare class EmpleadosService {
         observacion_Id_Observaciones: number;
         empleado_Id_Usuario: number | null;
     })[]>;
+    getReservasMes(id: number): Promise<({
+        cliente: {
+            Nombre: string;
+            Telefono: string;
+            Direccion: string;
+        };
+        servicios: {
+            Nombre_Servicio: string;
+            Precio: import("@prisma/client/runtime/library").Decimal;
+        }[];
+    } & {
+        Id_Usuario: number;
+        fecha: Date;
+        ID_Reserva: number;
+        Estado: string;
+        Hora: Date;
+        Informacion_adicional: string | null;
+        observacion_Id_Observaciones: number;
+        empleado_Id_Usuario: number | null;
+    })[]>;
     getSinServicios(): Promise<{
         Id_Usuario: number;
+        Correo: string;
         Nombre: string;
         Telefono: string;
-        Correo: string;
     }[]>;
     getServiciosFinalizados(): Promise<({
         empleado: {
@@ -89,7 +109,6 @@ export declare class EmpleadosService {
             descripcion: string;
             imagen_url: string | null;
             cotizacion_Id_Cotizacion: number | null;
-            reserva_ID_Reserva: number | null;
             duracion_estimada: string | null;
         }[];
     } & {
@@ -185,6 +204,7 @@ export declare class EmpleadosService {
         estado: import(".prisma/client").$Enums.usuario_estado;
         fecha_registro: Date;
         tipo_de_documento: {
+            idTipo_de_Documento: number;
             nombre_del_documento: string;
         };
         rol: {

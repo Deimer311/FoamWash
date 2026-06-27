@@ -62,7 +62,7 @@ let ServiciosService = class ServiciosService {
     }
     async masSolicitados() {
         return this.prisma.servicio.findMany({
-            include: { reserva: true },
+            include: { reservas: true },
             orderBy: { Id_Servicio: 'asc' },
             take: 10,
         });
@@ -74,12 +74,17 @@ let ServiciosService = class ServiciosService {
         tomorrow.setDate(tomorrow.getDate() + 1);
         return this.prisma.servicio.findMany({
             where: {
-                reserva: {
-                    fecha: { gte: today, lt: tomorrow },
+                reservas: {
+                    some: {
+                        fecha: { gte: today, lt: tomorrow },
+                    },
                 },
             },
             include: {
-                reserva: {
+                reservas: {
+                    where: {
+                        fecha: { gte: today, lt: tomorrow },
+                    },
                     include: {
                         cliente: { select: { Nombre: true } },
                         empleado: { select: { Nombre: true } },

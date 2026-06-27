@@ -72,6 +72,7 @@ let AuthService = class AuthService {
                 token_expires_at: new Date(Date.now() + 15 * 60 * 1000),
             },
         });
+        (0, email_util_1.sendWelcomeEmail)(newUser.Correo, newUser.Nombre).catch(e => console.error('Error enviando correo de bienvenida:', e));
         return {
             tokens,
             user: {

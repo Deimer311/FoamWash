@@ -6,6 +6,8 @@ import 'package:foamwash/Features/Services/providers/services_provider.dart';
 import 'package:foamwash/Features/Autenticacion/providers/auth_provider.dart';
 import 'package:foamwash/Features/Cart/providers/cart_provider.dart';
 import 'package:foamwash/Features/Services/widgets/service_card.dart';
+import 'package:foamwash/Features/Comun/widgets/fw_perfil_widgets.dart';
+import 'package:foamwash/Api/api_constants.dart';
 
 // Vista principal de agendamiento para usuarios autenticados.
 // Construye el catalogo de servicios dinamicamente consumiendo el API a traves de FutureBuilder.
@@ -207,14 +209,23 @@ class _SchedulingViewState extends State<SchedulingView> {
                 constraints: const BoxConstraints(),
               ),
               const SizedBox(width: 16),
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.person, color: Colors.grey, size: 20),
+              Consumer<AuthProvider>(
+                builder: (context, auth, _) {
+                  final fotoUrl = fwFotoUrl(
+                    auth.user?.fotoPerfil,
+                    ApiConstants.baseUrl.replaceAll('/api', ''),
+                  );
+                  return InkWell(
+                    onTap: () {
+                      _scaffoldKey.currentState?.openDrawer();
+                    },
+                    borderRadius: BorderRadius.circular(20),
+                    child: FWAvatar(
+                      fotoUrl: fotoUrl,
+                      size: 32,
+                    ),
+                  );
+                },
               ),
             ],
           )

@@ -49,12 +49,15 @@ dependencies:
   hive_flutter: ^1.1.0
   cached_network_image: ^3.4.1
   connectivity_plus: ^7.1.1
-  path_provider: ^2.1.5
+  path_provider: ^2.1.6
   flutter_secure_storage: ^9.2.2
   no_screenshot: ^1.1.0
   firebase_core: ^4.10.0
   firebase_messaging: ^16.3.0
   flutter_local_notifications: ^22.0.0
+  pdf: ^3.12.0
+  printing: ^5.14.3
+  image_picker: ^1.2.2
 
 dev_dependencies:
   flutter_test:
