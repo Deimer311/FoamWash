@@ -1296,8 +1296,10 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
   Widget _buildDialogFooter() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+      child: Wrap(
+        alignment: WrapAlignment.end,
+        spacing: 10,
+        runSpacing: 10,
         children: [
           if (_stage > 0 && _stage < 3)
             OutlinedButton(
@@ -1309,7 +1311,6 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
               ),
               child: const Text('← Volver', style: TextStyle(color: Color(0xFF555555))),
             ),
-          const SizedBox(width: 10),
           if (_stage < 2)
             ElevatedButton(
               onPressed: _continuar,
