@@ -1,6 +1,6 @@
   // src/servicios/servicios.controller.ts
 import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, ParseIntPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { ServiciosService } from './servicios.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -43,6 +43,7 @@ export class ServiciosController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Crear un nuevo servicio' })
+  @ApiBody({ schema: { example: { "Nombre_Servicio": "Lavado Premium", "Descripcion": "Lavado y encerado", "Precio": 25000, "Duracion": 60, "Imagen_URL": "" } } })
   async create(@Body() body: any) {
     const data = await this.serviciosService.create(body);
     return { success: true, message: 'Servicio creado exitosamente', data };
@@ -51,6 +52,7 @@ export class ServiciosController {
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Actualizar un servicio' })
+  @ApiBody({ schema: { example: { "Precio": 30000, "Duracion": 75 } } })
   async update(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
     const data = await this.serviciosService.update(id, body);
     return { success: true, message: 'Servicio actualizado exitosamente', data };

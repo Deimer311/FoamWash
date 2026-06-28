@@ -209,7 +209,7 @@ const FooterPublic = () => {
                             color: 'white',
                             boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
                         }}>
-                            FW
+                            <img src="/LogoFW.jpeg" alt="Logo FoamWash" style={{ width: "100%", height: "100%", borderRadius: "inherit", objectFit: "cover" }} />
                         </div>
                         <h2 style={{
                             fontSize: '28px',

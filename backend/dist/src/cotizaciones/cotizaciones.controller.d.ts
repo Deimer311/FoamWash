@@ -21,14 +21,13 @@ export declare class CotizacionesController {
                 Correo: string;
             };
             servicios: {
-                estado: string;
                 Id_Servicio: number;
                 Nombre_Servicio: string;
                 Precio: import("@prisma/client/runtime/library").Decimal;
                 descripcion: string;
                 imagen_url: string | null;
                 cotizacion_Id_Cotizacion: number | null;
-                reserva_ID_Reserva: number | null;
+                estado: string;
                 duracion_estimada: string | null;
             }[];
         } & {

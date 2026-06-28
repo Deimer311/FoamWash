@@ -59,13 +59,19 @@ let EmpleadosService = class EmpleadosService {
         return this.prisma.reserva.findMany({
             where: {
                 empleado_Id_Usuario: id,
-                fecha: { gte: today, lt: tomorrow },
+                OR: [
+                    { fecha: { gte: today, lt: tomorrow } },
+                    {
+                        fecha: { lt: today },
+                        Estado: { notIn: ['Completado', 'Cancelado', 'Finalizado'] }
+                    }
+                ]
             },
             include: {
                 cliente: { select: { Nombre: true, Telefono: true, Direccion: true } },
                 servicios: { select: { Nombre_Servicio: true, Precio: true, descripcion: true } },
             },
-            orderBy: { Hora: 'asc' },
+            orderBy: [{ fecha: 'asc' }, { Hora: 'asc' }],
         });
     }
     async getReservasSemana(id) {
@@ -77,6 +83,23 @@ let EmpleadosService = class EmpleadosService {
             where: {
                 empleado_Id_Usuario: id,
                 fecha: { gte: today, lte: nextWeek },
+            },
+            include: {
+                cliente: { select: { Nombre: true, Telefono: true, Direccion: true } },
+                servicios: { select: { Nombre_Servicio: true, Precio: true } },
+            },
+            orderBy: [{ fecha: 'asc' }, { Hora: 'asc' }],
+        });
+    }
+    async getReservasMes(id) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const nextMonth = new Date(today);
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        return this.prisma.reserva.findMany({
+            where: {
+                empleado_Id_Usuario: id,
+                fecha: { gte: today, lte: nextMonth },
             },
             include: {
                 cliente: { select: { Nombre: true, Telefono: true, Direccion: true } },

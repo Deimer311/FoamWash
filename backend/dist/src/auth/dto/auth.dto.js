@@ -11,38 +11,46 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResetPasswordDto = exports.VerifyResetCodeDto = exports.RequestPasswordResetDto = exports.LoginDto = exports.RegisterDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class RegisterDto {
 }
 exports.RegisterDto = RegisterDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Juan Perez' }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "nombre", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'juan@example.com' }),
     (0, class_validator_1.IsEmail)({}, { message: 'El correo no es válido' }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "correo", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '123456' }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(6, { message: 'La contraseña debe tener al menos 6 caracteres' }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "password", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: '3001234567' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "telefono", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Calle Falsa 123' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "direccion", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 1 }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], RegisterDto.prototype, "tipoDocumentoId", void 0);
 __decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'Cliente' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -51,10 +59,12 @@ class LoginDto {
 }
 exports.LoginDto = LoginDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'juan@example.com' }),
     (0, class_validator_1.IsEmail)({}, { message: 'El correo no es válido' }),
     __metadata("design:type", String)
 ], LoginDto.prototype, "correo", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '123456' }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], LoginDto.prototype, "password", void 0);
@@ -62,6 +72,7 @@ class RequestPasswordResetDto {
 }
 exports.RequestPasswordResetDto = RequestPasswordResetDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Correo electrónico registrado del usuario', example: 'juan@example.com' }),
     (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
 ], RequestPasswordResetDto.prototype, "correo", void 0);
@@ -69,6 +80,7 @@ class VerifyResetCodeDto {
 }
 exports.VerifyResetCodeDto = VerifyResetCodeDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Código de 6 dígitos enviado al correo', example: '123456' }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], VerifyResetCodeDto.prototype, "token", void 0);
@@ -76,10 +88,12 @@ class ResetPasswordDto {
 }
 exports.ResetPasswordDto = ResetPasswordDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Código de seguridad validado', example: '123456' }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], ResetPasswordDto.prototype, "token", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Nueva contraseña elegida por el usuario', example: 'NuevaClaveSegura123' }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(6),
     __metadata("design:type", String)

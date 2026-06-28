@@ -16,8 +16,7 @@
     RequestPasswordResetDto,
     ResetPasswordDto,
   } from './dto/auth.dto';
-  import { sendResetCode } from '../common/utils/email.util';
-
+  import { sendResetCode, sendWelcomeEmail } from '../common/utils/email.util';
   @Injectable()
   export class AuthService {
     constructor(
@@ -86,6 +85,8 @@
           token_expires_at: new Date(Date.now() + 15 * 60 * 1000),
         },
       });
+      // Enviar correo de bienvenida sin bloquear el flujo principal
+      sendWelcomeEmail(newUser.Correo, newUser.Nombre).catch(e => console.error('Error enviando correo de bienvenida:', e));
 
       return {
         tokens,

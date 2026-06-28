@@ -100,6 +100,7 @@ class AuthProvider extends ChangeNotifier {
       _userEmail = prefs.getString('userEmail');
       _userRole = prefs.getString('userRole') ?? '';
       final userId = prefs.getInt('userId') ?? 0;
+      final userFoto = prefs.getString('userFoto');
 
       if (_isAuthenticated) {
         _user = UserModel(
@@ -107,6 +108,7 @@ class AuthProvider extends ChangeNotifier {
           nombre: '',
           correo: _userEmail ?? '',
           rolId: null,
+          fotoPerfil: (userFoto != null && userFoto.isNotEmpty) ? userFoto : null,
         );
         // Auto-suscripción en reinicios si la sesión sigue activa
         try {
@@ -121,5 +123,24 @@ class AuthProvider extends ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  /// Actualiza la foto de perfil en el estado actual y memoria caché
+  Future<void> updateUserFoto(String newFotoUrl) async {
+    if (_user != null) {
+      _user = UserModel(
+        idUsuario: _user!.idUsuario,
+        nombre: _user!.nombre,
+        correo: _user!.correo,
+        telefono: _user!.telefono,
+        nDocumento: _user!.nDocumento,
+        direccion: _user!.direccion,
+        rolId: _user!.rolId,
+        fotoPerfil: newFotoUrl,
+      );
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('userFoto', newFotoUrl);
+      notifyListeners();
+    }
   }
 }

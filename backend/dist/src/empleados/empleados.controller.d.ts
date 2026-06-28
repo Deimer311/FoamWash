@@ -56,7 +56,6 @@ export declare class EmpleadosController {
                 descripcion: string;
                 imagen_url: string | null;
                 cotizacion_Id_Cotizacion: number | null;
-                reserva_ID_Reserva: number | null;
                 duracion_estimada: string | null;
             }[];
         } & {
@@ -146,6 +145,30 @@ export declare class EmpleadosController {
         total: number;
     }>;
     agendaSemanal(id: number): Promise<{
+        success: boolean;
+        data: ({
+            cliente: {
+                Nombre: string;
+                Telefono: string;
+                Direccion: string;
+            };
+            servicios: {
+                Nombre_Servicio: string;
+                Precio: import("@prisma/client/runtime/library").Decimal;
+            }[];
+        } & {
+            Id_Usuario: number;
+            ID_Reserva: number;
+            Estado: string;
+            fecha: Date;
+            Hora: Date;
+            Informacion_adicional: string | null;
+            observacion_Id_Observaciones: number;
+            empleado_Id_Usuario: number | null;
+        })[];
+        total: number;
+    }>;
+    agendaMensual(id: number): Promise<{
         success: boolean;
         data: ({
             cliente: {

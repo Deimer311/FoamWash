@@ -22,6 +22,7 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
                 (request) => {
                     return request?.cookies?.accessToken ?? null;
                 },
+                passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ]),
             ignoreExpiration: false,
             secretOrKey: configService.get('JWT_SECRET'),
@@ -31,7 +32,13 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         this.prisma = prisma;
     }
     async validate(request, payload) {
-        const token = request?.cookies?.accessToken;
+        let token = request?.cookies?.accessToken;
+        if (!token && request.headers.authorization) {
+            const authHeader = request.headers.authorization;
+            if (authHeader.startsWith('Bearer ')) {
+                token = authHeader.substring(7);
+            }
+        }
         const user = await this.prisma.usuario.findFirst({
             where: {
                 Id_Usuario: payload.id,

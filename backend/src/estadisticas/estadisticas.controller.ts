@@ -1,6 +1,6 @@
 // src/estadisticas/estadisticas.controller.ts
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { EstadisticasService } from './estadisticas.service';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -16,8 +16,9 @@ export class EstadisticasController {
 
   @Get()
   @ApiOperation({ summary: 'Obtener estadísticas del dashboard' })
-  async getDashboard() {
-    return this.estadisticasService.getDashboard();
+  @ApiQuery({ name: 'periodo', required: false, description: 'semanal, mensual, trimestral, semestral, anual' })
+  async getDashboard(@Query('periodo') periodo?: string) {
+    return this.estadisticasService.getDashboard(periodo);
   }
 }
 

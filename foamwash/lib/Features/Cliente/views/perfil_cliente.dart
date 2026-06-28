@@ -7,7 +7,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/Features/Comun/widgets/fw_perfil_widgets.dart';
+import 'package:foamwash/core/cache/secure_storage_service.dart';
+import 'package:provider/provider.dart';
+import 'package:foamwash/Features/Autenticacion/providers/auth_provider.dart';
+import 'package:foamwash/Features/Autenticacion/login_screen.dart';
 
 // =============================================================================
 // MODELO DE DATOS
@@ -50,7 +55,7 @@ class ClientePerfil {
       direccion: json['Direccion']?.toString(),
       fotoPerfil: json['foto_perfil']?.toString(),
       miembroDesde: parseFecha(json['created_at'] ?? json['fecha_registro']),
-      ultimoAcceso: parseFecha(json['ultimo_acceso']),
+      ultimoAcceso: parseFecha(json['ultimo_acceso'] ?? json['last_login']),
     );
   }
 }
@@ -75,7 +80,7 @@ class ActividadItem {
 class PerfilClienteScreen extends StatefulWidget {
   final String apiBaseUrl;
   final String userId;
-  final VoidCallback? onEditarPerfil;
+  final Future<void> Function()? onEditarPerfil;
   final VoidCallback? onLogout;
   final VoidCallback? onBackToHome;
   final VoidCallback? onCotizacion;
@@ -114,13 +119,48 @@ class _PerfilClienteScreenState extends State<PerfilClienteScreen> {
       _error = null;
     });
     try {
+      final secureStorage = SecureStorageService();
+      final prefs = await SharedPreferences.getInstance();
+      final token = await secureStorage.read('token') ?? '';
+
+      String safeUserId = widget.userId;
+      if (safeUserId.isEmpty) {
+        safeUserId = (prefs.getInt('userId') ?? 0).toString();
+      }
+
+      if (safeUserId == '0' || safeUserId.isEmpty) {
+        throw Exception('ID de usuario no disponible para cargar el perfil.');
+      }
+
       final res = await http.get(
-        Uri.parse('${widget.apiBaseUrl}/api/usuarios/${widget.userId}'),
+        Uri.parse('${widget.apiBaseUrl}/api/usuarios/$safeUserId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'ngrok-skip-browser-warning': 'true',
+        },
       );
       if (res.statusCode == 200) {
         final body = json.decode(res.body);
         if (body['success'] == true) {
           _perfil = ClientePerfil.fromJson(body['data']);
+          final data = body['data'];
+          if (data != null && data['reservasComoCliente'] != null) {
+            final list = data['reservasComoCliente'] as List;
+            _actividad = list.map((item) {
+              final servicios = item['servicios'] as List? ?? [];
+              final nombres = servicios.map((s) => s['Nombre_Servicio']).join(', ');
+              final fecha = item['fecha'] != null 
+                  ? DateTime.parse(item['fecha']).toIso8601String().split('T')[0]
+                  : 'Sin fecha';
+              final estado = item['Estado']?.toString().toLowerCase() ?? 'pendiente';
+              return ActividadItem(
+                icono: '🧼',
+                titulo: nombres.isEmpty ? 'Servicio' : nombres,
+                fecha: fecha,
+                estado: estado,
+              );
+            }).toList();
+          }
         }
       }
     } catch (e) {
@@ -146,6 +186,12 @@ class _PerfilClienteScreenState extends State<PerfilClienteScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
+              Provider.of<AuthProvider>(context, listen: false).logout();
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+                (route) => false,
+              );
               widget.onLogout?.call();
             },
             child: const Text('Cerrar sesión'),
@@ -157,8 +203,14 @@ class _PerfilClienteScreenState extends State<PerfilClienteScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: FWColors.background,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      },
+      child: Scaffold(
+        backgroundColor: FWColors.background,
       appBar: _buildAppBar(),
       body: _isLoading
           ? const Center(
@@ -195,6 +247,7 @@ class _PerfilClienteScreenState extends State<PerfilClienteScreen> {
                 ),
               ),
             ),
+      ),
     );
   }
 
@@ -202,13 +255,17 @@ class _PerfilClienteScreenState extends State<PerfilClienteScreen> {
     return AppBar(
       backgroundColor: const Color(0xFF0E1330),
       elevation: 0,
-      automaticallyImplyLeading: widget.onBackToHome != null,
-      leading: widget.onBackToHome != null
-          ? IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: widget.onBackToHome,
-            )
-          : null,
+      automaticallyImplyLeading: false,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.white),
+        onPressed: () {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/home',
+            (route) => false,
+          );
+        },
+      ),
       title: Row(
         children: const [
           Text(
@@ -312,7 +369,12 @@ class _PerfilClienteScreenState extends State<PerfilClienteScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: widget.onEditarPerfil,
+                  onPressed: () async {
+                    if (widget.onEditarPerfil != null) {
+                      await widget.onEditarPerfil!();
+                      _cargarPerfil();
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: FWColors.primaryBlue,

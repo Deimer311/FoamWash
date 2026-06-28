@@ -4,6 +4,7 @@ import 'package:foamwash/theme.dart';
 import 'package:foamwash/Features/Services/controllers/scheduling_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:foamwash/Features/Cart/providers/cart_provider.dart';
+import 'package:foamwash/Api/api_constants.dart';
 
 // Componente visual reutilizable para la presentacion de servicios.
 // Integra condicionales de acceso basados en el rol (Guest vs Autenticado).
@@ -101,7 +102,17 @@ class _ServiceCardState extends State<ServiceCard> {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = widget.service.imagenUrl ?? '';
+    // Construir URL completa si viene como path relativo del backend
+    final rawUrl = widget.service.imagenUrl ?? '';
+    String imageUrl = rawUrl;
+    if (rawUrl.isNotEmpty && !rawUrl.startsWith('http')) {
+      // Es un path relativo como /uploads/... → combinarlo con la base URL
+      // Extraer el dominio base (sin /api al final)
+      final baseWithoutApi = ApiConstants.baseUrl.endsWith('/api')
+          ? ApiConstants.baseUrl.substring(0, ApiConstants.baseUrl.length - 4)
+          : ApiConstants.baseUrl;
+      imageUrl = '$baseWithoutApi$rawUrl';
+    }
     final hasNetworkImage = imageUrl.startsWith('http');
 
     return Card(
@@ -119,6 +130,7 @@ class _ServiceCardState extends State<ServiceCard> {
             child: hasNetworkImage
                 ? Image.network(
                     imageUrl,
+                    headers: const {'ngrok-skip-browser-warning': 'true'},
                     height: 180,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => _buildImagePlaceholder(),

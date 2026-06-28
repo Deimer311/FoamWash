@@ -52,6 +52,7 @@ __decorate([
 __decorate([
     (0, common_1.Put)(':id/perfil'),
     (0, swagger_1.ApiOperation)({ summary: 'Actualizar el perfil del cliente' }),
+    (0, swagger_1.ApiBody)({ schema: { example: { "Nombre": "Carlos Cliente", "Telefono": "3201112233", "Direccion": "Avenida 7" } } }),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -68,6 +69,18 @@ __decorate([
         limits: { fileSize: 5 * 1024 * 1024 },
     })),
     (0, swagger_1.ApiOperation)({ summary: 'Actualizar la foto del cliente' }),
+    (0, swagger_1.ApiConsumes)('multipart/form-data'),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                foto: {
+                    type: 'string',
+                    format: 'binary',
+                },
+            },
+        },
+    }),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),

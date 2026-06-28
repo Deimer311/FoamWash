@@ -6,6 +6,8 @@ import 'package:foamwash/Features/Services/providers/services_provider.dart';
 import 'package:foamwash/Features/Autenticacion/providers/auth_provider.dart';
 import 'package:foamwash/Features/Cart/providers/cart_provider.dart';
 import 'package:foamwash/Features/Services/widgets/service_card.dart';
+import 'package:foamwash/Features/Comun/widgets/fw_perfil_widgets.dart';
+import 'package:foamwash/Api/api_constants.dart';
 
 // Vista principal de agendamiento para usuarios autenticados.
 // Construye el catalogo de servicios dinamicamente consumiendo el API a traves de FutureBuilder.
@@ -50,31 +52,62 @@ class _SchedulingViewState extends State<SchedulingView> {
   }
 
   Widget _buildDrawer() {
+    final auth = Provider.of<AuthProvider>(context);
+    final user = auth.user;
+    final isLogged = auth.isAuthenticated;
+    final userName = user?.nombre ?? 'Modo Invitado';
+    final userFoto = user?.fotoPerfil;
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.only(top: 60, bottom: 20, left: 20),
+            decoration: const BoxDecoration(
               color: AppTheme.appBarDark,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                if (isLogged)
+                  CircleAvatar(
+                    backgroundColor: Colors.white,
+                    radius: 30,
+                    backgroundImage: userFoto != null && userFoto.isNotEmpty
+                        ? NetworkImage(userFoto.startsWith('http') 
+                            ? userFoto 
+                            : '${ApiConstants.baseUrl.replaceAll('/api', '')}$userFoto')
+                        : null,
+                    child: (userFoto == null || userFoto.isEmpty)
+                        ? const Icon(Icons.person, color: AppTheme.appBarDark, size: 40)
+                        : null,
+                  )
+                else
+                  const Text(
+                    'FoamWash',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                const SizedBox(height: 15),
                 Text(
-                  'FoamWash',
-                  style: TextStyle(
+                  userName,
+                  style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 8),
-                Text(
-                  'Menú principal',
-                  style: TextStyle(color: Colors.white70),
-                )
+                if (isLogged && user?.correo != null)
+                  Text(
+                    user!.correo,
+                    style: const TextStyle(color: Colors.white70),
+                  )
               ],
             ),
           ),
@@ -207,14 +240,23 @@ class _SchedulingViewState extends State<SchedulingView> {
                 constraints: const BoxConstraints(),
               ),
               const SizedBox(width: 16),
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.person, color: Colors.grey, size: 20),
+              Consumer<AuthProvider>(
+                builder: (context, auth, _) {
+                  final fotoUrl = fwFotoUrl(
+                    auth.user?.fotoPerfil,
+                    ApiConstants.baseUrl.replaceAll('/api', ''),
+                  );
+                  return InkWell(
+                    onTap: () {
+                      _scaffoldKey.currentState?.openDrawer();
+                    },
+                    borderRadius: BorderRadius.circular(20),
+                    child: FWAvatar(
+                      fotoUrl: fotoUrl,
+                      size: 32,
+                    ),
+                  );
+                },
               ),
             ],
           )

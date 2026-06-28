@@ -71,6 +71,7 @@ export class UsuariosController {
   @Put(':id')
   @UseGuards(SelfOrAdminGuard)
   @ApiOperation({ summary: 'Actualizar datos de un usuario' })
+  @ApiBody({ schema: { example: { "Nombre": "Juan Modificado", "Telefono": "3109998877", "Direccion": "Nueva Calle 45" } } })
   async update(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
     const data = await this.usuariosService.update(id, body);
     return { success: true, data };
@@ -99,8 +100,9 @@ export class UsuariosController {
         },
       }),
       fileFilter: (req, file, cb) => {
-        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
-          return cb(new Error('Solo se permiten imágenes'), false);
+        const mime = file.mimetype.toLowerCase();
+        if (!mime.startsWith('image/') && !mime.includes('octet-stream')) {
+          return cb(new Error(`Solo se permiten imágenes (recibido: ${file.mimetype})`), false);
         }
         cb(null, true);
       },

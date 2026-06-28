@@ -7,7 +7,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/Features/Comun/widgets/fw_perfil_widgets.dart';
+import 'package:foamwash/core/cache/secure_storage_service.dart';
+import 'package:foamwash/Features/Trabajador/views/perfil_trabajador_edit.dart';
+import 'package:foamwash/Features/Trabajador/views/agenda_trabajador.dart';
 
 // =============================================================================
 // MODELOS
@@ -146,7 +150,7 @@ class PerfilTrabajadorScreen extends StatefulWidget {
   final String apiBaseUrl;
   final String userId;
 
-  final VoidCallback? onEditarPerfil;
+  final Future<void> Function()? onEditarPerfil;
   final VoidCallback? onLogout;
   final VoidCallback? onBackToHome;
 
@@ -184,12 +188,29 @@ class _PerfilTrabajadorScreenState extends State<PerfilTrabajadorScreen> {
       _error = null;
     });
     try {
+      final secureStorage = SecureStorageService();
+      final prefs = await SharedPreferences.getInstance();
+      final token = await secureStorage.read('token') ?? '';
+
+      String safeUserId = widget.userId;
+      if (safeUserId.isEmpty) {
+        safeUserId = (prefs.getInt('userId') ?? 0).toString();
+      }
+
+      if (safeUserId == '0' || safeUserId.isEmpty) {
+        throw Exception('ID de usuario no disponible para cargar el perfil.');
+      }
+
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'ngrok-skip-browser-warning': 'true',
+      };
       final base = widget.apiBaseUrl;
-      final id = widget.userId;
+      final id = safeUserId;
       final results = await Future.wait([
-        http.get(Uri.parse('$base/api/empleados/$id/perfil')),
-        http.get(Uri.parse('$base/api/empleados/$id/desempeno')),
-        http.get(Uri.parse('$base/api/empleados/$id/servicios-hoy')),
+        http.get(Uri.parse('$base/api/empleados/$id/perfil'), headers: headers),
+        http.get(Uri.parse('$base/api/empleados/$id/desempeno'), headers: headers),
+        http.get(Uri.parse('$base/api/empleados/$id/servicios-hoy'), headers: headers),
       ]);
 
       final perfilBody = json.decode(results[0].body);
@@ -210,10 +231,12 @@ class _PerfilTrabajadorScreenState extends State<PerfilTrabajadorScreen> {
       }
     } catch (e) {
       _error = 'No se pudo cargar la información del perfil. Verifica la conexión con el servidor.';
-      print('❌ Error al cargar el perfil del trabajador: $e');
+      debugPrint('Error al cargar el perfil del trabajador: $e');
     } finally {
-      setState(() => _isLoading = false);
-      fwAnimarEntrada(_visible, setState, mounted: () => mounted);
+      if (mounted) {
+        setState(() => _isLoading = false);
+        fwAnimarEntrada(_visible, setState, mounted: () => mounted);
+      }
     }
   }
 
@@ -237,16 +260,28 @@ class _PerfilTrabajadorScreenState extends State<PerfilTrabajadorScreen> {
     );
   }
 
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: FWColors.background,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Navigator.pushNamedAndRemoveUntil(context, '/empleado_agenda', (route) => false);
+      },
+      child: Scaffold(
+        backgroundColor: FWColors.background,
       appBar: AppBar(
         backgroundColor: const Color(0xFF0E1330),
         elevation: 0,
-        leading: widget.onBackToHome != null
-            ? IconButton(icon: const Icon(Icons.arrow_back, color: Colors.white), onPressed: widget.onBackToHome)
-            : null,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/empleado_agenda',
+              (route) => false,
+            );
+          },
+        ),
         title: Row(
           children: const [
             Text('FoamWash', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18)),
@@ -259,6 +294,7 @@ class _PerfilTrabajadorScreenState extends State<PerfilTrabajadorScreen> {
         ],
       ),
       body: _buildBody(),
+      ),
     );
   }
 
@@ -383,7 +419,19 @@ class _PerfilTrabajadorScreenState extends State<PerfilTrabajadorScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: widget.onEditarPerfil,
+                  onPressed: () async {
+                    // Navegar directamente y recargar si hubo cambios
+                    final updated = await Navigator.push<bool>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PerfilTrabajadorEditScreen(
+                          apiBaseUrl: widget.apiBaseUrl,
+                          userId: widget.userId,
+                        ),
+                      ),
+                    );
+                    if (updated == true) _cargarDatos();
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: FWColors.primaryBlue,
@@ -444,19 +492,25 @@ class _PerfilTrabajadorScreenState extends State<PerfilTrabajadorScreen> {
       title: 'Desempeño del Mes',
       spaceBetween: false,
       children: [
-        GridView.count(
-          crossAxisCount: 2,
+        GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: 1.15,
-          children: [
-            _PerfCard(icono: '⭐', valor: _desempeno?.calificacionPromedio?.toStringAsFixed(1), etiqueta: 'Calificación Promedio', mensajeVacio: 'Este trabajador aún no tiene calificaciones.'),
-            _PerfCard(icono: '✅', valor: _desempeno?.serviciosMes?.toString(), etiqueta: 'Servicios Completados', mensajeVacio: 'No hay servicios completados durante este mes.'),
-            const _PerfCard(icono: '⏱️', valor: null, etiqueta: 'Puntualidad', mensajeVacio: 'No disponible: el sistema no registra la hora real de inicio.'),
-            _PerfCard(icono: '💬', valor: _desempeno?.comentarios?.toString(), etiqueta: 'Comentarios', mensajeVacio: 'No existen comentarios registrados.'),
-          ],
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            mainAxisExtent: 160,
+          ),
+          itemCount: 4,
+          itemBuilder: (context, index) {
+            switch(index) {
+              case 0: return _PerfCard(icono: '⭐', valor: _desempeno?.calificacionPromedio?.toStringAsFixed(1), etiqueta: 'Calificación Promedio', mensajeVacio: 'Este trabajador aún no tiene calificaciones.');
+              case 1: return _PerfCard(icono: '✅', valor: _desempeno?.serviciosMes?.toString(), etiqueta: 'Servicios Completados', mensajeVacio: 'No hay servicios completados durante este mes.');
+              case 2: return const _PerfCard(icono: '⏱️', valor: null, etiqueta: 'Puntualidad', mensajeVacio: 'No disponible: el sistema no registra la hora real de inicio.');
+              case 3: return _PerfCard(icono: '💬', valor: _desempeno?.comentarios?.toString(), etiqueta: 'Comentarios', mensajeVacio: 'No existen comentarios registrados.');
+              default: return const SizedBox();
+            }
+          },
         ),
       ],
     );
@@ -528,21 +582,27 @@ class _StatSidebar extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Text(
-              valor ?? mensajeVacio,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: valor != null ? 22 : 11,
-                fontWeight: FontWeight.w800,
-                fontStyle: valor != null ? FontStyle.normal : FontStyle.italic,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                valor ?? mensajeVacio,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: valor != null ? 22 : 11,
+                  fontWeight: FontWeight.w800,
+                  fontStyle: valor != null ? FontStyle.normal : FontStyle.italic,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
-            Text(
-              etiqueta.toUpperCase(),
-              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 0.4),
-              textAlign: TextAlign.center,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                etiqueta.toUpperCase(),
+                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 0.4),
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
         ),
@@ -568,15 +628,19 @@ class _PerfCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(icono, style: const TextStyle(fontSize: 22)),
-          const SizedBox(height: 8),
-          Text(
-            valor ?? mensajeVacio,
-            textAlign: TextAlign.center,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: valor != null
-                ? const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: FWColors.textDark)
-                : const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF), fontStyle: FontStyle.italic),
+          const SizedBox(height: 4),
+          Expanded(
+            child: Center(
+              child: Text(
+                valor ?? mensajeVacio,
+                textAlign: TextAlign.center,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: valor != null
+                    ? const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: FWColors.textDark)
+                    : const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF), fontStyle: FontStyle.italic),
+              ),
+            ),
           ),
           const SizedBox(height: 4),
           Text(etiqueta, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, color: FWColors.textMuted, fontWeight: FontWeight.w600)),

@@ -6,23 +6,23 @@ export declare class ClientesController {
         success: boolean;
         data: {
             Id_Usuario: number;
+            N_Documento: string;
+            Correo: string;
             Nombre: string;
             Telefono: string;
-            N_Documento: string;
             Direccion: string;
-            Correo: string;
             estado: import(".prisma/client").$Enums.usuario_estado;
             last_login: Date;
             fecha_registro: Date;
             foto_perfil: string;
             cotizaciones: {
-                Precio_cotizado: import("@prisma/client/runtime/library").Decimal;
+                fecha_cotizacion: Date | null;
                 Id_Cotizacion: number;
                 Id_usuario: number;
+                Precio_cotizado: import("@prisma/client/runtime/library").Decimal;
                 Cantidad: number;
-                Id_servicio: number | null;
-                fecha_cotizacion: Date | null;
                 Tamaño: string;
+                Id_servicio: number | null;
             }[];
             reservasComoCliente: ({
                 observacion: {
@@ -38,14 +38,13 @@ export declare class ClientesController {
                     descripcion: string;
                     imagen_url: string | null;
                     cotizacion_Id_Cotizacion: number | null;
-                    reserva_ID_Reserva: number | null;
                     duracion_estimada: string | null;
                 }[];
             } & {
                 Id_Usuario: number;
+                fecha: Date;
                 ID_Reserva: number;
                 Estado: string;
-                fecha: Date;
                 Hora: Date;
                 Informacion_adicional: string | null;
                 observacion_Id_Observaciones: number;
@@ -63,10 +62,11 @@ export declare class ClientesController {
         success: boolean;
         data: {
             Id_Usuario: number;
+            N_Documento: string;
+            Correo: string;
             Nombre: string;
             Telefono: string;
             Direccion: string;
-            Correo: string;
         };
     }>;
     updateFoto(id: number, file: Express.Multer.File): Promise<{

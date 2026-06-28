@@ -6,44 +6,43 @@ export declare class ServiciosController {
         success: boolean;
         count: number;
         data: {
-            estado: string;
             Id_Servicio: number;
             Nombre_Servicio: string;
             Precio: import("@prisma/client/runtime/library").Decimal;
             descripcion: string;
             imagen_url: string;
+            estado: string;
             duracion_estimada: string;
         }[];
     }>;
     masSolicitados(): Promise<{
         success: boolean;
         data: ({
-            reserva: {
-                Id_Usuario: number;
+            reservas: {
                 ID_Reserva: number;
                 Estado: string;
+                Id_Usuario: number;
                 fecha: Date;
                 Hora: Date;
                 Informacion_adicional: string | null;
                 observacion_Id_Observaciones: number;
                 empleado_Id_Usuario: number | null;
-            };
+            }[];
         } & {
-            estado: string;
             Id_Servicio: number;
             Nombre_Servicio: string;
             Precio: import("@prisma/client/runtime/library").Decimal;
             descripcion: string;
             imagen_url: string | null;
             cotizacion_Id_Cotizacion: number | null;
-            reserva_ID_Reserva: number | null;
+            estado: string;
             duracion_estimada: string | null;
         })[];
     }>;
     programadosHoy(): Promise<{
         success: boolean;
         data: ({
-            reserva: {
+            reservas: ({
                 empleado: {
                     Nombre: string;
                 };
@@ -51,38 +50,36 @@ export declare class ServiciosController {
                     Nombre: string;
                 };
             } & {
-                Id_Usuario: number;
                 ID_Reserva: number;
                 Estado: string;
+                Id_Usuario: number;
                 fecha: Date;
                 Hora: Date;
                 Informacion_adicional: string | null;
                 observacion_Id_Observaciones: number;
                 empleado_Id_Usuario: number | null;
-            };
+            })[];
         } & {
-            estado: string;
             Id_Servicio: number;
             Nombre_Servicio: string;
             Precio: import("@prisma/client/runtime/library").Decimal;
             descripcion: string;
             imagen_url: string | null;
             cotizacion_Id_Cotizacion: number | null;
-            reserva_ID_Reserva: number | null;
+            estado: string;
             duracion_estimada: string | null;
         })[];
     }>;
     findOne(id: number): Promise<{
         success: boolean;
         data: {
-            estado: string;
             Id_Servicio: number;
             Nombre_Servicio: string;
             Precio: import("@prisma/client/runtime/library").Decimal;
             descripcion: string;
             imagen_url: string | null;
             cotizacion_Id_Cotizacion: number | null;
-            reserva_ID_Reserva: number | null;
+            estado: string;
             duracion_estimada: string | null;
         };
     }>;
@@ -90,14 +87,13 @@ export declare class ServiciosController {
         success: boolean;
         message: string;
         data: {
-            estado: string;
             Id_Servicio: number;
             Nombre_Servicio: string;
             Precio: import("@prisma/client/runtime/library").Decimal;
             descripcion: string;
             imagen_url: string | null;
             cotizacion_Id_Cotizacion: number | null;
-            reserva_ID_Reserva: number | null;
+            estado: string;
             duracion_estimada: string | null;
         };
     }>;
@@ -105,14 +101,13 @@ export declare class ServiciosController {
         success: boolean;
         message: string;
         data: {
-            estado: string;
             Id_Servicio: number;
             Nombre_Servicio: string;
             Precio: import("@prisma/client/runtime/library").Decimal;
             descripcion: string;
             imagen_url: string | null;
             cotizacion_Id_Cotizacion: number | null;
-            reserva_ID_Reserva: number | null;
+            estado: string;
             duracion_estimada: string | null;
         };
     }>;

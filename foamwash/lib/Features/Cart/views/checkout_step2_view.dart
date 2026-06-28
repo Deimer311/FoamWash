@@ -70,7 +70,7 @@ class _CheckoutStep2ViewState extends State<CheckoutStep2View> {
       final total = cartProvider.totalPrice;
 
       final formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate!);
-      final formattedTime = _selectedTime!.format(context);
+      final formattedTime = '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}';
 
       final voucher = await _controller.requestMultipleServices(
         serviceIds: serviceIds,
@@ -88,9 +88,10 @@ class _CheckoutStep2ViewState extends State<CheckoutStep2View> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Error al procesar la solicitud'),
+          SnackBar(
+            content: Text('Error: ${e.toString().replaceAll('Exception: ', '')}'),
             backgroundColor: Colors.redAccent,
+            duration: const Duration(seconds: 4),
           ),
         );
       }

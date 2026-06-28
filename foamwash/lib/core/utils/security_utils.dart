@@ -7,7 +7,8 @@ class SecurityUtils {
   /// Esto marcará la ventana como segura y mostrará una pantalla negra si se intenta grabar o capturar.
   static Future<void> secureScreen() async {
     try {
-      await _noScreenshot.screenshotOff();
+      // DESACTIVADO PARA PERMITIR COMPARTIR PANTALLA EN MEET
+      // await _noScreenshot.screenshotOff();
     } catch (e) {
       print('Error al activar protección contra capturas de pantalla: $e');
     }

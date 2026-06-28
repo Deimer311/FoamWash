@@ -6,7 +6,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { EmpleadosService } from './empleados.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -72,6 +72,13 @@ export class EmpleadosController {
     return { success: true, data, total: data.length };
   }
 
+  @Get(':id/agenda-mensual')
+  @ApiOperation({ summary: 'Obtener agenda mensual del empleado' })
+  async agendaMensual(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.empleadosService.getReservasMes(id);
+    return { success: true, data, total: data.length };
+  }
+
   @Get(':id/historial')
   @ApiOperation({ summary: 'Obtener historial completo de servicios del empleado (RF14)' })
   async historial(@Param('id', ParseIntPipe) id: number) {
@@ -113,6 +120,18 @@ export class EmpleadosController {
     }),
   )
   @ApiOperation({ summary: 'Actualizar foto del empleado' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        foto: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   async updateFoto(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File) {
     if (!file) return { success: false, message: 'No se subió ninguna imagen' };
     const fotoUrl = `/uploads/perfiles/${file.filename}`;

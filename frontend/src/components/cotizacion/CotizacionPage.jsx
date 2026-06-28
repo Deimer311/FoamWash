@@ -144,7 +144,7 @@ const CotizacionHeader = ({ onBackToHome, onGoToLogin, onGoToServicios }) => {
 
                 {/* Columna 1: Logo */}
                 <div className="ch-logo" onClick={onBackToHome}>
-                    <div className="ch-logo-mark">FW</div>
+                    <div className="ch-logo-mark"><img src="/LogoFW.jpeg" alt="Logo FoamWash" style={{ width: "100%", height: "100%", borderRadius: "inherit", objectFit: "cover" }} /></div>
                     <span className="ch-logo-text">FoamWash</span>
                 </div>
 
@@ -179,7 +179,7 @@ const AuthPromptModal = ({ onClose, onLogin }) => (
         <div style={{ background: '#fff', padding: 28, borderRadius: 14, width: 'min(480px,96%)', boxShadow: '0 10px 30px rgba(0,0,0,0.25)', position: 'relative' }}>
             <button onClick={onClose} style={{ position: 'absolute', right: 16, top: 14, border: 'none', background: 'transparent', fontSize: 20, cursor: 'pointer', color: '#666' }}>✕</button>
             <div style={{ textAlign: 'center' }}>
-                <div style={{ width: 64, height: 64, borderRadius: 12, background: 'linear-gradient(#223BFF, #0b74ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 24, margin: '0 auto 16px' }}>FW</div>
+                <div style={{ width: 64, height: 64, borderRadius: 12, background: 'linear-gradient(#223BFF, #0b74ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 24, margin: '0 auto 16px' }}><img src="/LogoFW.jpeg" alt="Logo FoamWash" style={{ width: "100%", height: "100%", borderRadius: "inherit", objectFit: "cover" }} /></div>
                 <h3 style={{ margin: '0 0 8px', fontSize: 20 }}>Inicia sesión para agendar</h3>
                 <p style={{ color: '#666', margin: '0 0 20px' }}>Tu cotización se guardará automáticamente cuando ingreses.</p>
                 <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>

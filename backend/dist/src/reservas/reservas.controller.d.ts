@@ -25,13 +25,12 @@ export declare class ReservasController {
                 descripcion: string;
                 imagen_url: string | null;
                 cotizacion_Id_Cotizacion: number | null;
-                reserva_ID_Reserva: number | null;
                 duracion_estimada: string | null;
             }[];
         } & {
-            Id_Usuario: number;
             ID_Reserva: number;
             Estado: string;
+            Id_Usuario: number;
             fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
@@ -47,9 +46,9 @@ export declare class ReservasController {
                 Telefono: string;
             };
         } & {
-            Id_Usuario: number;
             ID_Reserva: number;
             Estado: string;
+            Id_Usuario: number;
             fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
@@ -81,13 +80,12 @@ export declare class ReservasController {
                 descripcion: string;
                 imagen_url: string | null;
                 cotizacion_Id_Cotizacion: number | null;
-                reserva_ID_Reserva: number | null;
                 duracion_estimada: string | null;
             }[];
         } & {
-            Id_Usuario: number;
             ID_Reserva: number;
             Estado: string;
+            Id_Usuario: number;
             fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
@@ -95,7 +93,7 @@ export declare class ReservasController {
             empleado_Id_Usuario: number | null;
         };
     }>;
-    create(body: any): Promise<{
+    create(req: any, body: any): Promise<{
         success: boolean;
         message: string;
         data: {
@@ -127,9 +125,19 @@ export declare class ReservasController {
                     token_expires_at: Date | null;
                     foto_perfil: string | null;
                 };
-                Id_Usuario: number;
+                servicios: {
+                    estado: string;
+                    Id_Servicio: number;
+                    Nombre_Servicio: string;
+                    Precio: import("@prisma/client/runtime/library").Decimal;
+                    descripcion: string;
+                    imagen_url: string | null;
+                    cotizacion_Id_Cotizacion: number | null;
+                    duracion_estimada: string | null;
+                }[];
                 ID_Reserva: number;
                 Estado: string;
+                Id_Usuario: number;
                 fecha: Date;
                 Hora: Date;
                 Informacion_adicional: string | null;
@@ -142,9 +150,9 @@ export declare class ReservasController {
         success: boolean;
         message: string;
         data: {
-            Id_Usuario: number;
             ID_Reserva: number;
             Estado: string;
+            Id_Usuario: number;
             fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
@@ -185,13 +193,48 @@ export declare class ReservasController {
                 descripcion: string;
                 imagen_url: string | null;
                 cotizacion_Id_Cotizacion: number | null;
-                reserva_ID_Reserva: number | null;
                 duracion_estimada: string | null;
             }[];
         } & {
-            Id_Usuario: number;
             ID_Reserva: number;
             Estado: string;
+            Id_Usuario: number;
+            fecha: Date;
+            Hora: Date;
+            Informacion_adicional: string | null;
+            observacion_Id_Observaciones: number;
+            empleado_Id_Usuario: number | null;
+        };
+    }>;
+    cancelarReserva(id: number, motivo: string): Promise<{
+        success: boolean;
+        message: string;
+        data: {
+            cliente: {
+                Id_Usuario: number;
+                Nombre: string | null;
+                Telefono: string | null;
+                N_Documento: string | null;
+                Direccion: string | null;
+                Correo: string | null;
+                password_hash: string | null;
+                estado: import(".prisma/client").$Enums.usuario_estado | null;
+                rol_Id_Rol: number | null;
+                tipo_de_documento_id_tipo_de_documento: number | null;
+                reset_token: string | null;
+                reset_token_expires: Date | null;
+                last_login: Date | null;
+                fecha_registro: Date | null;
+                access_token: string | null;
+                refresh_token: string | null;
+                token_created_at: Date | null;
+                token_expires_at: Date | null;
+                foto_perfil: string | null;
+            };
+        } & {
+            ID_Reserva: number;
+            Estado: string;
+            Id_Usuario: number;
             fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;

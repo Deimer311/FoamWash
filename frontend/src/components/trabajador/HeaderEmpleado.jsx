@@ -205,7 +205,7 @@ const HeaderEmpleado = ({
       <header className={`em-header${scrolled ? ' scrolled' : ''}`}>
         {/* Logo */}
         <div className="em-logo" onClick={onGoAgendaEmpleado}>
-          <div className="em-logo-mark">FW</div>
+          <div className="em-logo-mark"><img src="/LogoFW.jpeg" alt="Logo FoamWash" style={{ width: "100%", height: "100%", borderRadius: "inherit", objectFit: "cover" }} /></div>
           <span className="em-logo-text">
             FoamWash<span className="em-logo-tag">EM</span>
           </span>

@@ -115,6 +115,7 @@ __decorate([
     (0, common_1.Put)(':id'),
     (0, common_1.UseGuards)(self_or_admin_guard_1.SelfOrAdminGuard),
     (0, swagger_1.ApiOperation)({ summary: 'Actualizar datos de un usuario' }),
+    (0, swagger_1.ApiBody)({ schema: { example: { "Nombre": "Juan Modificado", "Telefono": "3109998877", "Direccion": "Nueva Calle 45" } } }),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -144,8 +145,9 @@ __decorate([
             },
         }),
         fileFilter: (req, file, cb) => {
-            if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
-                return cb(new Error('Solo se permiten imágenes'), false);
+            const mime = file.mimetype.toLowerCase();
+            if (!mime.startsWith('image/') && !mime.includes('octet-stream')) {
+                return cb(new Error(`Solo se permiten imágenes (recibido: ${file.mimetype})`), false);
             }
             cb(null, true);
         },

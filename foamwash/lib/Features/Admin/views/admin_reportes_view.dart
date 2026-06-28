@@ -2,16 +2,16 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:foamwash/core/utils/security_utils.dart';
+import '../widgets/admin_drawer.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'package:foamwash/Features/Admin/views/admin_dashboard_view.dart';
 
-// NOTA: Reemplaza esto con tu cliente real de API (Dio, Http, etc.)
-// Simulamos el servicio 'api' de tu proyecto FoamWash.
-class ApiMock {
-  static Future<Map<String, dynamic>> get(String endpoint) async {
-    // Aquí iría tu lógica real: await http.get(Uri.parse('BASE_URL' + endpoint));
-    await Future.delayed(const Duration(milliseconds: 600));
-    return {};
-  }
-}
+// Eliminada clase ApiMock, ahora usamos http real.
+import 'package:http/http.dart' as http;
+import 'package:foamwash/Api/api_constants.dart';
+import 'package:foamwash/core/cache/secure_storage_service.dart';
 
 class AdminReportesView extends StatefulWidget {
   final VoidCallback? onGoDashboard;
@@ -66,79 +66,21 @@ class _AdminReportesViewState extends State<AdminReportesView> {
   Future<void> _fetchData() async {
     setState(() => _loading = true);
     try {
-      // 1. Obtener Estadísticas / KPIs
-      final estadisticasRes = await ApiMock.get(
-        '/estadisticas?periodo=$_periodoActivo',
-      );
-      final kpis = estadisticasRes['data'] ?? estadisticasRes ?? {};
+      final secureStorage = SecureStorageService();
+      final token = await secureStorage.read('token') ?? '';
+      final baseUrl = ApiConstants.baseUrl;
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
 
-      // 2. Obtener Productividad de Empleados
-      final empleadosRes = await ApiMock.get(
-        '/empleados/productividad/general',
-      );
-      final List empleados = empleadosRes['data'] ?? empleadosRes ?? [];
+      final results = await Future.wait([
+        http.get(Uri.parse('$baseUrl/estadisticas?periodo=$_periodoActivo'), headers: headers),
+        http.get(Uri.parse('$baseUrl/empleados/productividad/general'), headers: headers),
+        http.get(Uri.parse('$baseUrl/servicios/analytics/mas-solicitados'), headers: headers),
+        http.get(Uri.parse('$baseUrl/reservas'), headers: headers),
+      ]);
 
-      // 3. Obtener Servicios más solicitados
-      final serviciosRes = await ApiMock.get(
-        '/servicios/analytics/mas-solicitados',
-      );
-      final List servicios = serviciosRes['data'] ?? serviciosRes ?? [];
-
-      // 4. Obtener Cotizaciones para el gráfico de barras
-      final cotizacionesRes = await ApiMock.get('/cotizaciones');
-      final List cotizaciones =
-          cotizacionesRes['data'] ?? cotizacionesRes ?? [];
-
-      // --- Procesamiento de lógica de fechas intacta ---
-      final now = DateTime.now();
-      DateTime startDate = DateTime.now();
-      String groupBy = 'month';
-
-      if (_periodoActivo == 'semanal') {
-        startDate = now.subtract(const Duration(days: 7));
-        groupBy = 'day';
-      } else if (_periodoActivo == 'mensual') {
-        startDate = DateTime(now.year, now.month - 1, now.day);
-        groupBy = 'week';
-      } else if (_periodoActivo == 'trimestral') {
-        startDate = DateTime(now.year, now.month - 3, now.day);
-        groupBy = 'month';
-      } else if (_periodoActivo == 'anual') {
-        startDate = DateTime(now.year - 1, now.month, now.day);
-        groupBy = 'month';
-      }
-
-      Map<String, double> ingresosPorPeriodo = {};
-
-      for (var cot in cotizaciones) {
-        final fechaStr =
-            cot['fecha_cotizacion'] ?? cot['fecha'] ?? cot['createdAt'];
-        if (fechaStr == null) continue;
-        final d = DateTime.parse(fechaStr);
-
-        if (d.isAfter(startDate) || d.isAtSameMomentAs(startDate)) {
-          String key;
-          if (groupBy == 'day') {
-            key =
-                "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
-          } else if (groupBy == 'week') {
-            final firstDayOfWeek = d.subtract(Duration(days: d.weekday - 1));
-            key =
-                "${firstDayOfWeek.year}-${firstDayOfWeek.month.toString().padLeft(2, '0')}-${firstDayOfWeek.day.toString().padLeft(2, '0')}";
-          } else {
-            key = "${d.year}-${d.month.toString().padLeft(2, '0')}";
-          }
-
-          final precio =
-              double.tryParse(
-                (cot['Precio_cotizado'] ?? cot['Precio'] ?? 0).toString(),
-              ) ??
-              0.0;
-          ingresosPorPeriodo[key] = (ingresosPorPeriodo[key] ?? 0.0) + precio;
-        }
-      }
-
-      // Mapear colores alternos para servicios
       final List<Color> colorsList = [
         const Color(0xFF0066FF),
         const Color(0xFF00C853),
@@ -147,50 +89,142 @@ class _AdminReportesViewState extends State<AdminReportesView> {
         const Color(0xFF7C3AED),
       ];
 
-      setState(() {
-        _estadisticas = {
-          'serviciosRealizados':
-              kpis['Reservas_Completadas'] ?? kpis['precio_total'] ?? 0,
-          'ingresosTotal':
-              double.tryParse(
-                (kpis['Ingresos_Totales'] ?? kpis['ingresos'] ?? 0.0)
-                    .toString(),
-              ) ??
-              0.0,
-          'clientesAtendidos': kpis['Total_Clientes'] ?? 0,
-          'satisfaccion':
-              double.tryParse((kpis['satisfaccion'] ?? 95).toString()) ?? 95.0,
-        };
+      Map<String, dynamic> newEstadisticas = {
+        'serviciosRealizados': 0,
+        'ingresosTotal': 0.0,
+        'clientesAtendidos': 0,
+        'satisfaccion': 95.0,
+      };
+      List<Map<String, dynamic>> newRendimiento = [];
+      List<Map<String, dynamic>> newServicios = [];
+      List<Map<String, dynamic>> newVentas = [];
 
-        _rendimientoEmpleados = empleados.map((emp) {
-          final count = emp['_count']?['reservasComoEmpleado'] ?? 0;
+      // Los cálculos de newEstadisticas se harán localmente con results[3] para sincronizar con el Dashboard
+
+      if (results[1].statusCode == 200 || results[1].statusCode == 201) {
+        final prodData = jsonDecode(results[1].body);
+        final list = prodData['data'] as List? ?? [];
+        newRendimiento = list.map((e) {
+          final count = e['_count']?['reservasComoEmpleado'] ?? 0;
           return {
-            'nombre': emp['Nombre'] ?? 'Empleado ${emp['Id_Usuario']}',
+            'nombre': e['Nombre'] ?? 'Empleado',
             'servicios': count,
             'satisfaccion': 90.0 + (count * 0.1),
           };
         }).toList();
+      }
 
-        int idx = 0;
-        _serviciosPorTipo = servicios.map((serv) {
-          final count = serv['_count']?['reserva'] is List
-              ? (serv['_count']?['reserva'] as List).length
-              : (serv['_count']?['reserva'] ?? 0);
-          final color = colorsList[idx % colorsList.length];
-          idx++;
+      // Los cálculos de newServicios se harán localmente con results[3] para garantizar precisión
+
+      if (results[3].statusCode == 200 || results[3].statusCode == 201) {
+        final resData = jsonDecode(results[3].body);
+        // findAll() devuelve { success, data: [...] }
+        final List reservas = resData['data'] ?? (resData is List ? resData : []);
+        
+        final now = DateTime.now();
+        DateTime startDate = now;
+        String groupBy = 'month';
+
+        if (_periodoActivo == 'semanal') {
+          startDate = now.subtract(const Duration(days: 7));
+          groupBy = 'day';
+        } else if (_periodoActivo == 'mensual') {
+          startDate = DateTime(now.year, now.month, 1);
+          groupBy = 'week';
+        } else if (_periodoActivo == 'trimestral') {
+          startDate = DateTime(now.year, now.month - 3, now.day);
+          groupBy = 'month';
+        } else if (_periodoActivo == 'semestral') {
+          startDate = DateTime(now.year, now.month - 6, now.day);
+          groupBy = 'month';
+        } else if (_periodoActivo == 'anual') {
+          startDate = DateTime(now.year - 1, now.month, now.day);
+          groupBy = 'month';
+        }
+        int realizados = 0;
+        double totalIngresosLocal = 0.0;
+        Set<int> clientesUnicos = {};
+
+        Map<String, double> ingresosPorPeriodo = {};
+        Map<String, int> serviciosSolicitados = {};
+        
+        for (var res in reservas) {
+          final fechaStr = res['fecha'];
+          if (fechaStr == null) continue;
+          final d = DateTime.tryParse(fechaStr);
+          if (d != null && (d.isAfter(startDate) || d.isAtSameMomentAs(startDate))) {
+            // Clientes únicos en el periodo
+            if (res['cliente'] != null) {
+              final clientId = res['cliente']['Id_Usuario'] ?? res['cliente']['id'] ?? res['cliente']['ID_Usuario'];
+              if (clientId != null) {
+                clientesUnicos.add(clientId);
+              }
+            }
+            // Servicios solicitados (independientemente del estado, como en el backend original, 
+            // o solo completados. Lo haremos solo para reservas no canceladas para ser precisos)
+            if (res['Estado'] != 'Cancelado' && res['Estado'] != 'Cancelada') {
+              if (res['servicios'] != null) {
+                for (var s in res['servicios']) {
+                  final nom = s['Nombre_Servicio'] ?? 'Servicio';
+                  serviciosSolicitados[nom] = (serviciosSolicitados[nom] ?? 0) + 1;
+                }
+              }
+            }
+            
+            if (res['Estado'] != 'Completado' && res['Estado'] != 'Finalizado') continue;
+            
+            realizados++;
+            double sumaServicios = 0.0;
+            if (res['servicios'] != null) {
+              for (var s in res['servicios']) {
+                sumaServicios += double.tryParse((s['Precio'] ?? 0).toString()) ?? 0.0;
+              }
+            }
+            totalIngresosLocal += sumaServicios;
+            
+            String key;
+            if (groupBy == 'day') {
+              key = "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
+            } else if (groupBy == 'week') {
+              final firstDayOfWeek = d.subtract(Duration(days: d.weekday - 1));
+              key = "Semana ${firstDayOfWeek.day}/${firstDayOfWeek.month}";
+            } else {
+              key = "${d.year}-${d.month.toString().padLeft(2, '0')}";
+            }
+            ingresosPorPeriodo[key] = (ingresosPorPeriodo[key] ?? 0) + sumaServicios;
+          }
+        }
+        
+        newEstadisticas = {
+          'serviciosRealizados': realizados,
+          'ingresosTotal': totalIngresosLocal,
+          'clientesAtendidos': clientesUnicos.length,
+          'satisfaccion': 95.0,
+        };
+        
+        int sIdx = 0;
+        newServicios = serviciosSolicitados.entries.map((e) {
+          final color = colorsList[sIdx % colorsList.length];
+          sIdx++;
           return {
-            'nombre': serv['Nombre_Servicio'] ?? serv['nombre'] ?? 'Servicio',
-            'cantidad': count,
+            'nombre': e.key,
+            'cantidad': e.value,
             'color': color,
           };
         }).toList();
-
-        _ventasPorMes = ingresosPorPeriodo.entries.map((e) {
+        newServicios.sort((a, b) => (b['cantidad'] as int).compareTo(a['cantidad'] as int));
+        
+        newVentas = ingresosPorPeriodo.entries.map((e) {
           return {'periodo': e.key, 'valor': e.value};
         }).toList();
-        _ventasPorMes.sort(
-          (a, b) => (a['periodo'] as String).compareTo(b['periodo'] as String),
-        );
+        newVentas.sort((a, b) => (a['periodo'] as String).compareTo(b['periodo'] as String));
+      }
+
+      setState(() {
+        _estadisticas = newEstadisticas;
+        _rendimientoEmpleados = newRendimiento;
+        _serviciosPorTipo = newServicios;
+        _ventasPorMes = newVentas;
       });
     } catch (e) {
       debugPrint('Error fetching report data: $e');
@@ -206,7 +240,7 @@ class _AdminReportesViewState extends State<AdminReportesView> {
         _rendimientoEmpleados = [];
       });
     } finally {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -220,6 +254,34 @@ class _AdminReportesViewState extends State<AdminReportesView> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F4F8),
+      endDrawer: AdminDrawer(),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: const Color(0xFF0A1435), // Match _primaryDark
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const AdminDashboardView()),
+            (route) => false,
+          ),
+        ),
+        title: const Text(
+          'Reportes',
+          style: TextStyle(fontFamily: 'Kanit', fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white),
+        ),
+        actions: [
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white, size: 28),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
@@ -243,25 +305,29 @@ class _AdminReportesViewState extends State<AdminReportesView> {
                     ),
                   ),
                   const SizedBox(width: 14),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        'Reportes y Análisis',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1A2540),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          'Reportes y Análisis',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1A2540),
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      Text(
-                        'Visualiza el rendimiento de tu empresa',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Color(0xFF8898b3),
+                        Text(
+                          'Visualiza el rendimiento de tu empresa',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF8898b3),
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -278,7 +344,7 @@ class _AdminReportesViewState extends State<AdminReportesView> {
                     border: Border.all(color: const Color(0xFFE0E8F5)),
                   ),
                   child: Row(
-                    children: ['semanal', 'mensual', 'trimestral', 'anual'].map(
+                    children: ['semanal', 'mensual', 'trimestral', 'semestral', 'anual'].map(
                       (p) {
                         final isSelected = _periodoActivo == p;
                         return GestureDetector(
@@ -385,6 +451,8 @@ class _AdminReportesViewState extends State<AdminReportesView> {
                           ? 'Mensuales'
                           : _periodoActivo == 'trimestral'
                           ? 'Trimestrales'
+                          : _periodoActivo == 'semestral'
+                          ? 'Semestrales'
                           : 'Anuales'}',
                   child: _ventasPorMes.isEmpty
                       ? const Center(
@@ -684,46 +752,141 @@ class _AdminReportesViewState extends State<AdminReportesView> {
           ),
         ),
       ),
-      // --- FooterAdmin Reemplazado por el BottomNavigationBar estándar de Flutter ---
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 3, // El índice activo de Reportes
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFF0066FF),
-        unselectedItemColor: const Color(0xFF8898b3),
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              widget.onGoDashboard?.call();
-              break;
-            case 1:
-              widget.onGoAgenda?.call();
-              break;
-            case 2:
-              widget.onGoEmpleados?.call();
-              break;
-            case 3:
-              widget.onGoReportes?.call();
-              break;
-            case 4:
-              widget.onGoPerfil?.call();
-              break;
-          }
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _generarPDF,
+        backgroundColor: const Color(0xFF0066FF),
+        icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
+        label: const Text('Exportar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
+    );
+  }
+
+  Future<void> _generarPDF() async {
+    final pdf = pw.Document();
+    
+    final primaryColor = PdfColor.fromHex('#1A56FF');
+    final secondaryColor = PdfColor.fromHex('#0F172A');
+    final grayColor = PdfColor.fromHex('#64748B');
+    final bgLight = PdfColor.fromHex('#F8FAFC');
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(40),
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              // Header
+              pw.Container(
+                padding: const pw.EdgeInsets.only(bottom: 20),
+                decoration: pw.BoxDecoration(
+                  border: pw.Border(bottom: pw.BorderSide(color: primaryColor, width: 2)),
+                ),
+                child: pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text('FOAMWASH', style: pw.TextStyle(color: primaryColor, fontSize: 28, fontWeight: pw.FontWeight.bold)),
+                        pw.Text('REPORTE ANALÍTICO', style: pw.TextStyle(color: secondaryColor, fontSize: 16, letterSpacing: 1.2)),
+                      ],
+                    ),
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.end,
+                      children: [
+                        pw.Text('Periodo:', style: pw.TextStyle(color: grayColor, fontSize: 10)),
+                        pw.Text(_periodoActivo.toUpperCase(), style: pw.TextStyle(color: secondaryColor, fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                        pw.SizedBox(height: 4),
+                        pw.Text('Fecha de emisión: ${DateFormat('dd/MM/yyyy').format(DateTime.now())}', style: pw.TextStyle(color: grayColor, fontSize: 10)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              pw.SizedBox(height: 30),
+
+              // KPIs
+              pw.Text('RESUMEN DE RESULTADOS', style: pw.TextStyle(color: secondaryColor, fontSize: 14, fontWeight: pw.FontWeight.bold)),
+              pw.SizedBox(height: 15),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildPdfKpi('SERVICIOS', '${_estadisticas['serviciosRealizados']}', bgLight, primaryColor),
+                  _buildPdfKpi('INGRESOS', '\$${_estadisticas['ingresosTotal'].toStringAsFixed(0)}', bgLight, PdfColor.fromHex('#00C853')),
+                  _buildPdfKpi('CLIENTES', '${_estadisticas['clientesAtendidos']}', bgLight, PdfColor.fromHex('#F59E0B')),
+                ],
+              ),
+              pw.SizedBox(height: 40),
+
+              // Ingresos Breakdown
+              pw.Text('DESGLOSE DE INGRESOS', style: pw.TextStyle(color: secondaryColor, fontSize: 14, fontWeight: pw.FontWeight.bold)),
+              pw.SizedBox(height: 15),
+              pw.TableHelper.fromTextArray(
+                context: context,
+                border: const pw.TableBorder(
+                  bottom: pw.BorderSide(color: PdfColors.grey300, width: 0.5),
+                  horizontalInside: pw.BorderSide(color: PdfColors.grey300, width: 0.5),
+                ),
+                headerDecoration: pw.BoxDecoration(color: primaryColor),
+                headerStyle: pw.TextStyle(color: PdfColors.white, fontWeight: pw.FontWeight.bold, fontSize: 11),
+                cellStyle: const pw.TextStyle(fontSize: 11),
+                cellAlignment: pw.Alignment.centerLeft,
+                headerPadding: const pw.EdgeInsets.all(8),
+                cellPadding: const pw.EdgeInsets.all(8),
+                data: <List<String>>[
+                  <String>['PERIODO', 'INGRESOS GENERADOS'],
+                  ..._ventasPorMes.map((v) => [v['periodo'].toString(), '\$${v['valor'].toStringAsFixed(2)}']),
+                ],
+              ),
+              pw.SizedBox(height: 40),
+
+              // Servicios Populares
+              pw.Text('SERVICIOS MÁS SOLICITADOS', style: pw.TextStyle(color: secondaryColor, fontSize: 14, fontWeight: pw.FontWeight.bold)),
+              pw.SizedBox(height: 15),
+              ..._serviciosPorTipo.map((s) => pw.Container(
+                    margin: const pw.EdgeInsets.only(bottom: 8),
+                    padding: const pw.EdgeInsets.all(10),
+                    decoration: pw.BoxDecoration(
+                      color: bgLight,
+                      borderRadius: const pw.BorderRadius.all(pw.Radius.circular(6)),
+                    ),
+                    child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text('${s['nombre']}', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: secondaryColor)),
+                        pw.Text('${s['cantidad']} solicitudes', style: pw.TextStyle(color: primaryColor, fontWeight: pw.FontWeight.bold)),
+                      ],
+                    ),
+                  )).toList(),
+            ],
+          );
         },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'Agenda',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.badge), label: 'Empleados'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.analytics),
-            label: 'Reportes',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+      ),
+    );
+
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+      name: 'Reporte_FoamWash_$_periodoActivo.pdf',
+    );
+  }
+
+  pw.Widget _buildPdfKpi(String title, String value, PdfColor bg, PdfColor accent) {
+    return pw.Container(
+      width: 150,
+      padding: const pw.EdgeInsets.all(15),
+      decoration: pw.BoxDecoration(
+        color: bg,
+        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(10)),
+        border: pw.Border.all(color: PdfColors.grey300, width: 0.5),
+      ),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(title, style: pw.TextStyle(color: PdfColor.fromHex('#64748B'), fontSize: 10, fontWeight: pw.FontWeight.bold)),
+          pw.SizedBox(height: 8),
+          pw.Text(value, style: pw.TextStyle(color: accent, fontSize: 18, fontWeight: pw.FontWeight.bold)),
         ],
       ),
     );

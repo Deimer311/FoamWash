@@ -50,7 +50,6 @@ export declare class UsuariosService {
                 descripcion: string;
                 imagen_url: string | null;
                 cotizacion_Id_Cotizacion: number | null;
-                reserva_ID_Reserva: number | null;
                 duracion_estimada: string | null;
             }[];
         } & {
@@ -136,7 +135,6 @@ export declare class UsuariosService {
             descripcion: string;
             imagen_url: string | null;
             cotizacion_Id_Cotizacion: number | null;
-            reserva_ID_Reserva: number | null;
             duracion_estimada: string | null;
         }[];
     } & {

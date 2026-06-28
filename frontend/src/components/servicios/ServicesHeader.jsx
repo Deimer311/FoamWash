@@ -118,7 +118,7 @@ const ServicesHeader = ({ onBackToHome, onGoToLogin, onCotizacionPublica }) => {
 
                 {/* Columna 1: Logo */}
                 <div className="sv-logo" onClick={onBackToHome}>
-                    <div className="sv-logo-mark">FW</div>
+                    <div className="sv-logo-mark"><img src="/LogoFW.jpeg" alt="Logo FoamWash" style={{ width: "100%", height: "100%", borderRadius: "inherit", objectFit: "cover" }} /></div>
                     <span className="sv-logo-text">
                         FoamWash<span className="sv-logo-tag">LG</span>
                     </span>
