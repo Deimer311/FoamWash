@@ -28,9 +28,9 @@ export declare class ReservasService {
         }[];
     } & {
         Id_Usuario: number;
-        fecha: Date;
         ID_Reserva: number;
         Estado: string;
+        fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
         observacion_Id_Observaciones: number;
@@ -43,9 +43,9 @@ export declare class ReservasService {
         };
     } & {
         Id_Usuario: number;
-        fecha: Date;
         ID_Reserva: number;
         Estado: string;
+        fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
         observacion_Id_Observaciones: number;
@@ -78,9 +78,9 @@ export declare class ReservasService {
         }[];
     } & {
         Id_Usuario: number;
-        fecha: Date;
         ID_Reserva: number;
         Estado: string;
+        fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
         observacion_Id_Observaciones: number;
@@ -130,9 +130,9 @@ export declare class ReservasService {
                 foto_perfil: string | null;
             };
             Id_Usuario: number;
-            fecha: Date;
             ID_Reserva: number;
             Estado: string;
+            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -147,9 +147,9 @@ export declare class ReservasService {
         empleado_Id_Usuario: number;
     }>): Promise<{
         Id_Usuario: number;
-        fecha: Date;
         ID_Reserva: number;
         Estado: string;
+        fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
         observacion_Id_Observaciones: number;
@@ -190,9 +190,9 @@ export declare class ReservasService {
         }[];
     } & {
         Id_Usuario: number;
-        fecha: Date;
         ID_Reserva: number;
         Estado: string;
+        fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
         observacion_Id_Observaciones: number;
@@ -200,9 +200,9 @@ export declare class ReservasService {
     }>;
     remove(id: number): Promise<{
         Id_Usuario: number;
-        fecha: Date;
         ID_Reserva: number;
         Estado: string;
+        fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
         observacion_Id_Observaciones: number;
@@ -227,9 +227,9 @@ export declare class ReservasService {
         }[];
     } & {
         Id_Usuario: number;
-        fecha: Date;
         ID_Reserva: number;
         Estado: string;
+        fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
         observacion_Id_Observaciones: number;

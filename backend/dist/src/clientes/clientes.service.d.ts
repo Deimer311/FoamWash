@@ -3,27 +3,24 @@ export declare class ClientesService {
     private prisma;
     constructor(prisma: PrismaService);
     getPerfil(id: number): Promise<{
-        rol: {
-            Rol: string;
-        };
         Id_Usuario: number;
-        N_Documento: string;
-        Correo: string;
         Nombre: string;
         Telefono: string;
+        N_Documento: string;
         Direccion: string;
+        Correo: string;
         estado: import(".prisma/client").$Enums.usuario_estado;
         last_login: Date;
         fecha_registro: Date;
         foto_perfil: string;
         cotizaciones: {
+            Precio_cotizado: import("@prisma/client/runtime/library").Decimal;
             Id_Cotizacion: number;
             Id_usuario: number;
-            Precio_cotizado: import("@prisma/client/runtime/library").Decimal;
             Cantidad: number;
-            Tamaño: string;
-            fecha_cotizacion: Date | null;
             Id_servicio: number | null;
+            fecha_cotizacion: Date | null;
+            Tamaño: string;
         }[];
         reservasComoCliente: ({
             observacion: {
@@ -55,6 +52,9 @@ export declare class ClientesService {
         tipo_de_documento: {
             nombre_del_documento: string;
         };
+        rol: {
+            Rol: string;
+        };
     }>;
     updatePerfil(id: number, data: Partial<{
         Nombre: string;
@@ -63,10 +63,10 @@ export declare class ClientesService {
         N_Documento: string;
     }>): Promise<{
         Id_Usuario: number;
-        Correo: string;
         Nombre: string;
         Telefono: string;
         Direccion: string;
+        Correo: string;
     }>;
     updateFoto(id: number, fotoUrl: string): Promise<{
         Id_Usuario: number;

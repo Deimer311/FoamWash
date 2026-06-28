@@ -27,8 +27,8 @@ export declare class ConsultasController {
         consulta: number;
         data: {
             Id_Usuario: number;
-            Correo: string;
             Nombre: string;
+            Correo: string;
             reservasComoCliente: {
                 ID_Reserva: number;
                 Estado: string;
@@ -76,9 +76,9 @@ export declare class ConsultasController {
         consulta: number;
         data: ({
             cliente: {
-                Correo: string;
                 Nombre: string;
                 Telefono: string;
+                Correo: string;
             };
         } & {
             Id_Usuario: number;
@@ -108,8 +108,8 @@ export declare class ConsultasController {
         consulta: number;
         data: {
             Id_Usuario: number;
-            Correo: string;
             Nombre: string;
+            Correo: string;
             _count: {
                 reservasComoCliente: number;
             };
@@ -133,9 +133,9 @@ export declare class ConsultasController {
         consulta: number;
         data: {
             Id_Usuario: number;
-            Correo: string;
             Nombre: string;
             Telefono: string;
+            Correo: string;
         }[];
     }>;
     c10(): Promise<{
@@ -180,8 +180,8 @@ export declare class ConsultasController {
             }[];
             consulta3_serviciosPorCliente: {
                 Id_Usuario: number;
-                Correo: string;
                 Nombre: string;
+                Correo: string;
                 reservasComoCliente: {
                     ID_Reserva: number;
                     Estado: string;
@@ -201,9 +201,9 @@ export declare class ConsultasController {
             }[];
             consulta5_clientesSemana: ({
                 cliente: {
-                    Correo: string;
                     Nombre: string;
                     Telefono: string;
+                    Correo: string;
                 };
             } & {
                 Id_Usuario: number;
@@ -225,17 +225,17 @@ export declare class ConsultasController {
             }[];
             consulta7_reservasPorCliente: {
                 Id_Usuario: number;
-                Correo: string;
                 Nombre: string;
+                Correo: string;
                 _count: {
                     reservasComoCliente: number;
                 };
             }[];
             consulta9_empleadosSinServicios: {
                 Id_Usuario: number;
-                Correo: string;
                 Nombre: string;
                 Telefono: string;
+                Correo: string;
             }[];
         };
     }>;

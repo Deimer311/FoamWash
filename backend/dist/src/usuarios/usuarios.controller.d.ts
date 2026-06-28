@@ -65,9 +65,9 @@ export declare class UsuariosController {
             }[];
         } & {
             Id_Usuario: number;
-            fecha: Date;
             ID_Reserva: number;
             Estado: string;
+            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -112,9 +112,9 @@ export declare class UsuariosController {
                 }[];
             } & {
                 Id_Usuario: number;
-                fecha: Date;
                 ID_Reserva: number;
                 Estado: string;
+                fecha: Date;
                 Hora: Date;
                 Informacion_adicional: string | null;
                 observacion_Id_Observaciones: number;

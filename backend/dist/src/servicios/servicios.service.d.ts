@@ -67,9 +67,9 @@ export declare class ServiciosService {
     }>;
     masSolicitados(): Promise<({
         reserva: {
+            Id_Usuario: number;
             ID_Reserva: number;
             Estado: string;
-            Id_Usuario: number;
             fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
@@ -96,9 +96,9 @@ export declare class ServiciosService {
                 Nombre: string;
             };
         } & {
+            Id_Usuario: number;
             ID_Reserva: number;
             Estado: string;
-            Id_Usuario: number;
             fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;

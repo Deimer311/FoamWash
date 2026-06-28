@@ -22,7 +22,7 @@ import { NotificacionesModule } from './notificaciones/notificaciones.module';
 @Module({
   imports: [
     // Variables de entorno disponibles globalmente
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: join(__dirname, '..', '.env') }),
 
     // Servir archivos estáticos (carpeta uploads) — igual que antes
     ServeStaticModule.forRoot({

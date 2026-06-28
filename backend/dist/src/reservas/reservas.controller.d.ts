@@ -30,9 +30,9 @@ export declare class ReservasController {
             }[];
         } & {
             Id_Usuario: number;
-            fecha: Date;
             ID_Reserva: number;
             Estado: string;
+            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -48,9 +48,9 @@ export declare class ReservasController {
             };
         } & {
             Id_Usuario: number;
-            fecha: Date;
             ID_Reserva: number;
             Estado: string;
+            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -86,9 +86,9 @@ export declare class ReservasController {
             }[];
         } & {
             Id_Usuario: number;
-            fecha: Date;
             ID_Reserva: number;
             Estado: string;
+            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -128,9 +128,9 @@ export declare class ReservasController {
                     foto_perfil: string | null;
                 };
                 Id_Usuario: number;
-                fecha: Date;
                 ID_Reserva: number;
                 Estado: string;
+                fecha: Date;
                 Hora: Date;
                 Informacion_adicional: string | null;
                 observacion_Id_Observaciones: number;
@@ -143,9 +143,9 @@ export declare class ReservasController {
         message: string;
         data: {
             Id_Usuario: number;
-            fecha: Date;
             ID_Reserva: number;
             Estado: string;
+            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -190,9 +190,9 @@ export declare class ReservasController {
             }[];
         } & {
             Id_Usuario: number;
-            fecha: Date;
             ID_Reserva: number;
             Estado: string;
+            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;

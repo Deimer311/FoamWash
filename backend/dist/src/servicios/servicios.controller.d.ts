@@ -19,9 +19,9 @@ export declare class ServiciosController {
         success: boolean;
         data: ({
             reserva: {
+                Id_Usuario: number;
                 ID_Reserva: number;
                 Estado: string;
-                Id_Usuario: number;
                 fecha: Date;
                 Hora: Date;
                 Informacion_adicional: string | null;
@@ -51,9 +51,9 @@ export declare class ServiciosController {
                     Nombre: string;
                 };
             } & {
+                Id_Usuario: number;
                 ID_Reserva: number;
                 Estado: string;
-                Id_Usuario: number;
                 fecha: Date;
                 Hora: Date;
                 Informacion_adicional: string | null;

@@ -15,8 +15,8 @@ export declare class AuthController {
                 nombre_del_documento: string;
             };
             rol: {
-                Rol: string;
                 Id_Rol: number;
+                Rol: string;
             };
             Id_Usuario: number;
             Nombre: string | null;

@@ -61,9 +61,9 @@ export declare class EmpleadosController {
             }[];
         } & {
             Id_Usuario: number;
-            fecha: Date;
             ID_Reserva: number;
             Estado: string;
+            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -93,6 +93,7 @@ export declare class EmpleadosController {
             estado: import(".prisma/client").$Enums.usuario_estado;
             fecha_registro: Date;
             tipo_de_documento: {
+                idTipo_de_Documento: number;
                 nombre_del_documento: string;
             };
             rol: {
@@ -134,9 +135,9 @@ export declare class EmpleadosController {
             }[];
         } & {
             Id_Usuario: number;
-            fecha: Date;
             ID_Reserva: number;
             Estado: string;
+            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -158,9 +159,9 @@ export declare class EmpleadosController {
             }[];
         } & {
             Id_Usuario: number;
-            fecha: Date;
             ID_Reserva: number;
             Estado: string;
+            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -187,9 +188,9 @@ export declare class EmpleadosController {
             }[];
         } & {
             Id_Usuario: number;
-            fecha: Date;
             ID_Reserva: number;
             Estado: string;
+            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -211,9 +212,9 @@ export declare class EmpleadosController {
             }[];
         } & {
             Id_Usuario: number;
-            fecha: Date;
             ID_Reserva: number;
             Estado: string;
+            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -235,9 +236,9 @@ export declare class EmpleadosController {
             }[];
         } & {
             Id_Usuario: number;
-            fecha: Date;
             ID_Reserva: number;
             Estado: string;
+            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;

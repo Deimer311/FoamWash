@@ -167,7 +167,10 @@ let EmpleadosService = class EmpleadosService {
                 estado: true,
                 fecha_registro: true,
                 tipo_de_documento: {
-                    select: { nombre_del_documento: true },
+                    select: {
+                        idTipo_de_Documento: true,
+                        nombre_del_documento: true,
+                    },
                 },
                 rol: {
                     select: { Rol: true },
