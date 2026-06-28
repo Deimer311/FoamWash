@@ -25,6 +25,7 @@ import 'package:foamwash/Features/Services/views/agendamientos_view.dart';
 
 import 'package:foamwash/Features/Autenticacion/data/data_sources/auth_remote_data_source.dart';
 import 'package:foamwash/Features/Cotizacion/Cotizacion.dart';
+import 'package:foamwash/Features/Cliente/views/cotizador.dart';
 import 'package:foamwash/Features/Cliente/views/perfil_cliente_edit.dart';
 import 'package:foamwash/Features/Trabajador/views/perfil_trabajador_edit.dart';
 import 'package:foamwash/Features/Trabajador/views/agenda_trabajador.dart';
@@ -97,10 +98,24 @@ class MyApp extends StatelessWidget {
           '/admin_agenda': (context) => const AdminAgendaView(),
           '/admin_empleados': (context) => const AdminEmpleadosView(),
           '/admin_usuarios': (context) => const AdminUsuariosView(),
+          // Cotización pública — para invitados y usuarios no autenticados
           '/cotizador': (context) => CotizacionScreen(
             onBackToHome: () => Navigator.pushReplacementNamed(context, '/home'),
             onGoToLogin: () => Navigator.pushNamed(context, '/login'),
           ),
+          // Cotización de cliente autenticado — replica cotizacion-cliente del frontend
+          '/cliente-cotizacion': (context) {
+            final auth = Provider.of<AuthProvider>(context, listen: false);
+            if (!auth.isAuthenticated) {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+            return ClienteCotizadorScreen(
+              onBackToHome: () => Navigator.pushReplacementNamed(context, '/home'),
+              onGoToServicios: () => Navigator.pushReplacementNamed(context, '/home'),
+            );
+          },
           '/admin_servicios': (context) => const AdminServiciosView(),
           '/empleado_agenda': (context) => const EmpleadoAgendaView(),
           '/cart': (context) => const CartView(),
@@ -113,6 +128,7 @@ class MyApp extends StatelessWidget {
               onEditarPerfil: () {},
               onLogout: () => auth.logout(),
               onBackToHome: () => Navigator.pop(context),
+              onCotizacion: () => Navigator.pushNamed(context, '/cliente-cotizacion'),
             );
           },
           '/perfilTrabajador': (context) {
