@@ -197,7 +197,7 @@ const HeaderCliente = ({ onBackToHome, onCotizacion, onPerfil, onServicios, acti
             <header className="hc-header">
                 {/* Logo */}
                 <div className="hc-logo" onClick={onBackToHome}>
-                    <div className="hc-logo-mark">FW</div>
+                    <div className="hc-logo-mark"><img src="/LogoFW.jpeg" alt="Logo FoamWash" style={{ width: "100%", height: "100%", borderRadius: "inherit", objectFit: "cover" }} /></div>
                     <span className="hc-logo-text">FoamWash<span className="hc-logo-tag">CL</span></span>
                 </div>
 

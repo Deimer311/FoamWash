@@ -244,7 +244,7 @@ const HeaderAdmin = ({
             <header className="ha-header">
                 {/* Logo */}
                 <div className="ha-logo" onClick={onGoDashboard}>
-                    <div className="ha-logo-mark">FW</div>
+                    <div className="ha-logo-mark"><img src="/LogoFW.jpeg" alt="Logo FoamWash" style={{ width: "100%", height: "100%", borderRadius: "inherit", objectFit: "cover" }} /></div>
                     <span className="ha-logo-text">FoamWash<span className="ha-logo-tag">AD</span></span>
                 </div>
 

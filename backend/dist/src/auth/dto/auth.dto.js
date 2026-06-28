@@ -72,6 +72,7 @@ class RequestPasswordResetDto {
 }
 exports.RequestPasswordResetDto = RequestPasswordResetDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Correo electrónico registrado del usuario', example: 'juan@example.com' }),
     (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
 ], RequestPasswordResetDto.prototype, "correo", void 0);
@@ -79,6 +80,7 @@ class VerifyResetCodeDto {
 }
 exports.VerifyResetCodeDto = VerifyResetCodeDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Código de 6 dígitos enviado al correo', example: '123456' }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], VerifyResetCodeDto.prototype, "token", void 0);
@@ -86,10 +88,12 @@ class ResetPasswordDto {
 }
 exports.ResetPasswordDto = ResetPasswordDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Código de seguridad validado', example: '123456' }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], ResetPasswordDto.prototype, "token", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Nueva contraseña elegida por el usuario', example: 'NuevaClaveSegura123' }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MinLength)(6),
     __metadata("design:type", String)

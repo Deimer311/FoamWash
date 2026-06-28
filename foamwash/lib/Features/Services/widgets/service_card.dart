@@ -130,6 +130,7 @@ class _ServiceCardState extends State<ServiceCard> {
             child: hasNetworkImage
                 ? Image.network(
                     imageUrl,
+                    headers: const {'ngrok-skip-browser-warning': 'true'},
                     height: 180,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => _buildImagePlaceholder(),

@@ -275,16 +275,9 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
                 ),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Center(
-                child: Text(
-                  'FW',
-                  style: TextStyle(
-                    fontFamily: _font,
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset('assets/LogoFW.jpeg', fit: BoxFit.cover),
               ),
             ),
             const SizedBox(width: 8),

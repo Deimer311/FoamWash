@@ -415,7 +415,10 @@ class _CotizacionScreenState extends State<CotizacionScreen> {
               width: 56,
               height: 56,
               decoration: BoxDecoration(gradient: AppTheme.buttonGradient, borderRadius: BorderRadius.circular(14)),
-              child: const Center(child: Text('FW', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 20))),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset('assets/LogoFW.jpeg', fit: BoxFit.cover),
+              ),
             ),
             const SizedBox(height: 12),
             const Text('Inicia sesión para agendar', textAlign: TextAlign.center, style: TextStyle(fontSize: 17)),
@@ -468,7 +471,10 @@ class _CotizacionScreenState extends State<CotizacionScreen> {
               width: 24,
               height: 24,
               decoration: BoxDecoration(gradient: AppTheme.buttonGradient, borderRadius: BorderRadius.circular(6)),
-              child: const Center(child: Text('FW', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800))),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: Image.asset('assets/LogoFW.jpeg', fit: BoxFit.cover),
+              ),
             ),
             const SizedBox(width: 6),
             const Text('Cotización', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
@@ -693,6 +699,7 @@ class _ServiceCardState extends State<_ServiceCard> {
                 borderRadius: BorderRadius.circular(16),
                 child: Image.network(
                   _imagenCompleta(widget.servicio.imagenUrl),
+                  headers: const {'ngrok-skip-browser-warning': 'true'},
                   fit: BoxFit.contain,
                   errorBuilder: (_, __, ___) => const Icon(Icons.image_not_supported, color: Colors.white54, size: 64),
                 ),
@@ -733,6 +740,7 @@ class _ServiceCardState extends State<_ServiceCard> {
                 children: [
                   Image.network(
                     _imagenCompleta(s.imagenUrl),
+                    headers: const {'ngrok-skip-browser-warning': 'true'},
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => Container(color: const Color(0xFFEFF1FA), child: const Icon(Icons.local_laundry_service, color: AppTheme.primaryBlue, size: 40)),
                   ),

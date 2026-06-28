@@ -126,17 +126,9 @@ class _GuestViewState extends State<GuestView> {
               gradient: AppTheme.buttonGradient,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Center(
-              child: Text(
-                'FW',
-                style: TextStyle(
-                  fontFamily: 'Kanit',
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  letterSpacing: 0.5,
-                ),
-              ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset('assets/LogoFW.jpeg', fit: BoxFit.cover),
             ),
           ),
           const SizedBox(width: 10),

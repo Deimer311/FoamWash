@@ -31,9 +31,12 @@ class TrabajadorDrawer extends StatelessWidget {
                   backgroundColor: Colors.white,
                   radius: 30,
                   backgroundImage: userFoto != null && userFoto.isNotEmpty
-                      ? NetworkImage(userFoto.startsWith('http') 
-                          ? userFoto 
-                          : '${ApiConstants.baseUrl.replaceAll('/api', '')}$userFoto')
+                      ? NetworkImage(
+                          userFoto.startsWith('http') 
+                              ? userFoto 
+                              : '${ApiConstants.baseUrl.replaceAll('/api', '')}$userFoto',
+                          headers: const {'ngrok-skip-browser-warning': 'true'},
+                        )
                       : null,
                   child: (userFoto == null || userFoto.isEmpty)
                       ? const Icon(Icons.person, color: primaryDark, size: 40)

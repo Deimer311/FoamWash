@@ -51,19 +51,23 @@ export class LoginDto {
 }
 
 export class RequestPasswordResetDto {
+  @ApiProperty({ description: 'Correo electrónico registrado del usuario', example: 'juan@example.com' })
   @IsEmail()
   correo: string;
 }
 
 export class VerifyResetCodeDto {
+  @ApiProperty({ description: 'Código de 6 dígitos enviado al correo', example: '123456' })
   @IsString()
   token: string;
 }
 
 export class ResetPasswordDto {
+  @ApiProperty({ description: 'Código de seguridad validado', example: '123456' })
   @IsString()
   token: string;
 
+  @ApiProperty({ description: 'Nueva contraseña elegida por el usuario', example: 'NuevaClaveSegura123' })
   @IsString()
   @MinLength(6)
   newPassword: string;
