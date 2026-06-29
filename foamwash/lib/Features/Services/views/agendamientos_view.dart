@@ -249,6 +249,16 @@ class _AgendamientosViewState extends State<AgendamientosView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              Navigator.pushReplacementNamed(context, '/cliente-cotizacion');
+            }
+          },
+        ),
         title: const Text('Mis Agendamientos'),
         backgroundColor: AppTheme.appBarDark,
         foregroundColor: Colors.white,

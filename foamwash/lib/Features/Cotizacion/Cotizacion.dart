@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/theme.dart';
 import 'package:foamwash/Api/api_constants.dart';
 import 'package:foamwash/Features/Autenticacion/providers/auth_provider.dart';
+import 'package:foamwash/core/cache/secure_storage_service.dart';
 
 const String _imagenFallback = '/img/imag1.jpg';
 
@@ -108,11 +109,33 @@ String _formatearMoneda(double v) {
 
 String _imagenCompleta(String path) {
   if (path.startsWith('http')) return path;
-  final base = ApiConstants.baseUrl.replaceAll(RegExp(r'/api$'), '');
-  String safePath = path.startsWith('/') ? path : '/$path';
-  // Redirigir antiguas URLs de /img/ hacia la nueva carpeta /uploads/ del servidor.
-  safePath = safePath.replaceFirst('/img/', '/uploads/');
-  return '$base$safePath';
+  if (path.startsWith('/img/')) return path; // Se manejará como asset
+  final base = ApiConstants.baseUrl.replaceAll('/api', '');
+  final separator = path.startsWith('/') ? '' : '/';
+  return '$base$separator$path';
+}
+
+Widget _buildImageWidget(String path, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
+  if (path.trim().isEmpty) {
+    return Icon(Icons.local_laundry_service, color: Colors.grey, size: width ?? 40);
+  }
+  if (path.startsWith('/img/')) {
+    return Image.asset(
+      'assets$path',
+      width: width,
+      height: height,
+      fit: fit,
+      errorBuilder: (_, __, ___) => Icon(Icons.image_not_supported, color: Colors.grey, size: width ?? 40),
+    );
+  }
+  return Image.network(
+    _imagenCompleta(path),
+    width: width,
+    height: height,
+    fit: fit,
+    headers: const {'ngrok-skip-browser-warning': 'true'},
+    errorBuilder: (_, __, ___) => Icon(Icons.local_laundry_service, color: AppTheme.primaryBlue, size: width ?? 40),
+  );
 }
 
 const List<String> _horariosDisponibles = [
@@ -197,9 +220,16 @@ class CotizacionStorage {
     final items = await leer();
     if (items.isEmpty) return true;
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token') ?? '';
+
       final res = await http.post(
         Uri.parse('${ApiConstants.baseUrl}/cotizaciones/sincronizar'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json', 
+          'ngrok-skip-browser-warning': 'true',
+          if (token.isNotEmpty) 'Authorization': 'Bearer $token',
+        },
         body: json.encode({'userId': userId, 'items': items}),
       );
       return res.statusCode == 200 || res.statusCode == 201;
@@ -271,7 +301,10 @@ class _CotizacionScreenState extends State<CotizacionScreen> {
   Future<void> _cargarServicios() async {
     setState(() => _isLoading = true);
     try {
-      final res = await http.get(Uri.parse('${ApiConstants.baseUrl}/cotizaciones/servicios'));
+      final res = await http.get(
+        Uri.parse('${ApiConstants.baseUrl}/cotizaciones/servicios'),
+        headers: {'ngrok-skip-browser-warning': 'true'},
+      );
       if (res.statusCode == 200) {
         final body = json.decode(res.body);
         final data = (body['data'] as List?) ?? [];
@@ -379,8 +412,49 @@ class _CotizacionScreenState extends State<CotizacionScreen> {
           Navigator.pop(context);
           _abrirConfirmacion();
         },
+        onGuardarCotizacionRapida: () {
+          Navigator.pop(context);
+          _guardarRapido();
+        },
       ),
     );
+  }
+
+  Future<void> _guardarRapido() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final strList = prefs.getStringList('mis_cotizaciones') ?? [];
+      final list = strList.map((e) => jsonDecode(e) as Map<String, dynamic>).toList();
+
+      final newQuotation = {
+        'ID_Reserva': DateTime.now().millisecondsSinceEpoch.toString(),
+        'creadoEn': DateTime.now().toIso8601String(),
+        'expiraEn': DateTime.now().add(const Duration(hours: 48)).toIso8601String(),
+        'servicios': _carrito.map((e) => {
+          'ID_Servicio': e.servicio.id,
+          'Nombre_Servicio': e.servicio.nombre,
+          'cantidad': e.cantidad,
+          'Precio': e.servicio.precio,
+          'imagenUrl': e.servicio.imagenUrl,
+        }).toList(),
+        'total': _total,
+        'fecha': null,
+        'Hora': null,
+        'direccion': '',
+        'ciudad': '',
+      };
+      
+      list.add(newQuotation);
+      await prefs.setStringList('mis_cotizaciones', list.map((e) => jsonEncode(e)).toList());
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cotización guardada (válida por 48h)'), backgroundColor: AppTheme.successGreen),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al guardar: $e'), backgroundColor: Colors.red),
+      );
+    }
   }
 
   void _abrirConfirmacion() {
@@ -394,10 +468,8 @@ class _CotizacionScreenState extends State<CotizacionScreen> {
       builder: (_) => _ConfirmationDialog(
         carrito: _carrito,
         total: _total,
+        userId: auth.user?.idUsuario,
         onConfirmarPedido: () async {
-          await CotizacionStorage.sincronizarConBD(
-  auth.user?.idUsuario.toString() ?? '',
-);
           await _limpiarCarrito();
         },
       ),
@@ -415,10 +487,7 @@ class _CotizacionScreenState extends State<CotizacionScreen> {
               width: 56,
               height: 56,
               decoration: BoxDecoration(gradient: AppTheme.buttonGradient, borderRadius: BorderRadius.circular(14)),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.asset('assets/LogoFW.jpeg', fit: BoxFit.cover),
-              ),
+              child: const Center(child: Text('FW', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 20))),
             ),
             const SizedBox(height: 12),
             const Text('Inicia sesión para agendar', textAlign: TextAlign.center, style: TextStyle(fontSize: 17)),
@@ -467,16 +536,11 @@ class _CotizacionScreenState extends State<CotizacionScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(gradient: AppTheme.buttonGradient, borderRadius: BorderRadius.circular(6)),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: Image.asset('assets/LogoFW.jpeg', fit: BoxFit.cover),
-              ),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.asset('assets/LogoFW.jpeg', width: 24, height: 24, fit: BoxFit.cover),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 8),
             const Text('Cotización', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
           ],
         ),
@@ -697,11 +761,9 @@ class _ServiceCardState extends State<_ServiceCard> {
             Center(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  _imagenCompleta(widget.servicio.imagenUrl),
-                  headers: const {'ngrok-skip-browser-warning': 'true'},
+                child: _buildImageWidget(
+                  widget.servicio.imagenUrl,
                   fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => const Icon(Icons.image_not_supported, color: Colors.white54, size: 64),
                 ),
               ),
             ),
@@ -723,8 +785,7 @@ class _ServiceCardState extends State<_ServiceCard> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withOpacity(0.06)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2))],
+        border: Border.all(color: Colors.black.withOpacity(0.08)),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -738,11 +799,9 @@ class _ServiceCardState extends State<_ServiceCard> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.network(
-                    _imagenCompleta(s.imagenUrl),
-                    headers: const {'ngrok-skip-browser-warning': 'true'},
+                  _buildImageWidget(
+                    s.imagenUrl,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(color: const Color(0xFFEFF1FA), child: const Icon(Icons.local_laundry_service, color: AppTheme.primaryBlue, size: 40)),
                   ),
                   Positioned(
                     top: 10,
@@ -861,12 +920,14 @@ class _CartSheet extends StatefulWidget {
   final double total;
   final void Function(int servicioId, int nuevaCantidad) onActualizarCantidad;
   final VoidCallback onFinalizarCompra;
+  final VoidCallback onGuardarCotizacionRapida;
 
   const _CartSheet({
     required this.carrito,
     required this.total,
     required this.onActualizarCantidad,
     required this.onFinalizarCompra,
+    required this.onGuardarCotizacionRapida,
   });
 
   @override
@@ -922,12 +983,11 @@ class _CartSheetState extends State<_CartSheet> {
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
-                                  child: Image.network(
-                                    _imagenCompleta(item.servicio.imagenUrl),
+                                  child: _buildImageWidget(
+                                    item.servicio.imagenUrl,
                                     width: 56,
                                     height: 56,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => Container(width: 56, height: 56, color: const Color(0xFFEFF1FA), child: const Icon(Icons.local_laundry_service, color: AppTheme.primaryBlue)),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
@@ -969,13 +1029,29 @@ class _CartSheetState extends State<_CartSheet> {
                         ],
                       ),
                       const SizedBox(height: 14),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                          onPressed: widget.onFinalizarCompra,
-                          child: const Text('Continuar con el agendamiento →', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Colors.white)),
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: AppTheme.primaryBlue),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              onPressed: widget.onGuardarCotizacionRapida,
+                              child: const Text('💾 Guardar', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppTheme.primaryBlue)),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            flex: 2,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                              onPressed: widget.onFinalizarCompra,
+                              child: const Text('Continuar →', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: Colors.white)),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -1006,14 +1082,24 @@ class _CartSheetState extends State<_CartSheet> {
 }
 
 // =============================================================================
-// DIÁLOGO: CONFIRMACIÓN MULTI-ETAPA — equivalente a ConfirmationModal
+// DIÁLOGO: CONFIRMACIÓN MULTI-ETAPA — 4 stages igual que ConfirmationModal.jsx
+// Stage 0: Tamaño + Cantidad por ítem
+// Stage 1: Fecha, Hora, Dirección, Ciudad, Teléfono, Observaciones
+// Stage 2: Resumen final
+// Stage 3: Éxito con ID Reserva + Empleado asignado
 // =============================================================================
 class _ConfirmationDialog extends StatefulWidget {
   final List<CarritoItem> carrito;
   final double total;
+  final int? userId;
   final Future<void> Function() onConfirmarPedido;
 
-  const _ConfirmationDialog({required this.carrito, required this.total, required this.onConfirmarPedido});
+  const _ConfirmationDialog({
+    required this.carrito,
+    required this.total,
+    required this.onConfirmarPedido,
+    this.userId,
+  });
 
   @override
   State<_ConfirmationDialog> createState() => _ConfirmationDialogState();
@@ -1021,203 +1107,821 @@ class _ConfirmationDialog extends StatefulWidget {
 
 class _ConfirmationDialogState extends State<_ConfirmationDialog> {
   int _stage = 0;
+
+  // Stage 0 — tamaños seleccionados por servicio
+  final Map<int, String> _tamanos = {};
+  // Stage 1 — fecha/hora/datos de servicio
   DateTime? _fecha;
   String? _horario;
-  bool _confirmando = false;
+  final _ctrlDireccion    = TextEditingController();
+  final _ctrlCiudad       = TextEditingController();
+  final _ctrlTelefono     = TextEditingController();
+  final _ctrlObservaciones = TextEditingController();
+  // Stage 3 — resultado reserva
+  String? _pedidoId;
+  String? _empleadoAsignado;
+  String _errorGuardar = '';
+  bool   _confirmando  = false;
+  bool   _fueGuardadaLocalmente = false;
+
+  @override
+  void dispose() {
+    _ctrlDireccion.dispose();
+    _ctrlCiudad.dispose();
+    _ctrlTelefono.dispose();
+    _ctrlObservaciones.dispose();
+    super.dispose();
+  }
 
   String get _titulo {
     switch (_stage) {
-      case 0:
-        return '📋 Resumen de Cotización';
-      case 1:
-        return '📅 Selecciona Fecha y Hora';
-      case 2:
-        return '✅ Confirmar Pedido';
-      default:
-        return '🎉 ¡Pedido Confirmado!';
+      case 0:  return '📋 Selecciona los detalles';
+      case 1:  return '📅 Datos del servicio';
+      case 2:  return '✅ Confirmar pedido';
+      default: return '🎉 ¡Pedido confirmado!';
     }
+  }
+
+  // ── Avanzar / validar ───────────────────────────────────────────────────────
+  void _continuar() {
+    if (_stage == 0) {
+      // Validar que todos los ítems tengan tamaño seleccionado
+      final falta = widget.carrito.any(
+        (c) => c.servicio.tamanos.isNotEmpty && !_tamanos.containsKey(c.servicio.id),
+      );
+      if (falta) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Por favor selecciona el tamaño de todos los servicios')),
+        );
+        return;
+      }
+    }
+    if (_stage == 1) {
+      if (_ctrlDireccion.text.trim().isEmpty || _fecha == null || _horario == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Completa la dirección, fecha y horario')),
+        );
+        return;
+      }
+    }
+    setState(() {
+      _errorGuardar = '';
+      _stage++;
+    });
   }
 
   Future<void> _elegirFecha() async {
     final hoy = DateTime.now();
-    final seleccionada = await showDatePicker(
+    final sel = await showDatePicker(
       context: context,
       initialDate: hoy,
       firstDate: hoy,
       lastDate: hoy.add(const Duration(days: 90)),
+      builder: (ctx, child) => Theme(
+        data: Theme.of(ctx).copyWith(
+          colorScheme: const ColorScheme.light(primary: AppTheme.primaryBlue),
+        ),
+        child: child!,
+      ),
     );
-    if (seleccionada != null) setState(() => _fecha = seleccionada);
+    if (sel != null) setState(() => _fecha = sel);
   }
 
-  void _continuar() {
-    if (_stage == 1 && (_fecha == null || _horario == null)) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Por favor selecciona fecha y horario')));
-      return;
-    }
-    setState(() => _stage++);
-  }
-
+  // ── Llamada real a la API — igual que handleConfirmar en CotizacionesCliente.jsx ──
   Future<void> _confirmar() async {
-    setState(() => _confirmando = true);
-    await widget.onConfirmarPedido();
-    setState(() {
-      _confirmando = false;
-      _stage = 3;
-    });
+    setState(() { _confirmando = true; _errorGuardar = ''; _fueGuardadaLocalmente = false; });
+    try {
+      final token = await SecureStorageService().read('token') ?? '';
+
+      // 1. Crear reserva
+      final infoAdicional =
+          'Dirección: ${_ctrlDireccion.text.trim()}'
+          '${_ctrlCiudad.text.trim().isNotEmpty ? ', ${_ctrlCiudad.text.trim()}' : ''}'
+          '. Tel: ${_ctrlTelefono.text.trim()}';
+
+      final serviciosList = widget.carrito.map((c) => {
+        'Id_Servicio': c.servicio.id,
+        'cantidad': c.cantidad,
+        'tamano': _tamanos[c.servicio.id] ?? 'Estándar',
+      }).toList();
+
+      final fechaStr = '${_fecha!.year}-${_fecha!.month.toString().padLeft(2,'0')}-${_fecha!.day.toString().padLeft(2,'0')}';
+
+      final resReserva = await http.post(
+        Uri.parse('${ApiConstants.baseUrl}/reservas'),
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+          if (token.isNotEmpty) 'Authorization': 'Bearer $token',
+        },
+        body: json.encode({
+          'Id_Usuario':            widget.userId,
+          'fecha':                 fechaStr,
+          'Hora':                  _horario,
+          'Informacion_adicional': infoAdicional,
+          'observaciones':         _ctrlObservaciones.text.trim().isEmpty
+                                       ? null
+                                       : _ctrlObservaciones.text.trim(),
+          'servicios':             serviciosList,
+        }),
+      );
+
+      final bodyReserva = json.decode(resReserva.body) as Map<String, dynamic>;
+      if (resReserva.statusCode != 200 && resReserva.statusCode != 201) {
+        throw Exception(bodyReserva['message'] ?? 'Error al crear reserva');
+      }
+      final reservaData = bodyReserva['data'] as Map<String, dynamic>? ?? {};
+
+      // 2. Guardar cotizaciones individuales
+      if (widget.userId != null) {
+        for (final c in widget.carrito) {
+          try {
+            await http.post(
+              Uri.parse('${ApiConstants.baseUrl}/cotizaciones'),
+              headers: {
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true',
+                if (token.isNotEmpty) 'Authorization': 'Bearer $token',
+              },
+              body: json.encode({
+                'Id_usuario':      widget.userId,
+                'Id_servicio':     c.servicio.id,
+                'Precio_cotizado': c.subtotal,
+                'Cantidad':        c.cantidad,
+                'Tamaño':          _tamanos[c.servicio.id] ?? 'Estándar',
+              }),
+            );
+          } catch (_) {}
+        }
+      }
+
+      // 3. Limpiar carrito local y avanzar a éxito
+      await widget.onConfirmarPedido();
+      setState(() {
+        _pedidoId        = 'PED-${reservaData['ID_Reserva'] ?? reservaData['id'] ?? '—'}';
+        _empleadoAsignado = reservaData['empleado_asignado']?.toString();
+        _confirmando     = false;
+        _stage           = 3;
+      });
+    } catch (e) {
+      setState(() {
+        _errorGuardar = 'Hubo un error al guardar tu pedido. Intenta de nuevo.';
+        _confirmando  = false;
+      });
+    }
   }
 
+  Future<void> _guardarCotizacionLocal() async {
+    setState(() { _confirmando = true; _errorGuardar = ''; _fueGuardadaLocalmente = true; });
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final List<String> currentCotizaciones = prefs.getStringList('mis_cotizaciones') ?? [];
+      
+      final fechaStr = '${_fecha!.year}-${_fecha!.month.toString().padLeft(2,'0')}-${_fecha!.day.toString().padLeft(2,'0')}';
+      
+      final nuevaCotizacion = {
+        'ID_Reserva': DateTime.now().millisecondsSinceEpoch.toString().substring(5),
+        'fecha': fechaStr,
+        'Hora': _horario,
+        'Estado': 'Guardado Local',
+        'creadoEn': DateTime.now().toIso8601String(),
+        'expiraEn': DateTime.now().add(const Duration(hours: 48)).toIso8601String(),
+        'servicios': widget.carrito.map((c) => {
+          'Id_Servicio': c.servicio.id,
+          'Nombre_Servicio': c.servicio.nombre,
+          'cantidad': c.cantidad,
+          'Precio': c.subtotal,
+          'tamano': _tamanos[c.servicio.id] ?? 'Estándar',
+        }).toList(),
+      };
+
+      currentCotizaciones.add(jsonEncode(nuevaCotizacion));
+      await prefs.setStringList('mis_cotizaciones', currentCotizaciones);
+
+      await widget.onConfirmarPedido();
+      
+      setState(() {
+        _pedidoId = 'COT-${nuevaCotizacion['ID_Reserva']}';
+        _stage = 3;
+        _confirmando = false;
+      });
+    } catch (e) {
+      setState(() {
+        _errorGuardar = 'Hubo un error al guardar tu cotización. Intenta de nuevo.';
+        _confirmando = false;
+      });
+    }
+  }
+
+  // ── Build ─────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: 480, 
-          maxHeight: MediaQuery.of(context).size.height * 0.8
+          maxWidth: 520,
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 18, 12, 12),
-              child: Row(
-                children: [
-                  Expanded(child: Text(_titulo, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700))),
-                  if (_stage < 3) IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
-                ],
+            // ── Header ──
+            _buildDialogHeader(),
+            // ── Indicador de etapas ──
+            if (_stage < 3) _buildStepIndicator(),
+            const Divider(height: 1),
+            // ── Contenido ──
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: _buildStageContent(),
               ),
             ),
             const Divider(height: 1),
-            Expanded(child: Padding(padding: const EdgeInsets.all(20), child: _buildStageContent())),
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Wrap(
-                alignment: WrapAlignment.end,
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  if (_stage > 0 && _stage < 3)
-                    TextButton(onPressed: () => setState(() => _stage--), child: const Text('← Volver')),
-                  if (_stage < 2)
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),
-                      onPressed: _continuar,
-                      child: const Text('Continuar →', style: TextStyle(color: Colors.white)),
-                    ),
-                  if (_stage == 2)
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF223BFF)),
-                      onPressed: _confirmando ? null : _confirmar,
-                      child: _confirmando
-                          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                          : const Text('✅ Confirmar Pedido', style: TextStyle(color: Colors.white)),
-                    ),
-                  if (_stage == 3)
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Cerrar', style: TextStyle(color: Colors.white)),
-                    ),
-                ],
-              ),
-            ),
+            // ── Footer de acciones ──
+            _buildDialogFooter(),
           ],
         ),
       ),
     );
   }
 
+  Widget _buildDialogHeader() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 18, 12, 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              _titulo,
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+            ),
+          ),
+          if (_stage < 3)
+            IconButton(
+              icon: const Icon(Icons.close, size: 20),
+              onPressed: () => Navigator.pop(context),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepIndicator() {
+    const steps = ['Detalles', 'Datos', 'Confirmar'];
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+      child: Row(
+        children: List.generate(steps.length, (i) {
+          final active   = i == _stage;
+          final done     = i < _stage;
+          return Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: done
+                              ? AppTheme.successGreen
+                              : active
+                                  ? AppTheme.primaryBlue
+                                  : const Color(0xFFEEEEEE),
+                        ),
+                        child: Center(
+                          child: done
+                              ? const Icon(Icons.check, color: Colors.white, size: 14)
+                              : Text(
+                                  '${i + 1}',
+                                  style: TextStyle(
+                                    color: active ? Colors.white : const Color(0xFF999999),
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        steps[i],
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: active ? FontWeight.w700 : FontWeight.w400,
+                          color: active ? AppTheme.primaryBlue : const Color(0xFF999999),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (i < steps.length - 1)
+                  Expanded(
+                    child: Container(
+                      height: 2,
+                      margin: const EdgeInsets.only(bottom: 20),
+                      color: i < _stage ? AppTheme.primaryBlue : const Color(0xFFEEEEEE),
+                    ),
+                  ),
+              ],
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _buildDialogFooter() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      child: Wrap(
+        alignment: WrapAlignment.end,
+        spacing: 10,
+        runSpacing: 10,
+        children: [
+          if (_stage > 0 && _stage < 3)
+            OutlinedButton(
+              onPressed: () => setState(() => _stage--),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFFDDDDDD)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              ),
+              child: const Text('← Volver', style: TextStyle(color: Color(0xFF555555))),
+            ),
+          if (_stage < 2)
+            ElevatedButton(
+              onPressed: _continuar,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryBlue,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+              ),
+              child: Text(
+                _stage == 0 ? 'Agendar servicio →' : 'Continuar →',
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+              ),
+            ),
+          if (_stage == 2) ...[
+            OutlinedButton(
+              onPressed: _confirmando ? null : _guardarCotizacionLocal,
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: AppTheme.primaryBlue),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              ),
+              child: const Text('💾 Guardar cotización', style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.w700)),
+            ),
+            ElevatedButton(
+              onPressed: _confirmando ? null : _confirmar,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF223BFF),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+              ),
+              child: _confirmando
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    )
+                  : const Text('✓ Agendar servicio', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+            ),
+          ],
+          if (_stage == 3)
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryBlue,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+              ),
+              child: const Text('¡Listo!', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+            ),
+        ],
+      ),
+    );
+  }
+
+  // ── Contenido por etapa ───────────────────────────────────────────────────
   Widget _buildStageContent() {
     switch (_stage) {
+      // ── Stage 0: Tamaño + cantidad ────────────────────────────────────────
       case 0:
-        return SingleChildScrollView(
-          child: Column(
-            children: [
-              ...widget.carrito.map((item) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(child: Text('${item.servicio.nombre} × ${item.cantidad}')),
-                        Text(_formatearMoneda(item.subtotal), style: const TextStyle(fontWeight: FontWeight.w700, color: AppTheme.primaryBlue)),
-                      ],
-                    ),
-                  )),
-              const Divider(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Total', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
-                  Text(_formatearMoneda(widget.total), style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppTheme.primaryBlue)),
-                ],
-              ),
-            ],
-          ),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Completa el tamaño de cada servicio para generar la cotización',
+              style: TextStyle(color: Color(0xFF888888), fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            ...widget.carrito.map((item) => _buildItemDetalle(item)),
+          ],
         );
+
+      // ── Stage 1: Fecha/Hora + datos del domicilio ─────────────────────────
       case 1:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Fecha del servicio *', style: TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
+            if (_errorGuardar.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF0F0),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFFFCCCC)),
+                ),
+                child: Text('⚠️ $_errorGuardar', style: const TextStyle(color: Color(0xFFCC0000), fontSize: 13)),
+              ),
+            // Dirección
+            _buildLabel('Dirección *'),
+            _buildTextField(_ctrlDireccion, 'Calle 123 #45-67'),
+            const SizedBox(height: 14),
+            // Ciudad + Teléfono en fila
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildLabel('Ciudad'),
+                      _buildTextField(_ctrlCiudad, 'Bogotá'),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildLabel('Teléfono'),
+                      _buildTextField(_ctrlTelefono, '300 123 4567', type: TextInputType.phone),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            // Fecha
+            _buildLabel('Fecha del servicio *'),
+            const SizedBox(height: 6),
             InkWell(
               onTap: _elegirFecha,
+              borderRadius: BorderRadius.circular(10),
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(border: Border.all(color: const Color(0xFFE0E0E0), width: 2), borderRadius: BorderRadius.circular(10)),
-                child: Text(_fecha != null ? _formatearFechaLarga(_fecha!) : 'Seleccionar fecha', style: TextStyle(color: _fecha != null ? Colors.black : const Color(0xFF999999))),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: _fecha != null ? AppTheme.primaryBlue : const Color(0xFFE0E0E0),
+                    width: _fecha != null ? 1.8 : 1.5,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  color: _fecha != null ? const Color(0xFFF0F4FF) : Colors.white,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today_outlined,
+                      size: 16,
+                      color: _fecha != null ? AppTheme.primaryBlue : const Color(0xFF999999),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      _fecha != null ? _formatearFechaLarga(_fecha!) : 'Seleccionar fecha',
+                      style: TextStyle(
+                        color: _fecha != null ? const Color(0xFF111111) : const Color(0xFF999999),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 18),
-            const Text('Horario *', style: TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
+            const SizedBox(height: 14),
+            // Hora
+            _buildLabel('Hora preferida *'),
+            const SizedBox(height: 6),
             DropdownButtonFormField<String>(
               value: _horario,
               decoration: InputDecoration(
-                contentPadding: const EdgeInsets.all(14),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 2)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 1.5),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 1.5),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 1.8),
+                ),
               ),
-              hint: const Text('Seleccionar horario'),
-              items: _horariosDisponibles.map((h) => DropdownMenuItem(value: h, child: Text(h))).toList(),
+              hint: const Text('Seleccionar'),
+              items: _horariosDisponibles.map((h) {
+                final hora = int.tryParse(h.split(':').first) ?? 0;
+                return DropdownMenuItem(
+                  value: h,
+                  child: Text('$h ${hora < 12 ? 'AM' : 'PM'}'),
+                );
+              }).toList(),
               onChanged: (v) => setState(() => _horario = v),
+            ),
+            const SizedBox(height: 14),
+            // Observaciones
+            _buildLabel('Observaciones (opcional)'),
+            const SizedBox(height: 6),
+            TextField(
+              controller: _ctrlObservaciones,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: 'Mascotas, instrucciones especiales, acceso…',
+                hintStyle: const TextStyle(color: Color(0xFFAAAAAA), fontSize: 13),
+                contentPadding: const EdgeInsets.all(14),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 1.5),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 1.5),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 1.8),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Total
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0F4FF),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Total estimado', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                  Text(
+                    _formatearMoneda(widget.total),
+                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppTheme.primaryBlue),
+                  ),
+                ],
+              ),
             ),
           ],
         );
+
+      // ── Stage 2: Resumen final antes de confirmar ─────────────────────────
       case 2:
-        return SingleChildScrollView(
-          child: Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(color: const Color(0xFFF8F9FF), borderRadius: BorderRadius.circular(12)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Detalles del pedido', style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF223BFF), fontSize: 15)),
-                const SizedBox(height: 14),
-                ...widget.carrito.map((item) => Text('• ${item.servicio.nombre} × ${item.cantidad} — ${_formatearMoneda(item.subtotal)}')),
-                const SizedBox(height: 12),
-                Text('Fecha: ${_fecha != null ? _formatearFechaLarga(_fecha!) : '—'}', style: const TextStyle(fontWeight: FontWeight.w600)),
-                Text('Horario: ${_horario ?? '—'}', style: const TextStyle(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 10),
-                Text('Total: ${_formatearMoneda(widget.total)}', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppTheme.primaryBlue)),
-              ],
-            ),
+        return Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8F9FF),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE0E6FF)),
           ),
-        );
-      default:
-        return const Center(
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('🎉', style: TextStyle(fontSize: 56)),
-              SizedBox(height: 14),
-              Text('¡Cotización guardada!', style: TextStyle(color: Color(0xFF223BFF), fontWeight: FontWeight.w700, fontSize: 17)),
-              SizedBox(height: 8),
-              Text('Te contactaremos pronto para confirmar los detalles del servicio.', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF666666))),
+              const Text(
+                'Detalles del pedido',
+                style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF223BFF), fontSize: 15),
+              ),
+              const SizedBox(height: 14),
+              ...widget.carrito.map((item) => Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text(
+                  '• ${item.servicio.nombre} × ${item.cantidad}'
+                  '${_tamanos.containsKey(item.servicio.id) ? ' [${_tamanos[item.servicio.id]}]' : ''}'
+                  ' — ${_formatearMoneda(item.subtotal)}',
+                  style: const TextStyle(fontSize: 13),
+                ),
+              )),
+              const Divider(height: 20),
+              _buildResumenRow(Icons.location_on_outlined, 'Dirección', _ctrlDireccion.text.trim()),
+              if (_ctrlCiudad.text.trim().isNotEmpty)
+                _buildResumenRow(Icons.location_city_outlined, 'Ciudad', _ctrlCiudad.text.trim()),
+              if (_ctrlTelefono.text.trim().isNotEmpty)
+                _buildResumenRow(Icons.phone_outlined, 'Teléfono', _ctrlTelefono.text.trim()),
+              _buildResumenRow(
+                Icons.calendar_today_outlined,
+                'Fecha',
+                _fecha != null ? _formatearFechaLarga(_fecha!) : '—',
+              ),
+              _buildResumenRow(Icons.access_time_outlined, 'Hora', _horario ?? '—'),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [Color(0xFF1A4BFF), Color(0xFF7C3AED)]),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Total', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: Colors.white)),
+                    Text(
+                      _formatearMoneda(widget.total),
+                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+              if (_errorGuardar.isNotEmpty) ...
+                [
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF0F0),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: const Color(0xFFFFCCCC)),
+                    ),
+                    child: Text('⚠️ $_errorGuardar', style: const TextStyle(color: Color(0xFFCC0000), fontSize: 13)),
+                  ),
+                ],
             ],
           ),
         );
+
+      // ── Stage 3: Éxito ────────────────────────────────────────────────────
+      default:
+        return Column(
+          children: [
+            const SizedBox(height: 8),
+            const Text('🎉', style: TextStyle(fontSize: 60)),
+            const SizedBox(height: 14),
+            const Text(
+              '¡Pedido confirmado!',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF223BFF)),
+            ),
+            if (_pedidoId != null) ...
+              [
+                const SizedBox(height: 6),
+                Text('ID: $_pedidoId', style: const TextStyle(fontSize: 13, color: Color(0xFF666666))),
+              ],
+            const SizedBox(height: 20),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8F9FF),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0xFFE0E6FF)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildResumenRow(
+                    Icons.calendar_today,
+                    'Fecha',
+                    _fecha != null ? _formatearFechaLarga(_fecha!) : '—',
+                  ),
+                  _buildResumenRow(Icons.access_time, 'Hora', _horario ?? '—'),
+                  _buildResumenRow(Icons.location_on, 'Dirección', _ctrlDireccion.text.trim()),
+                  if (_empleadoAsignado != null && _empleadoAsignado!.isNotEmpty)
+                    _buildResumenRow(Icons.person_outline, 'Técnico', _empleadoAsignado!),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _fueGuardadaLocalmente 
+                ? 'Tu cotización ha sido guardada localmente por 48 horas.'
+                : 'Te contactaremos pronto para confirmar los detalles del servicio.',
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Color(0xFF888888), fontSize: 13),
+            ),
+          ],
+        );
     }
   }
+
+  // ── Helpers de UI ─────────────────────────────────────────────────────────
+  Widget _buildItemDetalle(CarritoItem item) {
+    final s = item.servicio;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFEEEEEE)),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${s.nombre} (×${item.cantidad})',
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+          ),
+          const SizedBox(height: 10),
+          // Selector de tamaño
+          if (s.tamanos.isNotEmpty) ...
+            [
+              const Text('Tamaño *', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF555555))),
+              const SizedBox(height: 6),
+              DropdownButtonFormField<String>(
+                value: _tamanos[s.id],
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  isDense: true,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 1.8),
+                  ),
+                ),
+                hint: const Text('Seleccionar tamaño', style: TextStyle(fontSize: 13)),
+                items: s.tamanos.map((t) => DropdownMenuItem(value: t, child: Text(t, style: const TextStyle(fontSize: 13)))).toList(),
+                onChanged: (v) => setState(() => _tamanos[s.id] = v!),
+              ),
+            ],
+          const SizedBox(height: 8),
+          // Subtotal
+          Text(
+            _formatearMoneda(item.subtotal),
+            style: const TextStyle(fontWeight: FontWeight.w700, color: AppTheme.primaryBlue, fontSize: 15),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLabel(String label) => Padding(
+    padding: const EdgeInsets.only(bottom: 6),
+    child: Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF333333))),
+  );
+
+  Widget _buildTextField(
+    TextEditingController ctrl,
+    String hint, {
+    TextInputType type = TextInputType.text,
+  }) =>
+      TextField(
+        controller: ctrl,
+        keyboardType: type,
+        style: const TextStyle(fontSize: 14),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(color: Color(0xFFAAAAAA), fontSize: 13),
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 1.5),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 1.5),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 1.8),
+          ),
+        ),
+      );
+
+  Widget _buildResumenRow(IconData icon, String label, String value) => Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 16, color: AppTheme.primaryBlue),
+        const SizedBox(width: 8),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: const TextStyle(color: Color(0xFF333333), fontSize: 13),
+              children: [
+                TextSpan(text: '$label: ', style: const TextStyle(fontWeight: FontWeight.w600)),
+                TextSpan(text: value),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }

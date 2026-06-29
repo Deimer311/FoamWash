@@ -4,6 +4,7 @@
 // ============================================================
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { join } from 'path';
 
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
@@ -20,7 +21,7 @@ import { NotificacionesModule } from './notificaciones/notificaciones.module';
 @Module({
   imports: [
     // Variables de entorno disponibles globalmente
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: join(__dirname, '..', '.env') }),
 
 
 

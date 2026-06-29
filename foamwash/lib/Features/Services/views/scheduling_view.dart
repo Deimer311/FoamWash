@@ -154,6 +154,14 @@ class _SchedulingViewState extends State<SchedulingView> {
               Navigator.pushNamed(context, '/agendamientos');
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.request_quote_outlined, color: AppTheme.primaryBlue),
+            title: const Text('Mis Cotizaciones', style: TextStyle(fontWeight: FontWeight.w600)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/mis_cotizaciones');
+            },
+          ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.logout_rounded, color: Color(0xFFFF6B6B)),

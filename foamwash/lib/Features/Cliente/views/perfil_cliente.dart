@@ -83,6 +83,7 @@ class PerfilClienteScreen extends StatefulWidget {
   final Future<void> Function()? onEditarPerfil;
   final VoidCallback? onLogout;
   final VoidCallback? onBackToHome;
+  final VoidCallback? onCotizacion;
 
   const PerfilClienteScreen({
     super.key,
@@ -91,6 +92,7 @@ class PerfilClienteScreen extends StatefulWidget {
     this.onEditarPerfil,
     this.onLogout,
     this.onBackToHome,
+    this.onCotizacion,
   });
 
   @override
@@ -286,6 +288,13 @@ class _PerfilClienteScreenState extends State<PerfilClienteScreen> {
         ],
       ),
       actions: [
+        // Botón de Cotización rápida
+        if (widget.onCotizacion != null)
+          IconButton(
+            icon: const Icon(Icons.request_quote_outlined, color: Colors.white),
+            tooltip: 'Cotizar servicios',
+            onPressed: widget.onCotizacion,
+          ),
         IconButton(
           icon: const Icon(Icons.logout, color: Colors.white),
           tooltip: 'Cerrar sesión',

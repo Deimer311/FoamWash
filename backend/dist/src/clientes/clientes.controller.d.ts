@@ -5,6 +5,9 @@ export declare class ClientesController {
     getPerfil(id: number): Promise<{
         success: boolean;
         data: {
+            rol: {
+                Rol: string;
+            };
             Id_Usuario: number;
             N_Documento: string;
             Correo: string;
@@ -16,12 +19,12 @@ export declare class ClientesController {
             fecha_registro: Date;
             foto_perfil: string;
             cotizaciones: {
-                fecha_cotizacion: Date | null;
                 Id_Cotizacion: number;
                 Id_usuario: number;
                 Precio_cotizado: import("@prisma/client/runtime/library").Decimal;
                 Cantidad: number;
                 Tamaño: string;
+                fecha_cotizacion: Date | null;
                 Id_servicio: number | null;
             }[];
             reservasComoCliente: ({
@@ -52,9 +55,6 @@ export declare class ClientesController {
             })[];
             tipo_de_documento: {
                 nombre_del_documento: string;
-            };
-            rol: {
-                Rol: string;
             };
         };
     }>;

@@ -117,23 +117,17 @@ export class ReservasService {
     empleado_Id_Usuario?: number;
     servicios?: Array<{ Id_Servicio: number; cantidad?: number; tamano?: string }>;
   }) {
-    // FIX fecha: convertir "YYYY-MM-DD" a ISO-8601 DateTime completo
+    // FIX fecha: usar explícitamente UTC para evitar desplazamientos por zona horaria
     let fechaISO: Date | undefined = undefined;
     if (data.fecha) {
       const soloFecha = data.fecha.split('T')[0];
-      const horaStr = data.Hora && data.Hora.match(/^\d{2}:\d{2}$/)
-        ? data.Hora + ':00'
-        : '00:00:00';
-      fechaISO = new Date(`${soloFecha}T${horaStr}.000Z`);
+      fechaISO = new Date(`${soloFecha}T00:00:00.000Z`);
     }
 
-    // FIX Hora: también es DateTime en Prisma
+    // FIX Hora: usar explícitamente UTC para evitar desplazamientos
     let horaISO: Date | undefined = undefined;
     if (data.Hora && data.Hora.match(/^\d{2}:\d{2}$/)) {
-      const soloFecha = data.fecha
-        ? data.fecha.split('T')[0]
-        : new Date().toISOString().split('T')[0];
-      horaISO = new Date(`${soloFecha}T${data.Hora}:00.000Z`);
+      horaISO = new Date(`1970-01-01T${data.Hora}:00.000Z`);
     }
 
     // FIX observacion: NOT NULL en schema → crear vacía si no se pasa
@@ -186,11 +180,11 @@ export class ReservasService {
     if (reserva.cliente && reserva.cliente.Correo) {
       const dateFormatter = new Intl.DateTimeFormat('es-CO', { 
         weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-        timeZone: 'America/Bogota'
+        timeZone: 'UTC'
       });
       const timeFormatter = new Intl.DateTimeFormat('es-CO', { 
         hour: '2-digit', minute: '2-digit',
-        timeZone: 'America/Bogota'
+        timeZone: 'UTC'
       });
 
       await sendServiceConfirmationEmail(reserva.cliente.Correo, {

@@ -22,9 +22,11 @@ import 'package:foamwash/Features/Admin/providers/usuarios_provider.dart';
 import 'package:foamwash/Features/Cart/providers/cart_provider.dart';
 import 'package:foamwash/Features/Cart/views/cart_view.dart';
 import 'package:foamwash/Features/Services/views/agendamientos_view.dart';
+import 'package:foamwash/Features/Services/views/mis_cotizaciones_view.dart';
 
 import 'package:foamwash/Features/Autenticacion/data/data_sources/auth_remote_data_source.dart';
 import 'package:foamwash/Features/Cotizacion/Cotizacion.dart';
+import 'package:foamwash/Features/Cliente/views/cotizador.dart';
 import 'package:foamwash/Features/Cliente/views/perfil_cliente_edit.dart';
 import 'package:foamwash/Features/Trabajador/views/perfil_trabajador_edit.dart';
 import 'package:foamwash/Features/Admin/views/perfil_admin_edit.dart';
@@ -146,6 +148,7 @@ class MyApp extends StatelessWidget {
           '/admin_agenda': (context) => const AdminAgendaView(),
           '/admin_empleados': (context) => const AdminEmpleadosView(),
           '/admin_usuarios': (context) => const AdminUsuariosView(),
+          // Cotización pública — para invitados y usuarios no autenticados
           '/cotizador': (context) => CotizacionScreen(
             onBackToHome: () {
               if (Navigator.canPop(context)) {
@@ -156,11 +159,31 @@ class MyApp extends StatelessWidget {
             },
             onGoToLogin: () => Navigator.pushNamed(context, '/login'),
           ),
+          // Cotización de cliente autenticado — replica cotizacion-cliente del frontend
+          '/cliente-cotizacion': (context) {
+            return Consumer<AuthProvider>(
+              builder: (context, auth, _) {
+                if (!auth.isAuthenticated) {
+                  // Si no está autenticado, redirigir al login
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    Navigator.pushReplacementNamed(context, '/login');
+                  });
+                  return const Scaffold(body: Center(child: CircularProgressIndicator()));
+                }
+                return ClienteCotizadorScreen(
+                  onBackToHome: () => Navigator.pushReplacementNamed(context, '/home'),
+                  onGoToServicios: () => Navigator.pushReplacementNamed(context, '/home'),
+                );
+              },
+            );
+          },
+
           '/admin_servicios': (context) => const AdminServiciosView(),
           '/admin_reportes': (context) => const AdminReportesView(),
           '/empleado_agenda': (context) => const EmpleadoAgendaView(),
           '/cart': (context) => const CartView(),
           '/agendamientos': (context) => const AgendamientosView(),
+          '/mis_cotizaciones': (context) => const MisCotizacionesView(),
           '/perfilCliente': (context) {
             final auth = Provider.of<AuthProvider>(context, listen: false);
             return PerfilClienteScreen(
@@ -177,6 +200,7 @@ class MyApp extends StatelessWidget {
                 Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
               },
               onBackToHome: () => Navigator.pop(context),
+              onCotizacion: () => Navigator.pushNamed(context, '/cliente-cotizacion'),
             );
           },
           '/perfilTrabajador': (context) {
