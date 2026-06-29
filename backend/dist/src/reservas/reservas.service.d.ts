@@ -11,9 +11,9 @@ export declare class ReservasService {
             Observaciones: string;
         };
         cliente: {
-            Correo: string;
             Nombre: string;
             Telefono: string;
+            Correo: string;
         };
         servicios: {
             estado: string;
@@ -26,9 +26,9 @@ export declare class ReservasService {
             duracion_estimada: string | null;
         }[];
     } & {
-        Id_Usuario: number;
         ID_Reserva: number;
         Estado: string;
+        Id_Usuario: number;
         fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
@@ -41,9 +41,9 @@ export declare class ReservasService {
             Telefono: string;
         };
     } & {
-        Id_Usuario: number;
         ID_Reserva: number;
         Estado: string;
+        Id_Usuario: number;
         fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
@@ -60,9 +60,9 @@ export declare class ReservasService {
             Observaciones: string | null;
         };
         cliente: {
-            Correo: string;
             Nombre: string;
             Telefono: string;
+            Correo: string;
         };
         servicios: {
             estado: string;
@@ -75,9 +75,9 @@ export declare class ReservasService {
             duracion_estimada: string | null;
         }[];
     } & {
-        Id_Usuario: number;
         ID_Reserva: number;
         Estado: string;
+        Id_Usuario: number;
         fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
@@ -108,11 +108,11 @@ export declare class ReservasService {
             };
             cliente: {
                 Id_Usuario: number;
-                N_Documento: string | null;
-                Correo: string | null;
                 Nombre: string | null;
                 Telefono: string | null;
+                N_Documento: string | null;
                 Direccion: string | null;
+                Correo: string | null;
                 password_hash: string | null;
                 estado: import(".prisma/client").$Enums.usuario_estado | null;
                 rol_Id_Rol: number | null;
@@ -137,9 +137,9 @@ export declare class ReservasService {
                 cotizacion_Id_Cotizacion: number | null;
                 duracion_estimada: string | null;
             }[];
-            Id_Usuario: number;
             ID_Reserva: number;
             Estado: string;
+            Id_Usuario: number;
             fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
@@ -154,9 +154,9 @@ export declare class ReservasService {
         Informacion_adicional: string;
         empleado_Id_Usuario: number;
     }>): Promise<{
-        Id_Usuario: number;
         ID_Reserva: number;
         Estado: string;
+        Id_Usuario: number;
         fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
@@ -166,11 +166,11 @@ export declare class ReservasService {
     updateEstado(id: number, estado: string): Promise<{
         cliente: {
             Id_Usuario: number;
-            N_Documento: string | null;
-            Correo: string | null;
             Nombre: string | null;
             Telefono: string | null;
+            N_Documento: string | null;
             Direccion: string | null;
+            Correo: string | null;
             password_hash: string | null;
             estado: import(".prisma/client").$Enums.usuario_estado | null;
             rol_Id_Rol: number | null;
@@ -196,9 +196,9 @@ export declare class ReservasService {
             duracion_estimada: string | null;
         }[];
     } & {
-        Id_Usuario: number;
         ID_Reserva: number;
         Estado: string;
+        Id_Usuario: number;
         fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
@@ -208,11 +208,11 @@ export declare class ReservasService {
     cancelarReserva(id: number, motivo: string): Promise<{
         cliente: {
             Id_Usuario: number;
-            N_Documento: string | null;
-            Correo: string | null;
             Nombre: string | null;
             Telefono: string | null;
+            N_Documento: string | null;
             Direccion: string | null;
+            Correo: string | null;
             password_hash: string | null;
             estado: import(".prisma/client").$Enums.usuario_estado | null;
             rol_Id_Rol: number | null;
@@ -228,19 +228,19 @@ export declare class ReservasService {
             foto_perfil: string | null;
         };
     } & {
-        Id_Usuario: number;
-        fecha: Date;
         ID_Reserva: number;
         Estado: string;
+        Id_Usuario: number;
+        fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
         observacion_Id_Observaciones: number;
         empleado_Id_Usuario: number | null;
     }>;
     remove(id: number): Promise<{
-        Id_Usuario: number;
         ID_Reserva: number;
         Estado: string;
+        Id_Usuario: number;
         fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
@@ -264,9 +264,9 @@ export declare class ReservasService {
             duracion_estimada: string | null;
         }[];
     } & {
-        Id_Usuario: number;
         ID_Reserva: number;
         Estado: string;
+        Id_Usuario: number;
         fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;

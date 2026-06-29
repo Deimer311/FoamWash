@@ -16,40 +16,40 @@ export declare class CotizacionesController {
         success: boolean;
         data: ({
             cliente: {
+                Correo: string;
                 Nombre: string;
                 Telefono: string;
-                Correo: string;
             };
             servicios: {
+                estado: string;
                 Id_Servicio: number;
                 Nombre_Servicio: string;
                 Precio: import("@prisma/client/runtime/library").Decimal;
                 descripcion: string;
                 imagen_url: string | null;
                 cotizacion_Id_Cotizacion: number | null;
-                estado: string;
                 duracion_estimada: string | null;
             }[];
         } & {
-            Precio_cotizado: import("@prisma/client/runtime/library").Decimal;
             Id_Cotizacion: number;
             Id_usuario: number;
+            Precio_cotizado: import("@prisma/client/runtime/library").Decimal;
             Cantidad: number;
-            Id_servicio: number | null;
-            fecha_cotizacion: Date | null;
             Tamaño: string;
+            fecha_cotizacion: Date | null;
+            Id_servicio: number | null;
         })[];
     }>;
     create(body: any, req: any): Promise<{
         success: boolean;
         data: {
-            Precio_cotizado: import("@prisma/client/runtime/library").Decimal;
             Id_Cotizacion: number;
             Id_usuario: number;
+            Precio_cotizado: import("@prisma/client/runtime/library").Decimal;
             Cantidad: number;
-            Id_servicio: number | null;
-            fecha_cotizacion: Date | null;
             Tamaño: string;
+            fecha_cotizacion: Date | null;
+            Id_servicio: number | null;
         };
     }>;
     sincronizar(items: any[], req: any): Promise<{

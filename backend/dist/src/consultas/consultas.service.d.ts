@@ -16,8 +16,8 @@ export declare class ConsultasService {
     }[]>;
     serviciosPorCliente(): Promise<{
         Id_Usuario: number;
-        Nombre: string;
         Correo: string;
+        Nombre: string;
         reservasComoCliente: {
             fecha: Date;
             ID_Reserva: number;
@@ -56,9 +56,9 @@ export declare class ConsultasService {
     })[]>;
     clientesSemana(): Promise<({
         cliente: {
+            Correo: string;
             Nombre: string;
             Telefono: string;
-            Correo: string;
         };
     } & {
         Id_Usuario: number;
@@ -80,8 +80,8 @@ export declare class ConsultasService {
     }[]>;
     reservasPorCliente(): Promise<{
         Id_Usuario: number;
-        Nombre: string;
         Correo: string;
+        Nombre: string;
         _count: {
             reservasComoCliente: number;
         };
@@ -97,9 +97,9 @@ export declare class ConsultasService {
     }[]>;
     empleadosSinServicios(): Promise<{
         Id_Usuario: number;
+        Correo: string;
         Nombre: string;
         Telefono: string;
-        Correo: string;
     }[]>;
     agendaSemanalCompleta(): Promise<({
         empleado: {
@@ -137,8 +137,8 @@ export declare class ConsultasService {
         }[];
         consulta3_serviciosPorCliente: {
             Id_Usuario: number;
-            Nombre: string;
             Correo: string;
+            Nombre: string;
             reservasComoCliente: {
                 fecha: Date;
                 ID_Reserva: number;
@@ -157,9 +157,9 @@ export declare class ConsultasService {
         }[];
         consulta5_clientesSemana: ({
             cliente: {
+                Correo: string;
                 Nombre: string;
                 Telefono: string;
-                Correo: string;
             };
         } & {
             Id_Usuario: number;
@@ -181,17 +181,17 @@ export declare class ConsultasService {
         }[];
         consulta7_reservasPorCliente: {
             Id_Usuario: number;
-            Nombre: string;
             Correo: string;
+            Nombre: string;
             _count: {
                 reservasComoCliente: number;
             };
         }[];
         consulta9_empleadosSinServicios: {
             Id_Usuario: number;
+            Correo: string;
             Nombre: string;
             Telefono: string;
-            Correo: string;
         }[];
     }>;
 }

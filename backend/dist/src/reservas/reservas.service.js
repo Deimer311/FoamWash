@@ -100,17 +100,11 @@ let ReservasService = class ReservasService {
         let fechaISO = undefined;
         if (data.fecha) {
             const soloFecha = data.fecha.split('T')[0];
-            const horaStr = data.Hora && data.Hora.match(/^\d{2}:\d{2}$/)
-                ? data.Hora + ':00'
-                : '00:00:00';
-            fechaISO = new Date(`${soloFecha}T${horaStr}.000Z`);
+            fechaISO = new Date(`${soloFecha}T00:00:00.000Z`);
         }
         let horaISO = undefined;
         if (data.Hora && data.Hora.match(/^\d{2}:\d{2}$/)) {
-            const soloFecha = data.fecha
-                ? data.fecha.split('T')[0]
-                : new Date().toISOString().split('T')[0];
-            horaISO = new Date(`${soloFecha}T${data.Hora}:00.000Z`);
+            horaISO = new Date(`1970-01-01T${data.Hora}:00.000Z`);
         }
         const observacionData = data.observacion_Id_Observaciones
             ? { connect: { Id_Observaciones: data.observacion_Id_Observaciones } }
@@ -154,11 +148,11 @@ let ReservasService = class ReservasService {
         if (reserva.cliente && reserva.cliente.Correo) {
             const dateFormatter = new Intl.DateTimeFormat('es-CO', {
                 weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-                timeZone: 'America/Bogota'
+                timeZone: 'UTC'
             });
             const timeFormatter = new Intl.DateTimeFormat('es-CO', {
                 hour: '2-digit', minute: '2-digit',
-                timeZone: 'America/Bogota'
+                timeZone: 'UTC'
             });
             await (0, email_util_1.sendServiceConfirmationEmail)(reserva.cliente.Correo, {
                 id: `PED-${reserva.ID_Reserva}`,

@@ -38,8 +38,8 @@ export declare class AuthService {
     }>;
     getMe(userId: number): Promise<{
         rol: {
-            Id_Rol: number;
             Rol: string;
+            Id_Rol: number;
         };
         tipo_de_documento: {
             idTipo_de_Documento: number;

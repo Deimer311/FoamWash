@@ -11,8 +11,8 @@ export declare class AuthController {
         success: boolean;
         data: {
             rol: {
-                Id_Rol: number;
                 Rol: string;
+                Id_Rol: number;
             };
             tipo_de_documento: {
                 idTipo_de_Documento: number;

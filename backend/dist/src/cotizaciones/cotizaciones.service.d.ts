@@ -11,9 +11,9 @@ export declare class CotizacionesService {
     }[]>;
     findAll(): Promise<({
         cliente: {
+            Correo: string;
             Nombre: string;
             Telefono: string;
-            Correo: string;
         };
         servicios: {
             estado: string;
@@ -26,13 +26,13 @@ export declare class CotizacionesService {
             duracion_estimada: string | null;
         }[];
     } & {
-        Precio_cotizado: import("@prisma/client/runtime/library").Decimal;
         Id_Cotizacion: number;
         Id_usuario: number;
+        Precio_cotizado: import("@prisma/client/runtime/library").Decimal;
         Cantidad: number;
-        Id_servicio: number | null;
-        fecha_cotizacion: Date | null;
         Tamaño: string;
+        fecha_cotizacion: Date | null;
+        Id_servicio: number | null;
     })[]>;
     create(data: {
         Precio_cotizado: number;
@@ -43,13 +43,13 @@ export declare class CotizacionesService {
         Id_servicio?: number;
         fecha_cotizacion?: Date;
     }): Promise<{
-        Precio_cotizado: import("@prisma/client/runtime/library").Decimal;
         Id_Cotizacion: number;
         Id_usuario: number;
+        Precio_cotizado: import("@prisma/client/runtime/library").Decimal;
         Cantidad: number;
-        Id_servicio: number | null;
-        fecha_cotizacion: Date | null;
         Tamaño: string;
+        fecha_cotizacion: Date | null;
+        Id_servicio: number | null;
     }>;
     sincronizar(items: any[], userId: number): Promise<any[]>;
 }

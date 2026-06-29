@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:foamwash/theme.dart';
 import 'package:foamwash/Api/api_constants.dart';
 import 'package:foamwash/Features/Autenticacion/providers/auth_provider.dart';
+import 'package:foamwash/core/cache/secure_storage_service.dart';
 
 const String _imagenFallback = '/img/imag1.jpg';
 
@@ -108,7 +109,33 @@ String _formatearMoneda(double v) {
 
 String _imagenCompleta(String path) {
   if (path.startsWith('http')) return path;
-  return '${ApiConstants.baseUrl}$path';
+  if (path.startsWith('/img/')) return path; // Se manejará como asset
+  final base = ApiConstants.baseUrl.replaceAll('/api', '');
+  final separator = path.startsWith('/') ? '' : '/';
+  return '$base$separator$path';
+}
+
+Widget _buildImageWidget(String path, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
+  if (path.trim().isEmpty) {
+    return Icon(Icons.local_laundry_service, color: Colors.grey, size: width ?? 40);
+  }
+  if (path.startsWith('/img/')) {
+    return Image.asset(
+      'assets$path',
+      width: width,
+      height: height,
+      fit: fit,
+      errorBuilder: (_, __, ___) => Icon(Icons.image_not_supported, color: Colors.grey, size: width ?? 40),
+    );
+  }
+  return Image.network(
+    _imagenCompleta(path),
+    width: width,
+    height: height,
+    fit: fit,
+    headers: const {'ngrok-skip-browser-warning': 'true'},
+    errorBuilder: (_, __, ___) => Icon(Icons.local_laundry_service, color: AppTheme.primaryBlue, size: width ?? 40),
+  );
 }
 
 const List<String> _horariosDisponibles = [
@@ -193,9 +220,16 @@ class CotizacionStorage {
     final items = await leer();
     if (items.isEmpty) return true;
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token') ?? '';
+
       final res = await http.post(
         Uri.parse('${ApiConstants.baseUrl}/cotizaciones/sincronizar'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json', 
+          'ngrok-skip-browser-warning': 'true',
+          if (token.isNotEmpty) 'Authorization': 'Bearer $token',
+        },
         body: json.encode({'userId': userId, 'items': items}),
       );
       return res.statusCode == 200 || res.statusCode == 201;
@@ -267,7 +301,10 @@ class _CotizacionScreenState extends State<CotizacionScreen> {
   Future<void> _cargarServicios() async {
     setState(() => _isLoading = true);
     try {
-      final res = await http.get(Uri.parse('${ApiConstants.baseUrl}/cotizaciones/servicios'));
+      final res = await http.get(
+        Uri.parse('${ApiConstants.baseUrl}/cotizaciones/servicios'),
+        headers: {'ngrok-skip-browser-warning': 'true'},
+      );
       if (res.statusCode == 200) {
         final body = json.decode(res.body);
         final data = (body['data'] as List?) ?? [];
@@ -375,8 +412,49 @@ class _CotizacionScreenState extends State<CotizacionScreen> {
           Navigator.pop(context);
           _abrirConfirmacion();
         },
+        onGuardarCotizacionRapida: () {
+          Navigator.pop(context);
+          _guardarRapido();
+        },
       ),
     );
+  }
+
+  Future<void> _guardarRapido() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final strList = prefs.getStringList('mis_cotizaciones') ?? [];
+      final list = strList.map((e) => jsonDecode(e) as Map<String, dynamic>).toList();
+
+      final newQuotation = {
+        'ID_Reserva': DateTime.now().millisecondsSinceEpoch.toString(),
+        'creadoEn': DateTime.now().toIso8601String(),
+        'expiraEn': DateTime.now().add(const Duration(hours: 48)).toIso8601String(),
+        'servicios': _carrito.map((e) => {
+          'ID_Servicio': e.servicio.id,
+          'Nombre_Servicio': e.servicio.nombre,
+          'cantidad': e.cantidad,
+          'Precio': e.servicio.precio,
+          'imagenUrl': e.servicio.imagenUrl,
+        }).toList(),
+        'total': _total,
+        'fecha': null,
+        'Hora': null,
+        'direccion': '',
+        'ciudad': '',
+      };
+      
+      list.add(newQuotation);
+      await prefs.setStringList('mis_cotizaciones', list.map((e) => jsonEncode(e)).toList());
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cotización guardada (válida por 48h)'), backgroundColor: AppTheme.successGreen),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al guardar: $e'), backgroundColor: Colors.red),
+      );
+    }
   }
 
   void _abrirConfirmacion() {
@@ -458,13 +536,11 @@ class _CotizacionScreenState extends State<CotizacionScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(gradient: AppTheme.buttonGradient, borderRadius: BorderRadius.circular(6)),
-              child: const Center(child: Text('FW', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800))),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.asset('assets/LogoFW.jpeg', width: 24, height: 24, fit: BoxFit.cover),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 8),
             const Text('Cotización', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
           ],
         ),
@@ -685,10 +761,9 @@ class _ServiceCardState extends State<_ServiceCard> {
             Center(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  _imagenCompleta(widget.servicio.imagenUrl),
+                child: _buildImageWidget(
+                  widget.servicio.imagenUrl,
                   fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => const Icon(Icons.image_not_supported, color: Colors.white54, size: 64),
                 ),
               ),
             ),
@@ -710,8 +785,7 @@ class _ServiceCardState extends State<_ServiceCard> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withOpacity(0.06)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2))],
+        border: Border.all(color: Colors.black.withOpacity(0.08)),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -725,10 +799,9 @@ class _ServiceCardState extends State<_ServiceCard> {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.network(
-                    _imagenCompleta(s.imagenUrl),
+                  _buildImageWidget(
+                    s.imagenUrl,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(color: const Color(0xFFEFF1FA), child: const Icon(Icons.local_laundry_service, color: AppTheme.primaryBlue, size: 40)),
                   ),
                   Positioned(
                     top: 10,
@@ -847,12 +920,14 @@ class _CartSheet extends StatefulWidget {
   final double total;
   final void Function(int servicioId, int nuevaCantidad) onActualizarCantidad;
   final VoidCallback onFinalizarCompra;
+  final VoidCallback onGuardarCotizacionRapida;
 
   const _CartSheet({
     required this.carrito,
     required this.total,
     required this.onActualizarCantidad,
     required this.onFinalizarCompra,
+    required this.onGuardarCotizacionRapida,
   });
 
   @override
@@ -908,12 +983,11 @@ class _CartSheetState extends State<_CartSheet> {
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
-                                  child: Image.network(
-                                    _imagenCompleta(item.servicio.imagenUrl),
+                                  child: _buildImageWidget(
+                                    item.servicio.imagenUrl,
                                     width: 56,
                                     height: 56,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => Container(width: 56, height: 56, color: const Color(0xFFEFF1FA), child: const Icon(Icons.local_laundry_service, color: AppTheme.primaryBlue)),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
@@ -955,13 +1029,29 @@ class _CartSheetState extends State<_CartSheet> {
                         ],
                       ),
                       const SizedBox(height: 14),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                          onPressed: widget.onFinalizarCompra,
-                          child: const Text('Continuar con el agendamiento →', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Colors.white)),
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: AppTheme.primaryBlue),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              onPressed: widget.onGuardarCotizacionRapida,
+                              child: const Text('💾 Guardar', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppTheme.primaryBlue)),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            flex: 2,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                              onPressed: widget.onFinalizarCompra,
+                              child: const Text('Continuar →', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: Colors.white)),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -1032,6 +1122,7 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
   String? _empleadoAsignado;
   String _errorGuardar = '';
   bool   _confirmando  = false;
+  bool   _fueGuardadaLocalmente = false;
 
   @override
   void dispose() {
@@ -1098,8 +1189,10 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
 
   // ── Llamada real a la API — igual que handleConfirmar en CotizacionesCliente.jsx ──
   Future<void> _confirmar() async {
-    setState(() { _confirmando = true; _errorGuardar = ''; });
+    setState(() { _confirmando = true; _errorGuardar = ''; _fueGuardadaLocalmente = false; });
     try {
+      final token = await SecureStorageService().read('token') ?? '';
+
       // 1. Crear reserva
       final infoAdicional =
           'Dirección: ${_ctrlDireccion.text.trim()}'
@@ -1116,7 +1209,11 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
 
       final resReserva = await http.post(
         Uri.parse('${ApiConstants.baseUrl}/reservas'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true',
+          if (token.isNotEmpty) 'Authorization': 'Bearer $token',
+        },
         body: json.encode({
           'Id_Usuario':            widget.userId,
           'fecha':                 fechaStr,
@@ -1141,7 +1238,11 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
           try {
             await http.post(
               Uri.parse('${ApiConstants.baseUrl}/cotizaciones'),
-              headers: {'Content-Type': 'application/json'},
+              headers: {
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true',
+                if (token.isNotEmpty) 'Authorization': 'Bearer $token',
+              },
               body: json.encode({
                 'Id_usuario':      widget.userId,
                 'Id_servicio':     c.servicio.id,
@@ -1166,6 +1267,48 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
       setState(() {
         _errorGuardar = 'Hubo un error al guardar tu pedido. Intenta de nuevo.';
         _confirmando  = false;
+      });
+    }
+  }
+
+  Future<void> _guardarCotizacionLocal() async {
+    setState(() { _confirmando = true; _errorGuardar = ''; _fueGuardadaLocalmente = true; });
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final List<String> currentCotizaciones = prefs.getStringList('mis_cotizaciones') ?? [];
+      
+      final fechaStr = '${_fecha!.year}-${_fecha!.month.toString().padLeft(2,'0')}-${_fecha!.day.toString().padLeft(2,'0')}';
+      
+      final nuevaCotizacion = {
+        'ID_Reserva': DateTime.now().millisecondsSinceEpoch.toString().substring(5),
+        'fecha': fechaStr,
+        'Hora': _horario,
+        'Estado': 'Guardado Local',
+        'creadoEn': DateTime.now().toIso8601String(),
+        'expiraEn': DateTime.now().add(const Duration(hours: 48)).toIso8601String(),
+        'servicios': widget.carrito.map((c) => {
+          'Id_Servicio': c.servicio.id,
+          'Nombre_Servicio': c.servicio.nombre,
+          'cantidad': c.cantidad,
+          'Precio': c.subtotal,
+          'tamano': _tamanos[c.servicio.id] ?? 'Estándar',
+        }).toList(),
+      };
+
+      currentCotizaciones.add(jsonEncode(nuevaCotizacion));
+      await prefs.setStringList('mis_cotizaciones', currentCotizaciones);
+
+      await widget.onConfirmarPedido();
+      
+      setState(() {
+        _pedidoId = 'COT-${nuevaCotizacion['ID_Reserva']}';
+        _stage = 3;
+        _confirmando = false;
+      });
+    } catch (e) {
+      setState(() {
+        _errorGuardar = 'Hubo un error al guardar tu cotización. Intenta de nuevo.';
+        _confirmando = false;
       });
     }
   }
@@ -1324,7 +1467,16 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
                 style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
               ),
             ),
-          if (_stage == 2)
+          if (_stage == 2) ...[
+            OutlinedButton(
+              onPressed: _confirmando ? null : _guardarCotizacionLocal,
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: AppTheme.primaryBlue),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              ),
+              child: const Text('💾 Guardar cotización', style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.w700)),
+            ),
             ElevatedButton(
               onPressed: _confirmando ? null : _confirmar,
               style: ElevatedButton.styleFrom(
@@ -1338,8 +1490,9 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
                       height: 18,
                       child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                     )
-                  : const Text('✓ Confirmar pedido', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                  : const Text('✓ Agendar servicio', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
             ),
+          ],
           if (_stage == 3)
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
@@ -1645,10 +1798,12 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Te contactaremos pronto para confirmar los detalles del servicio.',
+            Text(
+              _fueGuardadaLocalmente 
+                ? 'Tu cotización ha sido guardada localmente por 48 horas.'
+                : 'Te contactaremos pronto para confirmar los detalles del servicio.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Color(0xFF888888), fontSize: 13),
+              style: const TextStyle(color: Color(0xFF888888), fontSize: 13),
             ),
           ],
         );

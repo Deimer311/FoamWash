@@ -22,6 +22,7 @@ import 'package:foamwash/Features/Admin/providers/usuarios_provider.dart';
 import 'package:foamwash/Features/Cart/providers/cart_provider.dart';
 import 'package:foamwash/Features/Cart/views/cart_view.dart';
 import 'package:foamwash/Features/Services/views/agendamientos_view.dart';
+import 'package:foamwash/Features/Services/views/mis_cotizaciones_view.dart';
 
 import 'package:foamwash/Features/Autenticacion/data/data_sources/auth_remote_data_source.dart';
 import 'package:foamwash/Features/Cotizacion/Cotizacion.dart';
@@ -160,22 +161,29 @@ class MyApp extends StatelessWidget {
           ),
           // Cotización de cliente autenticado — replica cotizacion-cliente del frontend
           '/cliente-cotizacion': (context) {
-            final auth = Provider.of<AuthProvider>(context, listen: false);
-            if (!auth.isAuthenticated) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            }
-            return ClienteCotizadorScreen(
-              onBackToHome: () => Navigator.pushReplacementNamed(context, '/home'),
-              onGoToServicios: () => Navigator.pushReplacementNamed(context, '/home'),
+            return Consumer<AuthProvider>(
+              builder: (context, auth, _) {
+                if (!auth.isAuthenticated) {
+                  // Si no está autenticado, redirigir al login
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    Navigator.pushReplacementNamed(context, '/login');
+                  });
+                  return const Scaffold(body: Center(child: CircularProgressIndicator()));
+                }
+                return ClienteCotizadorScreen(
+                  onBackToHome: () => Navigator.pushReplacementNamed(context, '/home'),
+                  onGoToServicios: () => Navigator.pushReplacementNamed(context, '/home'),
+                );
+              },
             );
           },
+
           '/admin_servicios': (context) => const AdminServiciosView(),
           '/admin_reportes': (context) => const AdminReportesView(),
           '/empleado_agenda': (context) => const EmpleadoAgendaView(),
           '/cart': (context) => const CartView(),
           '/agendamientos': (context) => const AgendamientosView(),
+          '/mis_cotizaciones': (context) => const MisCotizacionesView(),
           '/perfilCliente': (context) {
             final auth = Provider.of<AuthProvider>(context, listen: false);
             return PerfilClienteScreen(

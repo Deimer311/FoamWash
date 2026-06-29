@@ -3,20 +3,20 @@ export declare class UsuariosService {
     private prisma;
     constructor(prisma: PrismaService);
     findAll(): Promise<{
+        rol: {
+            Rol: string;
+        };
         Id_Usuario: number;
+        N_Documento: string;
+        Correo: string;
         Nombre: string;
         Telefono: string;
-        N_Documento: string;
         Direccion: string;
-        Correo: string;
         estado: import(".prisma/client").$Enums.usuario_estado;
         fecha_registro: Date;
         foto_perfil: string;
         tipo_de_documento: {
             nombre_del_documento: string;
-        };
-        rol: {
-            Rol: string;
         };
     }[]>;
     findOne(id: number): Promise<{
@@ -26,12 +26,16 @@ export declare class UsuariosService {
             pendientes: number;
             calificacion_promedio: string;
         };
+        rol: {
+            Rol: string;
+            Id_Rol: number;
+        };
         Id_Usuario: number;
+        N_Documento: string;
+        Correo: string;
         Nombre: string;
         Telefono: string;
-        N_Documento: string;
         Direccion: string;
-        Correo: string;
         estado: import(".prisma/client").$Enums.usuario_estado;
         last_login: Date;
         fecha_registro: Date;
@@ -54,9 +58,9 @@ export declare class UsuariosService {
             }[];
         } & {
             Id_Usuario: number;
+            fecha: Date;
             ID_Reserva: number;
             Estado: string;
-            fecha: Date;
             Hora: Date;
             Informacion_adicional: string | null;
             observacion_Id_Observaciones: number;
@@ -66,18 +70,14 @@ export declare class UsuariosService {
             idTipo_de_Documento: number;
             nombre_del_documento: string;
         };
-        rol: {
-            Id_Rol: number;
-            Rol: string;
-        };
     }>;
     update(id: number, data: any): Promise<{
         Id_Usuario: number;
+        N_Documento: string;
+        Correo: string;
         Nombre: string;
         Telefono: string;
-        N_Documento: string;
         Direccion: string;
-        Correo: string;
         estado: import(".prisma/client").$Enums.usuario_estado;
         foto_perfil: string;
         tipo_de_documento: {
@@ -87,11 +87,11 @@ export declare class UsuariosService {
     }>;
     softDelete(id: number): Promise<{
         Id_Usuario: number;
+        N_Documento: string | null;
+        Correo: string | null;
         Nombre: string | null;
         Telefono: string | null;
-        N_Documento: string | null;
         Direccion: string | null;
-        Correo: string | null;
         password_hash: string | null;
         estado: import(".prisma/client").$Enums.usuario_estado | null;
         rol_Id_Rol: number | null;
@@ -111,14 +111,14 @@ export declare class UsuariosService {
             usuarios: number;
         };
     } & {
-        Id_Rol: number;
         Rol: string;
+        Id_Rol: number;
     })[]>;
     empleadosActivos(): Promise<{
         Id_Usuario: number;
+        Correo: string;
         Nombre: string;
         Telefono: string;
-        Correo: string;
         last_login: Date;
     }[]>;
     historialCliente(id: number): Promise<({
@@ -139,9 +139,9 @@ export declare class UsuariosService {
         }[];
     } & {
         Id_Usuario: number;
+        fecha: Date;
         ID_Reserva: number;
         Estado: string;
-        fecha: Date;
         Hora: Date;
         Informacion_adicional: string | null;
         observacion_Id_Observaciones: number;
