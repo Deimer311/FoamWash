@@ -93,6 +93,10 @@ export const AuthProvider = ({ children }) => {
             const normalized = normalizeRole(rawUser);
             setUser(normalized);
 
+            if (import.meta.env.DEV && response.access_token) {
+                console.log(`🔑 [Dev Only] Token para Swagger:\n${response.access_token}`);
+            }
+
             return {
                 success: true,
                 message: `¡Bienvenido, ${normalized.nombre}!`,
@@ -149,6 +153,13 @@ export const AuthProvider = ({ children }) => {
         } catch {
             // ignorar errores de red al cerrar sesión
         } finally {
+            try {
+                localStorage.removeItem('foamwash_carrito');
+                localStorage.removeItem('foamwash_pedidos');
+                localStorage.removeItem('foamwash_carrito_local');
+            } catch (e) {
+                console.error(e);
+            }
             setUser(null);
         }
     };

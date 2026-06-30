@@ -164,6 +164,27 @@ export declare class ReservasController {
         success: boolean;
         message: string;
         data: {
+            empleado: {
+                Id_Usuario: number;
+                Nombre: string | null;
+                Telefono: string | null;
+                N_Documento: string | null;
+                Direccion: string | null;
+                Correo: string | null;
+                password_hash: string | null;
+                estado: import(".prisma/client").$Enums.usuario_estado | null;
+                rol_Id_Rol: number | null;
+                tipo_de_documento_id_tipo_de_documento: number | null;
+                reset_token: string | null;
+                reset_token_expires: Date | null;
+                last_login: Date | null;
+                fecha_registro: Date | null;
+                access_token: string | null;
+                refresh_token: string | null;
+                token_created_at: Date | null;
+                token_expires_at: Date | null;
+                foto_perfil: string | null;
+            };
             cliente: {
                 Id_Usuario: number;
                 Nombre: string | null;
@@ -210,6 +231,27 @@ export declare class ReservasController {
         success: boolean;
         message: string;
         data: {
+            empleado: {
+                Id_Usuario: number;
+                Nombre: string | null;
+                Telefono: string | null;
+                N_Documento: string | null;
+                Direccion: string | null;
+                Correo: string | null;
+                password_hash: string | null;
+                estado: import(".prisma/client").$Enums.usuario_estado | null;
+                rol_Id_Rol: number | null;
+                tipo_de_documento_id_tipo_de_documento: number | null;
+                reset_token: string | null;
+                reset_token_expires: Date | null;
+                last_login: Date | null;
+                fecha_registro: Date | null;
+                access_token: string | null;
+                refresh_token: string | null;
+                token_created_at: Date | null;
+                token_expires_at: Date | null;
+                foto_perfil: string | null;
+            };
             cliente: {
                 Id_Usuario: number;
                 Nombre: string | null;

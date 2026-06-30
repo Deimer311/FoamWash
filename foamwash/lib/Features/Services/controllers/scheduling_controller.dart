@@ -100,7 +100,14 @@ class SchedulingController {
 
         return voucher;
       } else {
-        throw Exception("Error al agendar los servicios: ${response.body}");
+        String errorMsg = 'Error al agendar los servicios';
+        try {
+          final decoded = jsonDecode(response.body);
+          if (decoded['message'] != null) {
+            errorMsg = decoded['message'];
+          }
+        } catch (_) {}
+        throw Exception(errorMsg);
       }
     } catch (e) {
       rethrow;

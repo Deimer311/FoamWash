@@ -17,6 +17,7 @@ import { ClientesModule } from './clientes/clientes.module';
 import { ConsultasModule } from './consultas/consultas.module';
 import { EstadisticasModule } from './estadisticas/estadisticas.module';
 import { NotificacionesModule } from './notificaciones/notificaciones.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { NotificacionesModule } from './notificaciones/notificaciones.module';
     ConsultasModule,
     EstadisticasModule,
     NotificacionesModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}

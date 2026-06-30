@@ -43,3 +43,13 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Node.js / React / NestJS
+node_modules/
+dist/
+.DS_Store
+
+# Temp
+temp_docx/
+docx_text.txt
+temp.zip

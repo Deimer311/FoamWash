@@ -117,4 +117,77 @@ class EmpleadosProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<bool> editarEmpleado({
+    required int id,
+    required String nombre,
+    required String telefono,
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final secureStorage = SecureStorageService();
+      final token = await secureStorage.read('token') ?? '';
+      
+      final response = await http.put(
+        Uri.parse('${ApiConstants.baseUrl}/usuarios/$id'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({
+          'Nombre': nombre,
+          'Telefono': telefono,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        await fetchEmpleados();
+        return true;
+      } else {
+        _error = 'Error al editar empleado';
+        return false;
+      }
+    } catch (e) {
+      _error = 'Error de conexión: $e';
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> eliminarEmpleado(int id) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final secureStorage = SecureStorageService();
+      final token = await secureStorage.read('token') ?? '';
+      
+      final response = await http.delete(
+        Uri.parse('${ApiConstants.baseUrl}/usuarios/$id'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        await fetchEmpleados();
+        return true;
+      } else {
+        _error = 'Error al eliminar empleado';
+        return false;
+      }
+    } catch (e) {
+      _error = 'Error de conexión: $e';
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }

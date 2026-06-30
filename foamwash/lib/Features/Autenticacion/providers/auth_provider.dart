@@ -30,8 +30,7 @@ class AuthProvider extends ChangeNotifier {
       _userEmail = email;
 
       // Leer el rol guardado por el repositorio
-      final prefs = await SharedPreferences.getInstance();
-      _userRole = prefs.getString('userRole') ?? '';
+      _userRole = await _repository.secureStorageService.read('userRole') ?? '';
 
       // Suscribirse a temas FCM según rol y userId
       await FCMService.subscribeToRoleTopics(_userRole, userModel.idUsuario);
@@ -45,16 +44,16 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     try {
       // Desuscribirse de temas FCM antes de limpiar almacenamiento
-      final prefs = await SharedPreferences.getInstance();
-      final role = prefs.getString('userRole') ?? '';
-      final userId = prefs.getInt('userId') ?? 0;
+      final role = await _repository.secureStorageService.read('userRole') ?? '';
+      final userIdStr = await _repository.secureStorageService.read('userId') ?? '0';
+      final userId = int.tryParse(userIdStr) ?? 0;
       try {
         await FCMService.unsubscribeFromRoleTopics(role, userId);
       } catch (e) {
         print('FCM unsubscribe failed during logout: $e');
       }
     } catch (e) {
-      print('Error reading prefs during logout: $e');
+      print('Error reading secure storage during logout: $e');
     }
 
     try {
@@ -95,12 +94,12 @@ class AuthProvider extends ChangeNotifier {
   Future<void> checkAuthStatus() async {
     try {
       final token = await _repository.secureStorageService.read('token');
-      final prefs = await SharedPreferences.getInstance();
       _isAuthenticated = token != null && token.isNotEmpty;
-      _userEmail = prefs.getString('userEmail');
-      _userRole = prefs.getString('userRole') ?? '';
-      final userId = prefs.getInt('userId') ?? 0;
-      final userFoto = prefs.getString('userFoto');
+      _userEmail = await _repository.secureStorageService.read('userEmail');
+      _userRole = await _repository.secureStorageService.read('userRole') ?? '';
+      final userIdStr = await _repository.secureStorageService.read('userId') ?? '0';
+      final userId = int.tryParse(userIdStr) ?? 0;
+      final userFoto = await _repository.secureStorageService.read('userFoto');
 
       if (_isAuthenticated) {
         _user = UserModel(
@@ -138,8 +137,7 @@ class AuthProvider extends ChangeNotifier {
         rolId: _user!.rolId,
         fotoPerfil: newFotoUrl,
       );
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('userFoto', newFotoUrl);
+      await _repository.secureStorageService.write('userFoto', newFotoUrl);
       notifyListeners();
     }
   }

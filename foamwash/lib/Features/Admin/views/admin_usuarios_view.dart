@@ -6,7 +6,8 @@ import '../widgets/add_usuario_dialog.dart';
 import '../widgets/edit_usuario_dialog.dart';
 import 'package:foamwash/core/utils/security_utils.dart';
 import 'package:foamwash/Features/Admin/views/admin_dashboard_view.dart';
-
+import 'package:foamwash/Features/Autenticacion/providers/auth_provider.dart';
+import 'package:foamwash/Api/api_constants.dart';
 class AdminUsuariosView extends StatefulWidget {
   const AdminUsuariosView({super.key});
 
@@ -72,6 +73,8 @@ class _AdminUsuariosViewState extends State<AdminUsuariosView> {
   Widget build(BuildContext context) {
     const Color primaryDark = Color(0xFF15192C);
     const Color primaryBlue = Color(0xFF007BFF);
+    final auth = Provider.of<AuthProvider>(context);
+    final userFoto = auth.user?.fotoPerfil;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -106,9 +109,17 @@ class _AdminUsuariosViewState extends State<AdminUsuariosView> {
             ),
           ),
           const SizedBox(width: 8),
-          const CircleAvatar(
+          CircleAvatar(
+            backgroundColor: const Color(0xFFD9D9D9),
             radius: 16,
-            backgroundColor: Color(0xFFD9D9D9),
+            backgroundImage: userFoto != null && userFoto.isNotEmpty
+                ? NetworkImage(userFoto.startsWith('http')
+                    ? userFoto
+                    : '${ApiConstants.baseUrl.replaceAll('/api', '')}$userFoto')
+                : null,
+            child: (userFoto == null || userFoto.isEmpty)
+                ? const Icon(Icons.person, color: Colors.white, size: 24)
+                : null,
           ),
           const SizedBox(width: 16),
         ],

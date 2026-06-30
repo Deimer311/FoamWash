@@ -12,6 +12,8 @@ import 'package:foamwash/Features/Admin/views/admin_dashboard_view.dart';
 import 'package:http/http.dart' as http;
 import 'package:foamwash/Api/api_constants.dart';
 import 'package:foamwash/core/cache/secure_storage_service.dart';
+import 'package:provider/provider.dart';
+import 'package:foamwash/Features/Autenticacion/providers/auth_provider.dart';
 
 class AdminReportesView extends StatefulWidget {
   final VoidCallback? onGoDashboard;
@@ -251,6 +253,8 @@ class _AdminReportesViewState extends State<AdminReportesView> {
       symbol: '\$',
       decimalDigits: 0,
     );
+    final auth = Provider.of<AuthProvider>(context);
+    final userFoto = auth.user?.fotoPerfil;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F4F8),
@@ -280,6 +284,19 @@ class _AdminReportesViewState extends State<AdminReportesView> {
             ),
           ),
           const SizedBox(width: 8),
+          CircleAvatar(
+            backgroundColor: const Color(0xFFD9D9D9),
+            radius: 16,
+            backgroundImage: userFoto != null && userFoto.isNotEmpty
+                ? NetworkImage(userFoto.startsWith('http')
+                    ? userFoto
+                    : '${ApiConstants.baseUrl.replaceAll('/api', '')}$userFoto')
+                : null,
+            child: (userFoto == null || userFoto.isEmpty)
+                ? const Icon(Icons.person, color: Colors.white, size: 24)
+                : null,
+          ),
+          const SizedBox(width: 16),
         ],
       ),
       body: SafeArea(

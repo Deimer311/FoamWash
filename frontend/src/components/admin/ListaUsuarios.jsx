@@ -10,15 +10,15 @@
 // =============================================================================
 
     import { useEffect, useState } from 'react';
+    import api from '../../services/api';
 
     function ListaUsuarios() {
     const [usuarios, setUsuarios] = useState([]);
 
     useEffect(() => {
         // Hacemos la petición al backend
-        fetch('http://localhost:5000/api/usuarios')
-        .then(res => res.json())
-        .then(data => setUsuarios(data))
+        api.get('/usuarios')
+        .then(res => setUsuarios(res.data))
         .catch(err => console.error("Error:", err));
     }, []);
 

@@ -1,9 +1,14 @@
   // src/servicios/servicios.controller.ts
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, ParseIntPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
+import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, ParseIntPipe, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { ServiciosService } from './servicios.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname, join } from 'path';
+
+const UPLOADS_PATH = join(process.cwd(), 'uploads', 'servicios');
 
 @Controller('servicios') // → /api/servicios
 @ApiTags('Servicios')
@@ -64,6 +69,37 @@ export class ServiciosController {
   async remove(@Param('id', ParseIntPipe) id: number) {
     await this.serviciosService.remove(id);
     return { success: true, message: 'Servicio eliminado exitosamente' };
+  }
+
+  @Post(':id/imagen')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Subir imagen de un servicio' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        imagen: { type: 'string', format: 'binary' },
+      },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor('imagen', {
+      storage: diskStorage({
+        destination: UPLOADS_PATH,
+        filename: (req, file, cb) => {
+          const srvId = req.params?.id ?? 'srv';
+          const uniqueName = `servicio-${srvId}-${Date.now()}${extname(file.originalname)}`;
+          cb(null, uniqueName);
+        },
+      }),
+    }),
+  )
+  async uploadImagen(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new Error('No se subió ningún archivo');
+    const url = `/uploads/servicios/${file.filename}`;
+    await this.serviciosService.update(id, { imagen_url: url });
+    return { success: true, url };
   }
 }
 

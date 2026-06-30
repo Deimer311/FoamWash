@@ -10,10 +10,8 @@
 // =============================================================================
 
     import React, { useState, useEffect } from 'react';
-    import axios from 'axios';
+    import api from '../../services/api';
     import './estilos_admin/Consultas.css';
-
-    const API_URL = 'http://localhost:5000/api';
 
     function Consultas() {
     const [consultaActiva, setConsultaActiva] = useState(1);
@@ -116,7 +114,7 @@
 
     const cargarEmpleados = async () => {
         try {
-        const response = await axios.get(`${API_URL}/usuarios`);
+        const response = await api.get('/usuarios');
         const emps = response.data.data.filter(u => u.Rol === 'Empleado');
         setEmpleados(emps);
         } catch (error) {
@@ -128,13 +126,13 @@
         setLoading(true);
         try {
         const consulta = consultas.find(c => c.numero === numero);
-        let url = `${API_URL}/consultas/${consulta.endpoint}`;
+        let url = `/consultas/${consulta.endpoint}`;
         
         if (consulta.requiereId && empleadoId) {
             url += `/${empleadoId}`;
         }
         
-        const response = await axios.get(url);
+        const response = await api.get(url);
         setDatos(response.data.data || []);
         } catch (error) {
         console.error('Error al cargar consulta:', error);

@@ -19,7 +19,9 @@ const CrudServicios = ({ onBackToProfile }) => {
     const [isLoading,  setIsLoading]  = useState(true);
     const [modalAbierto, setModalAbierto] = useState(false);
     const [servicioEditando, setServicioEditando] = useState(null);
-    const [formData, setFormData] = useState({ nombre: '', descripcion: '', imagen: '', precio: '' });
+    const [formData, setFormData] = useState({ nombre: '', descripcion: '', precio: '' });
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
 
     useEffect(() => {
         api.get('/servicios')
@@ -37,41 +39,84 @@ const CrudServicios = ({ onBackToProfile }) => {
             .finally(() => setIsLoading(false));
     }, []);
 
+    const getImageUrl = (url) => {
+        if (!url) return '/img/imag1.jpg';
+        if (url.startsWith('http')) return url;
+        const baseUrl = api.defaults.baseURL.replace(/\/api\/?$/, '');
+        return `${baseUrl}${url}`;
+    };
+
     const abrirModal = (servicio = null) => {
         if (servicio) {
             setServicioEditando(servicio);
-            setFormData({ nombre: servicio.nombre, descripcion: servicio.descripcion, imagen: servicio.imagen, precio: servicio.precio || '' });
+            setFormData({ nombre: servicio.nombre, descripcion: servicio.descripcion, precio: servicio.precio || '' });
+            setImagePreview(getImageUrl(servicio.imagen));
         } else {
             setServicioEditando(null);
-            setFormData({ nombre: '', descripcion: '', imagen: '', precio: '' });
+            setFormData({ nombre: '', descripcion: '', precio: '' });
+            setImagePreview(null);
         }
+        setImageFile(null);
         setModalAbierto(true);
     };
 
     const cerrarModal = () => {
         setModalAbierto(false);
         setServicioEditando(null);
-        setFormData({ nombre: '', descripcion: '', imagen: '', precio: '' });
+        setFormData({ nombre: '', descripcion: '', precio: '' });
+        setImageFile(null);
+        setImagePreview(null);
     };
 
     const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageFile(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
 
     const guardarServicio = async () => {
         try {
             const payload = {
                 Nombre_Servicio: formData.nombre,
                 Precio:          formData.precio || 0,
-                descripcion:     formData.descripcion,
-                imagen_url:      formData.imagen,
+                descripcion:     formData.descripcion
             };
+            
+            let servicioId = null;
+            let currentServicio = null;
+
             if (servicioEditando) {
-                await api.put('/servicios/' + servicioEditando.id, payload);
-                setServicios(servicios.map(s => s.id === servicioEditando.id ? { ...s, ...formData } : s));
+                servicioId = servicioEditando.id;
+                await api.put('/servicios/' + servicioId, payload);
+                currentServicio = { ...servicioEditando, ...formData };
             } else {
                 const res = await api.post('/servicios', payload);
-                const nuevo = { id: res.data.data?.id || Date.now(), ...formData };
-                setServicios([...servicios, nuevo]);
+                servicioId = res.data.data?.id || res.data.data?.Id_Servicio;
+                currentServicio = { id: servicioId, ...formData, imagen: '' };
             }
+
+            // Subir imagen si se seleccionó una nueva
+            if (imageFile && servicioId) {
+                const formDataImg = new FormData();
+                formDataImg.append('imagen', imageFile);
+                const imgRes = await api.post(`/servicios/${servicioId}/imagen`, formDataImg, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                if (imgRes.data?.data?.imagen_url) {
+                    currentServicio.imagen = imgRes.data.data.imagen_url;
+                }
+            }
+
+            if (servicioEditando) {
+                setServicios(servicios.map(s => s.id === servicioId ? currentServicio : s));
+            } else {
+                setServicios([...servicios, currentServicio]);
+            }
+
             cerrarModal();
         } catch (err) {
             console.error('Error guardando servicio:', err);
@@ -279,7 +324,7 @@ const CrudServicios = ({ onBackToProfile }) => {
                             ) : servicios.map(s => (
                                 <div key={s.id} className="cs-card">
                                     <div className="cs-img-wrap">
-                                        <img src={s.imagen} alt={s.nombre} className="cs-img"
+                                        <img src={getImageUrl(s.imagen)} alt={s.nombre} className="cs-img"
                                             onError={e => { e.target.src = '/img/imag1.jpg'; }} />
                                     </div>
                                     <div className="cs-info">
@@ -332,9 +377,13 @@ const CrudServicios = ({ onBackToProfile }) => {
                                     onChange={handleInputChange} placeholder="90000" />
                             </div>
                             <div className="cs-fg">
-                                <label>URL de Imagen</label>
-                                <input type="text" name="imagen" value={formData.imagen}
-                                    onChange={handleInputChange} placeholder="/img/servicio.jpg" />
+                                <label>Imagen del Servicio</label>
+                                {imagePreview && (
+                                    <div style={{ marginBottom: 10, borderRadius: 10, overflow: 'hidden', height: 120, background: '#f0f4f8' }}>
+                                        <img src={imagePreview} alt="Vista previa" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    </div>
+                                )}
+                                <input type="file" accept="image/*" onChange={handleImageChange} />
                             </div>
                         </div>
                         <div className="cs-modal-foot">

@@ -6,12 +6,12 @@ export declare class ServiciosController {
         success: boolean;
         count: number;
         data: {
-            estado: string;
             Id_Servicio: number;
             Nombre_Servicio: string;
             Precio: import("@prisma/client/runtime/library").Decimal;
             descripcion: string;
             imagen_url: string;
+            estado: string;
             duracion_estimada: string;
         }[];
     }>;
@@ -19,23 +19,23 @@ export declare class ServiciosController {
         success: boolean;
         data: ({
             reservas: {
-                Id_Usuario: number;
-                fecha: Date;
                 ID_Reserva: number;
                 Estado: string;
+                Id_Usuario: number;
+                fecha: Date;
                 Hora: Date;
                 Informacion_adicional: string | null;
                 observacion_Id_Observaciones: number;
                 empleado_Id_Usuario: number | null;
             }[];
         } & {
-            estado: string;
             Id_Servicio: number;
             Nombre_Servicio: string;
             Precio: import("@prisma/client/runtime/library").Decimal;
             descripcion: string;
             imagen_url: string | null;
             cotizacion_Id_Cotizacion: number | null;
+            estado: string;
             duracion_estimada: string | null;
         })[];
     }>;
@@ -50,36 +50,36 @@ export declare class ServiciosController {
                     Nombre: string;
                 };
             } & {
-                Id_Usuario: number;
-                fecha: Date;
                 ID_Reserva: number;
                 Estado: string;
+                Id_Usuario: number;
+                fecha: Date;
                 Hora: Date;
                 Informacion_adicional: string | null;
                 observacion_Id_Observaciones: number;
                 empleado_Id_Usuario: number | null;
             })[];
         } & {
-            estado: string;
             Id_Servicio: number;
             Nombre_Servicio: string;
             Precio: import("@prisma/client/runtime/library").Decimal;
             descripcion: string;
             imagen_url: string | null;
             cotizacion_Id_Cotizacion: number | null;
+            estado: string;
             duracion_estimada: string | null;
         })[];
     }>;
     findOne(id: number): Promise<{
         success: boolean;
         data: {
-            estado: string;
             Id_Servicio: number;
             Nombre_Servicio: string;
             Precio: import("@prisma/client/runtime/library").Decimal;
             descripcion: string;
             imagen_url: string | null;
             cotizacion_Id_Cotizacion: number | null;
+            estado: string;
             duracion_estimada: string | null;
         };
     }>;
@@ -87,13 +87,13 @@ export declare class ServiciosController {
         success: boolean;
         message: string;
         data: {
-            estado: string;
             Id_Servicio: number;
             Nombre_Servicio: string;
             Precio: import("@prisma/client/runtime/library").Decimal;
             descripcion: string;
             imagen_url: string | null;
             cotizacion_Id_Cotizacion: number | null;
+            estado: string;
             duracion_estimada: string | null;
         };
     }>;
@@ -101,18 +101,22 @@ export declare class ServiciosController {
         success: boolean;
         message: string;
         data: {
-            estado: string;
             Id_Servicio: number;
             Nombre_Servicio: string;
             Precio: import("@prisma/client/runtime/library").Decimal;
             descripcion: string;
             imagen_url: string | null;
             cotizacion_Id_Cotizacion: number | null;
+            estado: string;
             duracion_estimada: string | null;
         };
     }>;
     remove(id: number): Promise<{
         success: boolean;
         message: string;
+    }>;
+    uploadImagen(id: number, file: Express.Multer.File): Promise<{
+        success: boolean;
+        url: string;
     }>;
 }

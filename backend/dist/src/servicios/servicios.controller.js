@@ -17,6 +17,10 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const servicios_service_1 = require("./servicios.service");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
+const platform_express_1 = require("@nestjs/platform-express");
+const multer_1 = require("multer");
+const path_1 = require("path");
+const UPLOADS_PATH = (0, path_1.join)(process.cwd(), 'uploads', 'servicios');
 let ServiciosController = class ServiciosController {
     constructor(serviciosService) {
         this.serviciosService = serviciosService;
@@ -48,6 +52,13 @@ let ServiciosController = class ServiciosController {
     async remove(id) {
         await this.serviciosService.remove(id);
         return { success: true, message: 'Servicio eliminado exitosamente' };
+    }
+    async uploadImagen(id, file) {
+        if (!file)
+            throw new Error('No se subió ningún archivo');
+        const url = `/uploads/servicios/${file.filename}`;
+        await this.serviciosService.update(id, { imagen_url: url });
+        return { success: true, url };
     }
 };
 exports.ServiciosController = ServiciosController;
@@ -110,6 +121,35 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], ServiciosController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Post)(':id/imagen'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiOperation)({ summary: 'Subir imagen de un servicio' }),
+    (0, swagger_1.ApiConsumes)('multipart/form-data'),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                imagen: { type: 'string', format: 'binary' },
+            },
+        },
+    }),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('imagen', {
+        storage: (0, multer_1.diskStorage)({
+            destination: UPLOADS_PATH,
+            filename: (req, file, cb) => {
+                const srvId = req.params?.id ?? 'srv';
+                const uniqueName = `servicio-${srvId}-${Date.now()}${(0, path_1.extname)(file.originalname)}`;
+                cb(null, uniqueName);
+            },
+        }),
+    })),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], ServiciosController.prototype, "uploadImagen", null);
 exports.ServiciosController = ServiciosController = __decorate([
     (0, common_1.Controller)('servicios'),
     (0, swagger_1.ApiTags)('Servicios'),

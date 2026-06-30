@@ -25,6 +25,16 @@ class _CartViewState extends State<CartView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              Navigator.pushReplacementNamed(context, '/scheduling');
+            }
+          },
+        ),
         title: const Text('Carrito de Servicios'),
         backgroundColor: AppTheme.appBarDark,
         foregroundColor: Colors.white,

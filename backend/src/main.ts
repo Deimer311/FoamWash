@@ -46,9 +46,13 @@ async function bootstrap() {
 
   // ── Carpeta uploads ───────────────────────────────────────
   // Se crea automáticamente si no existe (importante en Docker / primer deploy)
-  const uploadsDir = join(process.cwd(), 'uploads', 'perfiles');
-  mkdirSync(uploadsDir, { recursive: true });
-  console.log(`📁 Carpeta uploads lista: ${uploadsDir}`);
+  const uploadsDirPerfiles = join(process.cwd(), 'uploads', 'perfiles');
+  mkdirSync(uploadsDirPerfiles, { recursive: true });
+  
+  const uploadsDirServicios = join(process.cwd(), 'uploads', 'servicios');
+  mkdirSync(uploadsDirServicios, { recursive: true });
+  
+  console.log(`📁 Carpetas uploads listas`);
 
   // ── Archivos estáticos ────────────────────────────────────
   // Sirve /uploads/perfiles/foto.jpg como GET /uploads/perfiles/foto.jpg

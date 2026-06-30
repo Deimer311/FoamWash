@@ -12,6 +12,12 @@ import 'package:foamwash/Features/Comun/widgets/fw_perfil_widgets.dart';
 import 'package:foamwash/core/cache/secure_storage_service.dart';
 import 'package:foamwash/Features/Trabajador/views/perfil_trabajador_edit.dart';
 import 'package:foamwash/Features/Trabajador/views/agenda_trabajador.dart';
+import 'package:logger/logger.dart';
+
+final _logger = Logger(
+  printer: PrettyPrinter(methodCount: 0),
+  level: Level.debug,
+);
 
 // =============================================================================
 // MODELOS
@@ -206,11 +212,10 @@ class _PerfilTrabajadorScreenState extends State<PerfilTrabajadorScreen> {
         'ngrok-skip-browser-warning': 'true',
       };
       final base = widget.apiBaseUrl;
-      final id = safeUserId;
       final results = await Future.wait([
-        http.get(Uri.parse('$base/api/empleados/$id/perfil'), headers: headers),
-        http.get(Uri.parse('$base/api/empleados/$id/desempeno'), headers: headers),
-        http.get(Uri.parse('$base/api/empleados/$id/servicios-hoy'), headers: headers),
+        http.get(Uri.parse('$base/api/empleados/mi-perfil'), headers: headers),
+        http.get(Uri.parse('$base/api/empleados/mi-desempeno'), headers: headers),
+        http.get(Uri.parse('$base/api/empleados/mis-servicios-hoy'), headers: headers),
       ]);
 
       final perfilBody = json.decode(results[0].body);
@@ -231,7 +236,7 @@ class _PerfilTrabajadorScreenState extends State<PerfilTrabajadorScreen> {
       }
     } catch (e) {
       _error = 'No se pudo cargar la información del perfil. Verifica la conexión con el servidor.';
-      debugPrint('Error al cargar el perfil del trabajador: $e');
+      _logger.e('Error al cargar el perfil del trabajador', error: e);
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

@@ -5,6 +5,12 @@ import 'package:foamwash/Features/Autenticacion/data/data_sources/auth_remote_da
 import 'package:foamwash/Features/Autenticacion/data/models/user_model.dart';
 import 'package:foamwash/core/cache/secure_storage_service.dart';
 import 'package:foamwash/Api/api_constants.dart';
+import 'package:logger/logger.dart';
+
+final _logger = Logger(
+  printer: PrettyPrinter(methodCount: 0),
+  level: Level.debug,
+);
 
 class AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
@@ -36,13 +42,12 @@ class AuthRepository {
       await secureStorageService.write('cookie_token', rawCookie);
     }
 
-    // Guardar información no confidencial de persistencia en SharedPreferences (Persistencia)
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('userEmail', email);
-    await prefs.setString('userRole', userData['rol'] ?? '');
-    await prefs.setInt('userId', userData['id'] ?? 0);
-    await prefs.setString('userFoto', userData['foto_perfil'] ?? '');
-    await prefs.setBool('isLogged', true);
+    // Guardar todos los datos de sesión en SecureStorage (Persistencia segura)
+    await secureStorageService.write('userEmail', email);
+    await secureStorageService.write('userRole', userData['rol'] ?? '');
+    await secureStorageService.write('userId', (userData['id'] ?? 0).toString());
+    await secureStorageService.write('userFoto', userData['foto_perfil'] ?? '');
+    await secureStorageService.write('isLogged', 'true');
 
     // Construimos el UserModel con los campos que devuelve la API
     final user = UserModel(
@@ -85,17 +90,13 @@ class AuthRepository {
       );
     } catch (e) {
       // No interrumpir el login si falla el envío del token FCM
-      print('[FCM] Error al enviar token al backend: $e');
+      _logger.e('[FCM] Error al enviar token al backend', error: e);
     }
   }
 
   Future<void> logout() async {
     // Limpiar almacenamiento cifrado
     await secureStorageService.clearAll();
-
-    // Limpiar preferencias generales
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
   }
 
   /// Maneja el registro de un nuevo usuario

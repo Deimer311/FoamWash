@@ -48,6 +48,8 @@ import AgendaEmpleado from './components/trabajador/AgendaEmpleado';
 // ✅ COMPONENTES DE CLIENTE
 import PerfilCliente from './components/cliente/PerfilCliente';
 import PerfilClienteEdi from './components/cliente/PerfilClienteEdi';
+import MisAgendamientosCliente from './components/cliente/MisAgendamientosCliente';
+import MisCotizacionesCliente from './components/cliente/MisCotizacionesCliente';
 
 //==============================================================================
 // Componentes de la Aplicación
@@ -222,6 +224,8 @@ if (role === 'admin') {
                         onGoToServicios={goToServiciosCliente}
                         onPerfil={goToPerfil}
                         onServicios={goToServiciosCliente}
+                        onMisAgendamientos={() => setCurrentPage('mis-agendamientos')}
+                        onMisCotizaciones={() => setCurrentPage('mis-cotizaciones')}
                     />
                 );
             
@@ -235,6 +239,8 @@ if (role === 'admin') {
                         onBackToHome={goToHome}
                         onCotizacion={goToCotizacion}
                         onPerfil={goToPerfil}
+                        onMisAgendamientos={() => setCurrentPage('mis-agendamientos')}
+                        onMisCotizaciones={() => setCurrentPage('mis-cotizaciones')}
                     />
                 );
 
@@ -253,6 +259,41 @@ if (role === 'admin') {
                         onServicios={goToServiciosCliente}
                         onEditarPerfil={() => setCurrentPage('editar-perfil-cliente')}
                         onLogout={handleLogout}
+                        onMisAgendamientos={() => setCurrentPage('mis-agendamientos')}
+                        onMisCotizaciones={() => setCurrentPage('mis-cotizaciones')}
+                    />
+                );
+
+            case 'mis-agendamientos':
+                if (!isAuthenticated || user?.role !== 'cliente') {
+                    goToLogin();
+                    return null;
+                }
+                return (
+                    <MisAgendamientosCliente
+                        onBackToHome={goToHome}
+                        onCotizacion={goToCotizacion}
+                        onPerfil={goToPerfil}
+                        onServicios={goToServiciosCliente}
+                        onMisAgendamientos={() => setCurrentPage('mis-agendamientos')}
+                        onMisCotizaciones={() => setCurrentPage('mis-cotizaciones')}
+                    />
+                );
+
+            case 'mis-cotizaciones':
+                if (!isAuthenticated || user?.role !== 'cliente') {
+                    goToLogin();
+                    return null;
+                }
+                return (
+                    <MisCotizacionesCliente
+                        onBackToHome={goToHome}
+                        onCotizacion={goToCotizacion}
+                        onPerfil={goToPerfil}
+                        onServicios={goToServiciosCliente}
+                        onMisAgendamientos={() => setCurrentPage('mis-agendamientos')}
+                        onMisCotizaciones={() => setCurrentPage('mis-cotizaciones')}
+                        onAgendamientoSuccess={() => setCurrentPage('mis-agendamientos')}
                     />
                 );
 

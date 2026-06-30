@@ -40,6 +40,18 @@ let EmpleadosController = class EmpleadosController {
         const data = await this.empleadosService.getProductividadGeneral();
         return { success: true, data };
     }
+    async miPerfilCompleto(req) {
+        const data = await this.empleadosService.getPerfilCompleto(req.user.id);
+        return { success: true, data };
+    }
+    async miDesempeno(req) {
+        const data = await this.empleadosService.getDesempeno(req.user.id);
+        return { success: true, data };
+    }
+    async misServiciosHoy(req) {
+        const data = await this.empleadosService.getReservasHoy(req.user.id);
+        return { success: true, data };
+    }
     async perfilCompleto(id) {
         const data = await this.empleadosService.getPerfilCompleto(id);
         return { success: true, data };
@@ -109,6 +121,30 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], EmpleadosController.prototype, "productividadGeneral", null);
+__decorate([
+    (0, common_1.Get)('mi-perfil'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtener perfil completo del empleado autenticado' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], EmpleadosController.prototype, "miPerfilCompleto", null);
+__decorate([
+    (0, common_1.Get)('mi-desempeno'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtener métricas de desempeño reales del empleado autenticado' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], EmpleadosController.prototype, "miDesempeno", null);
+__decorate([
+    (0, common_1.Get)('mis-servicios-hoy'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtener servicios del día para el empleado autenticado' }),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], EmpleadosController.prototype, "misServiciosHoy", null);
 __decorate([
     (0, common_1.Get)(':id/perfil'),
     (0, swagger_1.ApiOperation)({ summary: 'Obtener perfil completo del empleado (usuario + empleado + relaciones)' }),

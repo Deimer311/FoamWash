@@ -13,9 +13,11 @@ exports.ReservasService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const email_util_1 = require("../common/utils/email.util");
+const notifications_service_1 = require("../notifications/notifications.service");
 let ReservasService = class ReservasService {
-    constructor(prisma) {
+    constructor(prisma, notificationsService) {
         this.prisma = prisma;
+        this.notificationsService = notificationsService;
     }
     async findAll() {
         return this.prisma.reserva.findMany({
@@ -104,7 +106,22 @@ let ReservasService = class ReservasService {
         }
         let horaISO = undefined;
         if (data.Hora && data.Hora.match(/^\d{2}:\d{2}$/)) {
+            const horaStr = data.Hora.split(':')[0];
+            const horaNum = parseInt(horaStr, 10);
+            if (horaNum < 8 || horaNum > 17) {
+                throw new common_1.BadRequestException('La hora de reserva debe estar dentro del horario laboral (08:00 a 17:00).');
+            }
             horaISO = new Date(`1970-01-01T${data.Hora}:00.000Z`);
+        }
+        if (fechaISO && horaISO) {
+            const fechaHoraReserva = new Date(fechaISO);
+            fechaHoraReserva.setUTCHours(horaISO.getUTCHours(), horaISO.getUTCMinutes(), 0, 0);
+            const ahora = new Date();
+            const ahoraColombia = new Date(ahora.getTime() - (5 * 60 * 60 * 1000));
+            const reservaColombia = new Date(fechaHoraReserva.getTime() - (5 * 60 * 60 * 1000));
+            if (reservaColombia < ahoraColombia) {
+                throw new common_1.BadRequestException('No se pueden crear reservas en el pasado.');
+            }
         }
         const observacionData = data.observacion_Id_Observaciones
             ? { connect: { Id_Observaciones: data.observacion_Id_Observaciones } }
@@ -134,6 +151,20 @@ let ReservasService = class ReservasService {
                 servicios: true,
             },
         });
+        try {
+            await this.notificationsService.sendToTopic('topic_admin', 'Nueva Reserva Creada', `Reserva #${reserva.ID_Reserva} para el cliente ${reserva.cliente.Nombre}.`, { type: 'nueva_reserva', reservaId: reserva.ID_Reserva.toString() });
+        }
+        catch (e) {
+            console.log('Error enviando push notification:', e);
+        }
+        if (empleadoId) {
+            try {
+                await this.notificationsService.sendToTopic(`user_${empleadoId}`, 'Nueva Cita Asignada', `Tienes una nueva reserva #${reserva.ID_Reserva} asignada automáticamente.`, { type: 'nueva_reserva', reservaId: reserva.ID_Reserva.toString() });
+            }
+            catch (e) {
+                console.log('Error enviando push notification al empleado:', e);
+            }
+        }
         let total = 0;
         if (data.servicios && data.servicios.length > 0) {
             const servicioIds = data.servicios.map(s => s.Id_Servicio);
@@ -186,6 +217,7 @@ let ReservasService = class ReservasService {
             include: {
                 cliente: true,
                 servicios: true,
+                empleado: true,
             }
         });
         if (estado === 'Confirmado' && updatedReserva.cliente && updatedReserva.cliente.Correo) {
@@ -212,6 +244,16 @@ let ReservasService = class ReservasService {
                 estado: estado,
             }).catch(err => console.error('Error al enviar correo de actualización de estado:', err));
         }
+        try {
+            await this.notificationsService.sendToTopic(`user_${updatedReserva.cliente.Id_Usuario}`, 'Actualización de tu Reserva', `El estado de tu reserva #${updatedReserva.ID_Reserva} ha cambiado a: ${estado}.`, { type: 'actualizacion_reserva', reservaId: updatedReserva.ID_Reserva.toString(), estado });
+        }
+        catch (e) { }
+        if (updatedReserva.empleado) {
+            try {
+                await this.notificationsService.sendToTopic(`user_${updatedReserva.empleado.Id_Usuario}`, 'Actualización de Reserva', `El estado de la reserva #${updatedReserva.ID_Reserva} ha cambiado a: ${estado}.`, { type: 'actualizacion_reserva', reservaId: updatedReserva.ID_Reserva.toString(), estado });
+            }
+            catch (e) { }
+        }
         return updatedReserva;
     }
     async cancelarReserva(id, motivo) {
@@ -221,7 +263,7 @@ let ReservasService = class ReservasService {
         const updatedReserva = await this.prisma.reserva.update({
             where: { ID_Reserva: id },
             data: { Estado: 'Cancelado' },
-            include: { cliente: true }
+            include: { cliente: true, empleado: true }
         });
         if (updatedReserva.cliente && updatedReserva.cliente.Correo) {
             const dateFormatter = new Intl.DateTimeFormat('es-CO', {
@@ -234,6 +276,16 @@ let ReservasService = class ReservasService {
                 fecha: dateFormatter.format(new Date(updatedReserva.fecha)),
                 motivo: motivo
             }).catch(err => console.error('Error al enviar correo de cancelación:', err));
+        }
+        try {
+            await this.notificationsService.sendToTopic('topic_admin', 'Reserva Cancelada', `La reserva #${updatedReserva.ID_Reserva} ha sido cancelada.`, { type: 'reserva_cancelada', reservaId: updatedReserva.ID_Reserva.toString() });
+        }
+        catch (e) { }
+        if (updatedReserva.empleado) {
+            try {
+                await this.notificationsService.sendToTopic(`user_${updatedReserva.empleado.Id_Usuario}`, 'Reserva Cancelada', `Se ha cancelado la reserva #${updatedReserva.ID_Reserva} que tenías asignada.`, { type: 'reserva_cancelada', reservaId: updatedReserva.ID_Reserva.toString() });
+            }
+            catch (e) { }
         }
         return updatedReserva;
     }
@@ -254,6 +306,7 @@ let ReservasService = class ReservasService {
 exports.ReservasService = ReservasService;
 exports.ReservasService = ReservasService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        notifications_service_1.NotificationsService])
 ], ReservasService);
 //# sourceMappingURL=reservas.service.js.map

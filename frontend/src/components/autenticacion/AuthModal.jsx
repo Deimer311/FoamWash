@@ -60,7 +60,7 @@ const AuthModal = ({
                 {/* ICONO DE FOAMWASH */}
                 <div className="auth-modal-icon">
                     <div className="auth-modal-logo">
-                        <img src="/LogoFW.jpeg" alt="Logo FoamWash" style={{ width: "100%", height: "100%", borderRadius: "inherit", objectFit: "cover" }} />
+                        FW
                     </div>
                 </div>
 

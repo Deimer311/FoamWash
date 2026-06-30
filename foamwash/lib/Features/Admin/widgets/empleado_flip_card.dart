@@ -1,12 +1,19 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:foamwash/Features/Admin/models/empleado_model.dart';
+import '../models/empleado_model.dart';
 import 'package:foamwash/Api/api_constants.dart';
 
 class EmpleadoFlipCard extends StatefulWidget {
   final EmpleadoModel empleado;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
-  const EmpleadoFlipCard({super.key, required this.empleado});
+  const EmpleadoFlipCard({
+    super.key,
+    required this.empleado,
+    required this.onEdit,
+    required this.onDelete,
+  });
 
   @override
   State<EmpleadoFlipCard> createState() => _EmpleadoFlipCardState();
@@ -47,24 +54,45 @@ class _EmpleadoFlipCardState extends State<EmpleadoFlipCard>
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: _flipCard,
-      child: AnimatedBuilder(
-        animation: _animation,
-        builder: (context, child) {
-          final isUnder = _animation.value > 0.5;
-          final angle = _animation.value * pi;
+      child: Stack(
+        children: [
+          AnimatedBuilder(
+            animation: _animation,
+            builder: (context, child) {
+              final isUnder = _animation.value > 0.5;
+              final angle = _animation.value * pi;
 
-          return Transform(
-            transform: Matrix4.rotationY(angle),
-            alignment: Alignment.center,
-            child: isUnder
-                ? Transform(
-                    transform: Matrix4.rotationY(pi),
-                    alignment: Alignment.center,
-                    child: _buildBack(),
-                  )
-                : _buildFront(),
-          );
-        },
+              return Transform(
+                transform: Matrix4.rotationY(angle),
+                alignment: Alignment.center,
+                child: isUnder
+                    ? Transform(
+                        transform: Matrix4.rotationY(pi),
+                        alignment: Alignment.center,
+                        child: _buildBack(),
+                      )
+                    : _buildFront(),
+              );
+            },
+          ),
+          // Botones superpuestos fijos
+          Positioned(
+            top: 4,
+            right: 4,
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.blue),
+                  onPressed: widget.onEdit,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: widget.onDelete,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

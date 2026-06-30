@@ -960,13 +960,13 @@ class _CartSheetState extends State<_CartSheet> {
               const Divider(height: 1),
               Expanded(
                 child: widget.carrito.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text('🛒', style: TextStyle(fontSize: 44)),
-                            SizedBox(height: 10),
-                            Text('No hay servicios en tu cotización', style: TextStyle(color: Color(0xFF999999))),
+                            const Text('🛒', style: TextStyle(fontSize: 44)),
+                            const SizedBox(height: 10),
+                            const Text('No hay servicios en tu cotización', style: TextStyle(color: Color(0xFF999999))),
                           ],
                         ),
                       )
@@ -1265,7 +1265,8 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
       });
     } catch (e) {
       setState(() {
-        _errorGuardar = 'Hubo un error al guardar tu pedido. Intenta de nuevo.';
+        final errorMsg = e.toString().replaceAll('Exception: ', '');
+        _errorGuardar = errorMsg.isNotEmpty ? errorMsg : 'Hubo un error al guardar tu pedido. Intenta de nuevo.';
         _confirmando  = false;
       });
     }
@@ -1628,7 +1629,16 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
                 ),
               ),
               hint: const Text('Seleccionar'),
-              items: _horariosDisponibles.map((h) {
+              items: _horariosDisponibles.where((h) {
+                if (_fecha == null) return true;
+                final hoy = DateTime.now();
+                if (_fecha!.year == hoy.year && _fecha!.month == hoy.month && _fecha!.day == hoy.day) {
+                  // Si es hoy, solo mostrar horas que no han pasado (dando 1 hora de margen)
+                  final horaInt = int.parse(h.split(':')[0]);
+                  return horaInt > hoy.hour;
+                }
+                return true;
+              }).map((h) {
                 final hora = int.tryParse(h.split(':').first) ?? 0;
                 return DropdownMenuItem(
                   value: h,

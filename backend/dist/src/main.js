@@ -26,9 +26,11 @@ async function bootstrap() {
         forbidNonWhitelisted: false,
         transform: true,
     }));
-    const uploadsDir = (0, path_1.join)(process.cwd(), 'uploads', 'perfiles');
-    (0, fs_1.mkdirSync)(uploadsDir, { recursive: true });
-    console.log(`📁 Carpeta uploads lista: ${uploadsDir}`);
+    const uploadsDirPerfiles = (0, path_1.join)(process.cwd(), 'uploads', 'perfiles');
+    (0, fs_1.mkdirSync)(uploadsDirPerfiles, { recursive: true });
+    const uploadsDirServicios = (0, path_1.join)(process.cwd(), 'uploads', 'servicios');
+    (0, fs_1.mkdirSync)(uploadsDirServicios, { recursive: true });
+    console.log(`📁 Carpetas uploads listas`);
     app.useStaticAssets((0, path_1.join)(process.cwd(), 'uploads'), {
         prefix: '/uploads',
     });

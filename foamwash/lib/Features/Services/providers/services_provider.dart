@@ -32,7 +32,7 @@ class ServicesProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> createService({
+  Future<int?> createService({
     required String nombre,
     required String precio,
     required String descripcion,
@@ -66,19 +66,43 @@ class ServicesProvider extends ChangeNotifier {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = json.decode(response.body);
+        final id = data['data']['Id_Servicio'];
         await fetchServices();
-        return true;
+        return id;
       } else {
         final data = json.decode(response.body);
         _error = data['message'] ?? 'Error al crear servicio';
-        return false;
+        return null;
       }
     } catch (e) {
       _error = 'Error de conexión: $e';
-      return false;
+      return null;
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<bool> uploadServiceImage(int id, String filePath) async {
+    try {
+      final secureStorage = SecureStorageService();
+      final token = await secureStorage.read('token') ?? '';
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${ApiConstants.getServicesEndpoint}/$id/imagen'),
+      );
+      request.headers['Authorization'] = 'Bearer $token';
+      request.files.add(await http.MultipartFile.fromPath('imagen', filePath));
+      
+      final streamedResponse = await request.send();
+      if (streamedResponse.statusCode == 200 || streamedResponse.statusCode == 201) {
+        await fetchServices();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
     }
   }
 

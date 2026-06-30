@@ -44,6 +44,27 @@ export class EmpleadosController {
     return { success: true, data };
   }
 
+  @Get('mi-perfil')
+  @ApiOperation({ summary: 'Obtener perfil completo del empleado autenticado' })
+  async miPerfilCompleto(@Req() req: any) {
+    const data = await this.empleadosService.getPerfilCompleto(req.user.id);
+    return { success: true, data };
+  }
+
+  @Get('mi-desempeno')
+  @ApiOperation({ summary: 'Obtener métricas de desempeño reales del empleado autenticado' })
+  async miDesempeno(@Req() req: any) {
+    const data = await this.empleadosService.getDesempeno(req.user.id);
+    return { success: true, data };
+  }
+
+  @Get('mis-servicios-hoy')
+  @ApiOperation({ summary: 'Obtener servicios del día para el empleado autenticado' })
+  async misServiciosHoy(@Req() req: any) {
+    const data = await this.empleadosService.getReservasHoy(req.user.id);
+    return { success: true, data };
+  }
+
   @Get(':id/perfil')
   @ApiOperation({ summary: 'Obtener perfil completo del empleado (usuario + empleado + relaciones)' })
   async perfilCompleto(@Param('id', ParseIntPipe) id: number) {

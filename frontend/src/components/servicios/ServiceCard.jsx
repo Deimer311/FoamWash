@@ -6,17 +6,17 @@
 
 import React, { useState } from 'react';
 import AuthModal from '../autenticacion/AuthModal';
-import { checkActiveSession } from '../../utils/AuthUtils';
+import { useAuth } from '../autenticacion/AuthContext';
 
 const ServiceCard = ({ servicio, onSolicitar, onGoToLogin }) => {
+    const { isAuthenticated } = useAuth();
     const [isHovered,     setIsHovered]     = useState(false);
     const [isRequesting,  setIsRequesting]  = useState(false);
     const [showFullImage, setShowFullImage] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
 
     const handleSolicitar = async () => {
-        const session = checkActiveSession();
-        if (!session.isActive) {
+        if (!isAuthenticated) {
             setShowAuthModal(true);
         } else {
             setIsRequesting(true);

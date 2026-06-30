@@ -25,13 +25,20 @@ const ServiciosPage = ({ onBackToHome, onGoToLogin, onCotizacionPublica }) => {
             try {
                 const res = await api.get('/cotizaciones/servicios');
                 if (res.data.success && res.data.data.length > 0) {
+                    const getImageUrl = (path) => {
+                        if (!path) return IMAGEN_FALLBACK;
+                        if (path.startsWith('http')) return path;
+                        const cleanPath = path.startsWith('/') ? path : `/${path}`;
+                        const baseUrl = (api.defaults.baseURL || 'http://localhost:5000').replace(/\/api$/, '');
+                        return `${baseUrl}${cleanPath}`;
+                    };
                     const serviciosBD = res.data.data.map(s => ({
                         ...s,
                         id:          s.Id_Servicio        || s.id,
                         nombre:      s.Nombre_Servicio    || s.nombre       || 'Sin nombre',
                         descripcion: s.Descripcion        || s.descripcion  || '',
                         precio:      Number(s.Precio      || s.precio       || 0),
-                        imagen:      s.imagen_url         || IMAGEN_FALLBACK,
+                        imagen:      getImageUrl(s.imagen_url),
                         tamanos:     ['Estándar'],
                     }));
                     setServicios(serviciosBD);

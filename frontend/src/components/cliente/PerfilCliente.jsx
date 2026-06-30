@@ -13,7 +13,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL
     ? import.meta.env.VITE_API_URL.replace('/api', '')
     : 'http://localhost:5000';
 
-const PerfilCliente = ({ onBackToHome, onCotizacion, onServicios, onEditarPerfil, onLogout }) => {
+const PerfilCliente = ({ onBackToHome, onCotizacion, onServicios, onEditarPerfil, onLogout, onMisAgendamientos, onMisCotizaciones }) => {
     const { user } = useAuth();
     const [perfil,    setPerfil]    = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -85,6 +85,8 @@ const PerfilCliente = ({ onBackToHome, onCotizacion, onServicios, onEditarPerfil
                 onCotizacion={onCotizacion}
                 onPerfil={onEditarPerfil}
                 onServicios={onServicios}
+                onMisAgendamientos={onMisAgendamientos}
+                onMisCotizaciones={onMisCotizaciones}
                 activeLink="perfil"
             />
 

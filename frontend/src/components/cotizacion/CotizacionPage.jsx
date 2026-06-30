@@ -18,9 +18,19 @@ import {
     sincronizarCotizacionConBD,
     tiempoRestanteCotizacion
 } from '../../services/cotizacionStorage';
+import { CartModal, ConfirmationModal, AuthPromptModal } from '../cliente/Modalescarrito';
+import BotonCarritoFlotante from '../modales/BotonCarritoFlotante';
 import './estilos_cotizar.css';
 
 const IMAGEN_FALLBACK = '/img/imag1.jpg';
+
+const getImageUrl = (path) => {
+    if (!path) return IMAGEN_FALLBACK;
+    if (path.startsWith('http')) return path;
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    const baseUrl = (api.defaults.baseURL || 'http://localhost:5000').replace(/\/api$/, '');
+    return `${baseUrl}${cleanPath}`;
+};
 
 const SERVICIOS_FALLBACK = [
     { id: 1, nombre: "Lavado de muebles",              precio: 90000,  imagen_url: "/img/imag1.jpg", descripcion: "Lavado profundo de sofás y sillas, eliminación de manchas y olores.",     tamanos: ["Pequeño","Mediano","Grande"],           duracion: "60-90 min",    rating: 4.8, garantia: true,  ecologico: true,  popular: true  },
@@ -144,7 +154,7 @@ const CotizacionHeader = ({ onBackToHome, onGoToLogin, onGoToServicios }) => {
 
                 {/* Columna 1: Logo */}
                 <div className="ch-logo" onClick={onBackToHome}>
-                    <div className="ch-logo-mark"><img src="/LogoFW.jpeg" alt="Logo FoamWash" style={{ width: "100%", height: "100%", borderRadius: "inherit", objectFit: "cover" }} /></div>
+                    <div className="ch-logo-mark">FW</div>
                     <span className="ch-logo-text">FoamWash</span>
                 </div>
 
@@ -173,197 +183,11 @@ const CotizacionHeader = ({ onBackToHome, onGoToLogin, onGoToServicios }) => {
     );
 };
 
-// ── Modal: pedir login ────────────────────────────────────────────────────────
-const AuthPromptModal = ({ onClose, onLogin }) => (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 20 }}>
-        <div style={{ background: '#fff', padding: 28, borderRadius: 14, width: 'min(480px,96%)', boxShadow: '0 10px 30px rgba(0,0,0,0.25)', position: 'relative' }}>
-            <button onClick={onClose} style={{ position: 'absolute', right: 16, top: 14, border: 'none', background: 'transparent', fontSize: 20, cursor: 'pointer', color: '#666' }}>✕</button>
-            <div style={{ textAlign: 'center' }}>
-                <div style={{ width: 64, height: 64, borderRadius: 12, background: 'linear-gradient(#223BFF, #0b74ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 24, margin: '0 auto 16px' }}><img src="/LogoFW.jpeg" alt="Logo FoamWash" style={{ width: "100%", height: "100%", borderRadius: "inherit", objectFit: "cover" }} /></div>
-                <h3 style={{ margin: '0 0 8px', fontSize: 20 }}>Inicia sesión para agendar</h3>
-                <p style={{ color: '#666', margin: '0 0 20px' }}>Tu cotización se guardará automáticamente cuando ingreses.</p>
-                <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-                    <button onClick={onClose} style={{ flex: 1, padding: '10px 16px', borderRadius: 10, border: '1px solid #ddd', background: '#fff', cursor: 'pointer', fontWeight: 600 }}>Cancelar</button>
-                    <button onClick={onLogin} style={{ flex: 1, padding: '10px 16px', borderRadius: 10, border: 'none', background: '#0b74ff', color: '#fff', cursor: 'pointer', fontWeight: 600 }}>Iniciar Sesión</button>
-                </div>
-            </div>
-        </div>
-    </div>
-);
-
-// ── Modal: Carrito ────────────────────────────────────────────────────────────
-const CartModal = ({ carrito, total, onActualizarCantidad, onCerrar, onFinalizarCompra }) => (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9998, padding: 20 }}>
-        <div style={{ background: '#fff', borderRadius: 16, width: 'min(550px,96%)', maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' }}>
-            <div style={{ padding: '20px 24px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0, fontSize: 20 }}>🛒 Mi Cotización</h2>
-                <button onClick={onCerrar} style={{ border: 'none', background: 'transparent', fontSize: 22, cursor: 'pointer', color: '#666' }}>✕</button>
-            </div>
-
-            <div style={{ flex: 1, overflowY: 'auto', padding: '16px 24px' }}>
-                {carrito.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '40px 20px', color: '#999' }}>
-                        <div style={{ fontSize: 48, marginBottom: 12 }}>🛒</div>
-                        <p>No hay servicios en tu cotización</p>
-                    </div>
-                ) : carrito.map(item => (
-                    <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 0', borderBottom: '1px solid #f0f0f0' }}>
-                        <img
-                            src={item.imagen}
-                            alt={item.nombre}
-                            style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 10 }}
-                            onError={e => { e.target.src = IMAGEN_FALLBACK; }}
-                        />
-                        <div style={{ flex: 1 }}>
-                            <p style={{ margin: '0 0 4px', fontWeight: 600, fontSize: 15 }}>{item.nombre}</p>
-                            <p style={{ margin: 0, color: '#0b74ff', fontWeight: 700 }}>{formatearMoneda(item.precio)} c/u</p>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <button onClick={() => onActualizarCantidad(item.id, item.cantidad - 1)} style={{ width: 28, height: 28, borderRadius: '50%', border: '1px solid #ddd', background: '#f5f5f5', cursor: 'pointer', fontWeight: 700, fontSize: 16 }}>−</button>
-                            <span style={{ minWidth: 20, textAlign: 'center', fontWeight: 600 }}>{item.cantidad}</span>
-                            <button onClick={() => onActualizarCantidad(item.id, item.cantidad + 1)} style={{ width: 28, height: 28, borderRadius: '50%', border: 'none', background: '#0b74ff', color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: 16 }}>+</button>
-                        </div>
-                        <p style={{ margin: 0, minWidth: 80, textAlign: 'right', fontWeight: 700 }}>{formatearMoneda(item.precio * item.cantidad)}</p>
-                    </div>
-                ))}
-            </div>
-
-            {carrito.length > 0 && (
-                <div style={{ padding: '16px 24px', borderTop: '1px solid #eee' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16, fontSize: 18, fontWeight: 700 }}>
-                        <span>Total</span>
-                        <span style={{ color: '#0b74ff' }}>{formatearMoneda(total)}</span>
-                    </div>
-                    <button onClick={onFinalizarCompra} style={{ width: '100%', padding: '14px', background: 'linear-gradient(135deg, #223BFF, #0b74ff)', color: '#fff', border: 'none', borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: 'pointer' }}>
-                        Continuar con el agendamiento →
-                    </button>
-                </div>
-            )}
-        </div>
-    </div>
-);
-
-// ── Modal: Confirmación y Agendamiento ────────────────────────────────────────
-const ConfirmationModal = ({ carrito, total, onCerrar, onConfirmarPedido, onStartAgendacion }) => {
-    const [modalStage, setModalStage] = useState(0);
-    const [formData, setFormData]     = useState({ fecha: '', horario: '' });
-
-    const horarios = ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];
-
-    const handleContinuar = () => {
-        if (modalStage === 0) {
-            onStartAgendacion(() => setModalStage(1));
-        } else {
-            setModalStage(s => s + 1);
-        }
-    };
-
-    const handleConfirmar = () => {
-        if (!formData.fecha || !formData.horario) {
-            alert('Por favor selecciona fecha y horario');
-            return;
-        }
-        onConfirmarPedido();
-        setModalStage(3);
-    };
-
-    return (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 20 }}>
-            <div style={{ background: '#fff', borderRadius: 16, width: 'min(560px,96%)', maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' }}>
-                <div style={{ padding: '20px 24px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h2 style={{ margin: 0, fontSize: 20 }}>
-                        {modalStage === 0 && '📋 Resumen de Cotización'}
-                        {modalStage === 1 && '📅 Selecciona Fecha y Hora'}
-                        {modalStage === 2 && '✅ Confirmar Pedido'}
-                        {modalStage === 3 && '🎉 ¡Pedido Confirmado!'}
-                    </h2>
-                    {modalStage < 3 && <button onClick={onCerrar} style={{ border: 'none', background: 'transparent', fontSize: 22, cursor: 'pointer', color: '#666' }}>✕</button>}
-                </div>
-
-                <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
-                    {modalStage === 0 && (
-                        <div>
-                            {carrito.map(item => (
-                                <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #f0f0f0' }}>
-                                    <span>{item.nombre} × {item.cantidad}</span>
-                                    <span style={{ fontWeight: 700, color: '#0b74ff' }}>{formatearMoneda(item.precio * item.cantidad)}</span>
-                                </div>
-                            ))}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 16, fontSize: 18, fontWeight: 700 }}>
-                                <span>Total</span><span style={{ color: '#0b74ff' }}>{formatearMoneda(total)}</span>
-                            </div>
-                        </div>
-                    )}
-
-                    {modalStage === 1 && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                            <div>
-                                <label style={{ display: 'block', fontWeight: 600, marginBottom: 8 }}>Fecha del servicio *</label>
-                                <input
-                                    type="date"
-                                    min={new Date().toISOString().split('T')[0]}
-                                    value={formData.fecha}
-                                    onChange={e => setFormData(p => ({ ...p, fecha: e.target.value }))}
-                                    style={{ width: '100%', padding: '12px', border: '2px solid #e0e0e0', borderRadius: 10, fontSize: 15, boxSizing: 'border-box' }}
-                                />
-                            </div>
-                            <div>
-                                <label style={{ display: 'block', fontWeight: 600, marginBottom: 8 }}>Horario *</label>
-                                <select
-                                    value={formData.horario}
-                                    onChange={e => setFormData(p => ({ ...p, horario: e.target.value }))}
-                                    style={{ width: '100%', padding: '12px', border: '2px solid #e0e0e0', borderRadius: 10, fontSize: 15, boxSizing: 'border-box' }}
-                                >
-                                    <option value="">Seleccionar horario</option>
-                                    {horarios.map(h => <option key={h} value={h}>{h}</option>)}
-                                </select>
-                            </div>
-                        </div>
-                    )}
-
-                    {modalStage === 2 && (
-                        <div style={{ background: '#f8f9ff', borderRadius: 12, padding: 20 }}>
-                            <h3 style={{ margin: '0 0 16px', color: '#223BFF' }}>Detalles del pedido</h3>
-                            {carrito.map(item => (
-                                <p key={item.id} style={{ margin: '0 0 8px' }}>• {item.nombre} × {item.cantidad} — {formatearMoneda(item.precio * item.cantidad)}</p>
-                            ))}
-                            <p style={{ margin: '12px 0 4px' }}><strong>Fecha:</strong> {formData.fecha ? formatearFecha(formData.fecha) : '—'}</p>
-                            <p style={{ margin: 0 }}><strong>Horario:</strong> {formData.horario}</p>
-                            <p style={{ margin: '12px 0 0', fontSize: 18, fontWeight: 700, color: '#0b74ff' }}>Total: {formatearMoneda(total)}</p>
-                        </div>
-                    )}
-
-                    {modalStage === 3 && (
-                        <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                            <div style={{ fontSize: 64, marginBottom: 16 }}>🎉</div>
-                            <h3 style={{ color: '#223BFF', margin: '0 0 12px' }}>¡Cotización guardada!</h3>
-                            <p style={{ color: '#666' }}>Te contactaremos pronto para confirmar los detalles del servicio.</p>
-                        </div>
-                    )}
-                </div>
-
-                <div style={{ padding: '16px 24px', borderTop: '1px solid #eee', display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-                    {modalStage < 3 && modalStage > 0 && (
-                        <button onClick={() => setModalStage(s => s - 1)} style={{ padding: '12px 24px', border: '1px solid #ddd', borderRadius: 10, background: '#fff', cursor: 'pointer', fontWeight: 600 }}>← Volver</button>
-                    )}
-                    {modalStage < 2 && (
-                        <button onClick={handleContinuar} style={{ padding: '12px 24px', border: 'none', borderRadius: 10, background: '#0b74ff', color: '#fff', cursor: 'pointer', fontWeight: 600 }}>Continuar →</button>
-                    )}
-                    {modalStage === 2 && (
-                        <button onClick={handleConfirmar} style={{ padding: '12px 24px', border: 'none', borderRadius: 10, background: '#223BFF', color: '#fff', cursor: 'pointer', fontWeight: 700 }}>✅ Confirmar Pedido</button>
-                    )}
-                    {modalStage === 3 && (
-                        <button onClick={onCerrar} style={{ padding: '12px 24px', border: 'none', borderRadius: 10, background: '#0b74ff', color: '#fff', cursor: 'pointer', fontWeight: 700 }}>Cerrar</button>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-};
+// Modals (AuthPromptModal, CartModal, ConfirmationModal) are imported from Modalescarrito.jsx to maintain design consistency
 
 // ── COMPONENTE PRINCIPAL ──────────────────────────────────────────────────────
 export default function CotizacionPage({ onBackToHome, onGoToServicios, onGoToLogin }) {
-    const { carrito, agregarAlCarrito, actualizarCantidad, limpiarCarrito } = useCarrito();
+    const { carrito, agregarAlCarrito, actualizarCantidad, actualizarDetalle, limpiarCarrito } = useCarrito();
     const { user } = useAuth();
 
     const [servicios,        setServicios]        = useState([]);
@@ -388,16 +212,15 @@ export default function CotizacionPage({ onBackToHome, onGoToServicios, onGoToLo
                         id:      s.Id_Servicio        || s.id,
                         nombre:  s.Nombre_Servicio    || s.nombre       || 'Sin nombre',
                         precio:  Number(s.Precio      || s.precio       || 0),
-                        imagen:  s.imagen_url         || IMAGEN_FALLBACK,
+                        imagen:  getImageUrl(s.imagen_url),
                         desc:    s.Descripcion        || s.descripcion  || '',
                         tamanos: ['Estándar'],
                     }));
                     setServicios(serviciosBD);
-                } else {
-                    setServicios(SERVICIOS_FALLBACK.map(s => ({ ...s, imagen: s.imagen_url })));
+                    setServicios(SERVICIOS_FALLBACK.map(s => ({ ...s, imagen: getImageUrl(s.imagen_url) })));
                 }
             } catch {
-                setServicios(SERVICIOS_FALLBACK.map(s => ({ ...s, imagen: s.imagen_url })));
+                setServicios(SERVICIOS_FALLBACK.map(s => ({ ...s, imagen: getImageUrl(s.imagen_url) })));
             } finally {
                 setIsLoading(false);
             }
@@ -616,15 +439,11 @@ export default function CotizacionPage({ onBackToHome, onGoToServicios, onGoToLo
             </div>
 
             {/* Botón flotante carrito */}
-            <button className="btn-carrito-flotante" onClick={() => setShowCartModal(true)} title="Ver carrito">
-                <span className="carrito-icono">🛒</span>
-                <span className="carrito-badge-flotante" style={{ display: totalItems > 0 ? 'flex' : 'none' }}>{totalItems}</span>
-            </button>
+            <BotonCarritoFlotante onClick={() => setShowCartModal(true)} />
 
             {showCartModal && (
                 <CartModal
                     carrito={carrito}
-                    total={total}
                     onActualizarCantidad={actualizarCantidad}
                     onCerrar={() => setShowCartModal(false)}
                     onFinalizarCompra={handleFinalizarCompra}
@@ -634,17 +453,24 @@ export default function CotizacionPage({ onBackToHome, onGoToServicios, onGoToLo
             {showConfirmModal && (
                 <ConfirmationModal
                     carrito={carrito}
-                    total={total}
+                    user={user}
                     onCerrar={() => setShowConfirmModal(false)}
-                    onConfirmarPedido={handleConfirmarPedido}
-                    onStartAgendacion={handleStartAgendacion}
+                    onActualizarDetalle={actualizarDetalle}
+                    onPedidoConfirmado={handleConfirmarPedido}
+                    onRequerirLogin={() => {
+                        setShowConfirmModal(false);
+                        setShowAuthPrompt(true);
+                    }}
                 />
             )}
 
             {showAuthPrompt && (
                 <AuthPromptModal
                     onClose={() => setShowAuthPrompt(false)}
-                    onLogin={() => { setShowAuthPrompt(false); onGoToLogin(); }}
+                    onLogin={() => {
+                        setShowAuthPrompt(false);
+                        onGoToLogin();
+                    }}
                 />
             )}
 

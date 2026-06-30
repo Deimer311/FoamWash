@@ -21,6 +21,7 @@ const clientes_module_1 = require("./clientes/clientes.module");
 const consultas_module_1 = require("./consultas/consultas.module");
 const estadisticas_module_1 = require("./estadisticas/estadisticas.module");
 const notificaciones_module_1 = require("./notificaciones/notificaciones.module");
+const notifications_module_1 = require("./notifications/notifications.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -39,6 +40,7 @@ exports.AppModule = AppModule = __decorate([
             consultas_module_1.ConsultasModule,
             estadisticas_module_1.EstadisticasModule,
             notificaciones_module_1.NotificacionesModule,
+            notifications_module_1.NotificationsModule,
         ],
     })
 ], AppModule);

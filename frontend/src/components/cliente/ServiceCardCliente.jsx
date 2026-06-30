@@ -6,6 +6,45 @@
 import React, { useState } from 'react';
 import { useCarrito } from '../modales/CarritoContext';
 
+/* ── SVG Icons (trazo consistente con HeaderCliente y ModalesCarrito) ── */
+const IcLeaf = () => (
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 22 16 8" /><path d="M22 2 8 16" />
+        <path d="M17 2c0 6-4 10-10 10C5 8.4 7.5 4 12 2z" />
+    </svg>
+);
+const IcShield = () => (
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+);
+const IcStar = () => (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="#ffc107" stroke="#ffc107" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+);
+const IcCart = () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+    </svg>
+);
+const IcCheck = () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="20 6 9 17 4 12" />
+    </svg>
+);
+const IcLoader = () => (
+    <svg className="sc-spin" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+        <path d="M21 12a9 9 0 1 1-9-9" />
+    </svg>
+);
+const IcTrending = () => (
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" />
+    </svg>
+);
+
 const ServiceCardCliente = ({ servicio, onNotificacion }) => {
     const [isAdding, setIsAdding]         = useState(false);
     const [showFullImage, setShowFullImage] = useState(false);
@@ -220,9 +259,7 @@ const ServiceCardCliente = ({ servicio, onNotificacion }) => {
                 .sc-price-value {
                     font-size: 26px;
                     font-weight: 800;
-                    background: linear-gradient(135deg, #1a56ff, #7c3aed);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
+                    color: #1e3a8a;
                     font-family: 'Kanit', sans-serif;
                     line-height: 1;
                 }
@@ -234,7 +271,7 @@ const ServiceCardCliente = ({ servicio, onNotificacion }) => {
                     padding: 13px 20px;
                     border: none;
                     border-radius: 12px;
-                    background: linear-gradient(135deg, #1a56ff, #7c3aed);
+                    background: linear-gradient(135deg, #1e3a8a, #1a56ff);
                     color: #fff;
                     font-size: 14px;
                     font-weight: 700;
@@ -246,7 +283,7 @@ const ServiceCardCliente = ({ servicio, onNotificacion }) => {
                     gap: 8px;
                     overflow: hidden;
                     transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-                    box-shadow: 0 4px 16px rgba(26,86,255,0.28);
+                    box-shadow: 0 4px 16px rgba(30,58,138,0.3);
                 }
                 .sc-btn::before {
                     content: '';
@@ -261,8 +298,8 @@ const ServiceCardCliente = ({ servicio, onNotificacion }) => {
                 .sc-btn:hover::before { background-position: 200% 0; }
                 .sc-btn:hover:not(:disabled) {
                     transform: translateY(-1px);
-                    box-shadow: 0 8px 24px rgba(26,86,255,0.36);
-                    filter: brightness(1.06);
+                    box-shadow: 0 8px 24px rgba(30,58,138,0.4);
+                    filter: brightness(1.1);
                 }
                 .sc-btn:active:not(:disabled) { transform: scale(0.97); }
                 .sc-btn:disabled {
@@ -274,6 +311,8 @@ const ServiceCardCliente = ({ servicio, onNotificacion }) => {
                     background: linear-gradient(135deg, #16a34a, #15803d);
                     box-shadow: 0 4px 16px rgba(22,163,74,0.28);
                 }
+                @keyframes sc-spin { to { transform: rotate(360deg); } }
+                .sc-spin { animation: sc-spin 0.8s linear infinite; }
 
                 .sc-btn-icon {
                     font-size: 16px;
@@ -408,10 +447,10 @@ const ServiceCardCliente = ({ servicio, onNotificacion }) => {
                 <div className="sc-img-wrap" onClick={() => setShowFullImage(true)}>
                     {/* Badges top-left */}
                     <div className="sc-badges-row">
-                        {servicio.ecologico  && <span className="sc-badge-mini">🌿 Eco</span>}
-                        {servicio.garantia   && <span className="sc-badge-mini">✓ Garantía</span>}
+                        {servicio.ecologico  && <span className="sc-badge-mini"><IcLeaf /> Eco</span>}
+                        {servicio.garantia   && <span className="sc-badge-mini"><IcShield /> Garantía</span>}
                     </div>
-                    {servicio.popular && <span className="sc-badge-popular">✨ Popular</span>}
+                    {servicio.popular && <span className="sc-badge-popular"><IcTrending /> Popular</span>}
 
                     <img
                         src={servicio.imagen}
@@ -431,7 +470,7 @@ const ServiceCardCliente = ({ servicio, onNotificacion }) => {
                     <div className="sc-meta">
                         {servicio.rating && (
                             <div className="sc-rating">
-                                <span className="sc-star">★</span>
+                                <IcStar />
                                 <strong>{servicio.rating}</strong>
                                 <span style={{ color: '#bbb' }}>(4.8k)</span>
                             </div>
@@ -456,7 +495,7 @@ const ServiceCardCliente = ({ servicio, onNotificacion }) => {
                         disabled={isAdding}
                     >
                         <span className="sc-btn-icon">
-                            {isAdding ? '⏳' : added ? '✓' : '🛒'}
+                            {isAdding ? <IcLoader /> : added ? <IcCheck /> : <IcCart />}
                         </span>
                         <span className="sc-btn-label">
                             {isAdding ? 'Agregando...' : added ? '¡Agregado!' : 'Solicitar'}
