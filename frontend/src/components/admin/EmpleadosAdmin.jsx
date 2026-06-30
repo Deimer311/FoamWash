@@ -29,27 +29,30 @@ const CrudEmpleados = () => {
     const [modalAbierto, setModalAbierto] = useState(false);
     const [formData, setFormData] = useState({
         nombre: '', foto: '', cargo: '', especialidad: '',
-        descripcion: '', experiencia: '', telefono: '',
+        descripcion: '', experiencia: '', telefono: '', correo: '', password: ''
     });
 
     useEffect(() => {
         api.get('/empleados')
             .then(res => {
                 const data = res.data?.data || [];
-                setEmpleados(data.map(e => ({
-                    id:           e.Id_Usuario    || e.id,
-                    nombre:       e.Nombre        || e.nombre        || '',
-                    foto:         e.foto_perfil
-                                    ? (e.foto_perfil.startsWith('http')
-                                        ? e.foto_perfil
-                                        : 'http://localhost:5000' + e.foto_perfil)
-                                    : null,
-                    cargo:        e.cargo         || '—',
-                    especialidad: e.especialidades || '—',
-                    descripcion:  e.descripcion   || '',
-                    experiencia:  e.fecha_ingreso  || '—',
-                    telefono:     e.Telefono       || e.telefono || '—',
-                })));
+                setEmpleados(data.map(e => {
+                    const emp = e.empleado && e.empleado.length > 0 ? e.empleado[0] : {};
+                    return {
+                        id:           e.Id_Usuario    || e.id,
+                        nombre:       e.Nombre        || e.nombre        || '',
+                        foto:         e.foto_perfil
+                                        ? (e.foto_perfil.startsWith('http')
+                                            ? e.foto_perfil
+                                            : 'http://localhost:5000' + e.foto_perfil)
+                                        : null,
+                        cargo:        emp.cargo         || '—',
+                        especialidad: emp.especialidades || '—',
+                        descripcion:  emp.certificaciones   || '',
+                        experiencia:  emp.fecha_ingreso ? emp.fecha_ingreso.split('T')[0] : '',
+                        telefono:     e.Telefono       || e.telefono || '—',
+                    };
+                }));
             })
             .catch(err => console.error('Error cargando empleados:', err))
             .finally(() => setIsLoading(false));
@@ -57,17 +60,21 @@ const CrudEmpleados = () => {
 
     const toggleFlip = (id) => setFlippedId(prev => (prev === id ? null : id));
 
-    const abrirModal = (empleado = null) => {
-        setFormData(empleado ?? {
+    const abrirModal = (empleado) => {
+        // Avoid event objects masquerading as 'empleado' data
+        const isEvent = empleado && typeof empleado === 'object' && 'nativeEvent' in empleado;
+        const validEmpleado = (empleado && !isEvent) ? empleado : null;
+        
+        setFormData(validEmpleado || {
             nombre: '', foto: '', cargo: '', especialidad: '',
-            descripcion: '', experiencia: '', telefono: '',
+            descripcion: '', experiencia: '', telefono: '', correo: '', password: ''
         });
         setModalAbierto(true);
     };
 
-    const cerrarModal = () => {
+    const cerrarModal = (e) => {
         setModalAbierto(false);
-        setFormData({ nombre: '', foto: '', cargo: '', especialidad: '', descripcion: '', experiencia: '', telefono: '' });
+        setFormData({ nombre: '', foto: '', cargo: '', especialidad: '', descripcion: '', experiencia: '', telefono: '', correo: '', password: '' });
     };
 
     const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -75,25 +82,55 @@ const CrudEmpleados = () => {
     const guardarEmpleado = async () => {
         try {
             const payload = {
-                Nombre:         formData.nombre,
-                Telefono:       formData.telefono,
+                nombre:         formData.nombre,
+                telefono:       formData.telefono,
                 cargo:          formData.cargo,
-                especialidades: formData.especialidad,
-                descripcion:    formData.descripcion,
+                especialidad:   formData.especialidad,
+                certificaciones: formData.descripcion,
+                fecha_ingreso:  formData.experiencia
             };
             if (formData.id) {
-                await api.put('/empleados/' + formData.id, payload);
+                // Para el PUT de usuarios, debemos respetar las mayúsculas originales o lo que pida el backend.
+                // En usuarios.service.ts el update acepta: Nombre, Telefono, cargo, especialidades, certificaciones, fecha_ingreso
+                const putPayload = {
+                    Nombre: formData.nombre,
+                    Telefono: formData.telefono,
+                    cargo: formData.cargo,
+                    especialidades: formData.especialidad,
+                    certificaciones: formData.descripcion,
+                    fecha_ingreso: formData.experiencia
+                };
+                await api.put('/usuarios/' + formData.id, putPayload);
                 setEmpleados(empleados.map(e => e.id === formData.id ? { ...e, ...formData } : e));
+            } else {
+                payload.correo = formData.correo;
+                payload.password = formData.password;
+                
+                const res = await api.post('/usuarios/empleado', payload);
+                const nuevoEmpleado = res.data.data;
+                
+                // Agregarlo a la lista de forma local
+                setEmpleados([...empleados, {
+                    id: nuevoEmpleado.Id_Usuario,
+                    nombre: nuevoEmpleado.Nombre,
+                    foto: null,
+                    cargo: formData.cargo || '—',
+                    especialidad: formData.especialidad || '—',
+                    descripcion: formData.descripcion || '',
+                    experiencia: formData.experiencia || '—',
+                    telefono: formData.telefono || '—',
+                }]);
             }
         } catch (err) {
             console.error('Error guardando empleado:', err);
+            alert('Error guardando empleado: ' + (err.response?.data?.message || err.message));
         } finally { cerrarModal(); }
     };
 
     const eliminarEmpleado = async (id) => {
         if (!window.confirm('¿Estás seguro de eliminar este empleado?')) return;
-        try { await api.put('/usuarios/' + id + '/estado', { estado: 'inactivo' }); }
-        catch (err) { console.error('Error:', err); }
+        try { await api.delete('/usuarios/' + id); }
+        catch (err) { console.error('Error:', err); alert('Error al eliminar'); return; }
         setEmpleados(empleados.filter(e => e.id !== id));
         if (flippedId === id) setFlippedId(null);
     };
@@ -135,7 +172,7 @@ const CrudEmpleados = () => {
                     </p>
                 )}
 
-                <button className="btn-agregar" onClick={() => abrirModal()}>
+                <button type="button" className="btn-agregar" onClick={(e) => { e.preventDefault(); abrirModal(); }}>
                     <IcPlus /> Agregar Empleado
                 </button>
 
@@ -229,7 +266,7 @@ const CrudEmpleados = () => {
 
             {/* ── Modal ── */}
             {modalAbierto && (
-                <div className="modal-overlay" onClick={cerrarModal}>
+                <div className="ea-modal-overlay" onClick={cerrarModal}>
                     <div className="modal-content-empleado" onClick={e => e.stopPropagation()}>
                         <button className="modal-close" onClick={cerrarModal}><IcX /></button>
                         <div className="modal-body-empleado">
@@ -240,6 +277,18 @@ const CrudEmpleados = () => {
                                 <label>Nombre Completo</label>
                                 <input type="text" name="nombre" value={formData.nombre} onChange={handleInputChange} placeholder="Nombre completo del empleado" />
                             </div>
+                            {!formData.id && (
+                                <div className="form-row">
+                                    <div className="form-group-modal">
+                                        <label>Correo Electrónico</label>
+                                        <input type="email" name="correo" value={formData.correo || ''} onChange={handleInputChange} placeholder="empleado@foamwash.com" />
+                                    </div>
+                                    <div className="form-group-modal">
+                                        <label>Contraseña</label>
+                                        <input type="password" name="password" value={formData.password || ''} onChange={handleInputChange} placeholder="Mínimo 6 caracteres" />
+                                    </div>
+                                </div>
+                            )}
                             <div className="form-row">
                                 <div className="form-group-modal">
                                     <label>Cargo</label>
@@ -252,8 +301,8 @@ const CrudEmpleados = () => {
                             </div>
                             <div className="form-row">
                                 <div className="form-group-modal">
-                                    <label>Experiencia</label>
-                                    <input type="text" name="experiencia" value={formData.experiencia} onChange={handleInputChange} placeholder="Ej: 5 años" />
+                                    <label>Fecha de Ingreso</label>
+                                    <input type="date" name="experiencia" value={formData.experiencia} onChange={handleInputChange} />
                                 </div>
                                 <div className="form-group-modal">
                                     <label>Teléfono</label>

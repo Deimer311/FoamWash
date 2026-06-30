@@ -111,7 +111,8 @@ class _ServiceCardState extends State<ServiceCard> {
       final baseWithoutApi = ApiConstants.baseUrl.endsWith('/api')
           ? ApiConstants.baseUrl.substring(0, ApiConstants.baseUrl.length - 4)
           : ApiConstants.baseUrl;
-      imageUrl = '$baseWithoutApi$rawUrl';
+      final cleanRawUrl = rawUrl.startsWith('/') ? rawUrl : '/$rawUrl';
+      imageUrl = '$baseWithoutApi$cleanRawUrl';
     }
     final hasNetworkImage = imageUrl.startsWith('http');
 

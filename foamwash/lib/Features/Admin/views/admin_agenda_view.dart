@@ -7,6 +7,8 @@ import '../widgets/admin_drawer.dart';
 import 'package:foamwash/core/utils/security_utils.dart';
 import 'package:foamwash/core/cache/secure_storage_service.dart';
 import 'package:foamwash/Features/Admin/views/admin_dashboard_view.dart';
+import 'package:provider/provider.dart';
+import 'package:foamwash/Features/Autenticacion/providers/auth_provider.dart';
 
 
 
@@ -55,11 +57,11 @@ class _AdminAgendaViewState extends State<AdminAgendaView> {
   }
 
   Future<void> _checkAccess() async {
-    final prefs = await SharedPreferences.getInstance();
-    final email = prefs.getString('userEmail');
-    if (email != 'admin@gmail.com') {
-      if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
+    final auth = context.read<AuthProvider>();
+    if (!auth.isAdmin) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) Navigator.pushReplacementNamed(context, '/home');
+      });
     }
   }
 

@@ -6,22 +6,31 @@ export declare class UsuariosController {
         success: boolean;
         count: number;
         data: {
-            rol: {
-                Rol: string;
-            };
             Id_Usuario: number;
-            N_Documento: string;
-            Correo: string;
             Nombre: string;
             Telefono: string;
+            N_Documento: string;
             Direccion: string;
+            Correo: string;
             estado: import(".prisma/client").$Enums.usuario_estado;
             fecha_registro: Date;
             foto_perfil: string;
             tipo_de_documento: {
                 nombre_del_documento: string;
             };
+            rol: {
+                Rol: string;
+            };
         }[];
+    }>;
+    createEmpleado(body: any): Promise<{
+        success: boolean;
+        data: {
+            Id_Usuario: number;
+            Nombre: string;
+            Telefono: string;
+            Correo: string;
+        };
     }>;
     usuariosPorRol(): Promise<{
         success: boolean;
@@ -30,17 +39,17 @@ export declare class UsuariosController {
                 usuarios: number;
             };
         } & {
-            Rol: string;
             Id_Rol: number;
+            Rol: string;
         })[];
     }>;
     empleadosActivos(): Promise<{
         success: boolean;
         data: {
             Id_Usuario: number;
-            Correo: string;
             Nombre: string;
             Telefono: string;
+            Correo: string;
             last_login: Date;
         }[];
     }>;
@@ -82,16 +91,12 @@ export declare class UsuariosController {
                 pendientes: number;
                 calificacion_promedio: string;
             };
-            rol: {
-                Rol: string;
-                Id_Rol: number;
-            };
             Id_Usuario: number;
-            N_Documento: string;
-            Correo: string;
             Nombre: string;
             Telefono: string;
+            N_Documento: string;
             Direccion: string;
+            Correo: string;
             estado: import(".prisma/client").$Enums.usuario_estado;
             last_login: Date;
             fecha_registro: Date;
@@ -126,17 +131,21 @@ export declare class UsuariosController {
                 idTipo_de_Documento: number;
                 nombre_del_documento: string;
             };
+            rol: {
+                Id_Rol: number;
+                Rol: string;
+            };
         };
     }>;
     update(id: number, body: any): Promise<{
         success: boolean;
         data: {
             Id_Usuario: number;
-            N_Documento: string;
-            Correo: string;
             Nombre: string;
             Telefono: string;
+            N_Documento: string;
             Direccion: string;
+            Correo: string;
             estado: import(".prisma/client").$Enums.usuario_estado;
             foto_perfil: string;
             tipo_de_documento: {
@@ -153,11 +162,11 @@ export declare class UsuariosController {
         success: boolean;
         data: {
             Id_Usuario: number;
-            N_Documento: string;
-            Correo: string;
             Nombre: string;
             Telefono: string;
+            N_Documento: string;
             Direccion: string;
+            Correo: string;
             estado: import(".prisma/client").$Enums.usuario_estado;
             foto_perfil: string;
             tipo_de_documento: {

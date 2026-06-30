@@ -337,7 +337,7 @@
 /* ═══════════════════════════════════════
    MODAL
 ═══════════════════════════════════════ */
-.modal-overlay {
+.ea-modal-overlay {
     position: fixed;
     inset: 0;
     background: rgba(5,8,25,0.55);

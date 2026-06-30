@@ -65,11 +65,11 @@ class _LoginScreenState extends State<LoginScreen>
       // Redirección basada en el rol del usuario
       final role = context.read<AuthProvider>().userRole;
       if (email == 'admin@gmail.com' || role == 'admin') {
-        Navigator.pushReplacementNamed(context, '/admin_dashboard');
+        Navigator.pushNamedAndRemoveUntil(context, '/admin_dashboard', (route) => false);
       } else if (role == 'trabajador' || role == 'empleado') {
-        Navigator.pushReplacementNamed(context, '/empleado_agenda');
+        Navigator.pushNamedAndRemoveUntil(context, '/empleado_agenda', (route) => false);
       } else {
-        Navigator.pushReplacementNamed(context, '/scheduling');
+        Navigator.pushNamedAndRemoveUntil(context, '/scheduling', (route) => false);
       }
     } catch (e) {
       if (!mounted) return;

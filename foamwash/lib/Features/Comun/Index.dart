@@ -360,10 +360,12 @@ class _IndexScreenState extends State<IndexScreen>
                   // LOGO CENTRADO — ocupa el espacio restante, igual al header web
                   Expanded(
                     child: Center(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                           Text(
                             'FoamWash',
                             style: TextStyle(
@@ -390,8 +392,9 @@ class _IndexScreenState extends State<IndexScreen>
                       ),
                     ),
                   ),
+                ),
 
-                  // ACCIONES — mismo botón cápsula que .login-btn en el header web
+                // ACCIONES — mismo botón cápsula que .login-btn en el header web
                   SizedBox(
                     width: screenWidth > 560 ? 180 : null,
                     child: Row(

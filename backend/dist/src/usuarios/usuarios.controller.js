@@ -32,6 +32,10 @@ let UsuariosController = class UsuariosController {
         const data = await this.usuariosService.findAll();
         return { success: true, count: data.length, data };
     }
+    async createEmpleado(body) {
+        const data = await this.usuariosService.createEmpleado(body);
+        return { success: true, data };
+    }
     async usuariosPorRol() {
         const data = await this.usuariosService.usuariosPorRol();
         return { success: true, data };
@@ -75,6 +79,16 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], UsuariosController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Post)('empleado'),
+    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('admin'),
+    (0, swagger_1.ApiOperation)({ summary: 'Crear un nuevo empleado (admin)' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UsuariosController.prototype, "createEmpleado", null);
 __decorate([
     (0, common_1.Get)('analytics/usuarios-por-rol'),
     (0, common_1.UseGuards)(roles_guard_1.RolesGuard),

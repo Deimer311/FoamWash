@@ -40,11 +40,11 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
   }
 
   Future<void> _checkAccess() async {
-    final prefs = await SharedPreferences.getInstance();
-    final email = prefs.getString('userEmail');
-    if (email != 'admin@gmail.com') {
-      if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
+    final auth = context.read<AuthProvider>();
+    if (!auth.isAdmin) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) Navigator.pushReplacementNamed(context, '/home');
+      });
     }
   }
 

@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsuariosService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const bcrypt = require("bcryptjs");
 let UsuariosService = class UsuariosService {
     constructor(prisma) {
         this.prisma = prisma;
@@ -216,6 +217,49 @@ let UsuariosService = class UsuariosService {
                 },
             },
         });
+    }
+    async createEmpleado(data) {
+        const { nombre, correo, password, telefono, cargo, especialidad, fecha_ingreso, certificaciones } = data;
+        if (!correo) {
+            throw new common_1.BadRequestException('El correo es obligatorio');
+        }
+        const existing = await this.prisma.usuario.findUnique({ where: { Correo: correo } });
+        if (existing) {
+            throw new common_1.ConflictException('El correo ya está registrado');
+        }
+        const password_hash = await bcrypt.hash(password || '123456', 12);
+        let parsedFecha = null;
+        if (fecha_ingreso && fecha_ingreso.toString().trim() !== '') {
+            parsedFecha = new Date(fecha_ingreso);
+            if (isNaN(parsedFecha.getTime())) {
+                throw new common_1.BadRequestException('Fecha de ingreso no es válida');
+            }
+        }
+        const newUser = await this.prisma.usuario.create({
+            data: {
+                Nombre: nombre,
+                Correo: correo,
+                password_hash,
+                Telefono: telefono || null,
+                rol_Id_Rol: 2,
+                estado: 'activo',
+                empleado: {
+                    create: {
+                        cargo: cargo || null,
+                        especialidades: especialidad || null,
+                        fecha_ingreso: parsedFecha,
+                        certificaciones: certificaciones || null,
+                    },
+                },
+            },
+            select: {
+                Id_Usuario: true,
+                Nombre: true,
+                Correo: true,
+                Telefono: true,
+            },
+        });
+        return newUser;
     }
     async softDelete(id) {
         const exists = await this.prisma.usuario.findUnique({ where: { Id_Usuario: id } });

@@ -9,7 +9,10 @@ class ApiService {
   // Mapea la respuesta JSON anidada bajo la clave 'data' hacia objetos ServiceModel.
   Future<List<ServiceModel>> fetchServices() async {
     try {
-      final response = await http.get(Uri.parse(ApiConstants.getServicesEndpoint));
+      final response = await http.get(
+        Uri.parse(ApiConstants.getServicesEndpoint),
+        headers: {'ngrok-skip-browser-warning': 'true'},
+      );
       
       if (response.statusCode == 200) {
         final Map<String, dynamic> decodedBody = json.decode(response.body);

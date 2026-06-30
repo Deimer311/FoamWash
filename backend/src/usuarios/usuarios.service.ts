@@ -1,7 +1,7 @@
 // src/usuarios/usuarios.service.ts
 import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-
+import * as bcrypt from 'bcryptjs';
 @Injectable()
 export class UsuariosService {
   constructor(private prisma: PrismaService) {}
@@ -214,6 +214,56 @@ export class UsuariosService {
         },
       },
     });
+  }
+
+  async createEmpleado(data: any) {
+    const { nombre, correo, password, telefono, cargo, especialidad, fecha_ingreso, certificaciones } = data;
+
+    if (!correo) {
+      throw new BadRequestException('El correo es obligatorio');
+    }
+
+    const existing = await this.prisma.usuario.findUnique({ where: { Correo: correo } });
+    if (existing) {
+      throw new ConflictException('El correo ya está registrado');
+    }
+
+    const password_hash = await bcrypt.hash(password || '123456', 12);
+
+    let parsedFecha = null;
+    if (fecha_ingreso && fecha_ingreso.toString().trim() !== '') {
+      parsedFecha = new Date(fecha_ingreso);
+      if (isNaN(parsedFecha.getTime())) {
+        throw new BadRequestException('Fecha de ingreso no es válida');
+      }
+    }
+
+    const newUser = await this.prisma.usuario.create({
+      data: {
+        Nombre: nombre,
+        Correo: correo,
+        password_hash,
+        Telefono: telefono || null,
+        rol_Id_Rol: 2, // 2 = Empleado
+        estado: 'activo',
+        empleado: {
+          create: {
+            cargo: cargo || null,
+            especialidades: especialidad || null,
+            fecha_ingreso: parsedFecha,
+            certificaciones: certificaciones || null,
+          },
+        },
+      },
+      select: {
+        Id_Usuario: true,
+        Nombre: true,
+        Correo: true,
+        Telefono: true,
+      },
+    });
+
+    return newUser;
   }
 
   async softDelete(id: number) {

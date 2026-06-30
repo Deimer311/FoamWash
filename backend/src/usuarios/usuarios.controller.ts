@@ -34,6 +34,15 @@ export class UsuariosController {
     return { success: true, count: data.length, data };
   }
 
+  @Post('empleado')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Crear un nuevo empleado (admin)' })
+  async createEmpleado(@Body() body: any) {
+    const data = await this.usuariosService.createEmpleado(body);
+    return { success: true, data };
+  }
+
   @Get('analytics/usuarios-por-rol')
   @UseGuards(RolesGuard)
   @Roles('admin')

@@ -33,11 +33,19 @@ const api = axios.create({
 });
 
 // ✅ Interceptor SIMPLE — sin lógica de refresh automático
-// El refresh automático causaba bucle infinito:
-// 401 → intenta refresh → refresh falla con 401 → interceptor se dispara → bucle
+// Redirige al login si la sesión ha expirado para evitar pantallas rotas.
 api.interceptors.response.use(
     (response) => response,       // Respuesta exitosa: devolverla tal cual
-    (error)    => Promise.reject(error)  // Error: rechazarlo sin reintentar
+    (error)    => {
+        if (error.response && error.response.status === 401) {
+            // Evitar redirecciones infinitas si ya estamos en /login
+            if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
+                console.warn('Sesión expirada (401). Redirigiendo al login...');
+                window.location.href = '/login';
+            }
+        }
+        return Promise.reject(error);
+    }
 );
 
 export default api;
