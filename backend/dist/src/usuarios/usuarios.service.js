@@ -265,8 +265,9 @@ let UsuariosService = class UsuariosService {
         const exists = await this.prisma.usuario.findUnique({ where: { Id_Usuario: id } });
         if (!exists)
             throw new common_1.NotFoundException('Usuario no encontrado');
-        return this.prisma.usuario.delete({
+        return this.prisma.usuario.update({
             where: { Id_Usuario: id },
+            data: { estado: 'inactivo' },
         });
     }
     async usuariosPorRol() {

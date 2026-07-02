@@ -269,8 +269,9 @@ export class UsuariosService {
   async softDelete(id: number) {
     const exists = await this.prisma.usuario.findUnique({ where: { Id_Usuario: id } });
     if (!exists) throw new NotFoundException('Usuario no encontrado');
-    return this.prisma.usuario.delete({
+    return this.prisma.usuario.update({
       where: { Id_Usuario: id },
+      data: { estado: 'inactivo' },
     });
   }
 
