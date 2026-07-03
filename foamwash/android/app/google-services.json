@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "572221545449",
+    "project_id": "foam--wash",
+    "storage_bucket": "foam--wash.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:572221545449:android:bb808e09550ce717808978",
+        "android_client_info": {
+          "package_name": "com.example.foamwash"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhh_Rqy5vM93Gxln4edUh0l8pUAmrqbu0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,186 @@
+/* =============================================================================
+   ESTILOS_COTIZAR.CSS — REDISEÑO PREMIUM
+   FoamWash · Página de Cotización Pública
+   ============================================================================= */
+
+/* ── Reset base ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body, html {
+    margin: 0;
+    padding: 0;
+}
+
+/* ── Fuente global de la página ── */
+.cotizacion-page {
+    font-family: 'Kanit', 'Segoe UI', sans-serif;
+    background: #f6f7fb;
+    min-height: 100vh;
+}
+
+/* ==================== BARRA DE BÚSQUEDA ==================== */
+
+.search-section {
+    background: #fff;
+    padding: 28px 20px;
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px solid #eef0f5;
+}
+
+.search-container {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 14px 52px 14px 22px;
+    font-size: 15px;
+    font-family: 'Kanit', sans-serif;
+    border: 1.5px solid #e0e4ef;
+    border-radius: 50px;
+    outline: none;
+    background: #f8f9ff;
+    color: #111;
+    transition: border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.search-input::placeholder { color: #aab0c4; font-weight: 400; }
+
+.search-input:focus {
+    border-color: #1a56ff;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(26, 86, 255, 0.10);
+}
+
+.search-button {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #8890aa;
+    font-size: 18px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.search-button:hover { color: #1a56ff; }
+
+/* ==================== SECCIÓN DE SERVICIOS ==================== */
+
+.services-section {
+    background: #f6f7fb;
+    padding: 52px 40px 80px;
+    flex: 1;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 34px;
+    font-weight: 800;
+    color: #0a1435;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+    font-family: 'Kanit', sans-serif;
+}
+
+/* ==================== GRID DE TARJETAS ==================== */
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 28px;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+/* ==================== CARRITO FLOTANTE ==================== */
+
+.btn-carrito-flotante {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1a56ff, #7c3aed);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(26, 86, 255, 0.40);
+    z-index: 999;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-carrito-flotante:hover {
+    transform: translateY(-3px) scale(1.06);
+    box-shadow: 0 12px 30px rgba(26, 86, 255, 0.50);
+}
+
+.carrito-icono { font-size: 24px; }
+
+.carrito-badge-flotante {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #ff3d71;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Kanit', sans-serif;
+    border: 2px solid #fff;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+    .services-section {
+        padding: 36px 20px 60px;
+    }
+    .services-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    .btn-carrito-flotante {
+        bottom: 20px;
+        right: 20px;
+        width: 52px;
+        height: 52px;
+    }
+}
+
+@media (max-width: 480px) {
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+    .section-title {
+        font-size: 26px;
+    }
+}
+
+/* ==================== SCROLLBAR ==================== */
+
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #1a56ff, #7c3aed);
+    border-radius: 10px;
+    border: 2px solid #f1f1f1;
+}
+::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, #1540d4, #6b2fd0); }
