@@ -342,6 +342,7 @@ class _LoginScreenState extends State<LoginScreen>
           hint: 'Correo electrónico',
           icon: Icons.email_outlined,
           keyboardType: TextInputType.emailAddress,
+          identifier: 'input_email',
         ),
         const SizedBox(height: 14),
         _InputField(
@@ -349,6 +350,7 @@ class _LoginScreenState extends State<LoginScreen>
           hint: 'Contraseña',
           icon: Icons.lock_outline,
           obscure: _obscurePassword,
+          identifier: 'input_password',
           suffix: GestureDetector(
             onTap: () => setState(() => _obscurePassword = !_obscurePassword),
             child: Icon(
@@ -381,10 +383,13 @@ class _LoginScreenState extends State<LoginScreen>
           ),
         ),
         const SizedBox(height: 8),
-        _SubmitButton(
-          label: 'Iniciar sesión',
-          isLoading: _isLoading,
-          onPressed: _login,
+        Semantics(
+          identifier: 'btn_login',
+          child: _SubmitButton(
+            label: 'Iniciar sesión',
+            isLoading: _isLoading,
+            onPressed: _login,
+          ),
         ),
       ],
     );
@@ -402,6 +407,7 @@ class _InputField extends StatelessWidget {
   final bool obscure;
   final Widget? suffix;
   final TextInputType? keyboardType;
+  final String? identifier;
 
   static const Color _blue      = Color(0xFF1A56FF);
   static const Color _bgField   = Color(0xFFF8F9FF);
@@ -414,12 +420,15 @@ class _InputField extends StatelessWidget {
     this.obscure = false,
     this.suffix,
     this.keyboardType,
+    this.identifier,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
+    return Semantics(
+      identifier: identifier ?? hint,
+      child: TextField(
+        controller: controller,
       obscureText: obscure,
       keyboardType: keyboardType,
       style: const TextStyle(
@@ -457,7 +466,7 @@ class _InputField extends StatelessWidget {
           borderSide: const BorderSide(color: _blue, width: 1.5),
         ),
       ),
-    );
+    ));
   }
 }
 

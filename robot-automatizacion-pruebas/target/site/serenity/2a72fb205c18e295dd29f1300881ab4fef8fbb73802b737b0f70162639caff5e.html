@@ -226,7 +226,7 @@
             <a href="576946480b52ad056d6f5bddf874399c83582ecf90963cc074a14c70580e7d9f.html"><i class="bi bi-chat-text"></i> Features</a>
         </li>
     </ul>
-    <span class="date-and-time"><a href="build-info.html"><i class="bi bi-info-circle"></i></a> Report generated 23-06-2026 23:14:10</span>
+    <span class="date-and-time"><a href="build-info.html"><i class="bi bi-info-circle"></i></a> Report generated 07-07-2026 22:20:38</span>
     <br style="clear:left"/>
 </div>
     <div class="clr"></div>
@@ -326,48 +326,48 @@
                     <td>
                         <i class="bi bi-flag-fill"></i> Tests Started
                     </td>
-                    <td>Jun 23, 2026 22:40:45</td>
+                    <td>Jul 07, 2026 22:18:02</td>
                 </tr>
                 <tr scope="row">
                     <td>
                         <i class="bi bi-stop-circle"></i> Tests
                         Finished
                     </td>
-                    <td>Jun 23, 2026 22:41:16</td>
+                    <td>Jul 07, 2026 22:18:29</td>
                 </tr>
                 <tr scope="row">
                     <td>
                         <i class="bi bi-stopwatch"></i> Total
                         Duration
                     </td>
-                    <td>30s</td>
+                    <td>26s</td>
                 </tr>
                 <tr scope="row">
                     <td>
                         <i class="bi bi-trophy"></i> Fastest Test
                     </td>
-                    <td>30s</td>
+                    <td>26s</td>
                 </tr>
                 <tr scope="row">
                     <td>
                         <i class="bi bi-skip-start"></i> Slowest
                         Test
                     </td>
-                    <td>30s</td>
+                    <td>26s</td>
                 </tr>
                 <tr scope="row">
                     <td>
                         <i class="bi bi-stopwatch"></i> Average
                         Execution Time
                     </td>
-                    <td>30s</td>
+                    <td>26s</td>
                 </tr>
                 <tr scope="row">
                     <td>
                         <i class="bi bi-stopwatch-fill"></i> Total
                         Execution Time
                     </td>
-                    <td>30s</td>
+                    <td>26s</td>
                 </tr>
                 </tbody>
             </table>
@@ -404,32 +404,22 @@
                                                                                     <td>1</td>
                                                                                     <td>Dado que el usuario se encuentra en la pagina de registro
 Cliente nuevo abrir pagina
-Cliente Nuevo opens the browser at http://localhost:3000
-Cliente Nuevo clicks on [By.cssSelector: .login-btn]
-Cliente Nuevo clicks on botón para abrir modal de registro
+Cliente Nuevo clicks on botón login
 Cuando llena el formulario con sus datos validos
-Cliente nuevo registrar usuario
-Cliente Nuevo enters 'Juan Perez' into campo nombre
-Cliente Nuevo enters '3001234567' into campo telefono
-Cliente Nuevo enters 'usuario1782272460755@gmail.com' into campo email
-Cliente Nuevo enters 'Calle Falsa 123' into campo direccion
-Cliente Nuevo enters '123456' into campo contraseña
-Cliente Nuevo clicks on botón de finalizar registro
 Entonces deberia ver un mensaje de confirmacion de registro
-Then By.cssSelector: .hc-header should be an element that is visible
 </td>
                                                                                     <td>1</td>
-                                                                                    <td>100%</td>
+                                                                                    <td>0%</td>
                                                                                     <td>
-                                                                                            <a href='##beforetable'><i class='bi bi-check-circle-fill success-icon ' title='SUCCESS'></i></a>
+                                                                                            <a href='##beforetable'><i class='bi bi-x-circle-fill failure-icon ' title='FAILURE'></i></a>
                                                                                     </td>
                                                                                     <td>
                                                                                         <div class="progress">
                                                                                                 <div class="progress-bar"
                                                                                                      role="progressbar"
-                                                                                                     style="width: 100%; background-color: #b0cf73"
+                                                                                                     style="width: 100%; background-color: #fd938e"
                                                                                                      aria-valuenow="1"
-                                                                                                     title="100% success"
+                                                                                                     title="100% failure"
                                                                                                      aria-valuemin="0"
                                                                                                      aria-valuemax="100">
                                                                                                 </div>
@@ -441,6 +431,43 @@ Then By.cssSelector: .hc-header should be an element that is visible
                                                         </div>
                                                     </div>
 
+                                                    <div class="row">
+                                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                                            <h3>Test Failure Overview</h3>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                                            <h4>Most Frequent Failures</h4>
+                                                            <table class="table" style="width:40vw;">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td class="failure-color top-list-title">
+                                                                            <a href="af346bdb77858e8b9dd8bd5bfe57888793cf79caf5c16bf7fa2e267a71b7c409.html"><a href='##beforetable'><i class='bi bi-x-circle-fill failure-icon ' title='FAILURE'></i></a> Element should be present exception</a>
+                                                                        </td>
+                                                                        <td><span
+                                                                                    class="badge failure-badge">1</span>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                                            <h4>Most Unstable Features</h4>
+                                                            <table class="table" style="width:40vw;">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td class="failure-color top-list-title">
+                                                                            <a href="911cfd9a435e99ef997dd7ddce9744c1d9b30e6c8273b2b89b518a0b40d1453a.html">Autenticación y gestión de perfil</a>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span class="badge failure-badge">100%</span>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
                                             </div>
                                             <div class="container-fluid">
         <div class="row">
@@ -450,20 +477,8 @@ Then By.cssSelector: .hc-header should be an element that is visible
                         <div class="card-body">
                             <div>
                                     <a href="2a72fb205c18e295dd29f1300881ab4fef8fbb73802b737b0f70162639caff5e.html">
-                                    <span class="tag-badge badge" style="background-color:#b0cf73; margin:1em;padding:4px;">
+                                    <span class="tag-badge badge" style="background-color:#fd938e; margin:1em;padding:4px;">
                                         <i class="bi bi-tag-fill"></i> Hu-01&nbsp;&nbsp;&nbsp;1
-                                    </span>
-                                    </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
-                                <h5 class="card-title">Context</h5>
-                            <div>
-                                    <a href="59736924e81ea98f655ac8eba7cd96079d8d80131e0c4360daf32a724d0b38a0.html">
-                                    <span class="tag-badge badge" style="background-color:#b0cf73; margin:1em;padding:4px;">
-                                        <i class="bi bi-tag-fill"></i> Chrome, Windows&nbsp;&nbsp;&nbsp;1
                                     </span>
                                     </a>
                             </div>
@@ -491,7 +506,7 @@ Then By.cssSelector: .hc-header should be an element that is visible
                         <i class="bi bi-stopwatch"></i> Total
                         Duration
                     </td>
-                    <td>30s</td>
+                    <td>26s</td>
                 </tr>
                 <tr scope="row">
                     <td>
@@ -501,7 +516,7 @@ Then By.cssSelector: .hc-header should be an element that is visible
                     <td>
                         <i class="bi bi-trophy"></i> Fastest Test
                     </td>
-                    <td>30s</td>
+                    <td>26s</td>
                 </tr>
                 <tr scope="row">
                     <td>
@@ -512,30 +527,30 @@ Then By.cssSelector: .hc-header should be an element that is visible
                         <i class="bi bi-skip-start"></i> Slowest
                         Test
                     </td>
-                    <td>30s</td>
+                    <td>26s</td>
                 </tr>
                 <tr scope="row">
                     <td>
                         <i class="bi bi-flag-fill"></i> Tests Started
                     </td>
-                    <td>Jun 23, 2026 22:40:45</td>
+                    <td>Jul 07, 2026 22:18:02</td>
                     <td>
                         <i class="bi bi-stopwatch"></i> Average
                         Execution Time
                     </td>
-                    <td>30s</td>
+                    <td>26s</td>
                 </tr>
                 <tr scope="row">
                     <td>
                         <i class="bi bi-stop-circle"></i> Tests
                         Finished
                     </td>
-                    <td>Jun 23, 2026 22:41:16</td>
+                    <td>Jul 07, 2026 22:18:29</td>
                     <td>
                         <i class="bi bi-stopwatch-fill"></i> Total
                         Execution Time
                     </td>
-                    <td>30s</td>
+                    <td>26s</td>
                 </tr>
                 </tbody>
             </table>
@@ -558,24 +573,24 @@ Then By.cssSelector: .hc-header should be an element that is visible
                                                                 </tr>
                                                                 </thead>
                                                                 <tbody>
-                                                                    <tr class="scenario-result SUCCESS">
+                                                                    <tr class="scenario-result FAILURE">
                                                                         <td>
                                                                                 <a href="911cfd9a435e99ef997dd7ddce9744c1d9b30e6c8273b2b89b518a0b40d1453a.html">Autenticación y gestión de perfil</a>
                                                                         </td>
                                                                         <td data-order="Registro exitoso en el sistema como cliente">
-                                                                                    <a href="0d9294d4563f4c279a75815c5d39fa439f4be381957a64a09ba5f20d57046f04.html">Registro exitoso en el sistema como cliente</a>
+                                                                                    <a href="b1bc3b36d1c7d13409881cf3328fe4d6d26a7170e6cbecdacc4e5f20581337cb.html">Registro exitoso en el sistema como cliente</a>
                                                                         </td>
-                                                                        <td><span class='context-icon'><i class='bi bi-browser-chrome' title='Chrome'></i> <i class='bi bi-windows' title='Windows'></i></span><span style="display:none">Chrome,windows</span>
+                                                                        <td><span style="display:none"></span>
                                                                         </td>
                                                                         <td>3</td>
                                                                         <td>Dado que el usuario se encuentra en la pagina de registro
 Cuando llena el formulario con sus datos validos
 Entonces deberia ver un mensaje de confirmacion de registro
 </td>
-                                                                        <td data-order="1782272445">22:40:45</td>
-                                                                        <td>30s 716ms</td>
-                                                                        <td><a href='##beforetable'><i class='bi bi-check-circle-fill success-icon ' title='SUCCESS'></i></a> <span
-                                                                                    style="display:none">SUCCESS</span>
+                                                                        <td data-order="1783480682">22:18:02</td>
+                                                                        <td>26s 734ms</td>
+                                                                        <td><a href='##beforetable'><i class='bi bi-x-circle-fill failure-icon ' title='FAILURE'></i></a> <span
+                                                                                    style="display:none">FAILURE</span>
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>
@@ -601,20 +616,8 @@ Entonces deberia ver un mensaje de confirmacion de registro
                         <div class="card-body">
                             <div>
                                     <a href="2a72fb205c18e295dd29f1300881ab4fef8fbb73802b737b0f70162639caff5e.html">
-                                    <span class="tag-badge badge" style="background-color:#b0cf73; margin:1em;padding:4px;">
+                                    <span class="tag-badge badge" style="background-color:#fd938e; margin:1em;padding:4px;">
                                         <i class="bi bi-tag-fill"></i> Hu-01&nbsp;&nbsp;&nbsp;1
-                                    </span>
-                                    </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
-                                <h5 class="card-title">Context</h5>
-                            <div>
-                                    <a href="59736924e81ea98f655ac8eba7cd96079d8d80131e0c4360daf32a724d0b38a0.html">
-                                    <span class="tag-badge badge" style="background-color:#b0cf73; margin:1em;padding:4px;">
-                                        <i class="bi bi-tag-fill"></i> Chrome, Windows&nbsp;&nbsp;&nbsp;1
                                     </span>
                                     </a>
                             </div>
@@ -668,8 +671,8 @@ Entonces deberia ver un mensaje de confirmacion de registro
             datasets: [{
                 label: 'Test Results',
                 fill: false,
-                data: [1,0,0,0,0,0,0,0],
-                backgroundColor: ['rgba(153,204,51,0.5)','rgba(165, 199, 238, 0.5)','rgba(168, 168, 168, 0.5)','rgba(238, 224, 152, 0.75)','rgba(255, 153, 102, 0.5)','rgba(255, 22, 49, 0.5)','rgba(255, 97, 8, 0.5)','rgba(255, 104, 255, 0.5)','rgba(83, 50, 168, 0.5)'],
+                data: [0,0,0,0,0,1,0,0],
+                backgroundColor: ['rgba(153,204,51,0.5)',pattern.draw('line', 'rgba(165, 199, 238, 0.5)'),pattern.draw('line-vertical', 'rgba(168, 168, 168, 0.5)'),pattern.draw('diagonal', 'rgba(238, 224, 152, 0.75)'),pattern.draw('diagonal-right-left', 'rgba(255, 153, 102, 0.5)'),pattern.draw('zigzag-vertical', 'rgba(255, 22, 49, 0.5)'),pattern.draw('zigzag', 'rgba(255, 97, 8, 0.5)'),pattern.draw('square', 'rgba(255, 104, 255, 0.5)'),pattern.draw('diamond', 'rgba(83, 50, 168, 0.5)')],
                 borderColor: ['rgba(153,204,51,1)','rgba(165, 199, 238, 1)','rgba(168, 168, 168, 1)','rgba(238, 224, 152, 1)','rgba(255, 153, 102, 1)','rgba(255, 22, 49, 1)','rgba(255, 97, 8, 1)','rgba(255, 104, 255, 1)','rgba(83, 50, 168, 1)'],
                 borderWidth: 1,
             }]
@@ -719,7 +722,7 @@ Entonces deberia ver un mensaje de confirmacion de registro
                         ctx.font = fontSize + "em sans-serif";
                         ctx.textBaseline = "middle";
 
-                        var text = "100%"
+                        var text = " "
                         textX = 10 + Math.round((width - ctx.measureText(text).width) / 2);
                         textY = (height / 2) - 40;
 
@@ -764,15 +767,15 @@ Entonces deberia ver un mensaje de confirmacion de registro
             datasets: [
                 {
                     label: 'Automated',
-                    data: [1,0,0,0,0,0,0,0],
-                    backgroundColor: ['rgba(153,204,51,0.5)','rgba(165, 199, 238, 0.5)','rgba(168, 168, 168, 0.5)','rgba(238, 224, 152, 0.75)','rgba(255, 153, 102, 0.5)','rgba(255, 22, 49, 0.5)','rgba(255, 97, 8, 0.5)','rgba(255, 104, 255, 0.5)','rgba(83, 50, 168, 0.5)'],
+                    data: [0,0,0,0,0,1,0,0],
+                    backgroundColor: ['rgba(153,204,51,0.5)',pattern.draw('line', 'rgba(165, 199, 238, 0.5)'),pattern.draw('line-vertical', 'rgba(168, 168, 168, 0.5)'),pattern.draw('diagonal', 'rgba(238, 224, 152, 0.75)'),pattern.draw('diagonal-right-left', 'rgba(255, 153, 102, 0.5)'),pattern.draw('zigzag-vertical', 'rgba(255, 22, 49, 0.5)'),pattern.draw('zigzag', 'rgba(255, 97, 8, 0.5)'),pattern.draw('square', 'rgba(255, 104, 255, 0.5)'),pattern.draw('diamond', 'rgba(83, 50, 168, 0.5)')],
                     borderColor: ['rgba(153,204,51,1)','rgba(165, 199, 238, 1)','rgba(168, 168, 168, 1)','rgba(238, 224, 152, 1)','rgba(255, 153, 102, 1)','rgba(255, 22, 49, 1)','rgba(255, 97, 8, 1)','rgba(255, 104, 255, 1)','rgba(83, 50, 168, 1)'],
                     borderWidth: 1
                 },
                 {
                     label: 'Manual',
                     data: [0,0,0,0,0,0,0,0],
-                    backgroundColor: ['rgba(153,204,51,0.25)','rgba(165, 199, 238, 0.25)','rgba(168, 168, 168, 0.25)','rgba(238, 224, 152, 0.375)','rgba(255, 153, 102, 0.25)','rgba(255, 22, 49, 0.25)','rgba(255, 97, 8, 0.25)','rgba(255, 104, 255, 0.25)','rgba(83, 50, 168, 0.25)'],
+                    backgroundColor: ['rgba(153,204,51,0.25)',pattern.draw('line', 'rgba(165, 199, 238, 0.25)'),pattern.draw('line-vertical', 'rgba(168, 168, 168, 0.25)'),pattern.draw('diagonal', 'rgba(238, 224, 152, 0.375)'),pattern.draw('diagonal-right-left', 'rgba(255, 153, 102, 0.25)'),pattern.draw('zigzag-vertical', 'rgba(255, 22, 49, 0.25)'),pattern.draw('zigzag', 'rgba(255, 97, 8, 0.25)'),pattern.draw('triangle', 'rgba(255, 104, 255, 0.25)'),pattern.draw('diamond', 'rgba(83, 50, 168, 0.25)')],
                     borderColor: ['rgba(153,204,51,1)','rgba(165, 199, 238, 1)','rgba(168, 168, 168, 1)','rgba(238, 224, 152, 1)','rgba(255, 153, 102, 1)','rgba(255, 22, 49, 1)','rgba(255, 97, 8, 1)','rgba(255, 104, 255, 1)','rgba(83, 50, 168, 1)'],
                     borderWidth: 1
                 },
@@ -847,7 +850,7 @@ Entonces deberia ver un mensaje de confirmacion de registro
             datasets: [{
                 label: 'Number of tests per duration',
                 fill: false,
-                data: ['0','0','0','1','0','0','0','0'],
+                data: ['0','0','1','0','0','0','0','0'],
                 backgroundColor: 'rgba(83, 146, 255,0.5)',
                 borderColor: 'rgba(83, 146, 255, 1)',
             }]
@@ -911,7 +914,7 @@ Entonces deberia ver un mensaje de confirmacion de registro
         const coverageReports = [
             {
                 title: 'Autenticación y gestión de perfil',
-                result: 'SUCCESS',
+                result: 'FAILURE',
                 link: "911cfd9a435e99ef997dd7ddce9744c1d9b30e6c8273b2b89b518a0b40d1453a.html"
             },
         ]
@@ -922,43 +925,43 @@ Entonces deberia ver un mensaje de confirmacion de registro
             datasets: [
                 {
                     label: ['Passing Tests'],
-                    data: [1],
+                    data: [0],
                     backgroundColor: [ 'rgba(153,204,51,0.5)' ]
                 },
                 {
                     label: ['Pending Tests'],
                     data: [0],
-                    backgroundColor: [ 'rgba(165, 199, 238, 0.5)' ]
+                    backgroundColor: [ pattern.draw('line', 'rgba(165, 199, 238, 0.5)') ]
                 },
                 {
                     label: ['Ignored Tests'],
                     data: [0],
-                    backgroundColor: [ 'rgba(168, 168, 168, 0.5)' ]
+                    backgroundColor: [ pattern.draw('line-vertical', 'rgba(168, 168, 168, 0.5)') ]
                 },
                 {
                     label: ['Skipped Tests'],
                     data: [0],
-                    backgroundColor: [ 'rgba(238, 224, 152, 0.75)' ]
+                    backgroundColor: [ pattern.draw('diagonal', 'rgba(238, 224, 152, 0.75)') ]
                 },
                 {
                     label: ['Aborted Tests'],
                     data: [0],
-                    backgroundColor: [ 'rgba(255, 153, 102, 0.5)' ]
+                    backgroundColor: [ pattern.draw('diagonal-right-left', 'rgba(255, 153, 102, 0.5)') ]
                 },
                 {
                     label: ['Failed Tests'],
-                    data: [0],
-                    backgroundColor: [ 'rgba(255, 22, 49, 0.5)' ]
+                    data: [1],
+                    backgroundColor: [ pattern.draw('zigzag-vertical', 'rgba(255, 22, 49, 0.5)') ]
                 },
                 {
                     label: ['Errors'],
                     data: [0],
-                    backgroundColor: [ 'rgba(255, 97, 8, 0.5)' ]
+                    backgroundColor: [ pattern.draw('zigzag', 'rgba(255, 97, 8, 0.5)') ]
                 },
                 {
                     label: ['Compromised Tests'],
                     data: [0],
-                    backgroundColor: [ 'rgba(255, 104, 255, 0.5)' ]
+                    backgroundColor: [ pattern.draw('square', 'rgba(255, 104, 255, 0.5)') ]
                 },
             ]
         }

@@ -359,7 +359,7 @@ const RegisterView = ({ onLoginSuccess }) => {
                         required
                         autoComplete="name"
                         value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
+                        onChange={(e) => setFullName(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, ''))}
                     />
                 </div>
                 

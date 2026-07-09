@@ -8,6 +8,7 @@ export class UsuariosService {
 
   async findAll() {
     return this.prisma.usuario.findMany({
+      where: { estado: 'activo' },
       select: {
         Id_Usuario: true,
         Nombre: true,

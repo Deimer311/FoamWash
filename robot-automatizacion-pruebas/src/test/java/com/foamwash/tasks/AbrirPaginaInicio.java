@@ -13,8 +13,10 @@ public class AbrirPaginaInicio implements Task {
 
     @Override
     public <T extends Actor> void performAs(T actor) {
-        actor.attemptsTo(
-                Open.url("http://localhost:3000")
-        );
+        if (!com.foamwash.userinterfaces.CrossPlatform.isMobile()) {
+            actor.attemptsTo(
+                    Open.url("http://localhost:3000")
+            );
+        }
     }
 }

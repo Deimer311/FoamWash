@@ -797,7 +797,7 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
                                                 id="nombre"
                                                 type="text"
                                                 value={formData.nombre}
-                                                onChange={handleInputChange}
+                                                onChange={(e) => setFormData({ ...formData, nombre: e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '') })}
                                                 required
                                                 placeholder="Tu nombre completo"
                                             />

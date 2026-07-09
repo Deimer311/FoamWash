@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+firebase-key.json
+google-services.json
+*.log
+check.ts
+check_db.js
+check_emp.js
+check_recent.js

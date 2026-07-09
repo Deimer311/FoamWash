@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><testsuite errors="0" failures="1" name="Seguridad y Proteccion de Rutas" skipped="0" tests="1" time="20.58" timestamp="2026-07-07 10:20:11"><testcase name="Un cliente no puede acceder al panel de administrador"><failure message="Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)&#10;Build info: version: '4.21.0', revision: '79ed462ef4'&#10;System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'&#10;Driver info: driver.version: unknown" type="net.thucydides.core.webdriver.exceptions.ElementShouldBePresentException">Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)
+Build info: version: '4.21.0', revision: '79ed462ef4'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: driver.version: unknown</failure><system-err>Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)
+Build info: version: '4.21.0', revision: '79ed462ef4'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: driver.version: unknown&#13;
+com.foamwash.stepdefinitions.AutenticacionStepDefinitions.queElClienteHaIniciadoSesionEnElSistema(AutenticacionStepDefinitions.java:137)&#13;
+</system-err></testcase></testsuite>

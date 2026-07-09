@@ -300,6 +300,9 @@ class _PerfilAdminEditScreenState extends State<PerfilAdminEditScreen> {
                           controller: _nombreCtrl,
                           label: 'Nombre completo',
                           icon: Icons.person_outline,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]')),
+                          ],
                           validator: (v) => (v == null || v.trim().isEmpty) ? 'El nombre es obligatorio' : null,
                         ),
                         const SizedBox(height: 14),
@@ -373,6 +376,7 @@ class _PerfilAdminEditScreenState extends State<PerfilAdminEditScreen> {
     required IconData icon,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -391,6 +395,7 @@ class _PerfilAdminEditScreenState extends State<PerfilAdminEditScreen> {
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           validator: validator,
           style: const TextStyle(fontFamily: 'Kanit', fontSize: 14, color: Color(0xFF080C1E), fontWeight: FontWeight.w600),
           decoration: InputDecoration(

@@ -233,7 +233,7 @@ const ConfirmacionModal = ({ isOpen, onClose, carritoItems = [] }) => {
                                 type="text"
                                 name="nombre"
                                 value={formData.nombre}
-                                onChange={handleChange}
+                                onChange={(e) => setFormData({ ...formData, nombre: e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '') })}
                                 required
                                 placeholder="Ej: Juan Pérez"
                             />

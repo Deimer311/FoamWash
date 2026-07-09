@@ -1122,6 +1122,9 @@ class _PerfilClienteEditScreenState extends State<PerfilClienteEditScreen> {
         controller: _nombreCtrl,
         label: 'Nombre completo *',
         icon: Icons.person_outline,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]')),
+        ],
         validator: (v) => (v == null || v.trim().isEmpty) ? 'El nombre es obligatorio' : null,
       ),
       _buildField(
@@ -1341,6 +1344,7 @@ class _PerfilClienteEditScreenState extends State<PerfilClienteEditScreen> {
     String? Function(String?)? validator,
     bool enabled = true,
     bool obscureText = false,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1362,6 +1366,7 @@ class _PerfilClienteEditScreenState extends State<PerfilClienteEditScreen> {
           validator: validator,
           enabled: enabled,
           obscureText: obscureText,
+          inputFormatters: inputFormatters,
           style: TextStyle(
             fontSize: 14,
             color: enabled ? const Color(0xFF111111) : const Color(0xFF999999),

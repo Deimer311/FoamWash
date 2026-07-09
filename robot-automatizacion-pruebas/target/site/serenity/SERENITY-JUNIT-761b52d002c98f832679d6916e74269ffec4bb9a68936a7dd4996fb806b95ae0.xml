@@ -1,1 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><testsuite errors="0" failures="0" name="Flujo End-to-End de Servicio" skipped="0" tests="1" time="61.21" timestamp="2026-06-23 10:42:33"><testcase name="Ciclo de vida completo de un servicio (Agendar -&gt; Aprobar -&gt; Completar)"/></testsuite>

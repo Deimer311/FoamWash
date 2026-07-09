@@ -302,7 +302,7 @@ const CrudUsuarios = () => {
                             <div className="cu-fg">
                                 <label>Nombre</label>
                                 <input type="text" name="nombre" value={formData.nombre}
-                                    onChange={handleInputChange} placeholder="Nombre completo" />
+                                    onChange={(e) => setFormData({ ...formData, nombre: e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '') })} placeholder="Nombre completo" />
                             </div>
                             <div className="cu-fg">
                                 <label>Usuario</label>

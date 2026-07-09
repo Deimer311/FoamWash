@@ -378,7 +378,7 @@ const CrudEmpleados = () => {
                             </h3>
                             <div className="form-group-modal">
                                 <label>Nombre Completo</label>
-                                <input type="text" name="nombre" value={formData.nombre} onChange={handleInputChange} placeholder="Nombre completo del empleado" />
+                                <input type="text" name="nombre" value={formData.nombre} onChange={(e) => setFormData({ ...formData, nombre: e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '') })} placeholder="Nombre completo del empleado" />
                             </div>
                             <div className="form-row">
                                 <div className="form-group-modal">

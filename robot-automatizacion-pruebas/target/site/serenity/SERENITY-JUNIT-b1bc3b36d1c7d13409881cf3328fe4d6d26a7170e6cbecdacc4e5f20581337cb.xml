@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><testsuite errors="0" failures="5" name="Autenticación y gestión de perfil" skipped="0" tests="5" time="104.39" timestamp="2026-07-07 10:18:02"><testcase name="Registro exitoso en el sistema como cliente"><failure message="Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)&#10;Build info: version: '4.21.0', revision: '79ed462ef4'&#10;System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'&#10;Driver info: driver.version: unknown" type="net.thucydides.core.webdriver.exceptions.ElementShouldBePresentException">Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)
+Build info: version: '4.21.0', revision: '79ed462ef4'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: driver.version: unknown</failure><system-err>Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)
+Build info: version: '4.21.0', revision: '79ed462ef4'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: driver.version: unknown&#13;
+com.foamwash.stepdefinitions.AutenticacionStepDefinitions.queElUsuarioSeEncuentraEnLaPaginaDeRegistro(AutenticacionStepDefinitions.java:33)&#13;
+</system-err></testcase><testcase name="Inicio de sesión exitoso"><failure message="Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)&#10;Build info: version: '4.21.0', revision: '79ed462ef4'&#10;System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'&#10;Driver info: driver.version: unknown" type="net.thucydides.core.webdriver.exceptions.ElementShouldBePresentException">Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)
+Build info: version: '4.21.0', revision: '79ed462ef4'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: driver.version: unknown</failure><system-err>Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)
+Build info: version: '4.21.0', revision: '79ed462ef4'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: driver.version: unknown&#13;
+com.foamwash.stepdefinitions.AutenticacionStepDefinitions.queElUsuarioSeEncuentraEnLaPaginaDeInicioDeSesion(AutenticacionStepDefinitions.java:64)&#13;
+</system-err></testcase><testcase name="Inicio de sesión fallido por credenciales invalidas"><failure message="Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)&#10;Build info: version: '4.21.0', revision: '79ed462ef4'&#10;System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'&#10;Driver info: driver.version: unknown" type="net.thucydides.core.webdriver.exceptions.ElementShouldBePresentException">Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)
+Build info: version: '4.21.0', revision: '79ed462ef4'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: driver.version: unknown</failure><system-err>Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)
+Build info: version: '4.21.0', revision: '79ed462ef4'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: driver.version: unknown&#13;
+com.foamwash.stepdefinitions.AutenticacionStepDefinitions.queElUsuarioSeEncuentraEnLaPaginaDeInicioDeSesion(AutenticacionStepDefinitions.java:64)&#13;
+</system-err></testcase><testcase name="Recuperacion de contraseña"><failure message="Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)&#10;Build info: version: '4.21.0', revision: '79ed462ef4'&#10;System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'&#10;Driver info: driver.version: unknown" type="net.thucydides.core.webdriver.exceptions.ElementShouldBePresentException">Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)
+Build info: version: '4.21.0', revision: '79ed462ef4'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: driver.version: unknown</failure><system-err>Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)
+Build info: version: '4.21.0', revision: '79ed462ef4'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: driver.version: unknown&#13;
+com.foamwash.stepdefinitions.AutenticacionStepDefinitions.queElUsuarioOlvidoSuContrasena(AutenticacionStepDefinitions.java:106)&#13;
+</system-err></testcase><testcase name="Edicion del perfil de usuario"><failure message="Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)&#10;Build info: version: '4.21.0', revision: '79ed462ef4'&#10;System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'&#10;Driver info: driver.version: unknown" type="net.thucydides.core.webdriver.exceptions.ElementShouldBePresentException">Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)
+Build info: version: '4.21.0', revision: '79ed462ef4'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: driver.version: unknown</failure><system-err>Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)
+Build info: version: '4.21.0', revision: '79ed462ef4'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: driver.version: unknown&#13;
+com.foamwash.stepdefinitions.AutenticacionStepDefinitions.queElClienteHaIniciadoSesionEnElSistema(AutenticacionStepDefinitions.java:137)&#13;
+</system-err></testcase></testsuite>

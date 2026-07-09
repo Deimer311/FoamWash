@@ -313,7 +313,9 @@ class _PerfilTrabajadorEditScreenState extends State<PerfilTrabajadorEditScreen>
                     _sectionTitle('Datos Personales', Icons.person_rounded),
                     const SizedBox(height: 12),
                     _buildField(controller: _nombreCtrl,    label: 'Nombre completo',  icon: Icons.person_outline,
-                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Obligatorio' : null),
+                      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]'))],
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'El nombre es obligatorio' : null,
+                    ),
                     const SizedBox(height: 12),
                     _buildField(controller: _correoCtrl,    label: 'Correo electrónico',  icon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
@@ -406,6 +408,7 @@ class _PerfilTrabajadorEditScreenState extends State<PerfilTrabajadorEditScreen>
     String? Function(String?)? validator,
     String? hint,
     int maxLines = 1,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -424,6 +427,7 @@ class _PerfilTrabajadorEditScreenState extends State<PerfilTrabajadorEditScreen>
           keyboardType: keyboardType,
           validator: validator,
           maxLines: maxLines,
+          inputFormatters: inputFormatters,
           style: const TextStyle(fontFamily: 'Kanit', fontSize: 15, color: Color(0xFF080C1E), fontWeight: FontWeight.w600),
           decoration: InputDecoration(
             hintText: hint,

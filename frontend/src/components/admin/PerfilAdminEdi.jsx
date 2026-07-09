@@ -102,7 +102,11 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
-    setFormData(prev => ({ ...prev, [id]: value }));
+    let finalValue = value;
+    if (id === 'nombre') {
+      finalValue = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+    }
+    setFormData(prev => ({ ...prev, [id]: finalValue }));
   };
 
   const handleSubmit = async (e) => {

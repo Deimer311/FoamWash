@@ -15,6 +15,8 @@ import net.serenitybdd.screenplay.actors.OnlineCast;
 import net.serenitybdd.screenplay.actions.Click;
 import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
 import static org.hamcrest.Matchers.containsString;
+import com.foamwash.userinterfaces.CrossPlatform;
+import org.openqa.selenium.By;
 
 public class AutenticacionStepDefinitions {
 
@@ -29,7 +31,7 @@ public class AutenticacionStepDefinitions {
                 new AbrirPagina()
         );
         OnStage.theActorInTheSpotlight().attemptsTo(
-                Click.on(org.openqa.selenium.By.cssSelector(".login-btn")),
+                Click.on(CrossPlatform.target("botón login", By.cssSelector(".login-btn"), By.xpath("//*[@content-desc='btn_login']"))),
                 Click.on(RegisterPage.BTN_MODAL_REGISTRO)
         );
     }
@@ -46,10 +48,10 @@ public class AutenticacionStepDefinitions {
     public void deberiaVerUnMensajeDeConfirmacionDeRegistro() {
         // Esperar a que la redirección ocurra y el elemento sea visible
         OnStage.theActorInTheSpotlight().attemptsTo(
-                net.serenitybdd.screenplay.waits.WaitUntil.the(org.openqa.selenium.By.cssSelector(".hc-header"), net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible()).forNoMoreThan(5).seconds()
+                net.serenitybdd.screenplay.waits.WaitUntil.the(CrossPlatform.target("header confirmacion", By.cssSelector(".hc-header"), By.xpath("//android.widget.TextView")), net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible()).forNoMoreThan(5).seconds()
         );
         OnStage.theActorInTheSpotlight().should(
-                seeThat(net.serenitybdd.screenplay.questions.WebElementQuestion.the(org.openqa.selenium.By.cssSelector(".hc-header")), 
+                seeThat(net.serenitybdd.screenplay.questions.WebElementQuestion.the(CrossPlatform.target("header confirmacion", By.cssSelector(".hc-header"), By.xpath("//android.widget.TextView"))), 
                         net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible())
         );
     }
@@ -60,7 +62,7 @@ public class AutenticacionStepDefinitions {
                 new AbrirPagina()
         );
         OnStage.theActorInTheSpotlight().attemptsTo(
-                Click.on(org.openqa.selenium.By.cssSelector(".login-btn"))
+                Click.on(CrossPlatform.target("botón login", By.cssSelector(".login-btn"), By.xpath("//*[@content-desc='btn_login']")))
         );
     }
 
@@ -74,10 +76,10 @@ public class AutenticacionStepDefinitions {
     @Entonces("deberia ver un mensaje de error indicando fallo de autenticacion")
     public void deberiaVerUnMensajeDeErrorIndicandoFalloDeAutenticacion() {
         OnStage.theActorInTheSpotlight().attemptsTo(
-                net.serenitybdd.screenplay.waits.WaitUntil.the(org.openqa.selenium.By.cssSelector(".error-message"), net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible()).forNoMoreThan(5).seconds()
+                net.serenitybdd.screenplay.waits.WaitUntil.the(CrossPlatform.target("mensaje de error", By.cssSelector(".error-message"), By.xpath("//android.widget.TextView[contains(@text, 'error') or contains(@text, 'inválida')]")), net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible()).forNoMoreThan(5).seconds()
         );
         OnStage.theActorInTheSpotlight().should(
-                seeThat(net.serenitybdd.screenplay.questions.WebElementQuestion.the(org.openqa.selenium.By.cssSelector(".error-message")), 
+                seeThat(net.serenitybdd.screenplay.questions.WebElementQuestion.the(CrossPlatform.target("mensaje de error", By.cssSelector(".error-message"), By.xpath("//android.widget.TextView[contains(@text, 'error') or contains(@text, 'inválida')]"))), 
                         net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible())
         );
     }
@@ -102,16 +104,16 @@ public class AutenticacionStepDefinitions {
                 new AbrirPagina()
         );
         OnStage.theActorInTheSpotlight().attemptsTo(
-                Click.on(org.openqa.selenium.By.cssSelector(".login-btn")),
-                Click.on(org.openqa.selenium.By.cssSelector(".forgot-link"))
+                Click.on(CrossPlatform.target("botón login", By.cssSelector(".login-btn"), By.xpath("//*[@content-desc='btn_login']"))),
+                Click.on(CrossPlatform.target("enlace olvido contraseña", By.cssSelector(".forgot-link"), By.xpath("//android.widget.TextView[contains(@text, 'olvidado')]")))
         );
     }
 
     @Cuando("solicita la recuperacion de contraseña con su correo")
     public void solicitaLaRecuperacionDeContrasenaConSuCorreo() {
         OnStage.theActorInTheSpotlight().attemptsTo(
-                net.serenitybdd.screenplay.actions.Enter.theValue("cliente@gmail.com").into(org.openqa.selenium.By.cssSelector("input[type='email']")),
-                Click.on(org.openqa.selenium.By.cssSelector(".submit-button"))
+                net.serenitybdd.screenplay.actions.Enter.theValue("cliente@gmail.com").into(CrossPlatform.target("email recuperación", By.cssSelector("input[type='email']"), By.xpath("//android.widget.EditText[contains(@text, 'Email')]"))),
+                Click.on(CrossPlatform.target("botón enviar", By.cssSelector(".submit-button"), By.xpath("//android.widget.Button[contains(@text, 'Enviar')]")))
         );
     }
 
@@ -119,10 +121,10 @@ public class AutenticacionStepDefinitions {
     public void deberiaRecibirUnEnlaceDeRecuperacionValido() {
         // Esperamos a que pase al paso 2 antes de la aserción
         OnStage.theActorInTheSpotlight().attemptsTo(
-                net.serenitybdd.screenplay.waits.WaitUntil.the(org.openqa.selenium.By.cssSelector(".code-input"), net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible()).forNoMoreThan(5).seconds()
+                net.serenitybdd.screenplay.waits.WaitUntil.the(CrossPlatform.target("input codigo", By.cssSelector(".code-input"), By.xpath("//android.widget.EditText")), net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible()).forNoMoreThan(5).seconds()
         );
         OnStage.theActorInTheSpotlight().should(
-                seeThat(net.serenitybdd.screenplay.questions.WebElementQuestion.the(org.openqa.selenium.By.cssSelector(".code-input")), 
+                seeThat(net.serenitybdd.screenplay.questions.WebElementQuestion.the(CrossPlatform.target("input codigo", By.cssSelector(".code-input"), By.xpath("//android.widget.EditText"))), 
                         net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible())
         );
     }
@@ -133,7 +135,7 @@ public class AutenticacionStepDefinitions {
                 new AbrirPagina()
         );
         OnStage.theActorInTheSpotlight().attemptsTo(
-                Click.on(org.openqa.selenium.By.cssSelector(".login-btn")),
+                Click.on(CrossPlatform.target("botón login", By.cssSelector(".login-btn"), By.xpath("//*[@content-desc='btn_login']"))),
                 IngresarCredenciales.con("cliente@gmail.com", "123456")
         );
     }
@@ -141,27 +143,29 @@ public class AutenticacionStepDefinitions {
     @Cuando("edita su perfil con nueva informacion")
     public void editaSuPerfilConNuevaInformacion() {
         OnStage.theActorInTheSpotlight().attemptsTo(
-                net.serenitybdd.screenplay.waits.WaitUntil.the(org.openqa.selenium.By.cssSelector(".hc-avatar-btn"), net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible()).forNoMoreThan(5).seconds(),
-                Click.on(org.openqa.selenium.By.cssSelector(".hc-avatar-btn")),
-                net.serenitybdd.screenplay.waits.WaitUntil.the(org.openqa.selenium.By.xpath("//button[contains(., 'Mi Perfil')]"), net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isClickable()).forNoMoreThan(5).seconds(),
-                Click.on(org.openqa.selenium.By.xpath("//button[contains(., 'Mi Perfil')]")),
+                net.serenitybdd.screenplay.waits.WaitUntil.the(CrossPlatform.target("avatar", By.cssSelector(".hc-avatar-btn"), By.xpath("//android.widget.ImageView")), net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible()).forNoMoreThan(5).seconds(),
+                Click.on(CrossPlatform.target("avatar", By.cssSelector(".hc-avatar-btn"), By.xpath("//android.widget.ImageView"))),
+                net.serenitybdd.screenplay.waits.WaitUntil.the(CrossPlatform.target("btn mi perfil", By.xpath("//button[contains(., 'Mi Perfil')]"), By.xpath("//android.widget.TextView[contains(@text, 'Perfil')]")), net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isClickable()).forNoMoreThan(5).seconds(),
+                Click.on(CrossPlatform.target("btn mi perfil", By.xpath("//button[contains(., 'Mi Perfil')]"), By.xpath("//android.widget.TextView[contains(@text, 'Perfil')]"))),
                 
-                net.serenitybdd.screenplay.waits.WaitUntil.the(org.openqa.selenium.By.cssSelector(".edit-profile-btn"), net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible()).forNoMoreThan(10).seconds(),
-                Click.on(org.openqa.selenium.By.cssSelector(".edit-profile-btn")),
+                net.serenitybdd.screenplay.waits.WaitUntil.the(CrossPlatform.target("btn editar perfil", By.cssSelector(".edit-profile-btn"), By.xpath("//android.widget.Button[contains(@text, 'Editar')]")), net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible()).forNoMoreThan(10).seconds(),
+                Click.on(CrossPlatform.target("btn editar perfil", By.cssSelector(".edit-profile-btn"), By.xpath("//android.widget.Button[contains(@text, 'Editar')]"))),
                 
-                net.serenitybdd.screenplay.actions.Enter.theValue("Calle Editada " + System.currentTimeMillis()).into(org.openqa.selenium.By.id("direccion")).thenHit(org.openqa.selenium.Keys.ENTER)
+                net.serenitybdd.screenplay.actions.Enter.theValue("Calle Editada " + System.currentTimeMillis()).into(CrossPlatform.target("input direccion", By.id("direccion"), By.xpath("//android.widget.EditText[contains(@text, 'Dirección') or contains(@hint, 'Dirección')]"))).thenHit(org.openqa.selenium.Keys.ENTER)
         );
     }
 
     @Entonces("los cambios deberian guardarse correctamente y ver un mensaje de confirmacion")
     public void losCambiosDeberianGuardarseCorrectamente() {
         OnStage.theActorInTheSpotlight().attemptsTo(
-                net.serenitybdd.screenplay.waits.WaitUntil.the(org.openqa.selenium.By.cssSelector(".pce-toast"), net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible()).forNoMoreThan(5).seconds()
+                net.serenitybdd.screenplay.waits.WaitUntil.the(CrossPlatform.target("toast", By.cssSelector(".pce-toast"), By.xpath("//android.widget.Toast | //android.widget.TextView[contains(@text, 'éxito')]")), net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible()).forNoMoreThan(5).seconds()
         );
         OnStage.theActorInTheSpotlight().should(
-                seeThat(net.serenitybdd.screenplay.questions.WebElementQuestion.the(org.openqa.selenium.By.cssSelector(".pce-toast")), 
+                seeThat(net.serenitybdd.screenplay.questions.WebElementQuestion.the(CrossPlatform.target("toast", By.cssSelector(".pce-toast"), By.xpath("//android.widget.Toast | //android.widget.TextView[contains(@text, 'éxito')]"))), 
                         net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible())
         );
     }
 }
+
+
 

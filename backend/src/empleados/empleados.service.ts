@@ -12,7 +12,7 @@ export class EmpleadosService {
   // GET /api/empleados — lista todos los empleados
   async findAll() {
     return this.prisma.usuario.findMany({
-      where: { rol_Id_Rol: 2 },
+      where: { rol_Id_Rol: 2, estado: 'activo' },
       select: {
         Id_Usuario: true,
         Nombre: true,

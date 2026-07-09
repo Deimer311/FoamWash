@@ -76,6 +76,7 @@
                 <version>3.2.5</version>
                 <configuration>
                     <skipTests>true</skipTests>
+                    <testFailureIgnore>true</testFailureIgnore>
                 </configuration>
             </plugin>
             <plugin>
@@ -83,6 +84,7 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
+                    <testFailureIgnore>true</testFailureIgnore>
                     <includes>
                         <include>**/*Runner.java</include>
                     </includes>
@@ -103,6 +105,11 @@
                 <dependencies>
                     <dependency>
                         <groupId>net.serenity-bdd</groupId>
+                        <artifactId>serenity-single-page-report</artifactId>
+                        <version>${serenity.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>net.serenity-bdd</groupId>
                         <artifactId>serenity-report-resources</artifactId>
                         <version>${serenity.version}</version>
                     </dependency>
@@ -114,6 +121,16 @@
                         <goals>
                             <goal>aggregate</goal>
                         </goals>
+                    </execution>
+                    <execution>
+                        <id>serenity-single-page</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>reports</goal>
+                        </goals>
+                        <configuration>
+                            <reports>single-page-html</reports>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

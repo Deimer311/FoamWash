@@ -58,7 +58,7 @@ const RegisterView = ({ onRedirect }) => {
             <form className="form" onSubmit={handleRegister}>
                 <div className="input-group">
                     <input type="text" className="input-field" placeholder="Nombre completo *" required
-                        value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                        value={fullName} onChange={(e) => setFullName(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, ''))} />
                 </div>
                 <div className="input-group">
                     <input type="tel" className="input-field" placeholder="Teléfono (10 dígitos) *" required

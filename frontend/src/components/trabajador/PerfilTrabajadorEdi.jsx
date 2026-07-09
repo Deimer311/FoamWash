@@ -452,7 +452,7 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
                                     <div className="pte-form-grid" style={S.formGrid}>
                                         <div style={S.fg}>
                                             <label style={S.label}>Nombre Completo *</label>
-                                            <input className="pte-input" id="nombre" type="text" value={formData.nombre} onChange={handleInputChange} required placeholder="Nombre completo" style={S.input} />
+                                            <input className="pte-input" id="nombre" type="text" value={formData.nombre} onChange={(e) => setFormData({ ...formData, nombre: e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '') })} required placeholder="Nombre completo" style={S.input} />
                                         </div>
                                         <div style={S.fg}>
                                             <label style={S.label}>Fecha de Nacimiento</label>

@@ -1,3 +1,4 @@
+com\foamwash\userinterfaces\CrossPlatform.class
 com\foamwash\tasks\IngresarCredenciales.class
 com\foamwash\stepdefinitions\ReportesEstadisticasStepDefinitions.class
 com\foamwash\stepdefinitions\AutenticacionStepDefinitions.class

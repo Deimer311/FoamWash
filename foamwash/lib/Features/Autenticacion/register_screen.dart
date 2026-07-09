@@ -344,6 +344,9 @@ class _RegisterScreenState extends State<RegisterScreen>
           hint: 'Nombre completo *',
           icon: Icons.person_outline,
           keyboardType: TextInputType.name,
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]')),
+          ],
         ),
         const SizedBox(height: 12),
         _InputField(
