@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><testsuite errors="0" failures="1" name="Flujo End-to-End de Servicio" skipped="0" tests="1" time="19.6" timestamp="2026-07-07 10:19:50"><testcase name="Ciclo de vida completo de un servicio (Agendar -&gt; Aprobar -&gt; Completar)"><failure message="Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)&#10;Build info: version: '4.21.0', revision: '79ed462ef4'&#10;System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'&#10;Driver info: driver.version: unknown" type="net.thucydides.core.webdriver.exceptions.ElementShouldBePresentException">Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)
-Build info: version: '4.21.0', revision: '79ed462ef4'
-System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
-Driver info: driver.version: unknown</failure><system-err>Expected condition failed: waiting for By.xpath: //*[@content-desc='btn_login'] to be present (tried for 5 second(s) with 100 milliseconds interval)
-Build info: version: '4.21.0', revision: '79ed462ef4'
-System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
-Driver info: driver.version: unknown&#13;
-com.foamwash.stepdefinitions.FlujoE2EStepDefinitions.queClienteAgendaServicio(FlujoE2EStepDefinitions.java:18)&#13;
-</system-err></testcase></testsuite>

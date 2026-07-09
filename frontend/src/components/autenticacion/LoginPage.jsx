@@ -2,7 +2,7 @@
 // ARCHIVO  : LoginPage.jsx
 // PROYECTO : FoamWash
 // RUTA     : src/components/autenticacion/LoginPage.jsx
-// AUTOR    : Cristian Andrés Criollo Tovar
+// MODIFICADO POR: Cristian Andrés Criollo Tovar
 // FECHA    : 15-03-2026
 // -----------------------------------------------------------------------------
 // DESCRIPCIÓN:
@@ -16,24 +16,24 @@ import './estilos_autenticacion/login.css';
 import useSound from '../../hooks/useSound';
 
 const LoginPage = ({ onBackToHome, onLoginSuccess, onRecuperar }) => {
-    
+
     const [isRegisterActive, setIsRegisterActive] = useState(false);
-    
+
     const switchToRegister = () => {
         setIsRegisterActive(true);
     };
-    
+
     const switchToLogin = () => {
         setIsRegisterActive(false);
     };
-    
+
     return (
         <>
             <div className="background"></div>
 
             <center>
-                <a 
-                    href="#" 
+                <a
+                    href="#"
                     onClick={(e) => {
                         e.preventDefault();
                         onBackToHome();
@@ -49,12 +49,12 @@ const LoginPage = ({ onBackToHome, onLoginSuccess, onRecuperar }) => {
 
                     <div className="card-side form-side">
                         {!isRegisterActive && (
-                            <LoginView 
+                            <LoginView
                                 onLoginSuccess={onLoginSuccess}
                                 onRecuperar={onRecuperar}
                             />
                         )}
-                        
+
                         {isRegisterActive && (
                             <RegisterView onLoginSuccess={onLoginSuccess} />
                         )}
@@ -67,22 +67,22 @@ const LoginPage = ({ onBackToHome, onLoginSuccess, onRecuperar }) => {
                                 Si no tienes una cuenta<br />
                                 puedes crear una nueva
                             </p>
-                            <button 
-                                className="toggle-button" 
+                            <button
+                                className="toggle-button"
                                 onClick={switchToRegister}
                             >
                                 Registrar
                             </button>
                         </div>
-                        
+
                         <div className={`toggle-content register-active-content ${isRegisterActive ? 'active' : ''}`}>
                             <h2 className="toggle-title">¡Bienvenido de nuevo!</h2>
                             <p className="toggle-text">
                                 Si ya tienes una cuenta<br />
                                 puedes iniciar sesión
                             </p>
-                            <button 
-                                className="toggle-button" 
+                            <button
+                                className="toggle-button"
                                 onClick={switchToLogin}
                             >
                                 Iniciar sesión
@@ -103,18 +103,18 @@ const LoginView = ({ onLoginSuccess, onRecuperar }) => {
     const { login } = useAuth();
     // 🔊 NUEVO
     const { playExito, playError } = useSound();
-    
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [message, setMessage] = useState({ 
-        text: '', 
-        isError: false, 
-        isLoading: false 
+    const [message, setMessage] = useState({
+        text: '',
+        isError: false,
+        isLoading: false
     });
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        
+
         setMessage({ text: '', isError: false, isLoading: true });
 
         try {
@@ -124,13 +124,13 @@ const LoginView = ({ onLoginSuccess, onRecuperar }) => {
                 console.log('✅ Login exitoso:', result);
                 // 🔊 NUEVO — Suena éxito
                 playExito();
-                
-                setMessage({ 
-                    text: result.message, 
-                    isError: false, 
-                    isLoading: false 
+
+                setMessage({
+                    text: result.message,
+                    isError: false,
+                    isLoading: false
                 });
-                
+
                 setTimeout(() => {
                     if (onLoginSuccess) {
                         onLoginSuccess({
@@ -144,29 +144,29 @@ const LoginView = ({ onLoginSuccess, onRecuperar }) => {
                 console.log('❌ Login fallido:', result.message);
                 // 🔊 NUEVO — Suena error
                 playError();
-                
-                setMessage({ 
-                    text: result.message, 
-                    isError: true, 
-                    isLoading: false 
+
+                setMessage({
+                    text: result.message,
+                    isError: true,
+                    isLoading: false
                 });
             }
         } catch (error) {
             console.error('❌ Error en handleLogin:', error);
             // 🔊 NUEVO — Suena error
             playError();
-            setMessage({ 
-                text: 'Error al iniciar sesión. Por favor intenta de nuevo.', 
-                isError: true, 
-                isLoading: false 
+            setMessage({
+                text: 'Error al iniciar sesión. Por favor intenta de nuevo.',
+                isError: true,
+                isLoading: false
             });
         }
     };
-    
+
     return (
         <div className="form-content login-view">
             <h2 className="title">Iniciar sesión</h2>
-            
+
             {message.text && (
                 <div className={`message-area ${message.isError ? 'error-message' : 'success-message'}`}>
                     {message.isLoading ? 'Cargando...' : message.text}
@@ -175,10 +175,10 @@ const LoginView = ({ onLoginSuccess, onRecuperar }) => {
 
             <form className="form" onSubmit={handleLogin}>
                 <div className="input-group">
-                    <input 
-                        type="email" 
-                        className="input-field" 
-                        placeholder="Correo electrónico" 
+                    <input
+                        type="email"
+                        className="input-field"
+                        placeholder="Correo electrónico"
                         required
                         autoComplete="email"
                         value={email}
@@ -187,10 +187,10 @@ const LoginView = ({ onLoginSuccess, onRecuperar }) => {
                 </div>
 
                 <div className="input-group">
-                    <input 
-                        type="password" 
-                        className="input-field" 
-                        placeholder="Contraseña" 
+                    <input
+                        type="password"
+                        className="input-field"
+                        placeholder="Contraseña"
                         required
                         autoComplete="current-password"
                         value={password}
@@ -199,8 +199,8 @@ const LoginView = ({ onLoginSuccess, onRecuperar }) => {
                 </div>
 
                 <div className="forgot-password">
-                    <a 
-                        href="#" 
+                    <a
+                        href="#"
                         onClick={(e) => {
                             e.preventDefault();
                             if (onRecuperar) {
@@ -213,8 +213,8 @@ const LoginView = ({ onLoginSuccess, onRecuperar }) => {
                     </a>
                 </div>
 
-                <button 
-                    type="submit" 
+                <button
+                    type="submit"
                     className="submit-button"
                     disabled={message.isLoading}
                 >
@@ -232,42 +232,42 @@ const RegisterView = ({ onLoginSuccess }) => {
     const { register } = useAuth();
     // 🔊 NUEVO
     const { playExito, playError } = useSound();
-    
+
     const [email, setEmail] = useState('');
     const [fullName, setFullName] = useState('');
     const [phone, setPhone] = useState('');
     const [address, setAddress] = useState('');
     const [password, setPassword] = useState('');
-    const [message, setMessage] = useState({ 
-        text: '', 
-        isError: false, 
-        isLoading: false 
+    const [message, setMessage] = useState({
+        text: '',
+        isError: false,
+        isLoading: false
     });
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        
+
         setMessage({ text: '', isError: false, isLoading: true });
 
         // Validar teléfono
         if (phone && phone.length !== 10) {
             // 🔊 NUEVO — Suena error de validación
             playError();
-            setMessage({ 
-                text: 'El teléfono debe tener exactamente 10 dígitos.', 
-                isError: true, 
-                isLoading: false 
+            setMessage({
+                text: 'El teléfono debe tener exactamente 10 dígitos.',
+                isError: true,
+                isLoading: false
             });
             return;
         }
-        
+
         if (phone && !/^\d+$/.test(phone)) {
             // 🔊 NUEVO — Suena error de validación
             playError();
-            setMessage({ 
-                text: 'El teléfono solo puede contener números.', 
-                isError: true, 
-                isLoading: false 
+            setMessage({
+                text: 'El teléfono solo puede contener números.',
+                isError: true,
+                isLoading: false
             });
             return;
         }
@@ -289,13 +289,13 @@ const RegisterView = ({ onLoginSuccess }) => {
                 console.log('✅ Registro exitoso:', result);
                 // 🔊 NUEVO — Suena éxito
                 playExito();
-                
-                setMessage({ 
-                    text: result.message, 
-                    isError: false, 
-                    isLoading: false 
+
+                setMessage({
+                    text: result.message,
+                    isError: false,
+                    isLoading: false
                 });
-                
+
                 setTimeout(() => {
                     if (onLoginSuccess) {
                         onLoginSuccess({
@@ -309,29 +309,29 @@ const RegisterView = ({ onLoginSuccess }) => {
                 console.log('❌ Registro fallido:', result.message);
                 // 🔊 NUEVO — Suena error
                 playError();
-                
-                setMessage({ 
-                    text: result.message, 
-                    isError: true, 
-                    isLoading: false 
+
+                setMessage({
+                    text: result.message,
+                    isError: true,
+                    isLoading: false
                 });
             }
         } catch (error) {
             console.error('❌ Error en handleRegister:', error);
             // 🔊 NUEVO — Suena error
             playError();
-            setMessage({ 
-                text: 'Error al registrar. Por favor intenta de nuevo.', 
-                isError: true, 
-                isLoading: false 
+            setMessage({
+                text: 'Error al registrar. Por favor intenta de nuevo.',
+                isError: true,
+                isLoading: false
             });
         }
     };
-    
+
     return (
         <div className="form-content register-view">
             <h2 className="title">Regístrate</h2>
-            
+
             {message.text && (
                 <div className={`message-area ${message.isError ? 'error-message' : 'success-message'}`}>
                     {message.isLoading ? 'Procesando...' : message.text}
@@ -340,34 +340,34 @@ const RegisterView = ({ onLoginSuccess }) => {
 
             <form className="form" onSubmit={handleRegister}>
                 <div className="input-group">
-                    <input 
-                        type="email" 
-                        className="input-field" 
-                        placeholder="Correo electrónico *" 
+                    <input
+                        type="email"
+                        className="input-field"
+                        placeholder="Correo electrónico *"
                         required
                         autoComplete="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
                 </div>
-                
+
                 <div className="input-group">
-                    <input 
-                        type="text" 
-                        className="input-field" 
-                        placeholder="Nombre completo *" 
+                    <input
+                        type="text"
+                        className="input-field"
+                        placeholder="Nombre completo *"
                         required
                         autoComplete="name"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, ''))}
                     />
                 </div>
-                
+
                 <div className="input-group">
-                    <input 
-                        type="tel" 
-                        className="input-field" 
-                        placeholder="Teléfono (10 dígitos) *" 
+                    <input
+                        type="tel"
+                        className="input-field"
+                        placeholder="Teléfono (10 dígitos) *"
                         required
                         pattern="[0-9]{10}"
                         autoComplete="tel"
@@ -375,32 +375,32 @@ const RegisterView = ({ onLoginSuccess }) => {
                         onChange={(e) => setPhone(e.target.value)}
                     />
                 </div>
-                
+
                 <div className="input-group">
-                    <input 
-                        type="text" 
-                        className="input-field" 
-                        placeholder="Dirección (opcional)" 
+                    <input
+                        type="text"
+                        className="input-field"
+                        placeholder="Dirección (opcional)"
                         autoComplete="street-address"
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
                     />
                 </div>
-                
+
                 <div className="input-group">
-                    <input 
-                        type="password" 
-                        className="input-field" 
-                        placeholder="Contraseña (mín. 6 caracteres) *" 
+                    <input
+                        type="password"
+                        className="input-field"
+                        placeholder="Contraseña (mín. 6 caracteres) *"
                         required
                         autoComplete="new-password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </div>
-                
-                <button 
-                    type="submit" 
+
+                <button
+                    type="submit"
                     className="submit-button register-submit"
                     disabled={message.isLoading}
                 >

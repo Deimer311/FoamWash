@@ -1,1 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><testsuite errors="0" failures="0" name="Reportes y Estadísticas" skipped="0" tests="3" time="0.04" timestamp="2026-07-07 10:20:11"><testcase name="Visualizacion de estadisticas del sistema"/><testcase name="Generacion de reportes de servicios e ingresos"/><testcase name="Exportacion de datos historicos"/></testsuite>
