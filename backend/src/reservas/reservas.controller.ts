@@ -26,6 +26,13 @@ export class ReservasController {
     return { success: true, data };
   }
 
+  @Get('cliente/:id')
+  @ApiOperation({ summary: 'Obtener reservas de un cliente' })
+  async findByCliente(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.reservasService.findByCliente(id);
+    return { success: true, data };
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Obtener una reserva por ID' })
   async findOne(@Param('id', ParseIntPipe) id: number) {

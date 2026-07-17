@@ -23,6 +23,16 @@
       });
     }
 
+    async findByCliente(clienteId: number) {
+      return this.prisma.cotizacion.findMany({
+        where: { Id_usuario: clienteId },
+        include: {
+          servicios: true,
+        },
+        orderBy: { fecha_cotizacion: 'desc' },
+      });
+    }
+
     // FIX: el frontend manda { Tamano, Id_servicio } pero el schema usa "Tamaño" (con ñ)
     // Se acepta cualquiera de las dos formas para mayor compatibilidad
     async create(data: {
