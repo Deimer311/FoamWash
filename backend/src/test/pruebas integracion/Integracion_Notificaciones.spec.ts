@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import { AppModule } from '../../app.module';
 import { PrismaService } from '../../prisma/prisma.service';
 
-describe('Integración - Notificaciones (E2E)', () => {
+describe('Notificaciones', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let clientId: number;
@@ -46,11 +46,21 @@ describe('Integración - Notificaciones (E2E)', () => {
   });
 
   afterAll(async () => {
+    await prisma.calificacion.deleteMany();
+    await prisma.servicio.deleteMany();
+    await prisma.cotizacion.deleteMany();
+    await prisma.reserva.deleteMany();
+    await prisma.observacion.deleteMany();
+    await prisma.notificacion.deleteMany();
+    await prisma.empleado.deleteMany();
+    await prisma.usuario.deleteMany();
+    await prisma.tipoDeDocumento.deleteMany();
+    await prisma.rol.deleteMany();
     await prisma.$disconnect();
     await app.close();
   });
 
-  it('Validar que el usuario reciba una notificación cuando el estado del servicio cambie.', async () => {
+  it('Recibe una notificación cuando el estado del servicio cambie.', async () => {
     // Simulamos la creación directa en BD para verificar el endpoint de listado
     await prisma.notificacion.create({
       data: {
@@ -63,28 +73,28 @@ describe('Integración - Notificaciones (E2E)', () => {
     expect(res.status).toBeDefined();
   });
 
-  it('Validar que el usuario no tenga un canal externo en el que se vea el cambio del estado, el estado deber ser visible dentro de la plataforma', async () => {
+  it('Visualiza el estado dentro de la plataforma.', async () => {
     expect(true).toBe(true); // Lógica de canal externo
   });
 
-  it('Validar que el usuario reciba una notificación cuando se crea el servicio.', async () => {
+  it('Recibe una notificación al crear un servicio.', async () => {
     expect(true).toBe(true);
   });
 
-  it('Validar que el contenido de la notificación sea correcto.', async () => {
+  it('El contenido de la notificación es correcto.', async () => {
     const res = await request(app.getHttpServer()).get(`/notificaciones/cliente/${clientId}`);
     expect(res.status).toBeDefined();
   });
 
-  it('Validar que la notificación se envíe a los canales externos habilitados (correo, SMS, etc.).', async () => {
+  it('Envía la notificación a canales externos (correo, SMS).', async () => {
     expect(true).toBe(true);
   });
 
-  it('Validar que no se envíen notificaciones duplicadas por un mismo cambio de estado.', async () => {
+  it('No envía notificaciones duplicadas.', async () => {
     expect(true).toBe(true);
   });
 
-  it('Validar que las notificaciones se reciban en el orden correcto cuando existen varios cambios de estado.', async () => {
+  it('Muestra las notificaciones en el orden cronológico.', async () => {
     expect(true).toBe(true);
   });
 

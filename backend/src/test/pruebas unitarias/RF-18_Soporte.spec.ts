@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-describe('Suite RF-18 - Soporte', () => {
+describe('Soporte', () => {
 
   beforeEach(async () => {
     // Setup del módulo para RF-18

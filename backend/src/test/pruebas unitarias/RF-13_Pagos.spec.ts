@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-describe('Suite RF-13 - Pagos', () => {
+describe('Pagos', () => {
 
   beforeEach(async () => {
     // Setup del módulo para RF-13

@@ -1,22 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-describe('Suite RF-10 - AgendaEmpleados', () => {
+describe('AgendaEmpleados', () => {
 
   beforeEach(async () => {
     // Setup del módulo para RF-10
   });
 
-  it('CP-062: Validar que el empleado pueda visualizar su agenda de servicios', async () => {
+  it('CP-062: Pueda visualizar su agenda de servicios', async () => {
     // TODO: Implementación completa de validaciones según el documento
     expect(true).toBe(true);
   });
 
-  it('CP-063: Validar que se muestren correctamente los datos del servicio', async () => {
+  it('CP-063: Se muestren correctamente los datos del servicio', async () => {
     // TODO: Implementación completa de validaciones según el documento
     expect(true).toBe(true);
   });
 
-  it('CP-064: Validar que solo se muestren servicios del empleado logueado', async () => {
+  it('CP-064: Solo se muestren servicios del empleado logueado', async () => {
     // TODO: Implementación completa de validaciones según el documento
     expect(true).toBe(true);
   });

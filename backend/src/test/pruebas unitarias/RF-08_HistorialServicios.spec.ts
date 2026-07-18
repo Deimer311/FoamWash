@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-describe('Suite RF-08 - HistorialServicios', () => {
+describe('HistorialServicios', () => {
 
   beforeEach(async () => {
     // Setup del módulo para RF-08
   });
 
-  it('CP-050: Validar que el usuario pueda consultar el historial de servicios realizados.', async () => {
+  it('CP-050: Pueda consultar el historial de servicios realizados.', async () => {
     // TODO: Implementación completa de validaciones según el documento
     expect(true).toBe(true);
   });
 
-  it('CP-051: Validar que el usuario solo consulte su propio historial.', async () => {
+  it('CP-051: Solo consulte su propio historial.', async () => {
     // TODO: Implementación completa de validaciones según el documento
     expect(true).toBe(true);
   });
@@ -21,7 +21,7 @@ describe('Suite RF-08 - HistorialServicios', () => {
     expect(true).toBe(true);
   });
 
-  it('CP-053: Validar que el usuario pueda consultar el detalle de un servicio del historial.', async () => {
+  it('CP-053: Pueda consultar el detalle de un servicio del historial.', async () => {
     // TODO: Implementación completa de validaciones según el documento
     expect(true).toBe(true);
   });

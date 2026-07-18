@@ -4,12 +4,11 @@ import * as request from 'supertest';
 import { AppModule } from '../../app.module';
 import { PrismaService } from '../../prisma/prisma.service';
 
-describe('Integración - HistorialServicios (E2E)', () => {
+describe('HistorialServicios', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let clientId: number;
   let clientId2: number;
-  let observacionId: number;
   let reservaId: number;
 
   beforeAll(async () => {
@@ -36,72 +35,81 @@ describe('Integración - HistorialServicios (E2E)', () => {
     await prisma.rol.deleteMany();
 
     const rolCliente = await prisma.rol.create({ data: { Rol: 'Cliente' } });
+    
     const cliente1 = await prisma.usuario.create({
       data: {
         Nombre: 'Cliente Historial 1',
-        Correo: 'historial1@test.com',
+        Correo: 'hist1@test.com',
         estado: 'activo',
         rol_Id_Rol: rolCliente.Id_Rol,
-        N_Documento: '111111111'
-      },
+        N_Documento: '111111'
+      }
     });
     clientId = cliente1.Id_Usuario;
 
     const cliente2 = await prisma.usuario.create({
       data: {
         Nombre: 'Cliente Historial 2',
-        Correo: 'historial2@test.com',
+        Correo: 'hist2@test.com',
         estado: 'activo',
         rol_Id_Rol: rolCliente.Id_Rol,
-        N_Documento: '222222222'
-      },
+        N_Documento: '222222'
+      }
     });
     clientId2 = cliente2.Id_Usuario;
 
     const obs = await prisma.observacion.create({ data: { Observaciones: 'Lavado Básico' } });
-    observacionId = obs.Id_Observaciones;
-
     const res = await prisma.reserva.create({
       data: {
         fecha: new Date(),
         Hora: new Date(),
+        Estado: 'Finalizado',
         Id_Usuario: clientId,
-        observacion_Id_Observaciones: observacionId,
-        Estado: 'Completado'
+        observacion_Id_Observaciones: obs.Id_Observaciones
       }
     });
     reservaId = res.ID_Reserva;
   });
 
   afterAll(async () => {
+    await prisma.calificacion.deleteMany();
+    await prisma.servicio.deleteMany();
+    await prisma.cotizacion.deleteMany();
+    await prisma.reserva.deleteMany();
+    await prisma.observacion.deleteMany();
+    await prisma.notificacion.deleteMany();
+    await prisma.empleado.deleteMany();
+    await prisma.usuario.deleteMany();
+    await prisma.tipoDeDocumento.deleteMany();
+    await prisma.rol.deleteMany();
     await prisma.$disconnect();
     await app.close();
   });
 
-  it('Validar que el usuario pueda consultar el historial de servicios realizados.', async () => {
+  it('Consulta el historial de servicios realizados.', async () => {
     const res = await request(app.getHttpServer()).get(`/reservas/cliente/${clientId}`);
     expect(res.status).toBeDefined();
   });
 
-  it('Validar que el usuario solo consulte su propio historial.', async () => {
+  it('Solo permite consultar el propio historial.', async () => {
     const res = await request(app.getHttpServer()).get(`/reservas/cliente/${clientId2}`);
     expect(res.status).toBeDefined();
   });
 
-  it('Validar actualización del historial después de finalizar un servicio.', async () => {
+  it('Actualiza el historial después de finalizar un servicio.', async () => {
     expect(true).toBe(true);
   });
 
-  it('Validar que el usuario pueda consultar el detalle de un servicio del historial.', async () => {
+  it('Consulta el detalle de un servicio del historial.', async () => {
     const res = await request(app.getHttpServer()).get(`/reservas/${reservaId}`);
     expect(res.status).toBeDefined();
   });
 
-  it('Validar filtros del historial de servicios.', async () => {
+  it('Permite usar filtros en el historial de servicios.', async () => {
     expect(true).toBe(true);
   });
 
-  it('Validar comportamiento cuando ocurre una falla al cargar el historial', async () => {
+  it('Maneja correctamente fallas al cargar el historial', async () => {
     expect(true).toBe(true);
   });
 

@@ -85,13 +85,20 @@ for (const rf in groups) {
     const filePath = path.join(targetDir, fileName);
     
     let content = `import { Test, TestingModule } from '@nestjs/testing';\n\n`;
-    content += `describe('Suite ${rf} - ${nameSuffix}', () => {\n\n`;
+    content += `describe('${nameSuffix}', () => {\n\n`;
     content += `  beforeEach(async () => {\n`;
     content += `    // Setup del módulo para ${rf}\n`;
     content += `  });\n\n`;
     
     group.cps.forEach(cp => {
-        content += `  it('${cp.id}: ${cp.title.replace(/'/g, "\\'")}', async () => {\n`;
+        let cleanTitle = cp.title
+            .replace(/^Verificar que (el sistema |el usuario |el cliente |el empleado |el administrador |la aplicación |)/i, '')
+            .replace(/^Validar que (el sistema |el usuario |el cliente |el empleado |el administrador |la aplicación |)/i, '')
+            .replace(/^Comprobar que (el sistema |el usuario |el cliente |el empleado |el administrador |la aplicación |)/i, '');
+        // capitalize first letter
+        cleanTitle = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1);
+        
+        content += `  it('${cp.id}: ${cleanTitle.replace(/'/g, "\\'")}', async () => {\n`;
         content += `    // TODO: Implementación completa de validaciones según el documento\n`;
         content += `    expect(true).toBe(true);\n`;
         content += `  });\n\n`;

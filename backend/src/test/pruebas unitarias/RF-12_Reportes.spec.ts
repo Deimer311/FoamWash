@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-describe('Suite RF-12 - Reportes', () => {
+describe('Reportes', () => {
 
   beforeEach(async () => {
     // Setup del módulo para RF-12
   });
 
-  it('CP-074: Validar que el empleado pueda marcar un servicio como finalizado', async () => {
+  it('CP-074: Pueda marcar un servicio como finalizado', async () => {
     // TODO: Implementación completa de validaciones según el documento
     expect(true).toBe(true);
   });

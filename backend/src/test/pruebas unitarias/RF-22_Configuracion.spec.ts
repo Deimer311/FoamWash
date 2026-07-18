@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-describe('Suite RF-22 - Configuracion', () => {
+describe('Configuracion', () => {
 
   beforeEach(async () => {
     // Setup del módulo para RF-22
@@ -16,7 +16,7 @@ describe('Suite RF-22 - Configuracion', () => {
     expect(true).toBe(true);
   });
 
-  it('CP-002: Verificar que un usuario no pueda acceder a información de otros usuarios.', async () => {
+  it('CP-002: Un usuario no pueda acceder a información de otros usuarios.', async () => {
     // TODO: Implementación completa de validaciones según el documento
     expect(true).toBe(true);
   });

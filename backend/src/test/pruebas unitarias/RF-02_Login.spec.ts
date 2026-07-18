@@ -1,37 +1,37 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-describe('Suite RF-02 - Login', () => {
+describe('Login', () => {
 
   beforeEach(async () => {
     // Setup del módulo para RF-02
   });
 
-  it('CP-006: Verificar que el cliente pueda iniciar sesión con credenciales válidas.', async () => {
+  it('CP-006: Pueda iniciar sesión con credenciales válidas.', async () => {
     // TODO: Implementación completa de validaciones según el documento
     expect(true).toBe(true);
   });
 
-  it('CP-007: Verificar que el cliente pueda cerrar sesión correctamente', async () => {
+  it('CP-007: Pueda cerrar sesión correctamente', async () => {
     // TODO: Implementación completa de validaciones según el documento
     expect(true).toBe(true);
   });
 
-  it('CP-008: Verificar que la sesión expire por inactividad.', async () => {
+  it('CP-008: La sesión expire por inactividad.', async () => {
     // TODO: Implementación completa de validaciones según el documento
     expect(true).toBe(true);
   });
 
-  it('CP-009: Verificar que el sistema no permita iniciar sesión cuando existan campos obligatorios vacíos.', async () => {
+  it('CP-009: No permita iniciar sesión cuando existan campos obligatorios vacíos.', async () => {
     // TODO: Implementación completa de validaciones según el documento
     expect(true).toBe(true);
   });
 
-  it('CP-010: Verificar que el sistema valide el formato del correo electrónico antes de iniciar sesión.', async () => {
+  it('CP-010: Valide el formato del correo electrónico antes de iniciar sesión.', async () => {
     // TODO: Implementación completa de validaciones según el documento
     expect(true).toBe(true);
   });
 
-  it('CP-011: Verificar que el sistema no permita iniciar sesión con una contraseña incorrecta.', async () => {
+  it('CP-011: No permita iniciar sesión con una contraseña incorrecta.', async () => {
     // TODO: Implementación completa de validaciones según el documento
     expect(true).toBe(true);
   });
