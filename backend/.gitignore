@@ -8,3 +8,5 @@ check.ts
 check_db.js
 check_emp.js
 check_recent.js
+foamwash-contenedores.tar
+*.tar

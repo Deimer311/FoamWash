@@ -1,0 +1,174 @@
+// prisma/schema.test.prisma
+// ============================================================
+// Copia del schema de producción adaptada a SQLite para pruebas
+// de integración. NO usar en producción.
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/test-client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./test.db"
+}
+
+model TipoDeDocumento {
+  idTipo_de_Documento  Int       @id @default(autoincrement()) @map("idTipo_de_Documento")
+  nombre_del_documento String    @unique(map: "nombre_del_documento_UNIQUE") @map("nombre_del_documento")
+  usuario              Usuario[]
+
+  @@map("tipo_de_documento")
+}
+
+model Rol {
+  Id_Rol   Int       @id @default(autoincrement()) @map("Id_Rol")
+  Rol      String    @map("Rol")
+  usuarios Usuario[]
+
+  @@map("rol")
+}
+
+model Usuario {
+  Id_Usuario                             Int              @id @default(autoincrement()) @map("Id_Usuario")
+  Nombre                                 String?          @map("Nombre")
+  Telefono                               String?          @map("Telefono")
+  N_Documento                            String?          @unique(map: "N_Documento") @map("N_Documento")
+  Direccion                              String?          @map("Direccion")
+  Correo                                 String?          @unique(map: "Correo") @map("Correo")
+  password_hash                          String?          @map("password_hash")
+  estado                                 String?          @default("activo") @map("estado")
+  rol_Id_Rol                             Int?             @map("rol_Id_Rol")
+  tipo_de_documento_id_tipo_de_documento Int?
+  reset_token                            String?          @map("reset_token")
+  reset_token_expires                    DateTime?        @map("reset_token_expires")
+  last_login                             DateTime?        @map("last_login")
+  fecha_registro                         DateTime?        @default(now()) @map("fecha_registro")
+  access_token                           String?          @map("access_token")
+  refresh_token                          String?          @map("refresh_token")
+  token_created_at                       DateTime?        @map("token_created_at")
+  token_expires_at                       DateTime?        @map("token_expires_at")
+  foto_perfil                            String?          @map("foto_perfil")
+  calificaciones                         Calificacion[]
+  cotizaciones                           Cotizacion[]
+  empleado                               Empleado[]
+  notificaciones                         Notificacion[]
+  reservasComoEmpleado                   Reserva[]        @relation("EmpleadoReservas")
+  reservasComoCliente                    Reserva[]        @relation("ClienteReservas")
+  tipo_de_documento                      TipoDeDocumento? @relation(fields: [tipo_de_documento_id_tipo_de_documento], references: [idTipo_de_Documento], onDelete: Restrict)
+  rol                                    Rol?             @relation(fields: [rol_Id_Rol], references: [Id_Rol], onDelete: Restrict)
+
+  @@index([tipo_de_documento_id_tipo_de_documento], map: "fk_usuario_Tipo_de_Documento1_idx")
+  @@index([rol_Id_Rol], map: "fk_usuario_rol1_idx")
+  @@map("usuario")
+}
+
+model Empleado {
+  Id_Empleado                  Int       @id @default(autoincrement()) @map("Id_Empleado")
+  usuario_Id_Usuario           Int       @map("usuario_Id_Usuario")
+  cargo                        String?   @map("cargo")
+  fecha_nacimiento             DateTime? @map("fecha_nacimiento")
+  fecha_ingreso                DateTime? @map("fecha_ingreso")
+  dias_laborales               String?   @map("dias_laborales")
+  horario                      String?   @map("horario")
+  especialidades               String?   @map("especialidades")
+  certificaciones              String?   @map("certificaciones")
+  contacto_emergencia_nombre   String?   @map("contacto_emergencia_nombre")
+  contacto_emergencia_telefono String?   @map("contacto_emergencia_telefono")
+  usuario                      Usuario   @relation(fields: [usuario_Id_Usuario], references: [Id_Usuario], onUpdate: Restrict)
+
+  @@index([usuario_Id_Usuario], map: "usuario_Id_Usuario")
+  @@map("empleado")
+}
+
+model Observacion {
+  Id_Observaciones Int       @id @default(autoincrement()) @map("Id_Observaciones")
+  Observaciones    String?   @map("Observaciones")
+  estado           String?   @map("estado")
+  reservas         Reserva[]
+
+  @@map("observacion")
+}
+
+model Reserva {
+  ID_Reserva                   Int            @id @default(autoincrement()) @map("ID_Reserva")
+  Estado                       String         @default("Pendiente") @map("Estado")
+  Id_Usuario                   Int            @map("Id_Usuario")
+  fecha                        DateTime       @map("fecha")
+  Hora                         DateTime       @map("Hora")
+  Informacion_adicional        String?        @map("Informacion_adicional")
+  observacion_Id_Observaciones Int            @map("observacion_Id_Observaciones")
+  empleado_Id_Usuario          Int?           @map("empleado_Id_Usuario")
+  calificaciones               Calificacion[]
+  empleado                     Usuario?       @relation("EmpleadoReservas", fields: [empleado_Id_Usuario], references: [Id_Usuario])
+  observacion                  Observacion    @relation(fields: [observacion_Id_Observaciones], references: [Id_Observaciones])
+  cliente                      Usuario        @relation("ClienteReservas", fields: [Id_Usuario], references: [Id_Usuario])
+  servicios                    Servicio[]
+
+  @@index([empleado_Id_Usuario], map: "fk_reserva_empleado")
+  @@index([observacion_Id_Observaciones], map: "fk_reserva_observacion_idx")
+  @@index([Id_Usuario], map: "fk_reserva_usuario_idx")
+  @@map("reserva")
+}
+
+model Servicio {
+  Id_Servicio              Int          @id @default(autoincrement()) @map("Id_Servicio")
+  Nombre_Servicio          String       @map("Nombre_Servicio")
+  Precio                   Decimal      @map("Precio")
+  descripcion              String       @map("descripcion")
+  imagen_url               String?      @map("imagen_url")
+  cotizacion_Id_Cotizacion Int?         @map("cotizacion_Id_Cotizacion")
+  estado                   String       @default("activo")
+  duracion_estimada        String?
+  cotizacionesComoBase     Cotizacion[] @relation("CotizacionServicioBase")
+  cotizacion               Cotizacion?  @relation("ServiciosEnCotizacion", fields: [cotizacion_Id_Cotizacion], references: [Id_Cotizacion])
+  reservas                 Reserva[]
+
+  @@index([cotizacion_Id_Cotizacion], map: "fk_servicio_cotizacion_idx")
+  @@map("servicio")
+}
+
+model Cotizacion {
+  Id_Cotizacion    Int        @id @default(autoincrement()) @map("Id_Cotizacion")
+  Id_usuario       Int        @map("Id_usuario")
+  Precio_cotizado  Decimal    @map("Precio_cotizado")
+  Cantidad         Int        @map("Cantidad")
+  Tamaño          String     @map("Tamaño")
+  fecha_cotizacion DateTime?  @default(now()) @map("fecha_cotizacion")
+  Id_servicio      Int?       @map("Id_servicio")
+  servicioBase     Servicio?  @relation("CotizacionServicioBase", fields: [Id_servicio], references: [Id_Servicio])
+  cliente          Usuario    @relation(fields: [Id_usuario], references: [Id_Usuario])
+  servicios        Servicio[] @relation("ServiciosEnCotizacion")
+
+  @@index([Id_servicio], map: "fk_cotizacion_servicio")
+  @@index([Id_usuario], map: "fk_cotizacion_usuario_idx")
+  @@map("cotizacion")
+}
+
+model Notificacion {
+  id_notificaciones        Int       @id @default(autoincrement()) @map("id_notificaciones")
+  descripcion_notificacion String    @map("descripcion_notificacion")
+  fecha_notificacion       DateTime? @default(now()) @map("fecha_notificacion")
+  usuario_Id_Usuario       Int       @map("usuario_Id_Usuario")
+  usuario                  Usuario   @relation(fields: [usuario_Id_Usuario], references: [Id_Usuario], onDelete: Cascade)
+
+  @@index([usuario_Id_Usuario], map: "fk_notificaciones_usuario_idx")
+  @@map("notificaciones")
+}
+
+model Calificacion {
+  Id_Calificacion     Int       @id @default(autoincrement()) @map("Id_Calificacion")
+  empleado_Id_Usuario Int       @map("empleado_Id_Usuario")
+  reserva_ID_Reserva  Int       @map("reserva_ID_Reserva")
+  puntaje             Decimal   @map("puntaje")
+  comentario          String?   @map("comentario")
+  es_positivo         Boolean?  @default(true) @map("es_positivo")
+  fecha_calificacion  DateTime? @default(now()) @map("fecha_calificacion")
+  empleado            Usuario   @relation(fields: [empleado_Id_Usuario], references: [Id_Usuario], onUpdate: Restrict)
+  reserva             Reserva   @relation(fields: [reserva_ID_Reserva], references: [ID_Reserva], onUpdate: Restrict)
+
+  @@index([empleado_Id_Usuario], map: "empleado_Id_Usuario")
+  @@index([reserva_ID_Reserva], map: "reserva_ID_Reserva")
+  @@map("calificacion")
+}

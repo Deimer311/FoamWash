@@ -55,4 +55,8 @@ temp.zip
 # Firebase Credentials
 firebase-key.json
 firebase-adminsdk.json
-backend/firebase-key.json
+backend/firebase-key.json*.tar
+
+#docker
+foamwash-contenedores.tar
+*.tar

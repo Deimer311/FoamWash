@@ -1,0 +1,278 @@
+<html><head><meta charset="utf-8"/><title>🚿 FoamWash — Reporte de Pruebas de Integración</title><style type="text/css">:root {
+  --text-primary: #eee;
+  --text-secondary: #aaa;
+  --success: #2ecc71;
+  --success-bright: #1e3d2a;
+  --danger: #e74c3c;
+  --danger-bright: #3d1e1e;
+  --warning: #f39c12;
+  --warning-bright: #3d2c1e;
+  --panel: #1f1f1f;
+  --border: #444;
+  --disabled: #666;
+  background-color: #121212;
+}
+
+html,
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  color: var(--text-primary);
+}
+body {
+  padding: 2rem 1rem;
+}
+.jesthtml-content {
+  margin: 0 auto;
+  max-width: 70rem;
+}
+header {
+  display: flex;
+  align-items: center;
+}
+#title {
+  margin: 0;
+  flex-grow: 1;
+}
+#logo {
+  height: 4rem;
+}
+#timestamp {
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+#metadata-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.additional-information-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+}
+
+/** SUMMARY */
+#summary {
+  color: var(--text-primary);
+  display: flex;
+  font-family: monospace;
+  font-size: 1rem;
+}
+#summary > div {
+  margin-right: 0.5rem;
+  background: var(--panel);
+  padding: 1rem;
+  min-width: 15rem;
+}
+#summary > div:last-child {
+  margin-right: 0;
+}
+@media only screen and (max-width: 720px) {
+  #summary {
+    flex-direction: column;
+  }
+  #summary > div {
+    margin-right: 0;
+    margin-top: 1rem;
+  }
+  #summary > div:first-child {
+    margin-top: 0;
+  }
+}
+
+.summary-total {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.summary-passed {
+  color: var(--success);
+  border-left: 0.4rem solid var(--success);
+  padding-left: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+.summary-failed,
+.summary-obsolete-snapshots {
+  color: var(--danger);
+  border-left: 0.4rem solid var(--danger);
+  padding-left: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+.summary-pending {
+  color: var(--warning);
+  border-left: 0.4rem solid var(--warning);
+  padding-left: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+.summary-empty {
+  color: var(--disabled);
+  border-left: 0.4rem solid var(--disabled);
+  margin-bottom: 0.15rem;
+}
+
+.test-result {
+  padding: 1rem;
+  margin-bottom: 0.25rem;
+}
+.test-result:last-child {
+  border: 0;
+}
+.test-result.passed {
+  background-color: var(--success-bright);
+  color: var(--success);
+}
+.test-result.failed {
+  background-color: var(--danger-bright);
+  color: var(--danger);
+}
+.test-result.pending {
+  background-color: var(--warning-bright);
+  color: var(--warning);
+}
+
+.test-info {
+  display: flex;
+  justify-content: space-between;
+}
+.test-suitename {
+  width: 20%;
+  text-align: left;
+  font-weight: bold;
+  word-break: break-word;
+}
+.test-title {
+  width: 40%;
+  text-align: left;
+  font-style: italic;
+}
+.test-status {
+  width: 20%;
+  text-align: right;
+}
+.test-duration {
+  width: 10%;
+  text-align: right;
+  font-size: 0.85rem;
+}
+
+.failureMessages {
+  padding: 0 1rem;
+  margin-top: 1rem;
+  border-top: 1px dashed var(--danger);
+}
+.failureMessages.suiteFailure {
+  border-top: none;
+}
+.failureMsg {
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+
+.suite-container {
+  margin-bottom: 1rem;
+}
+.suite-info {
+  padding: 1rem;
+  background-color: var(--panel);
+  color: var(--text-secondary);
+  border: 0.15rem solid;
+  border-color: var(--panel);
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+.suite-info:hover {
+  border-color: var(--border);
+  cursor: pointer;
+}
+.suite-info .suite-path {
+  word-break: break-all;
+  flex-grow: 1;
+  font-family: monospace;
+  font-size: 1rem;
+}
+.suite-info .suite-time {
+  margin-left: 1rem;
+  padding: 0.2rem 0.3rem;
+  font-size: 0.85rem;
+}
+.suite-info .suite-time.warn {
+  background-color: var(--danger);
+  color: #fff;
+}
+.suite-info:before {
+  content: "\2303";
+  display: inline-block;
+  margin-right: 1rem;
+  transform: rotate(180deg) translateY(0.15rem);
+}
+.suite-container[open] .suite-info:before {
+  transform: rotate(0deg) translateY(0.15rem);
+}
+
+/* CONSOLE LOGS */
+.suite-consolelog {
+  margin-bottom: 0.25rem;
+  padding: 1rem;
+  background-color: var(--panel);
+}
+.suite-consolelog-header {
+  font-weight: bold;
+}
+.suite-consolelog-item {
+  padding: 0.5rem;
+}
+.suite-consolelog-item pre {
+  margin: 0.5rem 0;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+.suite-consolelog-item-origin {
+  color: var(--text-secondary);
+  font-weight: bold;
+}
+.suite-consolelog-item-message {
+  color: var(--text-primary);
+  font-size: 1rem;
+  padding: 0 0.5rem;
+}
+
+/* OBSOLETE SNAPSHOTS */
+.suite-obsolete-snapshots {
+  margin-bottom: 0.25rem;
+  padding: 1rem;
+  background-color: var(--danger-bright);
+  color: var(--danger);
+}
+.suite-obsolete-snapshots-header {
+  font-weight: bold;
+}
+.suite-obsolete-snapshots-item {
+  padding: 0.5rem;
+}
+.suite-obsolete-snapshots-item pre {
+  margin: 0.5rem 0;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+.suite-obsolete-snapshots-item-message {
+  color: var(--text-primary);
+  font-size: 1rem;
+  padding: 0 0.5rem;
+}
+</style></head><body><main class="jesthtml-content"><header><h1 id="title">🚿 FoamWash — Reporte de Pruebas de Integración</h1></header><section id="metadata-container"><div id="timestamp">Started: 2026-07-17 16:11:51</div><div id="summary"><div id="suite-summary"><div class="summary-total">Suites (6)</div><div class="summary-passed ">6 passed</div><div class="summary-failed  summary-empty">0 failed</div><div class="summary-pending  summary-empty">0 pending</div></div><div id="test-summary"><div class="summary-total">Tests (65)</div><div class="summary-passed ">65 passed</div><div class="summary-failed  summary-empty">0 failed</div><div class="summary-pending  summary-empty">0 pending</div></div></div></section><details id="suite-1" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">C:\Users\cristian andres\OneDrive\Documentos\todo lo de foam wash\foam version final\FoamWash\backend\src\test\pruebas integracion\INT-02_Reservas.spec.ts</div><div class="suite-time warn">16.609s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-02: Reservas (Integración con SQLite)</div><div class="test-title">INT-02-CP01: findAll retorna todas las reservas sembradas</div><div class="test-status">passed</div><div class="test-duration">0.033s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-02: Reservas (Integración con SQLite)</div><div class="test-title">INT-02-CP02: findByEstado filtra reservas por estado "Pendiente"</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-02: Reservas (Integración con SQLite)</div><div class="test-title">INT-02-CP03: findByEstado filtra reservas por estado "Confirmado"</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-02: Reservas (Integración con SQLite)</div><div class="test-title">INT-02-CP04: findOne retorna la reserva correcta por ID</div><div class="test-status">passed</div><div class="test-duration">0.014s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-02: Reservas (Integración con SQLite)</div><div class="test-title">INT-02-CP05: findOne lanza NotFoundException para ID inexistente</div><div class="test-status">passed</div><div class="test-duration">0.043s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-02: Reservas (Integración con SQLite)</div><div class="test-title">INT-02-CP06: Crear reserva nueva con datos válidos</div><div class="test-status">passed</div><div class="test-duration">0.046s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-02: Reservas (Integración con SQLite)</div><div class="test-title">INT-02-CP07: Crear reserva sin empleado activa asignación automática</div><div class="test-status">passed</div><div class="test-duration">0.034s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-02: Reservas (Integración con SQLite)</div><div class="test-title">INT-02-CP08: Crear reserva envía notificación push</div><div class="test-status">passed</div><div class="test-duration">0.034s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-02: Reservas (Integración con SQLite)</div><div class="test-title">INT-02-CP09: Actualizar estado de reserva a "Confirmado"</div><div class="test-status">passed</div><div class="test-duration">0.035s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-02: Reservas (Integración con SQLite)</div><div class="test-title">INT-02-CP10: updateEstado lanza NotFoundException para reserva inexistente</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-02: Reservas (Integración con SQLite)</div><div class="test-title">INT-02-CP11: Cancelar reserva cambia estado a "Cancelado"</div><div class="test-status">passed</div><div class="test-duration">0.021s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-02: Reservas (Integración con SQLite)</div><div class="test-title">INT-02-CP12: findByCliente retorna reservas del cliente correcto</div><div class="test-status">passed</div><div class="test-duration">0.012s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-02: Reservas (Integración con SQLite)</div><div class="test-title">INT-02-CP13: Eliminar reserva la borra de la BD</div><div class="test-status">passed</div><div class="test-duration">0.072s</div></div></div></div></details><details id="suite-2" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">C:\Users\cristian andres\OneDrive\Documentos\todo lo de foam wash\foam version final\FoamWash\backend\src\test\pruebas integracion\INT-01_Auth.spec.ts</div><div class="suite-time warn">11.064s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-01: Autenticación (Integración con SQLite)</div><div class="test-title">INT-01-CP01: Login exitoso con credenciales correctas de cliente</div><div class="test-status">passed</div><div class="test-duration">0.562s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-01: Autenticación (Integración con SQLite)</div><div class="test-title">INT-01-CP02: Login exitoso con credenciales de empleado</div><div class="test-status">passed</div><div class="test-duration">1.038s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-01: Autenticación (Integración con SQLite)</div><div class="test-title">INT-01-CP03: Login exitoso con credenciales de admin</div><div class="test-status">passed</div><div class="test-duration">0.658s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-01: Autenticación (Integración con SQLite)</div><div class="test-title">INT-01-CP04: Login falla con correo inexistente</div><div class="test-status">passed</div><div class="test-duration">0.057s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-01: Autenticación (Integración con SQLite)</div><div class="test-title">INT-01-CP05: Login falla con contraseña incorrecta</div><div class="test-status">passed</div><div class="test-duration">0.69s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-01: Autenticación (Integración con SQLite)</div><div class="test-title">INT-01-CP06: Registro de nuevo usuario exitoso</div><div class="test-status">passed</div><div class="test-duration">0.715s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-01: Autenticación (Integración con SQLite)</div><div class="test-title">INT-01-CP07: Registro falla con correo ya existente</div><div class="test-status">passed</div><div class="test-duration">0.043s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-01: Autenticación (Integración con SQLite)</div><div class="test-title">INT-01-CP08: Logout limpia tokens del usuario en BD</div><div class="test-status">passed</div><div class="test-duration">0.828s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-01: Autenticación (Integración con SQLite)</div><div class="test-title">INT-01-CP09: getMe retorna datos del usuario sin contraseña</div><div class="test-status">passed</div><div class="test-duration">0.004s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-01: Autenticación (Integración con SQLite)</div><div class="test-title">INT-01-CP10: Verificar que access_token se guarda en BD tras login</div><div class="test-status">passed</div><div class="test-duration">0.308s</div></div></div></div></details><details id="suite-3" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">C:\Users\cristian andres\OneDrive\Documentos\todo lo de foam wash\foam version final\FoamWash\backend\src\test\pruebas integracion\INT-04_Cotizaciones.spec.ts</div><div class="suite-time warn">6.06s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-04: Cotizaciones (Integración con SQLite)</div><div class="test-title">INT-04-CP01: getServicios retorna todos los servicios disponibles</div><div class="test-status">passed</div><div class="test-duration">0.01s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-04: Cotizaciones (Integración con SQLite)</div><div class="test-title">INT-04-CP02: findAll retorna todas las cotizaciones</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-04: Cotizaciones (Integración con SQLite)</div><div class="test-title">INT-04-CP03: findAll incluye datos del cliente en cada cotización</div><div class="test-status">passed</div><div class="test-duration">0.009s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-04: Cotizaciones (Integración con SQLite)</div><div class="test-title">INT-04-CP04: findAll ordena por fecha más reciente primero</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-04: Cotizaciones (Integración con SQLite)</div><div class="test-title">INT-04-CP05: findByCliente retorna cotizaciones del cliente correcto</div><div class="test-status">passed</div><div class="test-duration">0.008s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-04: Cotizaciones (Integración con SQLite)</div><div class="test-title">INT-04-CP06: findByCliente retorna array vacío para cliente sin cotizaciones</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-04: Cotizaciones (Integración con SQLite)</div><div class="test-title">INT-04-CP07: Crear cotización con servicio vinculado</div><div class="test-status">passed</div><div class="test-duration">0.022s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-04: Cotizaciones (Integración con SQLite)</div><div class="test-title">INT-04-CP08: Crear cotización acepta campo "Tamaño" con ñ</div><div class="test-status">passed</div><div class="test-duration">0.026s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-04: Cotizaciones (Integración con SQLite)</div><div class="test-title">INT-04-CP09: Crear cotización sin servicio usa "Estándar" como tamaño por defecto</div><div class="test-status">passed</div><div class="test-duration">0.032s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-04: Cotizaciones (Integración con SQLite)</div><div class="test-title">INT-04-CP10: sincronizar no crea duplicados para servicios ya cotizados</div><div class="test-status">passed</div><div class="test-duration">0.035s</div></div></div></div></details><details id="suite-4" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">C:\Users\cristian andres\OneDrive\Documentos\todo lo de foam wash\foam version final\FoamWash\backend\src\test\pruebas integracion\INT-03_Servicios.spec.ts</div><div class="suite-time warn">5.86s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-03: Servicios (Integración con SQLite)</div><div class="test-title">INT-03-CP01: findAll retorna los 4 servicios sembrados</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-03: Servicios (Integración con SQLite)</div><div class="test-title">INT-03-CP02: findAll retorna servicios con campos requeridos</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-03: Servicios (Integración con SQLite)</div><div class="test-title">INT-03-CP03: findAll ordena servicios alfabéticamente</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-03: Servicios (Integración con SQLite)</div><div class="test-title">INT-03-CP04: findOne retorna el servicio correcto</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-03: Servicios (Integración con SQLite)</div><div class="test-title">INT-03-CP05: findOne lanza NotFoundException para ID inexistente</div><div class="test-status">passed</div><div class="test-duration">0.017s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-03: Servicios (Integración con SQLite)</div><div class="test-title">INT-03-CP06: Crear nuevo servicio correctamente</div><div class="test-status">passed</div><div class="test-duration">0.016s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-03: Servicios (Integración con SQLite)</div><div class="test-title">INT-03-CP07: Actualizar precio de un servicio</div><div class="test-status">passed</div><div class="test-duration">0.017s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-03: Servicios (Integración con SQLite)</div><div class="test-title">INT-03-CP08: Actualizar descripción de un servicio</div><div class="test-status">passed</div><div class="test-duration">0.017s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-03: Servicios (Integración con SQLite)</div><div class="test-title">INT-03-CP09: update lanza NotFoundException para servicio inexistente</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-03: Servicios (Integración con SQLite)</div><div class="test-title">INT-03-CP10: masSolicitados retorna lista de servicios con relación de reservas</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-03: Servicios (Integración con SQLite)</div><div class="test-title">INT-03-CP11: Eliminar un servicio lo borra de la BD</div><div class="test-status">passed</div><div class="test-duration">0.034s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-03: Servicios (Integración con SQLite)</div><div class="test-title">INT-03-CP12: remove lanza NotFoundException para servicio inexistente</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div></div></details><details id="suite-5" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">C:\Users\cristian andres\OneDrive\Documentos\todo lo de foam wash\foam version final\FoamWash\backend\src\test\pruebas integracion\INT-05_Empleados.spec.ts</div><div class="suite-time warn">5.161s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-05: Empleados (Integración con SQLite)</div><div class="test-title">INT-05-CP01: findAll retorna los 2 empleados activos sembrados</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-05: Empleados (Integración con SQLite)</div><div class="test-title">INT-05-CP02: findAll solo devuelve usuarios con rol empleado (rol_Id_Rol=2)</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-05: Empleados (Integración con SQLite)</div><div class="test-title">INT-05-CP03: findAll incluye datos del perfil empleado</div><div class="test-status">passed</div><div class="test-duration">0.008s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-05: Empleados (Integración con SQLite)</div><div class="test-title">INT-05-CP04: findAll retorna tipo de documento asociado</div><div class="test-status">passed</div><div class="test-duration">0.013s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-05: Empleados (Integración con SQLite)</div><div class="test-title">INT-05-CP05: getReservasHoy retorna reservas del empleado para hoy o atrasadas</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-05: Empleados (Integración con SQLite)</div><div class="test-title">INT-05-CP06: getReservasHoy incluye datos del cliente y servicios</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-05: Empleados (Integración con SQLite)</div><div class="test-title">INT-05-CP07: getReservasSemana retorna agenda de la semana del empleado</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-05: Empleados (Integración con SQLite)</div><div class="test-title">INT-05-CP08: getReservasSemana incluye reservas pendientes y confirmadas</div><div class="test-status">passed</div><div class="test-duration">0.008s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-05: Empleados (Integración con SQLite)</div><div class="test-title">INT-05-CP09: Los datos del empleado en BD coinciden con el seed</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-05: Empleados (Integración con SQLite)</div><div class="test-title">INT-05-CP10: Empleado 2 tiene días laborales correctos en BD</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div></div></details><details id="suite-6" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">C:\Users\cristian andres\OneDrive\Documentos\todo lo de foam wash\foam version final\FoamWash\backend\src\test\pruebas integracion\INT-06_Notificaciones.spec.ts</div><div class="suite-time warn">5.4s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-06: Notificaciones (Integración con SQLite)</div><div class="test-title">INT-06-CP01: findByUsuario retorna notificaciones del cliente1</div><div class="test-status">passed</div><div class="test-duration">0.009s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-06: Notificaciones (Integración con SQLite)</div><div class="test-title">INT-06-CP02: findByUsuario retorna notificaciones del cliente2</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-06: Notificaciones (Integración con SQLite)</div><div class="test-title">INT-06-CP03: findByUsuario retorna notificaciones del empleado1</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-06: Notificaciones (Integración con SQLite)</div><div class="test-title">INT-06-CP04: findByUsuario retorna array vacío para usuario sin notificaciones</div><div class="test-status">passed</div><div class="test-duration">0.024s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-06: Notificaciones (Integración con SQLite)</div><div class="test-title">INT-06-CP05: findByUsuario ordena por fecha más reciente primero</div><div class="test-status">passed</div><div class="test-duration">0.004s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-06: Notificaciones (Integración con SQLite)</div><div class="test-title">INT-06-CP06: findByUsuario incluye datos del usuario relacionado</div><div class="test-status">passed</div><div class="test-duration">0.009s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-06: Notificaciones (Integración con SQLite)</div><div class="test-title">INT-06-CP07: Crear notificación directamente en BD y verificar persistencia</div><div class="test-status">passed</div><div class="test-duration">0.035s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-06: Notificaciones (Integración con SQLite)</div><div class="test-title">INT-06-CP08: Eliminar usuario en cascada elimina sus notificaciones</div><div class="test-status">passed</div><div class="test-duration">0.056s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-06: Notificaciones (Integración con SQLite)</div><div class="test-title">INT-06-CP09: Total de notificaciones sembradas es 5</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">INT-06: Notificaciones (Integración con SQLite)</div><div class="test-title">INT-06-CP10: Notificaciones tienen fecha_notificacion automática</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div></div></details></main></body></html>

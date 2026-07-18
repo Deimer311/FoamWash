@@ -1,15 +1,14 @@
 package com.foamwash.stepdefinitions;
 
-import com.foamwash.tasks.AbrirPagina;
-import com.foamwash.tasks.IngresarCredenciales;
+import static net.serenitybdd.screenplay.GivenWhenThen.*;
+
 import com.foamwash.tasks.NavegarMenuAdmin;
 import com.foamwash.userinterfaces.MenuAdminPage;
+
 import io.cucumber.java.es.Cuando;
-import io.cucumber.java.es.Dado;
 import io.cucumber.java.es.Entonces;
 import net.serenitybdd.screenplay.actors.OnStage;
 import net.serenitybdd.screenplay.questions.Visibility;
-import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
 
 public class AdminStepDefinitions {
 
