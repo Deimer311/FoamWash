@@ -16,10 +16,10 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
 
-    const [user, setUser]           = useState(null);
+    const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const isAuthenticated           = !!user;
-    const initialized               = useRef(false);
+    const isAuthenticated = !!user;
+    const initialized = useRef(false);
 
     // =========================================================================
     // normalizeRole
@@ -32,8 +32,8 @@ export const AuthProvider = ({ children }) => {
 
         const rolStr = (
             rawUser.rol?.Rol ||
-            rawUser.rol       ||
-            rawUser.role      ||
+            rawUser.rol ||
+            rawUser.role ||
             ''
         ).toLowerCase();
 
@@ -43,13 +43,13 @@ export const AuthProvider = ({ children }) => {
             // Primero los campos crudos (base)
             ...rawUser,
             // Luego los normalizados — SIEMPRE sobreescriben lo anterior
-            id:          rawUser.id          ?? rawUser.Id_Usuario,
-            nombre:      rawUser.nombre      ?? rawUser.Nombre,
-            correo:      rawUser.correo      ?? rawUser.Correo,
-            telefono:    rawUser.telefono    ?? rawUser.Telefono    ?? null,
-            direccion:   rawUser.direccion   ?? rawUser.Direccion   ?? null,
+            id: rawUser.id ?? rawUser.Id_Usuario,
+            nombre: rawUser.nombre ?? rawUser.Nombre,
+            correo: rawUser.correo ?? rawUser.Correo,
+            telefono: rawUser.telefono ?? rawUser.Telefono ?? null,
+            direccion: rawUser.direccion ?? rawUser.Direccion ?? null,
             foto_perfil: rawUser.foto_perfil ?? null,
-            role:        mapped,
+            role: mapped,
         };
     };
 
@@ -104,7 +104,7 @@ export const AuthProvider = ({ children }) => {
                 redirectPage: getRedirectByRole(normalized.role),
             };
         } catch (error) {
-            return { success: false, message: error?.error?.message || 'Error al iniciar sesión' };
+            return { success: false, message: error?.error?.message || error?.message || 'Error al iniciar sesión' };
         }
     };
 
@@ -114,11 +114,11 @@ export const AuthProvider = ({ children }) => {
     const register = async (userData) => {
         try {
             const backendData = {
-                nombre:          userData.fullName    || userData.nombre,
-                correo:          userData.email       || userData.correo,
-                password:        userData.password,
-                telefono:        userData.phone       || userData.telefono  || null,
-                direccion:       userData.address     || userData.direccion || null,
+                nombre: userData.fullName || userData.nombre,
+                correo: userData.email || userData.correo,
+                password: userData.password,
+                telefono: userData.phone || userData.telefono || null,
+                direccion: userData.address || userData.direccion || null,
                 tipoDocumentoId: userData.tipoDocumentoId || 1,
                 role: 'cliente',
             };
@@ -198,9 +198,9 @@ export const AuthProvider = ({ children }) => {
     // =========================================================================
     const getRedirectByRole = (role) => {
         const map = {
-            'admin':      'admin-dashboard',
+            'admin': 'admin-dashboard',
             'trabajador': 'agenda-empleado',
-            'cliente':    'servicios-cliente',
+            'cliente': 'servicios-cliente',
         };
         return map[role] || 'home';
     };

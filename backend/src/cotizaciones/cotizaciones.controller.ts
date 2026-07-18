@@ -1,5 +1,5 @@
 // src/cotizaciones/cotizaciones.controller.ts
-import { Controller, Get, Post, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { CotizacionesService } from './cotizaciones.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -23,6 +23,15 @@ export class CotizacionesController {
   @ApiOperation({ summary: 'Obtener todas las cotizaciones' })
   async findAll() {
     const data = await this.cotizacionesService.findAll();
+    return { success: true, data };
+  }
+
+  // Cotizaciones de un cliente específico
+  @Get('cliente/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Obtener cotizaciones de un cliente por su ID' })
+  async findByCliente(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.cotizacionesService.findByCliente(id);
     return { success: true, data };
   }
 
