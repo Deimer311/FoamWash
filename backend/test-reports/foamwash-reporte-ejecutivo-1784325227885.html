@@ -1,0 +1,640 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoamWash - Reporte Ejecutivo</title>
+    <style>
+        :root {
+            --primary: #2C3E50;
+            --success: #27AE60;
+            --danger: #E74C3C;
+            --light: #ECF0F1;
+            --dark: #34495E;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #F8F9F9;
+            color: var(--primary);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .status-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 40px;
+            border-top: 5px solid var(--success);
+        }
+        .status-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--success);
+            margin-bottom: 15px;
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            font-size: 1.2rem;
+        }
+        .stat-item strong {
+            display: block;
+            font-size: 2rem;
+            color: var(--dark);
+        }
+        .module {
+            background: white;
+            border-radius: 8px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .module-title {
+            font-size: 1.4rem;
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+        .test-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .test-item {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            font-size: 1.1rem;
+        }
+        .icon-pass {
+            color: var(--success);
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .icon-fail {
+            color: var(--danger);
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #7F8C8D;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>🚿 FoamWash</h1>
+        <p>Reporte Ejecutivo del Sistema</p>
+    </div>
+
+    <div class="status-card">
+        <div class="status-title">
+            ✨ Sistema Saludable y Operativo
+        </div>
+        <p>Se ha verificado automáticamente el correcto funcionamiento de las características del sistema.</p>
+        <div class="stats">
+            <div class="stat-item">
+                <strong>101</strong>
+                Funcionalidades Probadas
+            </div>
+            <div class="stat-item" style="color: var(--success)">
+                <strong>101</strong>
+                Aprobadas
+            </div>
+            
+        </div>
+    </div>
+
+    <h2>Detalle por Módulo</h2>
+
+    <div class="module">
+        <div class="module-title">Módulo de Reservas y Agendamientos</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findAll retorna todas las reservas sembradas
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findByEstado filtra reservas por estado "Pendiente"
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findByEstado filtra reservas por estado "Confirmado"
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findOne retorna la reserva correcta por ID
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findOne lanza NotFoundException para ID inexistente
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Crear reserva nueva con datos válidos
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Crear reserva sin empleado activa asignación automática
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Crear reserva envía notificación push
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Actualizar estado de reserva a "Confirmado"
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> updateEstado lanza NotFoundException para reserva inexistente
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Cancelar reserva cambia estado a "Cancelado"
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findByCliente retorna reservas del cliente correcto
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Eliminar reserva la borra de la BD
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo de Autenticación y Acceso</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Login exitoso con credenciales correctas de cliente
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Login exitoso con credenciales de empleado
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Login exitoso con credenciales de admin
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Login falla con correo inexistente
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Login falla con contraseña incorrecta
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Registro de nuevo usuario exitoso
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Registro falla con correo ya existente
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Logout limpia tokens del usuario en BD
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> getMe retorna datos del usuario sin contraseña
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Verificar que access_token se guarda en BD tras login
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo de Cotizaciones</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> getServicios retorna todos los servicios disponibles
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findAll retorna todas las cotizaciones
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findAll incluye datos del cliente en cada cotización
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findAll ordena por fecha más reciente primero
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findByCliente retorna cotizaciones del cliente correcto
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findByCliente retorna array vacío para cliente sin cotizaciones
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Crear cotización con servicio vinculado
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Crear cotización acepta campo "Tamaño" con ñ
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Crear cotización sin servicio usa "Estándar" como tamaño por defecto
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> sincronizar no crea duplicados para servicios ya cotizados
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo de Notificaciones y Alertas</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findByUsuario retorna notificaciones del cliente1
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findByUsuario retorna notificaciones del cliente2
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findByUsuario retorna notificaciones del empleado1
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findByUsuario retorna array vacío para usuario sin notificaciones
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findByUsuario ordena por fecha más reciente primero
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findByUsuario incluye datos del usuario relacionado
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Crear notificación directamente en BD y verificar persistencia
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Eliminar usuario en cascada elimina sus notificaciones
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Total de notificaciones sembradas es 5
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Notificaciones tienen fecha_notificacion automática
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo de Gestión de Empleados</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findAll retorna los 2 empleados activos sembrados
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findAll solo devuelve usuarios con rol empleado (rol_Id_Rol=2)
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findAll incluye datos del perfil empleado
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findAll retorna tipo de documento asociado
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> getReservasHoy retorna reservas del empleado para hoy o atrasadas
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> getReservasHoy incluye datos del cliente y servicios
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> getReservasSemana retorna agenda de la semana del empleado
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> getReservasSemana incluye reservas pendientes y confirmadas
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Los datos del empleado en BD coinciden con el seed
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Empleado 2 tiene días laborales correctos en BD
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo de Catálogo de Servicios</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findAll retorna los 4 servicios sembrados
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findAll retorna servicios con campos requeridos
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findAll ordena servicios alfabéticamente
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findOne retorna el servicio correcto
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> findOne lanza NotFoundException para ID inexistente
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Crear nuevo servicio correctamente
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Actualizar precio de un servicio
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Actualizar descripción de un servicio
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> update lanza NotFoundException para servicio inexistente
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> masSolicitados retorna lista de servicios con relación de reservas
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> Eliminar un servicio lo borra de la BD
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> remove lanza NotFoundException para servicio inexistente
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Recuperar Clave</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-005: Solicitar código de reseteo
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Autenticación de Usuarios</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-001: Debería permitir el login con credenciales correctas
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-002: No debería permitir el login con credenciales incorrectas
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo de Reservas y Agendamientos</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-012: Listar todas
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Cerrar Sesion</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-007: Debería cerrar sesión y borrar cookies
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Autenticación de Usuarios</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-003: Debería registrar un usuario válido
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Cotizar Servicio</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-016: Debería guardar la cotización
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Asignacion Empleado</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-014: Asignar empleado
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Actualizar Cancelar</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-011: Debería permitir cancelar
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Visualizar Agendamientos</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-010: Debería listar las reservas del cliente logueado
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo de Cotizaciones</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-017: Debería devolver las cotizaciones específicas del cliente
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Agendar Servicio</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-009: Debería crear una reserva
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Manejo Errores</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-033: BadRequestException
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Resiliencia</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-034: Manejo rechazos DB
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Activar Usuarios</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-020: Debería permitir cambiar el estado
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Seguridad</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-030: Proteger rutas
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo de Reservas y Agendamientos</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-025: El admin puede ver reservas
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Tiempos Sesion</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-035: JWT expira
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo de Catálogo de Servicios</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-022: Un administrador puede editar precios
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Auditoria</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-037: Logs de operaciones
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Compatibilidad</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-032: JSON válido
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Modificar Admin</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-027: El admin puede actualizar perfil
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Reportes</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-026: Estadísticas de ventas
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Convertir Cotizacion</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-018: Debería permitir utilizar los datos de la cotización para agendar
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Gestion Disponibilidad</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-023: Debería definir el horario
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo de Notificaciones y Alertas</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-024: Debería notificar al cliente
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Disponibilidad</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-031: Backend stateless
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo de Gestión de Empleados</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-021: Debería listar los empleados disponibles
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Escalabilidad</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-029: Inyección modular
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Modificar Perfil</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-008: Verificar validación de datos al editar perfil
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Estándares de Calidad y Arquitectura</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-QA-01: El proyecto debe compilar sin errores TypeScript (Simulado)
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-QA-02: Todas las dependencias principales deben estar actualizadas y sin vulnerabilidades
+            </li>
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-QA-03: Los archivos de configuración (package.json, tsconfig.json) deben existir
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Integridad Datos</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-036: SQL Injection
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Gestion Usuarios</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-019: Debería listar todos los usuarios
+            </li>
+        </ul>
+    </div>
+    <div class="module">
+        <div class="module-title">Módulo: Rendimiento</div>
+        <ul class="test-list">
+            <li class="test-item">
+                <span class="icon-pass">✓</span> CP-028: Tiempo de respuesta < 2s
+            </li>
+        </ul>
+    </div>
+    <div class="footer">
+        Generado automáticamente el 17/7/2026, 16:53:47 <br>
+        Pruebas End-to-End con Base de Datos Aislada.
+    </div>
+</div>
+
+</body>
+</html>

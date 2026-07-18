@@ -90,9 +90,20 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
   }
 
   Future<void> _loadUserAndFetch() async {
-    final prefs = await SharedPreferences.getInstance();
-    _userId = prefs.getInt('userId') ?? 0;
-    _userName = prefs.getString('userName') ?? 'Empleado';
+    final secureStorage = SecureStorageService();
+    final userIdStr = await secureStorage.read('userId') ?? '0';
+    _userId = int.tryParse(userIdStr) ?? 0;
+
+    // Fallback a SharedPreferences si SecureStorage no tiene el userId
+    if (_userId == 0) {
+      final prefs = await SharedPreferences.getInstance();
+      _userId = prefs.getInt('userId') ?? 0;
+      _userName = prefs.getString('userName') ?? 'Empleado';
+    } else {
+      final prefs = await SharedPreferences.getInstance();
+      _userName = prefs.getString('userName') ?? 'Empleado';
+    }
+
     await _fetchData();
   }
 
@@ -110,10 +121,22 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
       Map<String, String> headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
+        'ngrok-skip-browser-warning': 'true',
       };
       if (cookieToken != null && cookieToken.isNotEmpty) {
         headers['Cookie'] = cookieToken;
       }
+
+      // Verificar que el userId es válido antes de llamar
+      if (_userId == 0) {
+        setState(() {
+          _error = 'No se pudo obtener el ID del empleado. Por favor cierra sesión y vuelve a ingresar.';
+          _isLoading = false;
+        });
+        return;
+      }
+
+      debugPrint('[Agenda] Cargando servicios para userId: $_userId');
 
       // Llamar tres endpoints en paralelo
       final results = await Future.wait([
@@ -135,6 +158,10 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
       final resSemana = results[1];
       final resMes = results[2];
 
+      debugPrint('[Agenda] HOY status=${resHoy.statusCode} body=${resHoy.body.length > 200 ? resHoy.body.substring(0, 200) : resHoy.body}');
+      debugPrint('[Agenda] SEMANA status=${resSemana.statusCode}');
+      debugPrint('[Agenda] MES status=${resMes.statusCode}');
+
       if (resHoy.statusCode == 200 || resHoy.statusCode == 201) {
         final dataHoy = json.decode(resHoy.body);
         _serviciosHoy = dataHoy['data'] ?? [];
@@ -150,6 +177,8 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
         _serviciosMes = dataMes['data'] ?? [];
       }
 
+      debugPrint('[Agenda] Resultados → hoy=${_serviciosHoy.length}, semana=${_serviciosSemana.length}, mes=${_serviciosMes.length}');
+
       setState(() => _isLoading = false);
     } catch (e) {
       setState(() {
@@ -158,6 +187,7 @@ class _EmpleadoAgendaViewState extends State<EmpleadoAgendaView>
       });
     }
   }
+
 
   Future<void> _actualizarEstado(int reservaId, String nuevoEstado) async {
     try {
