@@ -1,6 +1,6 @@
 const { generarReporteEmpleados } = require('./reportesModule');
 const request = require('supertest');
-const app = require('./app');
+const app = require('../app');
 
 describe('RNF-009 - CP-018: Verificar la integración de un nuevo módulo', () => {
   test('la función del nuevo módulo debe generar el reporte correctamente', () => {

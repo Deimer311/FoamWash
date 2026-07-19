@@ -1,6 +1,6 @@
 const { reconectarServicio } = require('./recuperacionService');
 const request = require('supertest');
-const app = require('./app');
+const app = require('../app');
 
 describe('RNF-004 - CP-009: Verificar la recuperación del sistema después de una falla', () => {
   test('debe reconectarse exitosamente tras varios intentos', async () => {

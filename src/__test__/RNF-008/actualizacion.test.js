@@ -3,7 +3,7 @@ const {
   LIMITE_INDISPONIBILIDAD_MS,
 } = require('./actualizacionService');
 const request = require('supertest');
-const app = require('./app');
+const app = require('../app');
 
 describe('RNF-008 - CP-016: Verificar actualización sin pérdida de información', () => {
   test('los datos existentes deben permanecer intactos después de actualizar', async () => {

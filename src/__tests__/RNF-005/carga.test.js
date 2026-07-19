@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('./app');
+const app = require('../app');
 
 describe('RNF-005 - CP-010: Simular múltiples usuarios concurrentes', () => {
   test('debe procesar 100 solicitudes concurrentes sin errores', async () => {

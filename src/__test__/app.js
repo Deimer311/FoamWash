@@ -1,5 +1,5 @@
 const express = require('express');
-const { generarReporteEmpleados } = require('./reportesModule');
+const { generarReporteEmpleados } = require('./RNF-009/reportesModule');
 const app = express();
 app.use(express.json());
 
