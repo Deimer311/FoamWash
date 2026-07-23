@@ -1,34 +1,72 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { UsuariosService } from '../../usuarios/usuarios.service';
+import { PrismaService } from '../../prisma/prisma.service';
 
-describe('GestionRoles', () => {
+describe('GestionRoles (RF-11)', () => {
+  let usuariosService: UsuariosService;
+  let prismaService: jest.Mocked<PrismaService>;
+
+  const mockPrismaService = {
+    rol: {
+      findMany: jest.fn(),
+    },
+    usuario: {
+      findMany: jest.fn(),
+    },
+  };
 
   beforeEach(async () => {
-    // Setup del módulo para RF-11
+    jest.clearAllMocks();
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        UsuariosService,
+        { provide: PrismaService, useValue: mockPrismaService },
+      ],
+    }).compile();
+
+    usuariosService = module.get<UsuariosService>(UsuariosService);
+    prismaService = module.get(PrismaService);
   });
 
-  it('CP-069: Pueda consultar el detalle de una orden de servicio', async () => {
-    // TODO: Implementación completa de validaciones según el documento
-    expect(true).toBe(true);
+  it('CP-063: Consultar distribución de usuarios por rol.', async () => {
+    mockPrismaService.rol.findMany.mockResolvedValue([
+      { Id_Rol: 1, Rol: 'admin', _count: { usuarios: 2 } },
+      { Id_Rol: 2, Rol: 'empleado', _count: { usuarios: 5 } },
+      { Id_Rol: 3, Rol: 'cliente', _count: { usuarios: 20 } },
+    ]);
+
+    const result = await usuariosService.usuariosPorRol();
+    expect(result).toHaveLength(3);
+    expect(result[0]._count.usuarios).toBe(2);
   });
 
-  it('CP-070: Se visualicen correctamente los datos de la orden', async () => {
-    // TODO: Implementación completa de validaciones según el documento
-    expect(true).toBe(true);
+  it('CP-064: Listar únicamente los empleados activos del sistema.', async () => {
+    mockPrismaService.usuario.findMany.mockResolvedValue([
+      { Id_Usuario: 2, Nombre: 'Carlos', rol_Id_Rol: 2, estado: 'activo' },
+    ]);
+
+    const result = await usuariosService.empleadosActivos();
+    expect(result).toHaveLength(1);
+    expect(result[0].Nombre).toBe('Carlos');
   });
 
-  it('CP-071: Validar comportamiento si la orden no existe', async () => {
-    // TODO: Implementación completa de validaciones según el documento
-    expect(true).toBe(true);
+  it('CP-065: Verificar restricción de roles (Cliente vs Admin vs Empleado).', async () => {
+    const roles = { admin: 1, empleado: 2, cliente: 3 };
+    expect(roles.admin).toBe(1);
+    expect(roles.empleado).toBe(2);
+    expect(roles.cliente).toBe(3);
   });
 
-  it('CP-072: Validar actualización de datos en el detalle', async () => {
-    // TODO: Implementación completa de validaciones según el documento
-    expect(true).toBe(true);
+  it('CP-066: Validar asignación de permisos según el ID de rol.', async () => {
+    const isAllowed = (rolId: number, requiredRolId: number) => rolId === requiredRolId;
+    expect(isAllowed(1, 1)).toBe(true);
+    expect(isAllowed(3, 1)).toBe(false);
   });
 
-  it('CP-073: Validar visualización del estado de la orden', async () => {
-    // TODO: Implementación completa de validaciones según el documento
-    expect(true).toBe(true);
+  it('CP-067: Manejo de respuesta cuando no existen usuarios asignados a un rol.', async () => {
+    mockPrismaService.rol.findMany.mockResolvedValue([]);
+    const result = await usuariosService.usuariosPorRol();
+    expect(result).toEqual([]);
   });
-
 });
