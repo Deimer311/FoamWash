@@ -1,0 +1,38 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    # Phase 1: Warm up (Puesta a punto)
+    - duration: 10
+      arrivalRate: 2
+      name: "Warm up (Calentamiento)"
+    
+    # Phase 2: Sustained Load (Carga sostenida)
+    - duration: 30
+      arrivalRate: 10
+      name: "Sustained load (Carga Sostenida)"
+      
+    # Phase 3: Stress Spike (Pico de estrés)
+    - duration: 10
+      arrivalRate: 50
+      name: "Stress Spike (Pico de Estrés)"
+      
+  plugins:
+    # Plugins (Si fueran necesarios, por ahora nativo)
+
+scenarios:
+  - name: "Flujo de Cliente: Consultar Servicios Públicos"
+    flow:
+      # Petición GET a la lista de servicios (Endpoint público)
+      - get:
+          url: "/api/cotizaciones/servicios"
+          expect:
+            - statusCode: 200
+      
+      # Pausa para simular al usuario leyendo la página
+      - think: 1
+      
+      # Petición GET a los ajustes globales (Endpoint público)
+      - get:
+          url: "/api/configuracion"
+          expect:
+            - statusCode: 200

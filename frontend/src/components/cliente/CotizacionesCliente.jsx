@@ -97,7 +97,14 @@ export default function CotizacionesCliente({ onBackToHome, onGoToServicios, onP
 
     const handleActualizarCantidad = (id, n) => actualizarCantidad?.(id, n);
     const handleFinalizarCompra = () => { if (!carrito.length) return; setShowCartModal(false); setShowConfirmModal(true); };
-    const handlePedidoConfirmado = () => { if (typeof window !== 'undefined') localStorage.removeItem('foamwash_carrito_local'); };
+    const handlePedidoConfirmado = () => {
+        if (typeof vaciarCarrito === 'function') {
+            vaciarCarrito();
+        } else {
+            carrito.forEach(item => actualizarCantidad(item.id, 0));
+        }
+        if (typeof window !== 'undefined') localStorage.removeItem('foamwash_carrito_local');
+    };
 
     return (
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#f6f7fb' }}>

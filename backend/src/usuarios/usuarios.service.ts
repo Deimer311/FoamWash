@@ -46,6 +46,7 @@ export class UsuariosService {
           include: {
             servicios: true,
             observacion: true,
+            empleado: { select: { Nombre: true } },
           },
           orderBy: { fecha: 'desc' },
         },

@@ -10,7 +10,11 @@ import { PrismaClient } from '@prisma/client';
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     await this.$connect();
-    console.log('✅ Prisma conectado a MySQL exitosamente');
+    if (process.env.DATABASE_URL?.includes('test.db') || process.env.NODE_ENV === 'test') {
+      console.log('✅ Prisma conectado a SQLite (Pruebas) exitosamente');
+    } else {
+      console.log('✅ Prisma conectado a MySQL exitosamente');
+    }
   }
 
   async onModuleDestroy() {

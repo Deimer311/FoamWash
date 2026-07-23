@@ -3,6 +3,13 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../../app.module';
 import { PrismaService } from '../../prisma/prisma.service';
+import { fakerES as faker } from '@faker-js/faker';
+
+const mockClient = {
+  nombre: faker.person.fullName(),
+  correo: faker.internet.email().toLowerCase(),
+  documento: faker.string.numeric(8)
+};
 
 describe('ProgramarServicio', () => {
   let app: INestApplication;
@@ -29,18 +36,25 @@ describe('ProgramarServicio', () => {
     await prisma.observacion.deleteMany();
     await prisma.notificacion.deleteMany();
     await prisma.empleado.deleteMany();
-    await prisma.usuario.deleteMany();
-    await prisma.tipoDeDocumento.deleteMany();
-    await prisma.rol.deleteMany();
+    await prisma.usuario.deleteMany({
+      where: { Correo: mockClient.correo }
+    });
+    // TipoDeDocumento y Rol no los borramos de golpe porque pueden estar referenciados, usamos upsert
+    // await prisma.tipoDeDocumento.deleteMany();
 
-    const rolCliente = await prisma.rol.create({ data: { Rol: 'Cliente' } });
+    const rolCliente = await prisma.rol.upsert({
+      where: { Id_Rol: 3 },
+      update: { Rol: 'Cliente' },
+      create: { Id_Rol: 3, Rol: 'Cliente' }
+    });
+    
     const cliente = await prisma.usuario.create({
       data: {
-        Nombre: 'Cliente Integracion',
-        Correo: 'test@cliente.com',
+        Nombre: mockClient.nombre,
+        Correo: mockClient.correo,
         estado: 'activo',
         rol_Id_Rol: rolCliente.Id_Rol,
-        N_Documento: '123456789'
+        N_Documento: mockClient.documento
       }
     });
     clientId = cliente.Id_Usuario;
@@ -55,9 +69,9 @@ describe('ProgramarServicio', () => {
     await prisma.observacion.deleteMany();
     await prisma.notificacion.deleteMany();
     await prisma.empleado.deleteMany();
-    await prisma.usuario.deleteMany();
-    await prisma.tipoDeDocumento.deleteMany();
-    await prisma.rol.deleteMany();
+    await prisma.usuario.deleteMany({
+      where: { Correo: mockClient.correo }
+    });
     await prisma.$disconnect();
     await app.close();
   });

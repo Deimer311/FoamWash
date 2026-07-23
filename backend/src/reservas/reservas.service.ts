@@ -72,7 +72,7 @@ export class ReservasService {
     if (empleadosActivos.length === 0) return null;
 
     const dias = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-    const diaReserva = dias[fecha.getDay()];
+    const diaReserva = dias[fecha.getUTCDay()];
 
     const empleadosDisponibles = empleadosActivos.filter(emp => {
       if (!emp.empleado || emp.empleado.length === 0) return true; // Si no tiene configuración, asume disponible
@@ -120,6 +120,7 @@ export class ReservasService {
     observacion_Id_Observaciones?: number;
     empleado_Id_Usuario?: number;
     servicios?: Array<{ Id_Servicio: number; cantidad?: number; tamano?: string }>;
+    observaciones?: string;
   }) {
     // FIX fecha: usar explícitamente UTC para evitar desplazamientos por zona horaria
     let fechaISO: Date | undefined = undefined;
@@ -160,7 +161,7 @@ export class ReservasService {
     // FIX observacion: NOT NULL en schema → crear vacía si no se pasa
     const observacionData = data.observacion_Id_Observaciones
       ? { connect: { Id_Observaciones: data.observacion_Id_Observaciones } }
-      : { create: { Observaciones: data.Informacion_adicional ?? '', estado: 'Pendiente' } };
+      : { create: { Observaciones: data.observaciones ?? data.Informacion_adicional ?? '', estado: 'Pendiente' } };
 
     // ASIGNACIÓN AUTOMÁTICA: si no se pasa empleado, buscar el más disponible
     let empleadoId = data.empleado_Id_Usuario ?? null;
@@ -401,7 +402,7 @@ export class ReservasService {
   async findByCliente(clienteId: number) {
     return this.prisma.reserva.findMany({
       where: { Id_Usuario: clienteId },
-      include: { servicios: true, observacion: true },
+      include: { servicios: true, observacion: true, empleado: { select: { Nombre: true } } },
       orderBy: { fecha: 'desc' },
     });
   }

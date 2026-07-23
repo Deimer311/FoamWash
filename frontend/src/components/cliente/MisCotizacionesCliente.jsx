@@ -130,11 +130,27 @@ export default function MisCotizacionesCliente({ onBackToHome, onCotizacion, onP
                 throw new Error('No se encontró el ID del servicio en la cotización.');
             }
 
+            const serviceName = bookingCotizacion.servicioBase?.Nombre_Servicio ||
+                bookingCotizacion.servicios?.[0]?.Nombre_Servicio ||
+                'Servicio Personalizado';
+
+            const precioUnitario = bookingCotizacion.Cantidad > 0
+                ? Number(bookingCotizacion.Precio_cotizado) / bookingCotizacion.Cantidad
+                : Number(bookingCotizacion.Precio_cotizado);
+
+            const serializado = [{
+                id: serviceId,
+                nombre: serviceName,
+                cantidad: bookingCotizacion.Cantidad,
+                tamano: bookingCotizacion.Tamaño || 'Estándar',
+                precio: precioUnitario
+            }];
+
             const resReserva = await api.post('/reservas', {
                 Id_Usuario: user?.id,
                 fecha: formData.fecha,
                 Hora: formData.hora,
-                Informacion_adicional: `Dirección: ${formData.direccion}${formData.ciudad ? ', ' + formData.ciudad : ''}. Tel: ${formData.telefono}`,
+                Informacion_adicional: `Dirección: ${formData.direccion}${formData.ciudad ? ', ' + formData.ciudad : ''}. Tel: ${formData.telefono} ||| ${JSON.stringify(serializado)}`,
                 observaciones: formData.observaciones || null,
                 servicios: [{
                     Id_Servicio: serviceId,

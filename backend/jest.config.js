@@ -5,11 +5,21 @@
 // ============================================================
 const path = require('path');
 
+// Asegurar que durante las pruebas NUNCA se toque la base de datos MySQL
+process.env.DATABASE_URL = 'file:./prisma/test.db';
+
 module.exports = {
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: 'src',
-  // Ejecuta cualquier archivo que termine en .spec.ts en cualquier carpeta
+  // Redirigir las importaciones de @prisma/client al cliente SQLite generado
+  moduleNameMapper: {
+    '^@prisma/client$': path.join(__dirname, 'node_modules/.prisma/test-client'),
+  },
   testRegex: '.*\\.spec\\.ts$',
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/pruebas e2e/'
+  ],
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },

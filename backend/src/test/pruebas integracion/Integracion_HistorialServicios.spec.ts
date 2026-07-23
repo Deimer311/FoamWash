@@ -3,6 +3,19 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../../app.module';
 import { PrismaService } from '../../prisma/prisma.service';
+import { fakerES as faker } from '@faker-js/faker';
+
+const mockClient1 = {
+  nombre: faker.person.fullName(),
+  correo: faker.internet.email().toLowerCase(),
+  documento: faker.string.numeric(6)
+};
+
+const mockClient2 = {
+  nombre: faker.person.fullName(),
+  correo: faker.internet.email().toLowerCase(),
+  documento: faker.string.numeric(6)
+};
 
 describe('HistorialServicios', () => {
   let app: INestApplication;
@@ -30,30 +43,34 @@ describe('HistorialServicios', () => {
     await prisma.observacion.deleteMany();
     await prisma.notificacion.deleteMany();
     await prisma.empleado.deleteMany();
-    await prisma.usuario.deleteMany();
-    await prisma.tipoDeDocumento.deleteMany();
-    await prisma.rol.deleteMany();
+    await prisma.usuario.deleteMany({
+      where: { Correo: { in: [mockClient1.correo, mockClient2.correo] } }
+    });
 
-    const rolCliente = await prisma.rol.create({ data: { Rol: 'Cliente' } });
+    const rolCliente = await prisma.rol.upsert({
+      where: { Id_Rol: 3 },
+      update: { Rol: 'Cliente' },
+      create: { Id_Rol: 3, Rol: 'Cliente' }
+    });
     
     const cliente1 = await prisma.usuario.create({
       data: {
-        Nombre: 'Cliente Historial 1',
-        Correo: 'hist1@test.com',
+        Nombre: mockClient1.nombre,
+        Correo: mockClient1.correo,
         estado: 'activo',
         rol_Id_Rol: rolCliente.Id_Rol,
-        N_Documento: '111111'
+        N_Documento: mockClient1.documento
       }
     });
     clientId = cliente1.Id_Usuario;
 
     const cliente2 = await prisma.usuario.create({
       data: {
-        Nombre: 'Cliente Historial 2',
-        Correo: 'hist2@test.com',
+        Nombre: mockClient2.nombre,
+        Correo: mockClient2.correo,
         estado: 'activo',
         rol_Id_Rol: rolCliente.Id_Rol,
-        N_Documento: '222222'
+        N_Documento: mockClient2.documento
       }
     });
     clientId2 = cliente2.Id_Usuario;
@@ -79,9 +96,9 @@ describe('HistorialServicios', () => {
     await prisma.observacion.deleteMany();
     await prisma.notificacion.deleteMany();
     await prisma.empleado.deleteMany();
-    await prisma.usuario.deleteMany();
-    await prisma.tipoDeDocumento.deleteMany();
-    await prisma.rol.deleteMany();
+    await prisma.usuario.deleteMany({
+      where: { Correo: { in: [mockClient1.correo, mockClient2.correo] } }
+    });
     await prisma.$disconnect();
     await app.close();
   });

@@ -397,11 +397,20 @@ export const ConfirmationModal = ({ carrito, user, onCerrar, onActualizarDetalle
             const serviciosList = itemsBase.map(i => ({
                 Id_Servicio: i.id, cantidad: i.cantidad, tamano: i.tamano
             }));
+
+            const serializado = itemsBase.map(i => ({
+                id: i.id,
+                nombre: i.nombre || i.Nombre_Servicio || 'Servicio',
+                cantidad: i.cantidad || 1,
+                tamano: i.tamano || 'Estándar',
+                precio: Number(i.precio || i.Precio || 0)
+            }));
+
             const resReserva = await api.post('/reservas', {
                 Id_Usuario: userId,
                 fecha: formData.fecha,
                 Hora: formData.hora,
-                Informacion_adicional: `Dirección: ${formData.direccion}${formData.ciudad ? ', ' + formData.ciudad : ''}. Tel: ${formData.telefono || ''}`,
+                Informacion_adicional: `Dirección: ${formData.direccion}${formData.ciudad ? ', ' + formData.ciudad : ''}. Tel: ${formData.telefono || ''} ||| ${JSON.stringify(serializado)}`,
                 observaciones: formData.observaciones || null,
                 servicios: serviciosList
             });
