@@ -1,6 +1,6 @@
 // src/empleados/empleados.controller.ts
 import {
-  Controller, Get, Post, Param, UseGuards,
+  Controller, Get, Post, Body, Param, UseGuards,
   ParseIntPipe, UploadedFile, UseInterceptors, Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -9,6 +9,8 @@ import { extname } from 'path';
 import { ApiTags, ApiOperation, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { EmpleadosService } from './empleados.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller('empleados') // → /api/empleados
 @UseGuards(JwtAuthGuard)
@@ -20,6 +22,15 @@ export class EmpleadosController {
   @ApiOperation({ summary: 'Obtener todos los empleados' })
   async findAll() {
     const data = await this.empleadosService.findAll();
+    return { success: true, data };
+  }
+
+  @Post()
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Crear un nuevo empleado (admin)' })
+  async create(@Body() body: any) {
+    const data = await this.empleadosService.createEmpleado(body);
     return { success: true, data };
   }
 

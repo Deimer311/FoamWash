@@ -3,7 +3,7 @@ import { AuthService } from '../../auth/auth.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { ConflictException, BadRequestException } from '@nestjs/common';
+import { ConflictException } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 
 describe('Registro (RF-01)', () => {
@@ -33,6 +33,7 @@ describe('Registro (RF-01)', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    jest.spyOn(bcrypt, 'hash').mockImplementation(async () => '$2a$10$mockedhashvalue');
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -92,7 +93,6 @@ describe('Registro (RF-01)', () => {
   });
 
   it('CP-003: Valide los campos obligatorios vacíos.', async () => {
-    // Si falta correo o datos requeridos en tiempo de ejecución
     mockPrismaService.usuario.findUnique.mockResolvedValue(null);
     try {
       await authService.register({
@@ -106,7 +106,7 @@ describe('Registro (RF-01)', () => {
   });
 
   it('CP-004: Valide el formato de los datos ingresados.', async () => {
-    const isHashValid = await bcrypt.hash('Password123!', 12);
+    const isHashValid = await bcrypt.hash('Password123!', 1);
     expect(isHashValid).toBeDefined();
     expect(typeof isHashValid).toBe('string');
   });

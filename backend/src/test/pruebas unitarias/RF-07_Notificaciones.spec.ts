@@ -1,12 +1,32 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationsService } from '../../notifications/notifications.service';
+import { NotificacionesService } from '../../notificaciones/notificaciones.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { NotFoundException } from '@nestjs/common';
 
 describe('Notificaciones (RF-07)', () => {
   let notificationsService: NotificationsService;
+  let notificacionesService: NotificacionesService;
+  let prismaService: jest.Mocked<PrismaService>;
+
+  const mockPrismaService = {
+    notificacion: {
+      create: jest.fn(),
+      findMany: jest.fn(),
+      deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
+    },
+    usuario: {
+      findUnique: jest.fn(),
+    },
+  };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
+        NotificacionesService,
+        { provide: PrismaService, useValue: mockPrismaService },
         {
           provide: NotificationsService,
           useValue: {
@@ -18,6 +38,8 @@ describe('Notificaciones (RF-07)', () => {
     }).compile();
 
     notificationsService = module.get<NotificationsService>(NotificationsService);
+    notificacionesService = module.get<NotificacionesService>(NotificacionesService);
+    prismaService = module.get(PrismaService);
   });
 
   it('CP-043: Envío exitoso de notificación push a un tópico.', async () => {
@@ -30,35 +52,91 @@ describe('Notificaciones (RF-07)', () => {
     );
   });
 
-  it('CP-044: Envío exitoso de notificación push a un dispositivo.', async () => {
-    const res = await notificationsService.sendToDevice('device_token_xyz', 'Título Token', 'Detalle');
-    expect(res).toContain('msg_456');
-    expect(notificationsService.sendToDevice).toHaveBeenCalledWith(
-      'device_token_xyz',
-      'Título Token',
-      'Detalle',
+  it('CP-044: Notificación por asignaciones de servicio al trabajador guardada en la base de datos (RF15/CP-044).', async () => {
+    mockPrismaService.usuario.findUnique.mockResolvedValue({ Id_Usuario: 2, Nombre: 'Empleado 1' });
+    mockPrismaService.notificacion.create.mockResolvedValue({
+      id_notificaciones: 1,
+      usuario_Id_Usuario: 2,
+      descripcion_notificacion: 'Tienes una nueva orden de servicio #101 asignada.',
+      fecha_notificacion: new Date(),
+    });
+
+    const notif = await notificacionesService.crear({
+      usuario_Id_Usuario: 2,
+      descripcion_notificacion: 'Tienes una nueva orden de servicio #101 asignada.',
+    });
+
+    expect(notif.id_notificaciones).toBe(1);
+    expect(notif.usuario_Id_Usuario).toBe(2);
+    expect(mockPrismaService.notificacion.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          usuario_Id_Usuario: 2,
+          descripcion_notificacion: 'Tienes una nueva orden de servicio #101 asignada.',
+        }),
+      }),
     );
   });
 
-  it('CP-045: Manejo de errores al enviar notificación push con token inválido.', async () => {
-    jest.spyOn(notificationsService, 'sendToDevice').mockRejectedValueOnce(new Error('Invalid token'));
+  it('CP-045: Notificación por reasignaciones de servicio al trabajador guardada en la base de datos (RF15/CP-045).', async () => {
+    mockPrismaService.usuario.findUnique.mockResolvedValue({ Id_Usuario: 3, Nombre: 'Empleado Reasignado' });
+    mockPrismaService.notificacion.create.mockResolvedValue({
+      id_notificaciones: 2,
+      usuario_Id_Usuario: 3,
+      descripcion_notificacion: 'Se te ha reasignado la orden de servicio #101.',
+      fecha_notificacion: new Date(),
+    });
 
-    await expect(
-      notificationsService.sendToDevice('invalid_token', 'Test', 'Body'),
-    ).rejects.toThrow('Invalid token');
+    const notif = await notificacionesService.crear({
+      usuario_Id_Usuario: 3,
+      descripcion_notificacion: 'Se te ha reasignado la orden de servicio #101.',
+    });
+
+    expect(notif.id_notificaciones).toBe(2);
+    expect(notif.descripcion_notificacion).toContain('reasignado');
   });
 
-  it('CP-046: Envío diferido o reintento de notificación en caso de fallo de red.', async () => {
-    jest.spyOn(notificationsService, 'sendToTopic').mockRejectedValueOnce(new Error('Network Error'));
+  it('CP-046: Consultar notificaciones guardadas del usuario únicamente dentro de las últimas 72 horas.', async () => {
+    mockPrismaService.notificacion.findMany.mockResolvedValue([
+      { id_notificaciones: 2, usuario_Id_Usuario: 2, descripcion_notificacion: 'Reasignación' },
+      { id_notificaciones: 1, usuario_Id_Usuario: 2, descripcion_notificacion: 'Asignación' },
+    ]);
 
-    await expect(
-      notificationsService.sendToTopic('topic_admin', 'Alerta', 'Mensaje de error'),
-    ).rejects.toThrow('Network Error');
+    const list = await notificacionesService.findByUsuario(2);
+    expect(list).toHaveLength(2);
+    expect(mockPrismaService.notificacion.deleteMany).toHaveBeenCalled();
+    expect(mockPrismaService.notificacion.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          usuario_Id_Usuario: 2,
+          fecha_notificacion: expect.anything(),
+        }),
+        orderBy: { fecha_notificacion: 'desc' },
+      }),
+    );
   });
 
-  it('CP-047: Formato de estructura de datos payload de la notificación.', async () => {
-    const payload = { type: 'reserva_nueva', id: '10' };
-    expect(payload.type).toBe('reserva_nueva');
-    expect(payload.id).toBe('10');
+  it('CP-047: Rechazar creación de notificación si el usuario no existe.', async () => {
+    mockPrismaService.usuario.findUnique.mockResolvedValue(null);
+
+    await expect(
+      notificacionesService.crear({
+        usuario_Id_Usuario: 999,
+        descripcion_notificacion: 'Test para usuario inexistente',
+      }),
+    ).rejects.toThrow(NotFoundException);
+  });
+
+  it('CP-048: Purga de notificaciones con más de 72 horas de antigüedad.', async () => {
+    mockPrismaService.notificacion.deleteMany.mockResolvedValue({ count: 5 });
+    const res = await notificacionesService.limpiarNotificacionesAntiguas();
+    expect(res.count).toBe(5);
+    expect(mockPrismaService.notificacion.deleteMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          fecha_notificacion: expect.anything(),
+        },
+      }),
+    );
   });
 });

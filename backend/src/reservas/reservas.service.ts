@@ -191,6 +191,19 @@ export class ReservasService {
       },
     });
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // PERSISTENCIA EN BD: Guardar notificación para el cliente
+    // ─────────────────────────────────────────────────────────────────────────
+    if (reserva.cliente && this.prisma.notificacion?.create) {
+      await this.prisma.notificacion.create({
+        data: {
+          usuario_Id_Usuario: reserva.cliente.Id_Usuario,
+          descripcion_notificacion: `Tu reserva #${reserva.ID_Reserva} ha sido agendada exitosamente.`,
+          fecha_notificacion: new Date(),
+        },
+      }).catch(e => console.log('Error creando notificacion DB cliente:', e));
+    }
+
     // Notificar al administrador
     try {
       await this.notificationsService.sendToTopic(
@@ -203,13 +216,25 @@ export class ReservasService {
       console.log('Error enviando push notification:', e);
     }
 
-    // Notificar al empleado si se le asignó automáticamente
+    // ─────────────────────────────────────────────────────────────────────────
+    // CP-044 PERSISTENCIA EN BD: Notificación por asignación a trabajador
+    // ─────────────────────────────────────────────────────────────────────────
     if (empleadoId) {
+      if (this.prisma.notificacion?.create) {
+        await this.prisma.notificacion.create({
+          data: {
+            usuario_Id_Usuario: empleadoId,
+            descripcion_notificacion: `Tienes una nueva orden de servicio #${reserva.ID_Reserva} asignada.`,
+            fecha_notificacion: new Date(),
+          },
+        }).catch(e => console.log('Error creando notificacion DB empleado:', e));
+      }
+
       try {
         await this.notificationsService.sendToTopic(
           `user_${empleadoId}`,
           'Nueva Cita Asignada',
-          `Tienes una nueva reserva #${reserva.ID_Reserva} asignada automáticamente.`,
+          `Tienes una nueva reserva #${reserva.ID_Reserva} asignada.`,
           { type: 'nueva_reserva', reservaId: reserva.ID_Reserva.toString() }
         );
       } catch (e) {
@@ -272,6 +297,34 @@ export class ReservasService {
   ) {
     const exists = await this.prisma.reserva.findUnique({ where: { ID_Reserva: id } });
     if (!exists) throw new NotFoundException('Reserva no encontrada');
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // CP-045 PERSISTENCIA EN BD: Notificación por reasignación de empleado
+    // ─────────────────────────────────────────────────────────────────────────
+    if (data.empleado_Id_Usuario && data.empleado_Id_Usuario !== exists.empleado_Id_Usuario) {
+      if (this.prisma.notificacion?.create) {
+        // Notificar al nuevo empleado
+        await this.prisma.notificacion.create({
+          data: {
+            usuario_Id_Usuario: data.empleado_Id_Usuario,
+            descripcion_notificacion: `Se te ha reasignado la orden de servicio #${id}.`,
+            fecha_notificacion: new Date(),
+          },
+        }).catch(e => console.log('Error creando notificacion reasignacion nuevo empleado:', e));
+
+        // Notificar al empleado previo si existía
+        if (exists.empleado_Id_Usuario) {
+          await this.prisma.notificacion.create({
+            data: {
+              usuario_Id_Usuario: exists.empleado_Id_Usuario,
+              descripcion_notificacion: `La orden de servicio #${id} ha sido reasignada a otro trabajador.`,
+              fecha_notificacion: new Date(),
+            },
+          }).catch(e => console.log('Error creando notificacion reasignacion previo empleado:', e));
+        }
+      }
+    }
+
     return this.prisma.reserva.update({ where: { ID_Reserva: id }, data });
   }
 
@@ -289,6 +342,32 @@ export class ReservasService {
         empleado: true,
       }
     });
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // PERSISTENCIA EN BD: Guardar notificación de estado para el cliente
+    // ─────────────────────────────────────────────────────────────────────────
+    if (this.prisma.notificacion?.create) {
+      if (updatedReserva.cliente) {
+        await this.prisma.notificacion.create({
+          data: {
+            usuario_Id_Usuario: updatedReserva.cliente.Id_Usuario,
+            descripcion_notificacion: `El estado de tu reserva #${updatedReserva.ID_Reserva} ha cambiado a: ${estado}.`,
+            fecha_notificacion: new Date(),
+          },
+        }).catch(e => console.log('Error creando notificacion DB estado cliente:', e));
+      }
+
+      // Guardar notificación para el empleado asignado
+      if (updatedReserva.empleado) {
+        await this.prisma.notificacion.create({
+          data: {
+            usuario_Id_Usuario: updatedReserva.empleado.Id_Usuario,
+            descripcion_notificacion: `El estado de la reserva #${updatedReserva.ID_Reserva} ha cambiado a: ${estado}.`,
+            fecha_notificacion: new Date(),
+          },
+        }).catch(e => console.log('Error creando notificacion DB estado empleado:', e));
+      }
+    }
 
     if (estado === 'Confirmado' && updatedReserva.cliente && updatedReserva.cliente.Correo) {
       const total = updatedReserva.servicios.reduce((sum, s) => sum + Number(s.Precio || 0), 0);
@@ -316,7 +395,6 @@ export class ReservasService {
       }).catch(err => console.error('Error al enviar correo de actualización de estado:', err));
     }
 
-    // Notificar al cliente si tiene un token de app instalado (en este caso enviamos al topic general del cliente o user id si la app de cliente lo maneja)
     try {
       await this.notificationsService.sendToTopic(
         `user_${updatedReserva.cliente.Id_Usuario}`,
@@ -326,7 +404,6 @@ export class ReservasService {
       );
     } catch (e) {}
 
-    // Notificar al empleado si se cambia de estado y tiene empleado asignado
     if (updatedReserva.empleado) {
       try {
         await this.notificationsService.sendToTopic(
@@ -352,6 +429,31 @@ export class ReservasService {
       include: { cliente: true, empleado: true }
     });
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // PERSISTENCIA EN BD: Notificación de cancelación en tabla `notificaciones`
+    // ─────────────────────────────────────────────────────────────────────────
+    if (this.prisma.notificacion?.create) {
+      if (updatedReserva.cliente) {
+        await this.prisma.notificacion.create({
+          data: {
+            usuario_Id_Usuario: updatedReserva.cliente.Id_Usuario,
+            descripcion_notificacion: `La reserva #${updatedReserva.ID_Reserva} ha sido cancelada. Motivo: ${motivo}`,
+            fecha_notificacion: new Date(),
+          },
+        }).catch(e => console.log('Error creando notificacion DB cancelacion cliente:', e));
+      }
+
+      if (updatedReserva.empleado) {
+        await this.prisma.notificacion.create({
+          data: {
+            usuario_Id_Usuario: updatedReserva.empleado.Id_Usuario,
+            descripcion_notificacion: `Se ha cancelado la reserva #${updatedReserva.ID_Reserva} que tenías asignada.`,
+            fecha_notificacion: new Date(),
+          },
+        }).catch(e => console.log('Error creando notificacion DB cancelacion empleado:', e));
+      }
+    }
+
     if (updatedReserva.cliente && updatedReserva.cliente.Correo) {
       const dateFormatter = new Intl.DateTimeFormat('es-CO', {
         weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
@@ -366,7 +468,6 @@ export class ReservasService {
       }).catch(err => console.error('Error al enviar correo de cancelación:', err));
     }
 
-    // Notificar al administrador
     try {
       await this.notificationsService.sendToTopic(
         'topic_admin',
@@ -376,7 +477,6 @@ export class ReservasService {
       );
     } catch (e) {}
 
-    // Notificar al empleado si lo tiene asignado
     if (updatedReserva.empleado) {
       try {
         await this.notificationsService.sendToTopic(

@@ -4,6 +4,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
+import * as bcrypt from 'bcryptjs';
 
 describe('RecuperarPassword (RF-03)', () => {
   let authService: AuthService;
@@ -19,6 +20,7 @@ describe('RecuperarPassword (RF-03)', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    jest.spyOn(bcrypt, 'hash').mockImplementation(async () => '$2a$10$mockedhashvalue');
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [

@@ -2,8 +2,9 @@
 // ============================================================
 // Reemplaza routes/empleados.js + controllers/empleado.controller.js
 // ============================================================
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class EmpleadosService {
@@ -44,6 +45,94 @@ export class EmpleadosService {
         },
       },
     });
+  }
+
+  // POST /api/empleados — crea un nuevo empleado
+  async createEmpleado(data: any) {
+    const {
+      nombre, Nombre,
+      correo, Correo,
+      password,
+      telefono, Telefono,
+      N_Documento,
+      Direccion, direccion,
+      cargo,
+      especialidad, especialidades,
+      fecha_ingreso,
+      certificaciones,
+      dias_laborales,
+      horario,
+      contacto_emergencia_nombre,
+      contacto_emergencia_telefono,
+    } = data;
+
+    const userNombre = (nombre || Nombre || '').trim();
+    const userCorreo = (correo || Correo || '').trim().toLowerCase();
+    const userTel = (telefono || Telefono || '').trim();
+    const userDir = (direccion || Direccion || '').trim();
+    const userDoc = N_Documento ? N_Documento.toString().trim() : null;
+
+    if (!userNombre) {
+      throw new BadRequestException('El nombre completo del empleado es obligatorio');
+    }
+
+    if (!userCorreo) {
+      throw new BadRequestException('El correo electrónico es obligatorio');
+    }
+
+    const existingEmail = await this.prisma.usuario.findFirst({ where: { Correo: userCorreo } });
+    if (existingEmail) {
+      throw new ConflictException('El correo electrónico ya está registrado en el sistema');
+    }
+
+    if (userDoc) {
+      const existingDoc = await this.prisma.usuario.findFirst({ where: { N_Documento: userDoc } });
+      if (existingDoc) {
+        throw new ConflictException('El número de documento ya está registrado en otro usuario');
+      }
+    }
+
+    const password_hash = await bcrypt.hash(password || '123456', 10);
+
+    let parsedFecha = null;
+    if (fecha_ingreso && fecha_ingreso.toString().trim() !== '') {
+      parsedFecha = new Date(fecha_ingreso);
+      if (isNaN(parsedFecha.getTime())) {
+        throw new BadRequestException('La fecha de ingreso ingresada no es válida');
+      }
+    }
+
+    const newUser = await this.prisma.usuario.create({
+      data: {
+        Nombre: userNombre,
+        Correo: userCorreo,
+        password_hash,
+        Telefono: userTel || null,
+        Direccion: userDir || null,
+        N_Documento: userDoc || null,
+        rol_Id_Rol: 2, // 2 = Empleado
+        estado: 'activo',
+        empleado: {
+          create: {
+            cargo: cargo || null,
+            especialidades: especialidades || especialidad || null,
+            fecha_ingreso: parsedFecha,
+            certificaciones: certificaciones || null,
+            dias_laborales: dias_laborales || null,
+            horario: horario || null,
+            contacto_emergencia_nombre: contacto_emergencia_nombre || null,
+            contacto_emergencia_telefono: contacto_emergencia_telefono || null,
+          },
+        },
+      },
+      include: {
+        empleado: true,
+        rol: { select: { Rol: true } },
+        tipo_de_documento: true,
+      },
+    });
+
+    return newUser;
   }
 
   // GET /api/empleados/:id/servicios-hoy
@@ -298,7 +387,6 @@ export class EmpleadosService {
       calificacion_promedio: calificacionPromedio,
       total_calificaciones:  totalCalificaciones,
       comentarios:           comentarios,
-      // puntualidad = null: el sistema no registra hora real de inicio de servicio
       puntualidad:           null,
     };
   }

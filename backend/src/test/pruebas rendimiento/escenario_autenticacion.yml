@@ -1,0 +1,24 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    - duration: 10
+      arrivalRate: 4
+      name: "Prueba Inicial (Calentamiento x2)"
+    - duration: 20
+      arrivalRate: 30
+      name: "Carga de Autenticación Sostenida x2"
+    - duration: 10
+      arrivalRate: 80
+      name: "Pico de Autenticación Concurrente x2 (80 usuarios/seg)"
+
+scenarios:
+  - name: "Estrés de Autenticación: Inicio de Sesión de Usuarios (Doble Carga)"
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            correo: "cliente@gmail.com"
+            password: "123456"
+          expect:
+            - statusCode: 201
+            - contentType: json

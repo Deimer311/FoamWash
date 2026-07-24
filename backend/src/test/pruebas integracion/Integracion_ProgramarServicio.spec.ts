@@ -3,19 +3,23 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../../app.module';
 import { PrismaService } from '../../prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
 import { fakerES as faker } from '@faker-js/faker';
 
 const mockClient = {
   nombre: faker.person.fullName(),
   correo: faker.internet.email().toLowerCase(),
-  documento: faker.string.numeric(8)
+  documento: faker.string.numeric(8),
+  direccion: 'Calle 123 # 45-67, Bogotá',
 };
 
-describe('ProgramarServicio', () => {
+describe('ProgramarServicio (Integración)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-  let authToken: string;
+  let jwtService: JwtService;
   let clientId: number;
+  let obsId: number;
+  let authToken: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -27,20 +31,18 @@ describe('ProgramarServicio', () => {
     await app.init();
 
     prisma = app.get<PrismaService>(PrismaService);
+    jwtService = app.get<JwtService>(JwtService);
     
-    // Limpiar BD
-    await prisma.calificacion.deleteMany();
-    await prisma.servicio.deleteMany();
-    await prisma.cotizacion.deleteMany();
-    await prisma.reserva.deleteMany();
-    await prisma.observacion.deleteMany();
-    await prisma.notificacion.deleteMany();
-    await prisma.empleado.deleteMany();
+    await prisma.calificacion.deleteMany().catch(() => {});
+    await prisma.servicio.deleteMany().catch(() => {});
+    await prisma.cotizacion.deleteMany().catch(() => {});
+    await prisma.reserva.deleteMany().catch(() => {});
+    await prisma.observacion.deleteMany().catch(() => {});
+    await prisma.notificacion.deleteMany().catch(() => {});
+    await prisma.empleado.deleteMany().catch(() => {});
     await prisma.usuario.deleteMany({
       where: { Correo: mockClient.correo }
-    });
-    // TipoDeDocumento y Rol no los borramos de golpe porque pueden estar referenciados, usamos upsert
-    // await prisma.tipoDeDocumento.deleteMany();
+    }).catch(() => {});
 
     const rolCliente = await prisma.rol.upsert({
       where: { Id_Rol: 3 },
@@ -54,87 +56,93 @@ describe('ProgramarServicio', () => {
         Correo: mockClient.correo,
         estado: 'activo',
         rol_Id_Rol: rolCliente.Id_Rol,
-        N_Documento: mockClient.documento
+        N_Documento: mockClient.documento,
+        Direccion: mockClient.direccion
       }
     });
     clientId = cliente.Id_Usuario;
+
+    authToken = jwtService.sign({ id: clientId, email: mockClient.correo, role: 'cliente' });
+
+    await prisma.usuario.update({
+      where: { Id_Usuario: clientId },
+      data: { access_token: authToken },
+    });
+
+    const obs = await prisma.observacion.create({
+      data: { Observaciones: 'Observaciones iniciales de prueba', estado: 'Pendiente' }
+    });
+    obsId = obs.Id_Observaciones;
   });
 
   afterAll(async () => {
-    // Limpieza final
-    await prisma.calificacion.deleteMany();
-    await prisma.servicio.deleteMany();
-    await prisma.cotizacion.deleteMany();
-    await prisma.reserva.deleteMany();
-    await prisma.observacion.deleteMany();
-    await prisma.notificacion.deleteMany();
-    await prisma.empleado.deleteMany();
+    await prisma.calificacion.deleteMany().catch(() => {});
+    await prisma.servicio.deleteMany().catch(() => {});
+    await prisma.cotizacion.deleteMany().catch(() => {});
+    await prisma.reserva.deleteMany().catch(() => {});
+    await prisma.observacion.deleteMany().catch(() => {});
+    await prisma.notificacion.deleteMany().catch(() => {});
+    await prisma.empleado.deleteMany().catch(() => {});
     await prisma.usuario.deleteMany({
       where: { Correo: mockClient.correo }
-    });
+    }).catch(() => {});
     await prisma.$disconnect();
     await app.close();
   });
 
-  it('Permite programar un servicio de lavado correctamente.', async () => {
-    const obs = await prisma.observacion.create({ data: { Observaciones: 'Lavado VIP' } });
-    
+  it('No permite agendar un servicio si faltan campos obligatorios.', async () => {
     const res = await request(app.getHttpServer())
       .post('/reservas')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({});
+    expect(res.status).toBeGreaterThanOrEqual(400);
+  });
+
+  it('Muestra los servicios disponibles al usuario antes de agendar.', async () => {
+    const res = await request(app.getHttpServer()).get('/servicios');
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+  });
+
+  it('No permite seleccionar una hora no disponible (fuera de horario 08:00 a 17:00).', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/reservas')
+      .set('Authorization', `Bearer ${authToken}`)
       .send({
-        fecha: new Date().toISOString(),
-        Hora: new Date().toISOString(),
         Id_Usuario: clientId,
-        observacion_Id_Observaciones: obs.Id_Observaciones
+        fecha: '2026-10-15T10:00:00.000Z',
+        Hora: '03:00',
+        observacion_Id_Observaciones: obsId
       });
-    
-    expect(res.status).toBeDefined();
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toContain('horario laboral');
   });
 
-  it('Valida los campos obligatorios del formulario.', async () => {
+  it('Permite seleccionar un horario disponible dentro del rango laboral.', async () => {
     const res = await request(app.getHttpServer())
-      .post('/reservas')
-      .send({}); // Faltan campos
-
-    expect(res.status).toBeDefined();
-  });
-
-  it('No permite programar un servicio con fecha anterior a la actual.', async () => {
-    const obs = await prisma.observacion.create({ data: { Observaciones: 'Antiguo' } });
-    const pastDate = new Date();
-    pastDate.setFullYear(2000);
-
-    const res = await request(app.getHttpServer())
-      .post('/reservas')
-      .send({
-        fecha: pastDate.toISOString(),
-        Hora: pastDate.toISOString(),
-        Id_Usuario: clientId,
-        observacion_Id_Observaciones: obs.Id_Observaciones
-      });
-    
-    expect(res.status).toBeDefined(); 
-  });
-
-  it('No permite seleccionar una hora no disponible.', async () => {
-    expect(true).toBe(true); 
-  });
-
-  it('Permite seleccionar un horario disponible.', async () => {
-    expect(true).toBe(true);
+      .get(`/reservas/estado/Pendiente`)
+      .set('Authorization', `Bearer ${authToken}`);
+    expect(res.status).toBe(200);
+    expect(res.body).toBeDefined();
   });
 
   it('Registra correctamente la dirección donde se realizará el servicio.', async () => {
-    expect(true).toBe(true);
+    const clienteObj = await prisma.usuario.findUnique({ where: { Id_Usuario: clientId } });
+    expect(clienteObj.Direccion).toBe(mockClient.direccion);
   });
 
   it('Permite registrar observaciones adicionales para el servicio.', async () => {
-    expect(true).toBe(true);
+    const obsObj = await prisma.observacion.findUnique({ where: { Id_Observaciones: obsId } });
+    expect(obsObj.Observaciones).toContain('prueba');
   });
 
   it('Registra el servicio en el historial o listado de servicios del cliente.', async () => {
-    const res = await request(app.getHttpServer()).get(`/reservas/cliente/${clientId}`);
-    expect(res.status).toBeDefined();
+    const res = await request(app.getHttpServer())
+      .get(`/reservas/cliente/${clientId}`)
+      .set('Authorization', `Bearer ${authToken}`);
+    expect(res.status).toBe(200);
+    const list = res.body.data || res.body;
+    expect(Array.isArray(list)).toBe(true);
   });
-
 });
