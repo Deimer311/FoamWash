@@ -140,9 +140,22 @@ export const AuthProvider = ({ children }) => {
                 redirectPage: 'servicios-cliente',
             };
         } catch (error) {
-            return { success: false, message: error?.error?.message || 'Error al registrar usuario' };
+            // NestJS ConflictException con objeto: { statusCode, message: { code, message } }
+            const nestMsg = error?.message;
+            let friendlyMsg = 'Error al registrar usuario';
+
+            if (typeof nestMsg === 'object' && nestMsg?.message) {
+                friendlyMsg = nestMsg.message;
+            } else if (typeof nestMsg === 'string') {
+                friendlyMsg = nestMsg;
+            } else if (error?.error?.message) {
+                friendlyMsg = error.error.message;
+            }
+
+            return { success: false, message: friendlyMsg };
         }
     };
+
 
     // =========================================================================
     // LOGOUT
