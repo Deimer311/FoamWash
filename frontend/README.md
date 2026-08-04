@@ -100,49 +100,6 @@ import { serviciosService, usuariosService, reservasService,
 
 ---
 
-## ⚠️ Correcciones pendientes
-
-### 1. `LoginView.jsx` — usa login simulado
-Reemplazar `simulateLogin()` por `useAuth().login()`:
-```jsx
-// ❌ Actual
-const result = simulateLogin(email, password);
-
-// ✅ Correcto
-const { login } = useAuth();
-const result = await login(email, password);
-```
-
-### 2. `AdminDashboard.jsx` — ruta inexistente
-```jsx
-// ❌ No existe
-api.get('/reservas/analytics/ingresos')
-
-// ✅ Correcto
-api.get('/estadisticas')
-// Usar: data.Ingresos_Totales
-```
-
-### 3. `AgendaEmpleado.jsx` — formato de ruta incorrecto
-```jsx
-// ❌ No existe
-`/empleados/${user.id}/reservas/${filtro}`
-
-// ✅ Correcto según filtro:
-// hoy     → /empleados/:id/servicios-hoy
-// semana  → /empleados/:id/agenda-semanal
-```
-
-### 4. `authService.js` — parámetros incorrectos en recuperación
-```js
-// ✅ verifyResetCode espera:
-{ token: string }
-
-// ✅ resetPassword espera:
-{ token: string, newPassword: string }
-```
-
----
 
 ## 🚀 Scripts disponibles
 

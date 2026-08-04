@@ -51,11 +51,40 @@ export class ReservasService {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ASIGNACIÓN AUTOMÁTICA DE EMPLEADO
-  // Busca el empleado activo con menos reservas pendientes/en proceso
-  // en la misma fecha para balancear la carga de trabajo
+  // VALIDACIÓN DE DISPONIBILIDAD ESTRICTA (RF19)
+  // Verifica si el empleado tiene reservas que se crucen en un rango de 2h
   // ─────────────────────────────────────────────────────────────────────────
-  private async asignarEmpleadoAutomatico(fecha: Date): Promise<number | null> {
+  private async verificarDisponibilidad(empleadoId: number, fecha: Date, hora: Date, excludeReservaId?: number): Promise<boolean> {
+    const fechaInicio = new Date(fecha);
+    fechaInicio.setHours(0, 0, 0, 0);
+    const fechaFin = new Date(fecha);
+    fechaFin.setHours(23, 59, 59, 999);
+
+    const reservasDelDia = await this.prisma.reserva.findMany({
+      where: {
+        empleado_Id_Usuario: empleadoId,
+        fecha: { gte: fechaInicio, lte: fechaFin },
+        Estado: { notIn: ['Cancelado'] },
+        ID_Reserva: excludeReservaId ? { not: excludeReservaId } : undefined,
+      },
+      select: { Hora: true }
+    });
+
+    const horaMilis = hora.getTime();
+    const BLOQUE_MS = 2 * 60 * 60 * 1000; // 2 horas de margen
+
+    for (const r of reservasDelDia) {
+      if (Math.abs(r.Hora.getTime() - horaMilis) < BLOQUE_MS) {
+        return false; // Conflicto detectado
+      }
+    }
+    return true; // Disponible
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ASIGNACIÓN AUTOMÁTICA DE EMPLEADO
+  // ─────────────────────────────────────────────────────────────────────────
+  private async asignarEmpleadoAutomatico(fecha: Date, horaISO: Date): Promise<number | null> {
     // 1. Obtener todos los empleados activos (rol_Id_Rol = 2)
     const empleadosActivos = await this.prisma.usuario.findMany({
       where: {
@@ -87,25 +116,31 @@ export class ReservasService {
 
     if (empleadosDisponibles.length === 0) return null; // No hay nadie que trabaje ese día
 
-    // 2. Para cada empleado disponible, contar sus reservas en esa fecha
+    // 2. Filtrar por cruce de horarios y contar reservas para balanceo
     const fechaInicio = new Date(fecha);
     fechaInicio.setHours(0, 0, 0, 0);
     const fechaFin = new Date(fecha);
     fechaFin.setHours(23, 59, 59, 999);
 
-    const cargaPorEmpleado = await Promise.all(
-      empleadosDisponibles.map(async (emp) => {
-        const cantidad = await this.prisma.reserva.count({
+    const cargaPorEmpleado: { empId: number, reservasEnElDia: number }[] = [];
+    
+    for (const emp of empleadosDisponibles) {
+       const disponible = await this.verificarDisponibilidad(emp.Id_Usuario, fecha, horaISO);
+       if (!disponible) continue; // Descartar a los que tienen cruce (RF19)
+       
+       const cantidad = await this.prisma.reserva.count({
           where: {
             empleado_Id_Usuario: emp.Id_Usuario,
             fecha: { gte: fechaInicio, lte: fechaFin },
             Estado: { notIn: ['Cancelado'] },
           },
-        });
-        return { empId: emp.Id_Usuario, reservasEnElDia: cantidad };
-      }),
-    );
+       });
+       
+       cargaPorEmpleado.push({ empId: emp.Id_Usuario, reservasEnElDia: cantidad });
+    }
 
+    if (cargaPorEmpleado.length === 0) return null; // Nadie disponible en esa hora sin cruce
+    
     cargaPorEmpleado.sort((a, b) => a.reservasEnElDia - b.reservasEnElDia);
     return cargaPorEmpleado[0].empId;
   }
@@ -163,10 +198,15 @@ export class ReservasService {
       ? { connect: { Id_Observaciones: data.observacion_Id_Observaciones } }
       : { create: { Observaciones: data.observaciones ?? data.Informacion_adicional ?? '', estado: 'Pendiente' } };
 
-    // ASIGNACIÓN AUTOMÁTICA: si no se pasa empleado, buscar el más disponible
+    // ASIGNACIÓN AUTOMÁTICA O MANUAL: Validar disponibilidad (RF19)
     let empleadoId = data.empleado_Id_Usuario ?? null;
-    if (!empleadoId && fechaISO) {
-      empleadoId = await this.asignarEmpleadoAutomatico(fechaISO);
+    if (empleadoId && fechaISO && horaISO) {
+      const disponible = await this.verificarDisponibilidad(empleadoId, fechaISO, horaISO);
+      if (!disponible) {
+         throw new BadRequestException('El trabajador seleccionado ya tiene una reserva que se cruza en ese horario (margen de 2h).');
+      }
+    } else if (!empleadoId && fechaISO && horaISO) {
+      empleadoId = await this.asignarEmpleadoAutomatico(fechaISO, horaISO);
     }
 
     const reserva = await this.prisma.reserva.create({
@@ -297,6 +337,20 @@ export class ReservasService {
   ) {
     const exists = await this.prisma.reserva.findUnique({ where: { ID_Reserva: id } });
     if (!exists) throw new NotFoundException('Reserva no encontrada');
+
+    // VALIDAR DISPONIBILIDAD SI CAMBIA EMPLEADO O FECHA/HORA (RF19)
+    if (data.empleado_Id_Usuario || data.fecha || data.Hora) {
+      const targetEmpleadoId = data.empleado_Id_Usuario ?? exists.empleado_Id_Usuario;
+      const targetFecha = data.fecha ?? exists.fecha;
+      const targetHora = data.Hora ?? exists.Hora;
+      
+      if (targetEmpleadoId && targetFecha && targetHora) {
+        const disponible = await this.verificarDisponibilidad(targetEmpleadoId, targetFecha, targetHora, id);
+        if (!disponible) {
+          throw new BadRequestException('El trabajador ya tiene una reserva que se cruza en ese horario (margen de 2h).');
+        }
+      }
+    }
 
     // ─────────────────────────────────────────────────────────────────────────
     // CP-045 PERSISTENCIA EN BD: Notificación por reasignación de empleado
