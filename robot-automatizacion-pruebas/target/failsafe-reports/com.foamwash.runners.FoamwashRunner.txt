@@ -1,12 +1,12 @@
 -------------------------------------------------------------------------------
 Test set: com.foamwash.runners.FoamwashRunner
 -------------------------------------------------------------------------------
-Tests run: 23, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 139.5 s <<< FAILURE! -- in com.foamwash.runners.FoamwashRunner
-Autenticación y gestión de perfil.Registro exitoso en el sistema como cliente -- Time elapsed: 29.07 s <<< FAILURE!
+Tests run: 23, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 127.8 s <<< FAILURE! -- in com.foamwash.runners.FoamwashRunner
+Autenticación y gestión de perfil.Edicion del perfil de usuario -- Time elapsed: 15.99 s <<< FAILURE!
 java.lang.AssertionError: 
 
-Expected: an element that is visible
-     but: no matching element found by [header confirmacion located with: css: .hc-header]
+Expected: an element that is clickable
+     but: no matching element found by [btn mi perfil located with: xpath: //button[contains(., 'Mi Perfil')]] was not clickable
 	at net.serenitybdd.screenplay.ErrorTally.throwSummaryExceptionFrom(ErrorTally.java:38)
 	at net.serenitybdd.screenplay.ErrorTally.reportAnyErrors(ErrorTally.java:32)
 	at net.serenitybdd.screenplay.Actor.should(Actor.java:397)
@@ -16,6 +16,6 @@ Expected: an element that is visible
 	at net.serenitybdd.screenplay.Actor.performSilently(Actor.java:254)
 	at net.serenitybdd.screenplay.Actor.attemptsTo(Actor.java:211)
 	at net.serenitybdd.screenplay.Actor.attemptsTo(Actor.java:222)
-	at com.foamwash.stepdefinitions.AutenticacionStepDefinitions.deberiaVerUnMensajeDeConfirmacionDeRegistro(AutenticacionStepDefinitions.java:50)
-	at ✽.deberia ver un mensaje de confirmacion de registro(file:///C:/Users/cristian%20andres/OneDrive/Documentos/todo%20lo%20de%20foam%20wash/foam%20version%20final/FoamWash/robot-automatizacion-pruebas/src/test/resources/features/autenticacion_y_perfil.feature:11)
+	at com.foamwash.stepdefinitions.AutenticacionStepDefinitions.editaSuPerfilConNuevaInformacion(AutenticacionStepDefinitions.java:146)
+	at ✽.edita su perfil con nueva informacion(file:///C:/Users/cristian%20andres/OneDrive/Documentos/todo%20lo%20de%20foam%20wash/foam%20version%20final/FoamWash/robot-automatizacion-pruebas/src/test/resources/features/autenticacion_y_perfil.feature:34)
 

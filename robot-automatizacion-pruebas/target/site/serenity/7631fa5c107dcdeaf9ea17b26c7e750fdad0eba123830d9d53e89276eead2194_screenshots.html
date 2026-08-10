@@ -152,7 +152,7 @@
             <a href="576946480b52ad056d6f5bddf874399c83582ecf90963cc074a14c70580e7d9f.html"><i class="bi bi-chat-text"></i> Features</a>
         </li>
     </ul>
-    <span class="date-and-time"><a href="build-info.html"><i class="bi bi-info-circle"></i></a> Report generated 09-07-2026 07:35</span>
+    <span class="date-and-time"><a href="build-info.html"><i class="bi bi-info-circle"></i></a> Report generated 09-08-2026 21:43</span>
     <br style="clear:left"/>
 </div>
 
@@ -202,9 +202,9 @@ Para poder acceder a los servicios y mantener mi información actualizada
                 <table class="outcome-header">
                     <tr>
                         <td colspan="2" class="test-title-bar">
-                            <span class="outcome-icon"><a href='##beforetable'><i class='bi bi-check-circle-fill success-icon fa-2x' title='SUCCESS'></i></a></span>
+                            <span class="outcome-icon"><a href='##beforetable'><i class='bi bi-x-circle-fill failure-icon fa-2x' title='FAILURE'></i></a></span>
                             <span class="test-case-title">
-                                <span class="success-color">Edicion del perfil de usuario
+                                <span class="failing-color">Edicion del perfil de usuario
                                     <span class="related-issue-title"></span>
                                 </span>
                             </span>
@@ -221,38 +221,63 @@ Para poder acceder a los servicios y mantener mi información actualizada
 
     <div id="beforetable"></div>
     <div id="contenttilttle">
+            <div class="screenshotFailure panel panel-danger">
+    <div style="display:block">
+        <div class="table">
+            <div class="row">
+                <div class="col-sm-10" style="padding-left:1.5em; padding-top:0.5em; padding-bottom:0.5em;">
+                    <span class="error-message error-message-title">Assertion error: Expected: an element that is clickable but: no matching element found by [btn mi perfil located with: xpath: //button[contains(., 'Mi Perfil')]] was not clickable</span>
+                </div>
+                <div class="col-sm-2">
+                    <a class="btn btn-warning details-button" data-toggle="collapse" href="#stacktraceModal-overall"
+                       role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><i class="bi bi-eye"></i> More details</a>
+                </div>
+             </div>
+        </div>
+    <div>
+
+    <!-- Details Section -->
+    <div class="row stacktrace-details">
+      <div class="col">
+        <div class="collapse multi-collapse" id="stacktraceModal-overall">
+            <div class="card">
+                <div class="card-header">
+                    <h4>java.lang.AssertionError </h4>
+                </div>
+                <div class="card-body">
+                    <div>
+                        <pre>com.foamwash.stepdefinitions.AutenticacionStepDefinitions.editaSuPerfilConNuevaInformacion(AutenticacionStepDefinitions.java:146)<br /></pre>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+                    <div class="panel-body">
+                        <a href="pagesource11026025237084067634.html" target="_blank" class="btn btn-info">HTML Source</a>
+                    </div>
+            </div>
         <div class="slider-wrapper theme-default">
             <div id="slider">
-                <img src="2dbcf4017d1a1b6435e12fe3bdb8575954937525958110d929a60e7f8a1fd39c.png" title=" Dado que el cliente ha iniciado sesion en el sistema" width="0"/>
-                <img src="2dbcf4017d1a1b6435e12fe3bdb8575954937525958110d929a60e7f8a1fd39c.png" title=" Cliente perfil abrir pagina" width="0"/>
-                <img src="2dbcf4017d1a1b6435e12fe3bdb8575954937525958110d929a60e7f8a1fd39c.png" title=" Cliente Perfil opens the browser at http://localhost:3000" width="0"/>
-                <img src="2dbcf4017d1a1b6435e12fe3bdb8575954937525958110d929a60e7f8a1fd39c.png" title=" Cliente perfil abrir pagina (completed)" width="0"/>
-                <img src="2dbcf4017d1a1b6435e12fe3bdb8575954937525958110d929a60e7f8a1fd39c.png" title=" Cliente Perfil clicks on bot&oacute;n login" width="0"/>
-                <img src="14dee6caac36e4dd841675cef2e64834a685cd568dcfbdd0c5ddc8cef40d3a45.png" title=" Cliente Perfil clicks on bot&oacute;n login (completed)" width="0"/>
-                <img src="14dee6caac36e4dd841675cef2e64834a685cd568dcfbdd0c5ddc8cef40d3a45.png" title=" Cliente perfil ingresar credenciales" width="0"/>
-                <img src="14dee6caac36e4dd841675cef2e64834a685cd568dcfbdd0c5ddc8cef40d3a45.png" title=" Cliente Perfil enters 'cliente@gmail.com' into campo email" width="0"/>
-                <img src="3adf8cae98453ba7661a279320584f625ba95aa0c98c72e678527470c06e54d1.png" title=" Cliente Perfil enters 'cliente@gmail.com' into campo email (completed)" width="0"/>
-                <img src="3adf8cae98453ba7661a279320584f625ba95aa0c98c72e678527470c06e54d1.png" title=" Cliente Perfil enters '123456' into campo contrase&ntilde;a" width="0"/>
-                <img src="f313c6ea7a57b1ac83ca18c9bb0874b27e8feabfbfc2db8a46aa15ce28706de5.png" title=" Cliente Perfil enters '123456' into campo contrase&ntilde;a (completed)" width="0"/>
-                <img src="f313c6ea7a57b1ac83ca18c9bb0874b27e8feabfbfc2db8a46aa15ce28706de5.png" title=" Cliente Perfil clicks on bot&oacute;n de iniciar sesi&oacute;n" width="0"/>
-                <img src="5a5aa09b8af10c1097f89f02e43560b550228bfc273e59c15a9991579c1f1e15.png" title=" Cliente Perfil clicks on bot&oacute;n de iniciar sesi&oacute;n (completed)" width="0"/>
-                <img src="5a5aa09b8af10c1097f89f02e43560b550228bfc273e59c15a9991579c1f1e15.png" title=" Dado que el cliente ha iniciado sesion en el sistema" width="0"/>
-                <img src="5a5aa09b8af10c1097f89f02e43560b550228bfc273e59c15a9991579c1f1e15.png" title=" Cliente perfil ingresar credenciales (completed)" width="0"/>
-                <img src="5d4bf325f00d26a4915b755e3b3cd1f41e7458a18d8034d41dfd0ec1ab67d18a.png" title=" Cuando edita su perfil con nueva informacion" width="0"/>
-                <img src="5d4bf325f00d26a4915b755e3b3cd1f41e7458a18d8034d41dfd0ec1ab67d18a.png" title=" Cliente Perfil clicks on avatar" width="0"/>
-                <img src="a31130bc770713fbeb2faff7f9ddec2028de3fbfb06060dc1c83841316ff8196.png" title=" Cliente Perfil clicks on avatar (completed)" width="0"/>
-                <img src="43f0ac201d11a6b55ea309524c1cd4c81e663c9494700638a5343a91a3950ce4.png" title=" Cliente Perfil clicks on btn mi perfil" width="0"/>
-                <img src="e80999675f32ed4ee919bd77136b325fd5000a319af4a87b074e21d4ecb3b4c8.png" title=" Cliente Perfil clicks on btn mi perfil (completed)" width="0"/>
-                <img src="c525e695da2863d18ea34a92da95fd7cc3ba60a5a67e71f1b24824f0686ddb50.png" title=" Cliente Perfil clicks on btn editar perfil" width="0"/>
-                <img src="d47eae7b42e58feef8350aa0d5745d3aaa180a15550ee670d0c7bc93aa0a9505.png" title=" Cliente Perfil clicks on btn editar perfil (completed)" width="0"/>
-                <img src="d47eae7b42e58feef8350aa0d5745d3aaa180a15550ee670d0c7bc93aa0a9505.png" title=" Cliente Perfil enters 'Calle Editada 1783600549807' then hits [ENTER] into input direccion" width="0"/>
-                <img src="c032c6b7526a796253988a1967af696322e73d01ec5d6eff744d02d97b09bf58.png" title=" Cliente Perfil enters 'Calle Editada 1783600549807' then hits [ENTER] into input direccion" width="0"/>
-                <img src="098f455ffaa76dd21923cf3355a54c9efa2e43384b46427c0f93057b9ba75614.png" title=" Cliente Perfil enters 'Calle Editada 1783600549807' then hits [ENTER] into input direccion (completed)" width="0"/>
-                <img src="098f455ffaa76dd21923cf3355a54c9efa2e43384b46427c0f93057b9ba75614.png" title=" Cuando edita su perfil con nueva informacion (completed)" width="0"/>
-                <img src="77a3e6e877514dcbfe6a11bb30b7bc7744f423dd5285af12ce58e517e7323781.png" title=" Entonces los cambios deberian guardarse correctamente y ver un mensaje de confirmacion" width="0"/>
-                <img src="77a3e6e877514dcbfe6a11bb30b7bc7744f423dd5285af12ce58e517e7323781.png" title=" Then toast should be an element that is visible" width="0"/>
+                <img src="8288984eb87baf267cdede14827f4f1bc5acd13a6b586228852c011e1c9906a7.png" title=" Dado que el cliente ha iniciado sesion en el sistema" width="0"/>
+                <img src="8288984eb87baf267cdede14827f4f1bc5acd13a6b586228852c011e1c9906a7.png" title=" Cliente perfil abrir pagina" width="0"/>
+                <img src="8288984eb87baf267cdede14827f4f1bc5acd13a6b586228852c011e1c9906a7.png" title=" Cliente Perfil opens the browser at http://localhost:3000" width="0"/>
+                <img src="8288984eb87baf267cdede14827f4f1bc5acd13a6b586228852c011e1c9906a7.png" title=" Cliente perfil abrir pagina (completed)" width="0"/>
+                <img src="8288984eb87baf267cdede14827f4f1bc5acd13a6b586228852c011e1c9906a7.png" title=" Cliente Perfil clicks on bot&oacute;n login" width="0"/>
+                <img src="4cd10a93f7c0d57b7777d5fc049cc3ee2e78447cc0be605a06534f70f57b0cec.png" title=" Cliente Perfil clicks on bot&oacute;n login (completed)" width="0"/>
+                <img src="4cd10a93f7c0d57b7777d5fc049cc3ee2e78447cc0be605a06534f70f57b0cec.png" title=" Cliente perfil ingresar credenciales" width="0"/>
+                <img src="4cd10a93f7c0d57b7777d5fc049cc3ee2e78447cc0be605a06534f70f57b0cec.png" title=" Cliente Perfil enters 'cliente@gmail.com' into campo email" width="0"/>
+                <img src="6c83e774b20d1608c6a7539ff2a1661659797fccb3103907cc40d323fb6dda76.png" title=" Cliente Perfil enters 'cliente@gmail.com' into campo email (completed)" width="0"/>
+                <img src="6c83e774b20d1608c6a7539ff2a1661659797fccb3103907cc40d323fb6dda76.png" title=" Cliente Perfil enters '123456' into campo contrase&ntilde;a" width="0"/>
+                <img src="61e4a9e7f8d540c6ecf03e19de9b6991bceddc48e544a76049fe785ab9f5c42b.png" title=" Cliente Perfil enters '123456' into campo contrase&ntilde;a (completed)" width="0"/>
+                <img src="61e4a9e7f8d540c6ecf03e19de9b6991bceddc48e544a76049fe785ab9f5c42b.png" title=" Cliente Perfil clicks on bot&oacute;n de iniciar sesi&oacute;n" width="0"/>
+                <img src="43bdc7301c78df8dc093b012a283677660b2bf95a5497e48be059320ac2193d0.png" title=" Cliente Perfil clicks on bot&oacute;n de iniciar sesi&oacute;n (completed)" width="0"/>
+                <img src="43bdc7301c78df8dc093b012a283677660b2bf95a5497e48be059320ac2193d0.png" title=" Cliente perfil ingresar credenciales (completed)" width="0"/>
+                <img src="43bdc7301c78df8dc093b012a283677660b2bf95a5497e48be059320ac2193d0.png" title=" Dado que el cliente ha iniciado sesion en el sistema (completed)" width="0"/>
+                <img src="97d6f203587d60f453919714b29a109e022b404bc039a566c60e0578495709a6.png" title=" Cuando edita su perfil con nueva informacion" width="0"/>
+                <img src="97d6f203587d60f453919714b29a109e022b404bc039a566c60e0578495709a6.png" title=" Cliente Perfil clicks on avatar" width="0"/>
 
-                <img src="77a3e6e877514dcbfe6a11bb30b7bc7744f423dd5285af12ce58e517e7323781.png" title=" Entonces los cambios deberian guardarse correctamente y ver un mensaje de confirmacion (completed): <span class='success-color'>SUCCESS</span>" width="0"/>
+                <img src="97d6f203587d60f453919714b29a109e022b404bc039a566c60e0578495709a6.png" title=" Cuando edita su perfil con nueva informacion (completed): <span class='failing-color'>FAILURE</span>" width="0"/>
             </div>
         </div>
 
