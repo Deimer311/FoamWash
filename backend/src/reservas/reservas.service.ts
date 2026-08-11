@@ -35,6 +35,21 @@ export class ReservasService {
     });
   }
 
+  // GET /api/reservas/cliente/:id
+  async findByCliente(userId: number) {
+    return this.prisma.reserva.findMany({
+      where: { Id_Usuario: userId },
+      include: {
+        servicios: {
+          select: { Id_Servicio: true, Nombre_Servicio: true, Precio: true, imagen_url: true },
+        },
+        empleado: { select: { Nombre: true } },
+        observacion: { select: { Observaciones: true, estado: true } },
+      },
+      orderBy: [{ fecha: 'desc' }],
+    });
+  }
+
   // GET /api/reservas/:id
   async findOne(id: number) {
     const reserva = await this.prisma.reserva.findUnique({
@@ -91,8 +106,8 @@ export class ReservasService {
         rol_Id_Rol: 2,        // rol empleado
         estado: 'activo',
       },
-      select: { 
-        Id_Usuario: true, 
+      select: {
+        Id_Usuario: true,
         Nombre: true,
         empleado: { select: { dias_laborales: true } }
       },
@@ -109,7 +124,7 @@ export class ReservasService {
       const diasLaborales = (emp.empleado[0].dias_laborales || '')
         .toLowerCase()
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        
+
       if (!diasLaborales) return true;
       return diasLaborales.includes(diaReserva);
     });
@@ -182,7 +197,7 @@ export class ReservasService {
     if (fechaISO && horaISO) {
       const fechaHoraReserva = new Date(fechaISO);
       fechaHoraReserva.setUTCHours(horaISO.getUTCHours(), horaISO.getUTCMinutes(), 0, 0);
-      
+
       // Ajuste para hora local Colombia (UTC-5)
       const ahora = new Date();
       const ahoraColombia = new Date(ahora.getTime() - (5 * 60 * 60 * 1000));
@@ -290,18 +305,18 @@ export class ReservasService {
         where: { Id_Servicio: { in: servicioIds } },
       });
       total = data.servicios.reduce((sum, reqSvc) => {
-         const dbSvc = serviciosDb.find(s => s.Id_Servicio === reqSvc.Id_Servicio);
-         return sum + (dbSvc ? Number(dbSvc.Precio) * (reqSvc.cantidad || 1) : 0);
+        const dbSvc = serviciosDb.find(s => s.Id_Servicio === reqSvc.Id_Servicio);
+        return sum + (dbSvc ? Number(dbSvc.Precio) * (reqSvc.cantidad || 1) : 0);
       }, 0);
     }
 
     // Enviar correo si el cliente tiene correo
     if (reserva.cliente && reserva.cliente.Correo) {
-      const dateFormatter = new Intl.DateTimeFormat('es-CO', { 
+      const dateFormatter = new Intl.DateTimeFormat('es-CO', {
         weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
         timeZone: 'UTC'
       });
-      const timeFormatter = new Intl.DateTimeFormat('es-CO', { 
+      const timeFormatter = new Intl.DateTimeFormat('es-CO', {
         hour: '2-digit', minute: '2-digit',
         timeZone: 'UTC'
       });
@@ -456,7 +471,7 @@ export class ReservasService {
         `El estado de tu reserva #${updatedReserva.ID_Reserva} ha cambiado a: ${estado}.`,
         { type: 'actualizacion_reserva', reservaId: updatedReserva.ID_Reserva.toString(), estado }
       );
-    } catch (e) {}
+    } catch (e) { }
 
     if (updatedReserva.empleado) {
       try {
@@ -466,7 +481,7 @@ export class ReservasService {
           `El estado de la reserva #${updatedReserva.ID_Reserva} ha cambiado a: ${estado}.`,
           { type: 'actualizacion_reserva', reservaId: updatedReserva.ID_Reserva.toString(), estado }
         );
-      } catch (e) {}
+      } catch (e) { }
     }
 
     return updatedReserva;
@@ -513,7 +528,7 @@ export class ReservasService {
         weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
         timeZone: 'America/Bogota'
       });
-      
+
       const { sendCancellationEmail } = await import('../common/utils/email.util');
       await sendCancellationEmail(updatedReserva.cliente.Correo, {
         id: `PED-${updatedReserva.ID_Reserva}`,
@@ -529,7 +544,7 @@ export class ReservasService {
         `La reserva #${updatedReserva.ID_Reserva} ha sido cancelada.`,
         { type: 'reserva_cancelada', reservaId: updatedReserva.ID_Reserva.toString() }
       );
-    } catch (e) {}
+    } catch (e) { }
 
     if (updatedReserva.empleado) {
       try {
@@ -539,7 +554,7 @@ export class ReservasService {
           `Se ha cancelado la reserva #${updatedReserva.ID_Reserva} que tenías asignada.`,
           { type: 'reserva_cancelada', reservaId: updatedReserva.ID_Reserva.toString() }
         );
-      } catch (e) {}
+      } catch (e) { }
     }
 
     return updatedReserva;

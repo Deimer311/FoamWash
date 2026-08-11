@@ -23,6 +23,13 @@
       });
     }
 
+    async findByCliente(userId: number) {
+      return this.prisma.cotizacion.findMany({
+        where: { Id_usuario: userId },
+        include: {
+          servicios: {
+            select: { Id_Servicio: true, Nombre_Servicio: true, Precio: true, imagen_url: true },
+          },
     async findByCliente(clienteId: number) {
       return this.prisma.cotizacion.findMany({
         where: { Id_usuario: clienteId },

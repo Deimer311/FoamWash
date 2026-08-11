@@ -142,21 +142,30 @@ const LoginView = ({ onLoginSuccess, onRecuperar }) => {
 
             } else {
                 console.log('❌ Login fallido:', result.message);
-                // 🔊 NUEVO — Suena error
                 playError();
 
+                let mensaje = result.message;
+                if (result.message?.toLowerCase().includes('correo')) {
+                    mensaje = 'Correo inválido.';
+                } else if (result.message?.toLowerCase().includes('contraseña')) {
+                    mensaje = 'Contraseña incorrecta.';
+                } else if (result.message?.toLowerCase().includes('usuario')) {
+                    mensaje = 'El usuario no existe.';
+                } else if (result.message?.toLowerCase().includes('inactivo')) {
+                    mensaje = 'Tu cuenta está inactiva. Contacta al soporte.';
+                }
+
                 setMessage({
-                    text: result.message,
+                    text: mensaje,
                     isError: true,
                     isLoading: false
                 });
             }
         } catch (error) {
             console.error('❌ Error en handleLogin:', error);
-            // 🔊 NUEVO — Suena error
             playError();
             setMessage({
-                text: 'Error al iniciar sesión. Por favor intenta de nuevo.',
+                text: 'Error de conexión. Por favor intenta de nuevo.',
                 isError: true,
                 isLoading: false
             });

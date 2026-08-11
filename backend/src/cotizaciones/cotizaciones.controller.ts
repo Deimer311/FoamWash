@@ -1,4 +1,5 @@
 // src/cotizaciones/cotizaciones.controller.ts
+import { Controller, Get, Post, Body, Param, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
 import { Controller, Get, Post, Body, UseGuards, Req, Param, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { CotizacionesService } from './cotizaciones.service';
@@ -26,6 +27,10 @@ export class CotizacionesController {
     return { success: true, data };
   }
 
+  // Cotizaciones de un cliente específico
+  @Get('cliente/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Obtener cotizaciones de un cliente por su ID' })
   @Get('cliente/:id')
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Obtener cotizaciones de un cliente' })

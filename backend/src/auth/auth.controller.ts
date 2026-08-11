@@ -32,7 +32,7 @@ const cookieOptions = (maxAge: number) => ({
 @Controller('auth')
 @ApiTags('Auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   // POST /api/auth/register
   @Post('register')
@@ -118,4 +118,5 @@ export class AuthController {
     const result = await this.authService.resetPassword(dto);
     return { success: true, ...result };
   }
+
 }
