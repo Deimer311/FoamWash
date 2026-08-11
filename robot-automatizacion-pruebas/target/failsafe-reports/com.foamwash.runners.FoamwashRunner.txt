@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 Test set: com.foamwash.runners.FoamwashRunner
 -------------------------------------------------------------------------------
-Tests run: 23, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 127.8 s <<< FAILURE! -- in com.foamwash.runners.FoamwashRunner
-Autenticación y gestión de perfil.Edicion del perfil de usuario -- Time elapsed: 15.99 s <<< FAILURE!
+Tests run: 23, Failures: 1, Errors: 1, Skipped: 0, Time elapsed: 210.0 s <<< FAILURE! -- in com.foamwash.runners.FoamwashRunner
+Autenticación y gestión de perfil.Edicion del perfil de usuario -- Time elapsed: 17.84 s <<< FAILURE!
 java.lang.AssertionError: 
 
 Expected: an element that is clickable
@@ -18,4 +18,68 @@ Expected: an element that is clickable
 	at net.serenitybdd.screenplay.Actor.attemptsTo(Actor.java:222)
 	at com.foamwash.stepdefinitions.AutenticacionStepDefinitions.editaSuPerfilConNuevaInformacion(AutenticacionStepDefinitions.java:146)
 	at ✽.edita su perfil con nueva informacion(file:///C:/Users/cristian%20andres/OneDrive/Documentos/todo%20lo%20de%20foam%20wash/foam%20version%20final/FoamWash/robot-automatizacion-pruebas/src/test/resources/features/autenticacion_y_perfil.feature:34)
+
+Flujo End-to-End de Servicio.Ciclo de vida completo de un servicio (Agendar -> Aprobar -> Completar) -- Time elapsed: 74.53 s <<< ERROR!
+org.openqa.selenium.NoSuchSessionException: 
+invalid session id
+Build info: version: '4.21.0', revision: '79ed462ef4'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Command: [df9c163d8fbac1e97c6b51375b4b0321, get {url=http://localhost:3000}]
+Capabilities {acceptInsecureCerts: true, browserName: chrome, browserVersion: 151.0.7922.76, chrome: {chromedriverVersion: 151.0.7922.77 (ff37cfca2101..., userDataDir: C:\Users\CRISTI~1\AppData\L...}, fedcm:accounts: true, goog:chromeOptions: {debuggerAddress: localhost:51825}, goog:processID: 7328, networkConnectionEnabled: false, pageLoadStrategy: normal, platformName: windows, proxy: Proxy(), se:cdp: ws://localhost:51825/devtoo..., se:cdpVersion: 151.0.7922.76, setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:extension:credBlob: true, webauthn:extension:largeBlob: true, webauthn:extension:minPinLength: true, webauthn:extension:prf: true, webauthn:virtualAuthenticators: true}
+Session ID: df9c163d8fbac1e97c6b51375b4b0321
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:480)
+	at org.openqa.selenium.remote.ErrorCodec.decode(ErrorCodec.java:167)
+	at org.openqa.selenium.remote.codec.w3c.W3CHttpResponseCodec.decode(W3CHttpResponseCodec.java:138)
+	at org.openqa.selenium.remote.codec.w3c.W3CHttpResponseCodec.decode(W3CHttpResponseCodec.java:50)
+	at org.openqa.selenium.remote.HttpCommandExecutor.execute(HttpCommandExecutor.java:190)
+	at org.openqa.selenium.remote.service.DriverCommandExecutor.invokeExecute(DriverCommandExecutor.java:216)
+	at org.openqa.selenium.remote.service.DriverCommandExecutor.execute(DriverCommandExecutor.java:174)
+	at org.openqa.selenium.remote.RemoteWebDriver.execute(RemoteWebDriver.java:518)
+	at org.openqa.selenium.remote.RemoteWebDriver.get(RemoteWebDriver.java:300)
+	at net.thucydides.core.webdriver.WebDriverFacade.get(WebDriverFacade.java:221)
+	at net.serenitybdd.core.pages.PageObject.openPageAtUrl(PageObject.java:985)
+	at net.serenitybdd.core.pages.PageObject.openUrl(PageObject.java:931)
+	at net.serenitybdd.screenplay.actions.OpenUrl.performAs(OpenUrl.java:18)
+	at net.serenitybdd.screenplay.actions.OpenUrl$ByteBuddy$HHdQuWm7.performAs$accessor$Dz8PPMsu(Unknown Source)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at net.thucydides.core.steps.StepInterceptor.invokeMethod(StepInterceptor.java:524)
+	at net.thucydides.core.steps.StepInterceptor.executeTestStepMethod(StepInterceptor.java:504)
+	at net.thucydides.core.steps.StepInterceptor.runTestStep(StepInterceptor.java:476)
+	at net.thucydides.core.steps.StepInterceptor.runOrSkipMethod(StepInterceptor.java:218)
+	at net.thucydides.core.steps.StepInterceptor.testStepResult(StepInterceptor.java:205)
+	at net.thucydides.core.steps.StepInterceptor.intercept(StepInterceptor.java:93)
+	at net.thucydides.core.steps.ProxyConfiguration$InterceptorDispatcher.intercept(ProxyConfiguration.java:51)
+	at net.serenitybdd.screenplay.actions.OpenUrl$ByteBuddy$HHdQuWm7.performAs(Unknown Source)
+	at net.serenitybdd.screenplay.Actor.performTask(Actor.java:299)
+	at net.serenitybdd.screenplay.Actor.perform(Actor.java:274)
+	at net.serenitybdd.screenplay.Actor.attemptsTo(Actor.java:215)
+	at net.serenitybdd.screenplay.Actor.attemptsTo(Actor.java:222)
+	at com.foamwash.tasks.AbrirPagina.performAs(AbrirPagina.java:12)
+	at com.foamwash.tasks.AbrirPagina$ByteBuddy$PYAjQ4Gm.performAs$accessor$r2q3Hy4O(Unknown Source)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at net.thucydides.core.steps.StepInterceptor.invokeMethod(StepInterceptor.java:524)
+	at net.thucydides.core.steps.StepInterceptor.executeTestStepMethod(StepInterceptor.java:504)
+	at net.thucydides.core.steps.StepInterceptor.runTestStep(StepInterceptor.java:476)
+	at net.thucydides.core.steps.StepInterceptor.runOrSkipMethod(StepInterceptor.java:218)
+	at net.thucydides.core.steps.StepInterceptor.testStepResult(StepInterceptor.java:205)
+	at net.thucydides.core.steps.StepInterceptor.intercept(StepInterceptor.java:93)
+	at net.thucydides.core.steps.ProxyConfiguration$InterceptorDispatcher.intercept(ProxyConfiguration.java:51)
+	at com.foamwash.tasks.AbrirPagina$ByteBuddy$PYAjQ4Gm.performAs(Unknown Source)
+	at net.serenitybdd.screenplay.Actor.performTask(Actor.java:299)
+	at net.serenitybdd.screenplay.Actor.perform(Actor.java:274)
+	at net.serenitybdd.screenplay.Actor.attemptsTo(Actor.java:215)
+	at net.serenitybdd.screenplay.Actor.attemptsTo(Actor.java:222)
+	at com.foamwash.stepdefinitions.FlujoE2EStepDefinitions.clienteVerificaHistorial(FlujoE2EStepDefinitions.java:58)
+	at ✽."Carlos el Cliente" deberia ver la orden como finalizada en su historial(file:///C:/Users/cristian%20andres/OneDrive/Documentos/todo%20lo%20de%20foam%20wash/foam%20version%20final/FoamWash/robot-automatizacion-pruebas/src/test/resources/features/flujo_e2e_servicio.feature:12)
 
