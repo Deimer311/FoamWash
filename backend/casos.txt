@@ -1,0 +1,2186 @@
+Casos de Prueba — Foam Wash
+
+Listado completo de casos de prueba extraídos de las 32 hojas del archivo Casos_de_prueba.xlsx
+
+
+
+RF-01 ingresar al sistema como cliente 
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-001
+
+Verificar que el cliente pueda registrarse correctamente con información válida.
+
+1. Ingresar al portal Foam Wash.
+
+2. Seleccionar Registrarse.
+
+3. Diligenciar todos los campos obligatorios con información válida.
+
+4. Presionar el botón Registrar.
+
+El sistema registra al cliente correctamente, almacena la información en la base de datos y se recibe un mensaje "tu registro se ha compleado correctamente"
+
+CP-002
+
+Verificar que el sistema no permita registrar un correo electrónico ya existente.
+
+1. Ingresar al portal Foam Wash.
+
+2. Seleccionar Registrarse.
+
+3. Ingresar un correo electrónico previamente registrado.
+
+4. Completar los demás campos con información válida.
+
+5. Presionar Registrar.
+
+El sistema impide el registro y muestra el mensaje "Error a registar usuario"
+
+CP-003
+
+Verificar que el sistema valide los campos obligatorios vacíos.
+
+1. Ingresar al portal Foam Wash.
+
+2. Seleccionar Registrarse.
+
+3. Dejar uno o más campos obligatorios vacíos.
+
+4. Presionar Registrar.
+
+El sistema no registra al cliente y muestra los mensajes de validación indicando los campos obligatorios pendientes.
+
+CP-004
+
+Verificar que el sistema valide el formato de los datos ingresados.
+
+1. Ingresar al portal Foam Wash.
+
+2. Seleccionar Registrarse.
+
+3. Ingresar un correo con formato inválido, un teléfono con menos o más de 10 dígitos o una contraseña menor a 6 caracteres.
+
+4. Presionar Registrar.
+
+realiza el registro y muestra los mensajes correspondientes indicando que la información ingresada es inválida.
+
+CP-005
+
+Verificar el comportamiento del sistema cuando ocurre un error de conexión con el servidor durante el registro.
+
+1. Ingresar al portal Foam Wash.
+
+2. Seleccionar Registrarse.
+
+3. Diligenciar correctamente todos los campos.
+
+4. Simular una pérdida de conexión o indisponibilidad del servidor.
+
+5. Presionar Registrar.
+
+El sistema no registra la cuenta y muestra el mensaje "No fue posible completar el registro. Intente nuevamente más tarde." sin perder la información ingresada, si aplica.
+
+
+
+
+
+RF-02  Iniciar sesión / cerrar sesión 
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-006
+
+Verificar que el cliente pueda iniciar sesión con credenciales válidas.
+
+1. Ingresar al portal Foam Wash.
+
+2. Seleccionar Iniciar sesión.
+
+3. Ingresar un correo electrónico registrado.
+
+4. Ingresar la contraseña correcta.
+
+5. Presionar Ingresar.
+
+El sistema valida las credenciales, inicia la sesión del cliente y redirige al panel principal mostrando el inicio
+
+CP-007
+
+Verificar que el cliente pueda cerrar sesión correctamente
+
+1. Iniciar sesión en la plataforma.
+
+2. Acceder al menú de usuario.
+
+3. Seleccionar la opción Cerrar sesión.
+
+El sistema finaliza la sesión del cliente, elimina la sesión activa y redirige a la pantalla de inicio de sesión o página principal.
+
+CP-008
+
+Verificar que la sesión expire por inactividad.
+
+1. Iniciar sesión con un usuario válido.
+
+2.Esperar el teimpo de inactividad 
+
+3. Intentar realizar una acción dentro de la plataforma.
+
+El sistema cierra automáticamente la sesión por inactividad, redirige al usuario a la pantalla de inicio de sesión y muestra un mensaje como "Su sesión ha expirado por inactividad. Inicie sesión nuevamente."
+
+CP-009
+
+Verificar que el sistema no permita iniciar sesión cuando existan campos obligatorios vacíos.
+
+1. Ingresar al portal Foam Wash.
+
+2. Seleccionar Iniciar sesión.
+
+3. Dejar vacío el campo Correo electrónico, Contraseña o ambos.
+
+4. Presionar el botón Ingresar.
+
+El sistema no permite el inicio de sesión y muestra los mensajes de validación indicando que los campos son obligatorios.
+
+CP-010
+
+Verificar que el sistema valide el formato del correo electrónico antes de iniciar sesión.
+
+1. Ingresar al portal Foam Wash.
+
+2. Seleccionar Iniciar sesión.
+
+3. Escribir un correo electrónico con formato inválido (ej.: usuario@ o usuario.com).
+
+4. Ingresar una contraseña válida.
+
+5. Presionar el botón Ingresar
+
+El sistema no permite el inicio de sesión y muestra un mensaje indicando que el formato del correo electrónico es inválido.
+
+CP-011
+
+Verificar que el sistema no permita iniciar sesión con una contraseña incorrecta.
+
+. Ingresar al portal Foam Wash.
+
+2. Seleccionar Iniciar sesión.
+
+3. Ingresar un correo electrónico registrado.
+
+4. Ingresar una contraseña incorrecta.
+
+5. Presionar el botón Ingresar.
+
+El sistema deniega el acceso, no inicia la sesión del cliente y muestra el mensaje "Correo o contraseña incorrectos." Permite al usuario reintentar el inicio de sesión.
+
+CP-012
+
+Verificar el comportamiento del sistema cuando ocurre un error de conexión con el servidor durante el inicio de sesión.
+
+1. Ingresar al portal Foam Wash.
+
+2. Seleccionar Iniciar sesión.
+
+3. Ingresar un correo electrónico y contraseña válidos.
+
+4. Simular una pérdida de conexión o indisponibilidad del servidor.
+
+5. Presionar el botón Ingresar.
+
+El sistema no inicia sesión y muestra el mensaje "No fue posible establecer conexión con el servidor. Intente nuevamente más tarde." sin comprometer la seguridad de la información.
+
+
+
+
+
+RF-03 Recuperar contraseña
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-013
+
+Verificar que el cliente pueda recuperar su contraseña correctamente mediante un código enviado al correo.
+
+1. Ingresar al portal Foam Wash.
+
+2. Seleccionar ¿Olvidaste tu contraseña?.
+
+3. Ingresar un correo electrónico registrado.
+
+4. Seleccionar Enviar código.
+
+5. Revisar el correo electrónico e ingresar el código recibido.
+
+6. Escribir una nueva contraseña válida y confirmarla.
+
+7. Guardar los cambios.
+
+El sistema valida el código, actualiza la contraseña correctamente y muestra un mensaje indicando que el cambio fue exitoso.
+
+CP-014
+
+Verificar que el sistema no envíe un código a un correo no registrado.
+
+1. Seleccionar ¿Olvidaste tu contraseña?.
+
+2. Ingresar un correo no registrado.
+
+3. Seleccionar Enviar código.
+
+El sistema informa que el correo no está registrado y no envía ningún código de verificación.
+
+CP-015
+
+Verificar que el correo electrónico sea obligatorio.
+
+1. Seleccionar ¿Olvidaste tu contraseña?.
+
+2. Dejar el campo correo vacío.
+
+3. Seleccionar Enviar código.
+
+El sistema muestra un mensaje indicando que el correo es obligatorio.
+
+CP-016
+
+Verificar que el sistema valide el formato del correo electrónico.
+
+1. Seleccionar ¿Olvidaste tu contraseña?.
+
+2. Ingresar un correo con formato incorrecto.
+
+3. Seleccionar Enviar código.
+
+El sistema muestra un mensaje indicando que el formato del correo es inválido.
+
+CP-017
+
+Verificar que el sistema rechace un código de verificación incorrecto.
+
+1. Solicitar el código de recuperación.
+
+2. Ingresar un código diferente al recibido.
+
+3. Seleccionar Validar.
+
+El sistema informa que el código ingresado es incorrecto y no permite continuar.
+
+CP-018
+
+Verificar que el sistema rechace un código de verificación vencido.
+
+1. Solicitar el código de recuperación.
+
+2. Esperar a que expire el tiempo de validez.
+
+3. Ingresar el código recibido.
+
+4. Seleccionar Validar.
+
+El sistema informa que el código ha expirado y solicita generar uno nuevo.
+
+CP-019
+
+Verificar que el sistema no permita continuar sin ingresar el código de verificación.
+
+1. Solicitar el código de recuperación.
+
+2. Dejar vacío el campo del código.
+
+3. Seleccionar Validar.
+
+El sistema muestra un mensaje indicando que el código de verificación es obligatorio.
+
+CP-020
+
+Verificar que el sistema valide que las contraseñas coincidan.
+
+1. Ingresar un código de verificación válido.
+
+2. Escribir una nueva contraseña y una confirmación diferente.
+
+3. Guardar los cambios.
+
+El sistema informa que las contraseñas no coinciden y no actualiza la información.
+
+CP-021
+
+Verificar que el sistema no permita registrar una contraseña que incumpla las políticas de seguridad.
+
+1. Ingresar un código válido.
+
+2. Escribir una contraseña que no cumpla los requisitos mínimos.
+
+3. Guardar los cambios.
+
+El sistema rechaza la contraseña y muestra los requisitos mínimos establecidos.
+
+CP-022
+
+Verificar que el usuario pueda iniciar sesión con la nueva contraseña.
+
+1. Completar el proceso de recuperación exitosamente.
+
+2. Ir a la pantalla de inicio de sesión.
+
+3. Ingresar el correo y la nueva contraseña.
+
+El sistema permite iniciar sesión correctamente con la nueva contraseña.
+
+
+
+
+
+RF-04 Consultar servicios y tarifas disponibles 
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-023
+
+Verificar que el cliente pueda consultar el listado de servicios disponibles.
+
+1. Ingresar al portal Foam Wash.
+
+2. Acceder a la sección Servicios.
+
+El sistema muestra el listado completo de los servicios disponibles.
+
+CP-024
+
+Verificar que el sistema muestre la tarifa correspondiente a cada servicio.
+
+1. Ingresar a la sección Servicios.
+
+2. Seleccionar un servicio.
+
+El sistema muestra la descripción del servicio y su tarifa actual.
+
+CP-025
+
+Verificar que el cliente pueda visualizar la información detallada de un servicio.
+
+1. Ingresar a la sección Servicios.
+
+2. Seleccionar un servicio específico.
+
+El sistema muestra la descripción, tarifa, y demás información del servicio seleccionado.
+
+CP-026
+
+Verificar que el sistema permita consultar los servicios sin iniciar sesión.
+
+1. Ingresar al portal sin autenticarse.
+
+2. Acceder a la sección Servicios.
+
+El sistema permite visualizar los servicios y sus tarifas sin necesidad de iniciar sesión.
+
+CP-027
+
+Verificar que las tarifas mostradas correspondan a las registradas en el sistema.
+
+1. Ingresar a la sección Servicios.
+
+2. Comparar las tarifas visualizadas con las registradas por el administrador.
+
+El sistema muestra las tarifas correctas y actualizadas para cada servicio.
+
+CP-028
+
+Verificar que el sistema cargue correctamente la información de los servicios.
+
+1. Ingresar a la sección Servicios.
+
+El sistema carga correctamente el listado de servicios y sus tarifas sin presentar errores.
+
+CP-029
+
+Verificar que el sistema muestre una imagen representativa del servicio (si aplica).
+
+1. Ingresar a la sección Servicios.
+
+2. Seleccionar un servicio.
+
+El sistema muestra la imagen asociada al servicio junto con su información y tarifa.
+
+
+
+
+
+RF-05  Solicitar cotización de servicio 
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-030
+
+Verificar que el cliente pueda solicitar una cotización correctamente.
+
+1. Ingresar al portal Foam Wash.
+
+2. Acceder a la sección Solicitar cotización.
+
+3. Seleccionar el servicio requerido.
+
+4. Completar los datos solicitados (tipo de mueble, cantidad y tamaño .).
+
+5. Seleccionar Enviar solicitud.
+
+El sistema registra la solicitud de cotización y muestra un mensaje indicando que fue enviada correctamente.
+
+CP-031
+
+Verificar que el sistema valide los campos obligatorios del formulario.
+
+1. Acceder a Solicitar cotización.
+
+2. Dejar uno o más campos obligatorios vacíos.
+
+3. Seleccionar Enviar solicitud.
+
+El sistema muestra un mensaje indicando que los campos obligatorios deben ser completados.
+
+CP-032
+
+Verificar que el cliente pueda seleccionar un servicio para cotizar.
+
+1. Acceder al formulario de cotización.
+
+2. Seleccionar un servicio del listado.
+
+El sistema permite seleccionar el servicio y carga la información correspondiente.
+
+CP-033
+
+Verificar que el sistema genere una cotización estimada (si aplica).
+
+1. Completar el formulario con datos válidos.
+
+2. Seleccionar Calcular o Enviar solicitud.
+
+El sistema muestra el valor estimado de la cotización según la información ingresada.
+
+CP-034
+
+Verificar que la solicitud quede registrada en el sistema.
+
+1. Enviar una solicitud de cotización con datos válidos.
+
+2. Consultar el listado de solicitudes registradas.
+
+La solicitud aparece registrada con la información suministrada por el cliente y con el estado correspondiente (por ejemplo, "Pendiente").
+
+
+
+
+
+RF-06 Programar servicio de lavado
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-035
+
+Verificar que el cliente pueda programar un servicio de lavado correctamente.
+
+1. Iniciar sesión en el portal Foam Wash.
+
+2. Acceder a Programar servicio.
+
+3. Seleccionar el servicio deseado.
+
+4. Elegir la fecha, hora y dirección.
+
+5. Confirmar la programación.
+
+El sistema registra la programación del servicio y muestra un mensaje indicando que fue agendado exitosamente.
+
+CP-036
+
+Verificar que el sistema valide los campos obligatorios del formulario.
+
+1. Acceder a Programar servicio.
+
+2. Dejar uno o más campos obligatorios vacíos.
+
+3. Seleccionar Confirmar.
+
+El sistema muestra un mensaje indicando que todos los campos obligatorios deben ser completados.
+
+CP-037
+
+Verificar que el sistema no permita programar un servicio con una fecha anterior a la actual.
+
+1. Acceder a Programar servicio.
+
+2. Seleccionar una fecha pasada.
+
+3. Confirmar la programación.
+
+El sistema rechaza la solicitud e informa que la fecha seleccionada no es válida.
+
+CP-038
+
+Verificar que el sistema no permita seleccionar una hora no disponible.
+
+1. Acceder a Programar servicio.
+
+2. Seleccionar una fecha con horarios ocupados.
+
+3. Elegir una hora no disponible.
+
+4. Confirmar la programación.
+
+El sistema informa que el horario no está disponible y solicita seleccionar otro.
+
+CP-039
+
+Verificar que el cliente pueda seleccionar un horario disponible.
+
+1. Acceder a Programar servicio.
+
+2. Seleccionar una fecha disponible.
+
+3. Elegir un horario libre.
+
+4. Confirmar la programación.
+
+El sistema registra el servicio con la fecha y hora seleccionadas.
+
+CP-040
+
+Verificar que el sistema registre correctamente la dirección donde se realizará el servicio.
+
+1. Completar todos los datos del formulario.
+
+2. Ingresar una dirección válida.
+
+3. Confirmar la programación.
+
+El sistema almacena la dirección junto con la información del servicio programado.
+
+CP-041
+
+Verificar que el sistema permita registrar observaciones adicionales para el servicio.
+
+1. Completar el formulario de programación.
+
+2. Escribir observaciones (ejemplo: instrucciones de acceso al domicilio).
+
+3. Confirmar la programación.
+
+El sistema registra las observaciones junto con la programación del servicio.
+
+CP-042
+
+Verificar que el servicio programado quede registrado en el historial o listado de servicios del cliente.
+
+1. Programar un servicio correctamente.
+
+2. Acceder al historial o a la sección Mis servicios.
+
+El sistema muestra el servicio programado con la fecha, hora, dirección y estado correspondiente (por ejemplo, Programado).
+
+
+
+
+
+RF07 – Recibir notificaciones del estado de su servicio
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-043
+
+Validar que el usuario reciba una notificación cuando el estado del servicio cambie.
+
+1.Agedar un servicio                             2.Recibir notificacion de servicio agendado                                         3.Recibir una notificacion cada vez que el estado del sevicio se actualice
+
+Se envía una notificación con el nuevo estado actualizado.
+
+CP-044
+
+Validar que el usuario no tenga un canal externo en el que  se vea el cambio del estado , el estado deber ser visible dentro de la plataforma
+
+1.El cambio de estado se visualiza correctamente dentro de la plataforma.
+
+2.El cambio de estado se envía y se muestra correctamente en todos los canales externos habilitados para el usuario.
+
+3. La información del estado es consistente entre la plataforma y los canales externos.
+
+La notificación aparece en el centro de notificaciones o bandeja correspondiente.
+
+CP-045
+
+Validar que el usuario reciba una notificación cuando se crea el servicio.
+
+1.Iniciar sesión con un usuario válido.
+
+2.Crear un nuevo servicio.
+
+3.Guardar la información del servicio.
+
+4.Verificar las notificaciones dentro de la plataforma.
+
+5.Revisar los canales externos configurados .
+
+El usuario recibe la notificación con la información correcta del servicio.
+
+CP-046
+
+Validar que el contenido de la notificación sea correcto.
+
+1.Generar un cambio de estado del servicio.
+
+2.Abrir la notificación recibida.
+
+3.Verificar el número del servicio.
+
+4.Verificar el estado mostrado.
+
+5.Verificar la fecha y demás datos incluidos.
+
+La notificación muestra el número de servicio, estado, fecha y demás datos definidos por el negocio.
+
+CP-047
+
+Validar que la notificación se envíe a los canales externos habilitados (correo, SMS, etc.).
+
+1.Iniciar sesión con un usuario que tenga canales externos configurados.
+
+2.Realizar un cambio de estado del servicio.
+
+3.Esperar el procesamiento del envío.
+
+4.Revisar el correo electrónico, SMS u otro canal configurado.
+
+5.Confirmar la recepción de la notificación.
+
+El usuario recibe la notificación en todos los canales configurados.
+
+CP-048
+
+Validar que no se envíen notificaciones duplicadas por un mismo cambio de estado.
+
+1.Generar un único cambio de estado.
+
+2.Esperar el envío de la notificación.
+
+3.Revisar la bandeja de notificaciones.
+
+4.Revisar los canales externos configurados.
+
+El usuario recibe una única notificación por cada cambio de estado.
+
+CP-049
+
+Validar que las notificaciones se reciban en el orden correcto cuando existen varios cambios de estado.
+
+1.Iniciar sesión en la plataforma.
+
+2.Seleccionar un servicio.
+
+3.Realizar varios cambios de estado.
+
+4.Revisar las notificaciones recibidas.
+
+5.Validar el orden de las notificaciones.
+
+Las notificaciones reflejan la secuencia real de los cambios.
+
+
+
+
+
+RF08 – Consultar historial de servicios realizados
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-050
+
+Validar que el usuario pueda consultar el historial de servicios realizados.
+
+1.Iniciar sesión en la plataforma con un usuario válido.
+
+2.Ingresar al menú principal.
+
+3.Seleccionar la opción Historial de servicios.
+
+4.Esperar la carga de la información.
+
+5.Verificar los servicios registrados..
+
+Verifica la funcionalidad principal del requerimiento.
+
+CP-051
+
+Validar que el usuario solo consulte su propio historial.
+
+1.Iniciar sesión con un usuario registrado.
+
+2.Acceder al historial de servicios.
+
+3.Revisar los servicios disponibles.
+
+4.Validar que los registros correspondan al usuario autenticado.
+
+5.Intentar consultar información de otro usuario (si aplica).
+
+Valida la seguridad y privacidad de la información.
+
+CP-052
+
+Validar actualización del historial después de finalizar un servicio.
+
+1.Iniciar sesión en la plataforma.
+
+2.Seleccionar un servicio en proceso.
+
+3.Finalizar o cambiar el estado del servicio.
+
+4.Guardar la actualización.
+
+5.Ingresar al historial de servicios.
+
+6.Buscar el servicio actualizado.
+
+Confirma que los nuevos servicios aparezcan correctamente.
+
+CP-053
+
+Validar que el usuario pueda consultar el detalle de un servicio del historial.
+
+1.Iniciar sesión en la plataforma.
+
+2.Ingresar al módulo de Historial de servicios.
+
+3.Seleccionar un servicio registrado.
+
+4.Acceder a la opción Ver detalle.
+
+5.Revisar la información mostrada del servicio.
+
+Facilita la consulta cuando existen muchos registros.
+
+CP-054
+
+Validar filtros del historial de servicios.
+
+1.Iniciar sesión en la plataforma.
+
+2.Ingresar al módulo de Historial de servicios.
+
+3.Seleccionar un filtro disponible (fecha, estado u otro criterio).
+
+4.Aplicar el filtro seleccionado.
+
+5.Revisar los servicios mostrados.
+
+Permite validar opciones adicionales de consulta.
+
+CP-055
+
+Validar comportamiento cuando ocurre una falla al cargar el historial
+
+1.Iniciar sesión en la plataforma.
+
+2.Ingresar al módulo de Historial de servicios.
+
+3.Simular una falla en la carga de información.
+
+4.Intentar consultar el historial.
+
+5.Verificar la respuesta del sistema.
+
+Verifica el manejo de errores del sistema.
+
+
+
+
+
+RF09 – Ingresar al sistema (empleado)
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-056
+
+Validar que el empleado pueda iniciar sesión correctamente
+
+1. Ir a iniciar sesión
+
+2. Ingresar usuario y contraseña válidos
+
+3. Clic en "Iniciar sesión"
+
+Acceso permitido y redirección al panel del empleado
+
+CP-057
+
+Validar que no permita acceso con contraseña incorrecta
+
+1. Ir a iniciar sesión
+
+2. Ingresar usuario válido
+
+3. Ingresar contraseña incorrecta
+
+4. Clic en "Iniciar sesión"
+
+Muestra mensaje "Contraseña incorrecta" y no permite acceso
+
+CP-058
+
+Validar que no permita acceso con usuario inexistente
+
+1. Ir a iniciar sesión 
+
+2. Ingresar usuario no registrado
+
+3. Ingresar contraseña
+
+4. Clic en "Iniciar sesión"
+
+Muestra mensaje "Usuario no existe"
+
+CP-059
+
+Validar campos obligatorios
+
+1. Ir a iniciar sesión
+
+2. Dejar campos vacíos
+
+3. Clic en "Iniciar sesión"
+
+Muestra mensaje "Campos obligatorios"
+
+CP-060
+
+Validar funcionalidad de mostrar/ocultar contraseña
+
+1. Ingresar contraseña
+
+2. Clic en icono de ver contraseña
+
+Permite visualizar y ocultar la contraseña correctamente
+
+CP-061
+
+Validar recuperación de contraseña
+
+1. Clic en "Olvidé mi contraseña"
+
+Redirige al proceso de recuperación o envío de correo
+
+
+
+
+
+RF10 – Visualizar agenda de servicios asignados
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-062
+
+Validar que el empleado pueda visualizar su agenda de servicios
+
+1. Acceder al sistema con credenciales de empleado válidas
+
+2. Esperar la carga del panel principal
+
+3. Seleccionar la opción "Agenda" en el menú principal
+
+Se muestra la lista de servicios asignados al empleado
+
+CP-063
+
+Validar que se muestren correctamente los datos del servicio
+
+1. Ingresar a la agenda
+
+2. Revisar los servicios listados
+
+Cada servicio muestra: fecha, hora, cliente, tipo de servicio y estado
+
+CP-064
+
+Validar que solo se muestren servicios del empleado logueado
+
+1. Iniciar sesión con un empleado
+
+2. Ir a agenda
+
+Solo aparecen servicios asignados a ese empleado
+
+CP-065
+
+Validar comportamiento cuando no hay servicios asignados
+
+1. Iniciar sesión con empleado sin servicios
+
+2. Ir a agenda
+
+Muestra mensaje: "No tienes servicios asignados"
+
+CP-066
+
+Validar actualización de agenda
+
+1. Asignar un nuevo servicio al empleado
+
+2. Refrescar o volver a la agenda
+
+El nuevo servicio aparece en la lista
+
+CP-067
+
+Validar acceso a detalle del servicio
+
+1. Iniciar sesión como empleado
+
+2. Acceder a la agenda
+
+3. Seleccionar uno de los servicios listados
+
+4. Dar clic en "Ver detalle" o equivalente
+
+El sistema muestra la información detallada del servicio seleccionado
+
+CP-068
+
+Validar carga de la agenda (rendimiento)
+
+1. Iniciar sesión como empleado
+
+2. Acceder al módulo "Agenda"
+
+3. Medir el tiempo de carga de la información
+
+La agenda carga en un tiempo menor o igual a 3 segundos
+
+
+
+
+
+RF11 – Consultar detalles de órdenes de servicio
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-069
+
+Validar que el empleado pueda consultar el detalle de una orden de servicio
+
+1. Acceder al sistema con credenciales de empleado
+
+2. Ir al módulo "Agenda" o "Órdenes"
+
+3. Seleccionar una orden de servicio
+
+4. Hacer clic en "Ver detalle"
+
+El sistema muestra la información completa de la orden seleccionada
+
+CP-070
+
+Validar que se visualicen correctamente los datos de la orden
+
+1. Iniciar sesión como empleado
+
+2. Acceder a una orden de servicio
+
+3. Revisar la información mostrada
+
+Se visualizan correctamente datos como: cliente, servicio, fecha, hora, dirección, estado y observaciones
+
+CP-071
+
+Validar comportamiento si la orden no existe
+
+1. Ingresar una URL o ID de orden inexistente
+
+2. Intentar acceder al detalle
+
+El sistema muestra mensaje: "Orden no encontrada"
+
+CP-072
+
+Validar actualización de datos en el detalle
+
+1. Acceder a una orden de servicio
+
+2. Modificar datos de la orden (si aplica)
+
+3. Actualizar o recargar la vista
+
+Los cambios se reflejan correctamente en el detalle
+
+CP-073
+
+Validar visualización del estado de la orden
+
+1. Ingresar al detalle de una orden
+
+2. Observar el estado del servicio
+
+El estado se muestra correctamente (Pendiente, En proceso, Finalizado, etc.)
+
+
+
+
+
+RF12 – Marcar servicio como finalizado
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-074
+
+Validar que el empleado pueda marcar un servicio como finalizado
+
+1. Iniciar sesión con credenciales de empleado
+
+2. Acceder al módulo "Agenda"
+
+3. Seleccionar un servicio asignado
+
+4. Hacer clic en la opción "Marcar como finalizado"
+
+El sistema cambia el estado del servicio a "Finalizado"
+
+CP-075
+
+Validar confirmación de la acciónValidar confirmación de la acción
+
+1. Seleccionar un servicio
+
+2. Hacer clic en "Marcar como finalizado"
+
+El sistema muestra un mensaje de confirmación indicando que el servicio fue finalizado correctamente
+
+CP-076
+
+Validar actualización en la lista de servicios
+
+1. Finalizar un servicio
+
+2. Volver a la lista o actualizar la página
+
+El servicio aparece con estado "Finalizado" en la agenda
+
+CP-077
+
+Validar restricción de servicios no asignados
+
+1. Intentar marcar como finalizado un servicio no asignado al empleado
+
+El sistema bloquea la acción
+
+CP-078
+
+Validar persistencia del estado
+
+1. Marcar un servicio como finalizado
+
+2. Cerrar sesión
+
+3. Iniciar sesión nuevamente
+
+4. Consultar la agenda
+
+El servicio mantiene el estado "Finalizado"
+
+CP-079
+
+Validar actualización en tiempo real
+
+1. Finalizar un servicio
+
+2. Verificar en otro dispositivo o sesión
+
+El cambio de estado se refleja correctamente
+
+
+
+
+
+RF13 – Registrar observaciones del servicio
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-080
+
+El trabajador puede registrar correctamente las observaciones de un servicio realizado
+
+1.Iniciar sesion como trabajador
+
+2.ingresa al apartado de dashboard del empleado
+
+3. Revisa sus servicios
+
+4. Ingresa a cualquier servicio
+
+5. En el espacio de observaciones, registra cualquier observacion que tengael empleado
+
+Al momento de registrar la observacion el sistema no tenga ningun fallo y esta se guarde correctamente en la base de datos
+
+CP-081
+
+El trabajador puede registrar en blanco las observaciones, en el caso de que el servicio no requiera de ninguna observacion
+
+1.Iniciar sesion como trabajador
+
+2.ingresa al apartado de dashboard del empleado
+
+3. Revisa sus servicios
+
+4. Ingresa a cualquier servicio
+
+5. En el espacio de observaciones, registra en blanco la observacion
+
+Al momento de registrar la observacion el sistema permita los campos en blanco sin bloqueos y esto se guarde correctamente en la base de datos
+
+CP-082
+
+El administrador puede ver las observaciones que dejo el trabajador
+
+1.Iniciar sesion como administrador
+
+2.ingresa al apartado de gestion de servicios
+
+3. Selecciona algun servicio ya realizado
+
+4. Visualiza la observacion
+
+El administrador puede ver sin problemas la observacion
+
+
+
+
+
+RF14 – Consultar historial de servicios asignados
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-083 Historial exitoso
+
+El empleado puede consultar correctamente los servicios que tenga realizados, asignados y en progreso
+
+1. Iniciar sesion como trabajador
+
+2. Ingresar al dashboard del empleado
+
+3. Seleccionar cualquier filtro de busqueda de servicio
+
+4. Seleccionar el servicio
+
+El empleado puede ingresar al dashboard sin errores donde se muestra todos los servicios donde este alla ejercido alguna funcion, y ingresar a cualquiera de estos, ademas poder utilizar los filtros de busqueda
+
+CP-084 Sin registros
+
+El empleado puede ver su dashboard limpio, si no tiene historial de servicios
+
+1. Iniciar sesion como trabajador
+
+2. Ingresar al dashboard del empleado
+
+El empleado puede ingresar al dashboard sin errores donde se muestra todos los servicios donde este alla ejercido alguna funcion, y ingresar a cualquiera de estos, ademas poder utilizar los filtros de busqueda
+
+
+
+
+
+RF15 – Recibir notificación de nuevos servicios asignados
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-085 Notificación por asignación
+
+El empleado recibe una notificacion donde se le indica la informacion de el servicio que se le asigno
+
+1. El sistema registra al empleado en el servicio
+
+2. El empleado usa su dispositivo de trabajo (movil, PC)
+
+3. En el apartado de notificaciones del dispositivo(movil o web) aparece la notificacion
+
+El empleado recibe la notificacion sin problema y puede ver la informacion de esta, tanto como en un dispositivo movil o en la web
+
+CP-086 Notificación por reasignación
+
+El empleado recibe una notificacion donde se le indica la informacion de el servicio que se le reasigno
+
+1. El sistema registra al empleado en el servicio
+
+2. El empleado usa su dispositivo de trabajo (movil, PC)
+
+3. En el apartado de notificaciones del dispositivo(movil o web) aparece la notificacion
+
+El empleado recibe la notificacion sin problema y puede ver la informacion de esta, tanto como en un dispositivo movil o en la web
+
+
+
+
+
+RF16 – Gestionar usuarios y roles (clientes, empleados, administradores)
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-087 Registro exitoso
+
+El administrador ingresa correctamente a la lista de usuarios del sistema, y puede modificar una parte de sus datos, como su rol dentro del sistema
+
+1. Iniciar sesion como administrador
+
+2. Entrar al apartado de gestion de usuarios
+
+3. Se muestra la informacion de todos los usuarios de la pagina
+
+4. Seleccionar el boton de edicion de usuarios, que esta junto de cada usuario
+
+El administrador puede entrar a la gestion de usuarios sin problemas, pudiendo ver y modificar la informacion de los usuarios sin problemas, y en la base de datos se registra satisfactoriamente estos cambios
+
+CP-088 Correo duplicado
+
+El administrador ingresa correctamente a la lista de usuarios del sistema, y puede modificar una parte de sus datos, como su rol dentro del sistema
+
+1. Iniciar sesion como administrador
+
+2. Entrar al apartado de gestion de usuarios
+
+3. Se muestra la informacion de todos los usuarios de la pagina
+
+4. Seleccionar el boton de edicion de usuarios, que esta junto de cada usuario
+
+El administrador puede entrar a la gestion de usuarios sin problemas, pudiendo ver y modificar la informacion de los usuarios sin problemas, y en la base de datos se registra satisfactoriamente estos cambios
+
+CP-089 Actualización exitosa
+
+El administrador ingresa correctamente a la lista de usuarios del sistema, y puede modificar una parte de sus datos, como su rol dentro del sistema
+
+1. Iniciar sesion como administrador
+
+2. Entrar al apartado de gestion de usuarios
+
+3. Se muestra la informacion de todos los usuarios de la pagina
+
+4. Seleccionar el boton de edicion de usuarios, que esta junto de cada usuario
+
+El administrador puede entrar a la gestion de usuarios sin problemas, pudiendo ver y modificar la informacion de los usuarios sin problemas, y en la base de datos se registra satisfactoriamente estos cambios
+
+CP-090 Desactivación exitosa
+
+El administrador ingresa correctamente a la lista de usuarios del sistema, y puede modificar una parte de sus datos, como su rol dentro del sistema
+
+1. Iniciar sesion como administrador
+
+2. Entrar al apartado de gestion de usuarios
+
+3. Se muestra la informacion de todos los usuarios de la pagina
+
+4. Seleccionar el boton de edicion de usuarios, que esta junto de cada usuario
+
+El administrador puede entrar a la gestion de usuarios sin problemas, pudiendo ver y modificar la informacion de los usuarios sin problemas, y en la base de datos se registra satisfactoriamente estos cambios
+
+CP-091 Restricción de autodesactivación
+
+El administrador ingresa correctamente a la lista de usuarios del sistema, y puede modificar una parte de sus datos, como su rol dentro del sistema
+
+1. Iniciar sesion como administrador
+
+2. Entrar al apartado de gestion de usuarios
+
+3. Se muestra la informacion de todos los usuarios de la pagina
+
+4. Seleccionar el boton de edicion de usuarios, que esta junto de cada usuario
+
+El administrador puede entrar a la gestion de usuarios sin problemas, pudiendo ver y modificar la informacion de los usuarios sin problemas, y en la base de datos se registra satisfactoriamente estos cambios
+
+
+
+
+
+RF17 – Registrar y administrar órdenes de servicio
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-092 Aprobación exitosa
+
+El sistema deberá permitir al administrador revisar, aprobar, modificar o cancelar las órdenes de servicio generadas por los clientes, gestionando su ciclo de vida completo.
+
+1. Iniciar sesion como administrador
+
+2. Entrar al apartado de gestion de ordenes
+
+3. Seleccionar alguna orden de servicio
+
+El administrador puede entrar a la gestion de ordenes sin ninguna problema y en este realizar cualquier accion sin ningun problema y estas deben verse reflejadas en la base de datos.
+
+CP-093 Rechazo con motivo
+
+El sistema deberá permitir al administrador revisar, aprobar, modificar o cancelar las órdenes de servicio generadas por los clientes, gestionando su ciclo de vida completo.
+
+1. Iniciar sesion como administrador
+
+2. Entrar al apartado de gestion de ordenes
+
+3. Seleccionar alguna orden de servicio
+
+El administrador puede entrar a la gestion de ordenes sin ninguna problema y en este realizar cualquier accion sin ningun problema y estas deben verse reflejadas en la base de datos.
+
+CP-094 Cancelación exitosa
+
+El sistema deberá permitir al administrador revisar, aprobar, modificar o cancelar las órdenes de servicio generadas por los clientes, gestionando su ciclo de vida completo.
+
+1. Iniciar sesion como administrador
+
+2. Entrar al apartado de gestion de ordenes
+
+3. Seleccionar alguna orden de servicio
+
+El administrador puede entrar a la gestion de ordenes sin ninguna problema y en este realizar cualquier accion sin ningun problema y estas deben verse reflejadas en la base de datos.
+
+CP-095 Orden inexistente
+
+El sistema deberá permitir al administrador revisar, aprobar, modificar o cancelar las órdenes de servicio generadas por los clientes, gestionando su ciclo de vida completo.
+
+1. Iniciar sesion como administrador
+
+2. Entrar al apartado de gestion de ordenes
+
+3. Seleccionar alguna orden de servicio
+
+El administrador puede entrar a la gestion de ordenes sin ninguna problema y en este realizar cualquier accion sin ningun problema y estas deben verse reflejadas en la base de datos.
+
+
+
+
+
+RF18 – Asignar / reasignar servicios a empleados
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-096 Asignación exitosa
+
+El sistema deberá permitir al administrador asignar una orden de servicio aprobada a un trabajador disponible, o reasignarla a otro trabajador en caso de indisponibilidad o falla en la ejecución.
+
+1. Iniciar sesion como administrador
+
+2. Entrar al apartado de gestion de servicios
+
+3. Seleccionar algun servicio agendado por un cliente
+
+4. Hacer su revision
+
+5. Asignar algun trabajador al servicio
+
+El administrador ingresa correctamente al apartado de gestion de servicios, pudiendo seleccionar cualquiera de estos, ver su informacion y asignar al servicio el empleado seleccionado, esto debe de verse reflejado en la base de datos
+
+CP-097 Sin disponibilidad
+
+El sistema deberá permitir al administrador asignar una orden de servicio aprobada a un trabajador disponible, o reasignarla a otro trabajador en caso de indisponibilidad o falla en la ejecución.
+
+1. Iniciar sesion como administrador
+
+2. Entrar al apartado de gestion de servicios
+
+3. Seleccionar algun servicio agendado por un cliente
+
+4. Hacer su revision
+
+5. Asignar algun trabajador al servicio
+
+El administrador ingresa correctamente al apartado de gestion de servicios, pudiendo seleccionar cualquiera de estos, ver su informacion y asignar al servicio el empleado seleccionado, esto debe de verse reflejado en la base de datos
+
+CP-098 Reasignación exitosa
+
+El sistema deberá permitir al administrador asignar una orden de servicio aprobada a un trabajador disponible, o reasignarla a otro trabajador en caso de indisponibilidad o falla en la ejecución.
+
+1. Iniciar sesion como administrador
+
+2. Entrar al apartado de gestion de servicios
+
+3. Seleccionar algun servicio agendado por un cliente
+
+4. Hacer su revision
+
+5. Asignar algun trabajador al servicio
+
+El administrador ingresa correctamente al apartado de gestion de servicios, pudiendo seleccionar cualquiera de estos, ver su informacion y asignar al servicio el empleado seleccionado, esto debe de verse reflejado en la base de datos
+
+CP-099 Conflicto de horario
+
+El sistema deberá permitir al administrador asignar una orden de servicio aprobada a un trabajador disponible, o reasignarla a otro trabajador en caso de indisponibilidad o falla en la ejecución.
+
+1. Iniciar sesion como administrador
+
+2. Entrar al apartado de gestion de servicios
+
+3. Seleccionar algun servicio agendado por un cliente
+
+4. Hacer su revision
+
+5. Asignar algun trabajador al servicio
+
+El administrador ingresa correctamente al apartado de gestion de servicios, pudiendo seleccionar cualquiera de estos, ver su informacion y asignar al servicio el empleado seleccionado, esto debe de verse reflejado en la base de datos
+
+
+
+
+
+RF19 – Validar disponibilidad de empleados
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-100 Validación exitosa
+
+El sistema deberá validar automáticamente la disponibilidad de los trabajadores según su agenda y capacidad, antes de confirmar una asignación de servicio.
+
+1. Iniciar sesion como administrador
+
+2. Entrar al apartado de gestion de servicios
+
+3. Seleccionar algun servicio
+
+4.Asignar un empleado al servicio
+
+5. Se valida empleados disponibles
+
+Al momento de seleccionar el boton para asignar un empleado el sistema debe mostrar los empleados disponibles, si no hay tambien debe mostrarlo
+
+CP-101 Sin disponibilidad
+
+El sistema deberá validar automáticamente la disponibilidad de los trabajadores según su agenda y capacidad, antes de confirmar una asignación de servicio.
+
+1. Iniciar sesion como administrador
+
+2. Entrar al apartado de gestion de servicios
+
+3. Seleccionar algun servicio
+
+4.Asignar un empleado al servicio
+
+5. Se valida empleados disponibles
+
+Al momento de seleccionar el boton para asignar un empleado el sistema debe mostrar los empleados disponibles, si no hay tambien debe mostrarlo
+
+CP-102 Sin disponibilidad
+
+El sistema deberá validar automáticamente la disponibilidad de los trabajadores según su agenda y capacidad, antes de confirmar una asignación de servicio.
+
+1. Iniciar sesion como administrador
+
+2. Entrar al apartado de gestion de servicios
+
+3. Seleccionar algun servicio
+
+4.Asignar un empleado al servicio
+
+5. Se valida empleados disponibles
+
+Al momento de seleccionar el boton para asignar un empleado el sistema debe mostrar los empleados disponibles, si no hay tambien debe mostrarlo
+
+
+
+
+
+RF20 — Generar reportes de servicios, ingresos y productividad
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-103
+
+Generación Y Visualizacion Exitoza de los Graficos Administrativos y Finacieros del Sistema.
+
+1. Iniciar Sesion como Administrador.
+
+2. Ir al Apartado de "Reportes".
+
+3. Seleccionar el Periodo a Visuarilazar.
+
+4. Visualizar los Graficos Administrativos y Finacieros del Sistema.
+
+5. Cerrar Sesion y Salir del Sistema.
+
+Se Visualizan los Graficos Administrativos y Financieros del Sistema para el Periodo Solicitado en los Periodos Validos (Semanal,Mensual,Trimestral y Anual).
+
+CP-104
+
+Generación Y Visualizacion Exitoza de los Graficos Administrativos y Finacieros del Sistema,Al Seleccionar un Periodo en el Cual la Empresa no haya Tenido Funcionamiento los Reportes y Analisis del Sistema deben ser "0".
+
+1. Iniciar Sesion como Administrador.
+
+2. Ir al Apartado de "Reportes".
+
+3. Seleccionar el Periodo a Visuarilazar.
+
+4. Visualizar los Graficos Administrativos y Financieros del Sistema.
+
+5. Verificar que los Resportes y Analisis del Sistema Tengan la correcta Asignacion de "0".
+
+6. Cerrar Sesion y Salir del Sistema.
+
+Se Visualizan los Graficos Administrativos y Financieros del Sistema para el Periodo Solicitado en los Periodos Validos (Semanal,Mensual,Trimestral y Anual),  Verificando Que los Valores y el Periodo sea el Seleccionado.
+
+CP-105
+
+Generación exitosa de los reportes en el sistema en formato PDF.
+
+1. Iniciar Sesion como Administrador.
+
+2. Ir al Apartado de "Reportes".
+
+3. Seleccionar el Periodo a Visuarilazar.
+
+4. Visualizar los Graficos Administrativos del Sistema.
+
+5. Oprimir el Boton de "Generar Reporte PDF" para Generar y Descargar el Reporte.
+
+6. Visualizar que se Descargue el Reporte Deacuerdo al Formato PDF permitido.
+
+7. Cerrar Sesion y Salir del Sistema.
+
+Se Visualiza el Reporte Descargado y Guardado en Formato PDF. Donde se Encuentrn los Graficos Administrativos y Finacieros del sistema, Verificando que los Datos Coincidan con el Periodo Solicitado y Recordando los Periodos Validos (Semanal,Mensual,Trimestral y Anual).
+
+
+
+
+
+RF21 — Visualizar estadísticas del sistema
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-106
+
+Visualizacion Exitoza de los Estadisticos del sistema.
+
+1. Iniciar Sesion como Administrador.
+
+2. Ir al Apartado de "Reportes".
+
+3. Seleccionar el Periodo a Visuarilazar.
+
+4. Visualizar los Graficos Administrativos y Finacieros del Sistema.
+
+5. Cerrar Sesion y Salir del Sistema.
+
+Se Visualizan los Graficos Administrativos y Financieros del Sistema para el Periodo Solicitado en los Periodos Validos (Semanal,Mensual,Trimestral y Anual).
+
+CP-107
+
+Visualizar los Graficos en el Sistema Donde se Encuetre Sin datos suficientes en Caso de los Periodos de Inactividad del Sistema o la Empresa.
+
+1. Iniciar Sesion como Administrador.
+
+2. Ir al Apartado de "Reportes".
+
+3. Seleccionar el Periodo a Visuarilazar.
+
+4. Visualizar los Graficos Administrativos y Financieros del Sistema.
+
+5. Verificar que los Resportes y Analisis del Sistema Tengan la correcta Asignacion de o que no Contengan valores.
+
+6. Cerrar Sesion y Salir del Sistema.
+
+Se Visualizan los Graficos Administrativos y Financieros del Sistema para el Periodo Solicitado en los Periodos Validos (Semanal,Mensual,Trimestral y Anual),  Verificando Que los Valores y el Periodo sea el Seleccionado.
+
+
+
+
+
+RF22 — Exportar datos (reportes, indicadores, historial)
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-108
+
+Generación exitosa de los reportes en el sistema en formato PDF.
+
+1. Iniciar Sesion como Administrador.
+
+2. Ir al Apartado de "Reportes".
+
+3. Seleccionar el Periodo a Visuarilazar.
+
+4. Visualizar los Graficos Administrativos del Sistema.
+
+5. Oprimir el Boton de "Generar Reporte PDF" para Generar y Descargar el Reporte.
+
+6. Visualizar que se Descargue el Reporte Deacuerdo al Formato PDF permitido.
+
+7. Cerrar Sesion y Salir del Sistema.
+
+Se Visualiza el Reporte Descargado y Guardado en Formato PDF. Donde se Encuentrn los Graficos Administrativos y Finacieros del sistema, Verificando que los Datos Coincidan con el Periodo Solicitado y Recordando los Periodos Validos (Semanal,Mensual,Trimestral y Anual).
+
+
+
+
+
+RNF
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-001
+
+Proteger los Datos de los Usuarios del Sistema.
+
+1. Revisión del código fuente.
+
+2. Auditoría de seguridad.
+
+3.Inspección de la base de datos.
+
+4. Ejecución de pruebas de acceso.
+
+El sistema deberá proteger la información personal y los datos de los usuarios mediante mecanismos de autenticación, autorización y almacenamiento seguro.
+
+CP-002
+
+Verificar que un usuario no pueda acceder a información de otros usuarios.
+
+1. Iniciar sesión como cliente.
+
+2. Intentar acceder a información de otro usuario.
+
+3. Verificar que el acceso sea denegado.
+
+4. Confirmar que los datos sensibles no sean visibles sin autorización.
+
+El Sistema Verificara que la Informacion Solo sea Entregada a Usuarios Autorizados o Validos Para ese Tipo de Informacion y en Caso que un Usuario Quiera Acceder a Informacion que no le Corresponde le Denegara el Acceso.
+
+
+
+
+
+RNF-002: Registrar el acceso según roles
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-003
+
+Verificar Acceso Permitido Según el Rol del Usuario en el Sistema.
+
+1. Revisión del código fuente.
+
+2. Pruebas funcionales.
+
+3. Auditoría de permisos
+
+El sistema deberá controlar el acceso a las funcionalidades según el rol asignado a cada usuario (Administrador, Empleado y Cliente).
+
+CP-004
+
+Verificar el bloqueo de acceso a funcionalidades no autorizadas.
+
+1. Iniciar sesión como Administrador.
+
+2. Acceder al módulo de gestión de usuarios.
+
+3. Iniciar sesión como Cliente.
+
+4. Verificar que el cliente no pueda acceder al mismo módulo.
+
+5. Confirmar que cada rol visualice únicamente las opciones autorizadas.
+
+El Sistema Bloquera el Acceso a la Informacion de la Gestion de Usuarios al Momento de Realizar el Cambio del Rol del Usuario Logeado en el Sistema y no Dejando Acceder a la Ruta de ese aApartado.
+
+
+
+
+
+RNF-003: Registrar actividad en bitácora
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-005
+
+Verificar el registro del inicio de sesión.
+
+1.Revisión de la bitácora.
+
+2. Auditoría técnica.
+
+3. Pruebas funcionales.
+
+Se Deben Guardar los Logs en el Sistema Donde se Demuestre el Registro de las Acciones de Inicio de Sesion.
+
+CP-006
+
+Verificar el registro de modificaciones.
+
+1. Iniciar sesión en el sistema.
+
+2. Modificar un registro.
+
+3. Eliminar un registro.
+
+4. Consultar la bitácora.
+
+5. Verificar que las acciones se registren con fecha, hora, usuario y acción realizada.
+
+Se Deben Guardar los Logs en el Sistema Donde se Demuestre el Registro de las Acciones de Modificaciones en el Sistema.
+
+CP-007
+
+Verificar el registro de eliminación de información.
+
+1. Iniciar sesión en el sistema.
+
+2. Modificar un registro.
+
+3. Eliminar un registro.
+
+4. Consultar la bitácora.
+
+5. Verificar que las acciones se registren con fecha, hora, usuario y acción realizada.
+
+Se Deben Guardar los Logs en el Sistema Donde se Demuestre el Registro de las Acciones de Eliminaciones de Informacion en el Sistema.
+
+
+
+
+
+RNF-4
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-008
+
+Verificar la disponibilidad durante el horario de operación.
+
+1. Monitorear el sistema durante un período determinado.
+
+2. Registrar los tiempos de disponibilidad e indisponibilidad.
+
+3. Calcular el porcentaje de disponibilidad del sistema.
+
+4. Verificar que el porcentaje sea igual o superior al 99 %.
+
+El sistema mantiene una disponibilidad igual o superior al 99 % durante el período monitoreado.
+
+CP-009
+
+Verificar la recuperación del sistema después de una falla.
+
+1. Provocar una falla controlada en el sistema (caída del servidor o servicio).
+
+2. Registrar el tiempo transcurrido hasta el restablecimiento del servicio.
+
+3. Verificar que el sistema vuelva a estar operativo.
+
+4. Confirmar que no se haya perdido información durante la falla.
+
+El sistema se recupera de la falla en un tiempo razonable, sin pérdida de información, restableciendo el servicio con normalidad.
+
+
+
+
+
+RNF-5
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-010
+
+Simular múltiples usuarios concurrentes.
+
+1. Configurar una herramienta de pruebas de carga (JMeter o Locust).
+
+2. Simular 100 usuarios accediendo al sistema simultáneamente.
+
+3. Ejecutar consultas y registros al mismo tiempo.
+
+4. Verificar que no se produzcan errores durante la ejecución.
+
+El sistema procesa las solicitudes simultáneas de los 100 usuarios sin presentar errores ni degradación del servicio.
+
+CP-011
+
+Verificar el tiempo de respuesta bajo carga.
+
+1. Ejecutar la prueba de carga con 100 usuarios concurrentes.
+
+2. Medir el tiempo de respuesta promedio de las solicitudes.
+
+3. Comparar el tiempo obtenido con el límite establecido (3 segundos).
+
+4. Registrar los resultados obtenidos.
+
+El tiempo de respuesta promedio del sistema es inferior a 3 segundos, incluso bajo carga concurrente.
+
+
+
+
+
+RNF-6
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-012
+
+Verificar funcionamiento en teléfonos móviles.
+
+1. Abrir el sistema desde un teléfono móvil.
+
+2. Navegar por las diferentes secciones del sistema.
+
+3. Verificar que la interfaz se adapte correctamente a la pantalla.
+
+4. Confirmar que todas las funcionalidades sean utilizables.
+
+El sistema se visualiza y funciona correctamente en teléfonos móviles, adaptando su diseño de forma responsiva.
+
+CP-013
+
+Verificar funcionamiento en tabletas.
+
+1. Abrir el sistema desde una tableta.
+
+2. Navegar por las diferentes secciones del sistema.
+
+3. Verificar que la interfaz se adapte correctamente a la resolución.
+
+4. Confirmar que todas las funcionalidades sean utilizables.
+
+El sistema se visualiza y funciona correctamente en tabletas, manteniendo el 100 % de sus funcionalidades operativas.
+
+
+
+
+
+RNF-7
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-014
+
+Verificar la facilidad de navegación.
+
+1. Solicitar a un usuario realizar un agendamiento sin instrucciones previas.
+
+2. Medir el tiempo requerido para completar la tarea.
+
+3. Verificar que el usuario pueda finalizar el proceso sin ayuda externa.
+
+4. Registrar las dificultades encontradas, si las hubiera.
+
+Al menos el 90 % de los usuarios completa la tarea sin asistencia, dentro de un tiempo razonable.
+
+CP-015
+
+Verificar la comprensión de la interfaz.
+
+1. Presentar el sistema a un grupo de usuarios de prueba.
+
+2. Solicitar la realización de tareas básicas dentro del sistema.
+
+3. Aplicar una encuesta de satisfacción tras finalizar las tareas.
+
+4. Registrar el nivel de satisfacción obtenido.
+
+Los usuarios reportan un alto nivel de satisfacción y comprensión de la interfaz, cumpliendo con el valor esperado.
+
+
+
+
+
+RNF-8
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-016
+
+Verificar actualización sin pérdida de información.
+
+1. Registrar el estado de la información antes de la actualización.
+
+2. Realizar una actualización del sistema.
+
+3. Verificar que la información existente permanezca intacta.
+
+4. Comparar los datos antes y después de la actualización.
+
+La información del sistema se mantiene intacta después del proceso de actualización.
+
+CP-017
+
+Verificar continuidad del servicio durante la actualización.
+
+1. Ejecutar una actualización del sistema.
+
+2. Medir el tiempo de indisponibilidad generado.
+
+3. Verificar que los usuarios puedan seguir utilizando el sistema una vez finalizada la actualización.
+
+4. Confirmar que el tiempo de indisponibilidad sea inferior a 15 minutos.
+
+El sistema presenta una indisponibilidad inferior a 15 minutos durante la actualización, permitiendo la continuidad del servicio.
+
+
+
+
+
+RNF-9
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-018
+
+Verificar la integración de un nuevo módulo.
+
+1. Agregar un nuevo módulo al sistema.
+
+2. Ejecutar pruebas de integración sobre el nuevo módulo.
+
+3. Verificar que el módulo funcione correctamente.
+
+4. Confirmar que no se generen errores en el sistema.
+
+El nuevo módulo se integra correctamente al sistema sin generar errores.
+
+CP-019
+
+Verificar el funcionamiento de los módulos existentes después de la integración.
+
+1. Ejecutar las funcionalidades existentes del sistema.
+
+2. Realizar pruebas de regresión sobre los módulos actuales.
+
+3. Verificar que no se presenten errores ni fallas.
+
+4. Registrar los resultados obtenidos.
+
+Los módulos existentes funcionan correctamente sin presentar errores después de la integración del nuevo módulo.
+
+
+
+
+
+RNF-10
+
+ID
+
+Objetivo
+
+Pasos
+
+Resultado Esperado
+
+CP-020
+
+Verificar funcionamiento en Google Chrome
+
+1. Abrir el sistema en Google Chrome.
+
+
+
+CP-021
+
+Verificar funcionamiento en Microsoft Edge.
+
+2. Navegar por las diferentes funcionalidades del sistema.
+
+
+
+CP-022
+
+Verificar funcionamiento en Mozilla Firefox.
+
+3. Verificar que todas las funcionalidades operen correctamente.
+
+
+
+CP-023
+
+Verificar funcionamiento en Safari.
+
+4. Registrar posibles inconsistencias visuales o funcionales.
+
+
+
+
+

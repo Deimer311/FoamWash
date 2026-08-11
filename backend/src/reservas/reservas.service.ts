@@ -66,11 +66,40 @@ export class ReservasService {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ASIGNACIÓN AUTOMÁTICA DE EMPLEADO
-  // Busca el empleado activo con menos reservas pendientes/en proceso
-  // en la misma fecha para balancear la carga de trabajo
+  // VALIDACIÓN DE DISPONIBILIDAD ESTRICTA (RF19)
+  // Verifica si el empleado tiene reservas que se crucen en un rango de 2h
   // ─────────────────────────────────────────────────────────────────────────
-  private async asignarEmpleadoAutomatico(fecha: Date): Promise<number | null> {
+  private async verificarDisponibilidad(empleadoId: number, fecha: Date, hora: Date, excludeReservaId?: number): Promise<boolean> {
+    const fechaInicio = new Date(fecha);
+    fechaInicio.setHours(0, 0, 0, 0);
+    const fechaFin = new Date(fecha);
+    fechaFin.setHours(23, 59, 59, 999);
+
+    const reservasDelDia = await this.prisma.reserva.findMany({
+      where: {
+        empleado_Id_Usuario: empleadoId,
+        fecha: { gte: fechaInicio, lte: fechaFin },
+        Estado: { notIn: ['Cancelado'] },
+        ID_Reserva: excludeReservaId ? { not: excludeReservaId } : undefined,
+      },
+      select: { Hora: true }
+    });
+
+    const horaMilis = hora.getTime();
+    const BLOQUE_MS = 2 * 60 * 60 * 1000; // 2 horas de margen
+
+    for (const r of reservasDelDia) {
+      if (Math.abs(r.Hora.getTime() - horaMilis) < BLOQUE_MS) {
+        return false; // Conflicto detectado
+      }
+    }
+    return true; // Disponible
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ASIGNACIÓN AUTOMÁTICA DE EMPLEADO
+  // ─────────────────────────────────────────────────────────────────────────
+  private async asignarEmpleadoAutomatico(fecha: Date, horaISO: Date): Promise<number | null> {
     // 1. Obtener todos los empleados activos (rol_Id_Rol = 2)
     const empleadosActivos = await this.prisma.usuario.findMany({
       where: {
@@ -87,7 +116,7 @@ export class ReservasService {
     if (empleadosActivos.length === 0) return null;
 
     const dias = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-    const diaReserva = dias[fecha.getDay()];
+    const diaReserva = dias[fecha.getUTCDay()];
 
     const empleadosDisponibles = empleadosActivos.filter(emp => {
       if (!emp.empleado || emp.empleado.length === 0) return true; // Si no tiene configuración, asume disponible
@@ -102,25 +131,31 @@ export class ReservasService {
 
     if (empleadosDisponibles.length === 0) return null; // No hay nadie que trabaje ese día
 
-    // 2. Para cada empleado disponible, contar sus reservas en esa fecha
+    // 2. Filtrar por cruce de horarios y contar reservas para balanceo
     const fechaInicio = new Date(fecha);
     fechaInicio.setHours(0, 0, 0, 0);
     const fechaFin = new Date(fecha);
     fechaFin.setHours(23, 59, 59, 999);
 
-    const cargaPorEmpleado = await Promise.all(
-      empleadosDisponibles.map(async (emp) => {
-        const cantidad = await this.prisma.reserva.count({
+    const cargaPorEmpleado: { empId: number, reservasEnElDia: number }[] = [];
+    
+    for (const emp of empleadosDisponibles) {
+       const disponible = await this.verificarDisponibilidad(emp.Id_Usuario, fecha, horaISO);
+       if (!disponible) continue; // Descartar a los que tienen cruce (RF19)
+       
+       const cantidad = await this.prisma.reserva.count({
           where: {
             empleado_Id_Usuario: emp.Id_Usuario,
             fecha: { gte: fechaInicio, lte: fechaFin },
             Estado: { notIn: ['Cancelado'] },
           },
-        });
-        return { empId: emp.Id_Usuario, reservasEnElDia: cantidad };
-      }),
-    );
+       });
+       
+       cargaPorEmpleado.push({ empId: emp.Id_Usuario, reservasEnElDia: cantidad });
+    }
 
+    if (cargaPorEmpleado.length === 0) return null; // Nadie disponible en esa hora sin cruce
+    
     cargaPorEmpleado.sort((a, b) => a.reservasEnElDia - b.reservasEnElDia);
     return cargaPorEmpleado[0].empId;
   }
@@ -135,6 +170,7 @@ export class ReservasService {
     observacion_Id_Observaciones?: number;
     empleado_Id_Usuario?: number;
     servicios?: Array<{ Id_Servicio: number; cantidad?: number; tamano?: string }>;
+    observaciones?: string;
   }) {
     // FIX fecha: usar explícitamente UTC para evitar desplazamientos por zona horaria
     let fechaISO: Date | undefined = undefined;
@@ -175,12 +211,17 @@ export class ReservasService {
     // FIX observacion: NOT NULL en schema → crear vacía si no se pasa
     const observacionData = data.observacion_Id_Observaciones
       ? { connect: { Id_Observaciones: data.observacion_Id_Observaciones } }
-      : { create: { Observaciones: data.Informacion_adicional ?? '', estado: 'Pendiente' } };
+      : { create: { Observaciones: data.observaciones ?? data.Informacion_adicional ?? '', estado: 'Pendiente' } };
 
-    // ASIGNACIÓN AUTOMÁTICA: si no se pasa empleado, buscar el más disponible
+    // ASIGNACIÓN AUTOMÁTICA O MANUAL: Validar disponibilidad (RF19)
     let empleadoId = data.empleado_Id_Usuario ?? null;
-    if (!empleadoId && fechaISO) {
-      empleadoId = await this.asignarEmpleadoAutomatico(fechaISO);
+    if (empleadoId && fechaISO && horaISO) {
+      const disponible = await this.verificarDisponibilidad(empleadoId, fechaISO, horaISO);
+      if (!disponible) {
+         throw new BadRequestException('El trabajador seleccionado ya tiene una reserva que se cruza en ese horario (margen de 2h).');
+      }
+    } else if (!empleadoId && fechaISO && horaISO) {
+      empleadoId = await this.asignarEmpleadoAutomatico(fechaISO, horaISO);
     }
 
     const reserva = await this.prisma.reserva.create({
@@ -205,6 +246,19 @@ export class ReservasService {
       },
     });
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // PERSISTENCIA EN BD: Guardar notificación para el cliente
+    // ─────────────────────────────────────────────────────────────────────────
+    if (reserva.cliente && this.prisma.notificacion?.create) {
+      await this.prisma.notificacion.create({
+        data: {
+          usuario_Id_Usuario: reserva.cliente.Id_Usuario,
+          descripcion_notificacion: `Tu reserva #${reserva.ID_Reserva} ha sido agendada exitosamente.`,
+          fecha_notificacion: new Date(),
+        },
+      }).catch(e => console.log('Error creando notificacion DB cliente:', e));
+    }
+
     // Notificar al administrador
     try {
       await this.notificationsService.sendToTopic(
@@ -217,13 +271,25 @@ export class ReservasService {
       console.log('Error enviando push notification:', e);
     }
 
-    // Notificar al empleado si se le asignó automáticamente
+    // ─────────────────────────────────────────────────────────────────────────
+    // CP-044 PERSISTENCIA EN BD: Notificación por asignación a trabajador
+    // ─────────────────────────────────────────────────────────────────────────
     if (empleadoId) {
+      if (this.prisma.notificacion?.create) {
+        await this.prisma.notificacion.create({
+          data: {
+            usuario_Id_Usuario: empleadoId,
+            descripcion_notificacion: `Tienes una nueva orden de servicio #${reserva.ID_Reserva} asignada.`,
+            fecha_notificacion: new Date(),
+          },
+        }).catch(e => console.log('Error creando notificacion DB empleado:', e));
+      }
+
       try {
         await this.notificationsService.sendToTopic(
           `user_${empleadoId}`,
           'Nueva Cita Asignada',
-          `Tienes una nueva reserva #${reserva.ID_Reserva} asignada automáticamente.`,
+          `Tienes una nueva reserva #${reserva.ID_Reserva} asignada.`,
           { type: 'nueva_reserva', reservaId: reserva.ID_Reserva.toString() }
         );
       } catch (e) {
@@ -286,6 +352,48 @@ export class ReservasService {
   ) {
     const exists = await this.prisma.reserva.findUnique({ where: { ID_Reserva: id } });
     if (!exists) throw new NotFoundException('Reserva no encontrada');
+
+    // VALIDAR DISPONIBILIDAD SI CAMBIA EMPLEADO O FECHA/HORA (RF19)
+    if (data.empleado_Id_Usuario || data.fecha || data.Hora) {
+      const targetEmpleadoId = data.empleado_Id_Usuario ?? exists.empleado_Id_Usuario;
+      const targetFecha = data.fecha ?? exists.fecha;
+      const targetHora = data.Hora ?? exists.Hora;
+      
+      if (targetEmpleadoId && targetFecha && targetHora) {
+        const disponible = await this.verificarDisponibilidad(targetEmpleadoId, targetFecha, targetHora, id);
+        if (!disponible) {
+          throw new BadRequestException('El trabajador ya tiene una reserva que se cruza en ese horario (margen de 2h).');
+        }
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // CP-045 PERSISTENCIA EN BD: Notificación por reasignación de empleado
+    // ─────────────────────────────────────────────────────────────────────────
+    if (data.empleado_Id_Usuario && data.empleado_Id_Usuario !== exists.empleado_Id_Usuario) {
+      if (this.prisma.notificacion?.create) {
+        // Notificar al nuevo empleado
+        await this.prisma.notificacion.create({
+          data: {
+            usuario_Id_Usuario: data.empleado_Id_Usuario,
+            descripcion_notificacion: `Se te ha reasignado la orden de servicio #${id}.`,
+            fecha_notificacion: new Date(),
+          },
+        }).catch(e => console.log('Error creando notificacion reasignacion nuevo empleado:', e));
+
+        // Notificar al empleado previo si existía
+        if (exists.empleado_Id_Usuario) {
+          await this.prisma.notificacion.create({
+            data: {
+              usuario_Id_Usuario: exists.empleado_Id_Usuario,
+              descripcion_notificacion: `La orden de servicio #${id} ha sido reasignada a otro trabajador.`,
+              fecha_notificacion: new Date(),
+            },
+          }).catch(e => console.log('Error creando notificacion reasignacion previo empleado:', e));
+        }
+      }
+    }
+
     return this.prisma.reserva.update({ where: { ID_Reserva: id }, data });
   }
 
@@ -303,6 +411,32 @@ export class ReservasService {
         empleado: true,
       }
     });
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // PERSISTENCIA EN BD: Guardar notificación de estado para el cliente
+    // ─────────────────────────────────────────────────────────────────────────
+    if (this.prisma.notificacion?.create) {
+      if (updatedReserva.cliente) {
+        await this.prisma.notificacion.create({
+          data: {
+            usuario_Id_Usuario: updatedReserva.cliente.Id_Usuario,
+            descripcion_notificacion: `El estado de tu reserva #${updatedReserva.ID_Reserva} ha cambiado a: ${estado}.`,
+            fecha_notificacion: new Date(),
+          },
+        }).catch(e => console.log('Error creando notificacion DB estado cliente:', e));
+      }
+
+      // Guardar notificación para el empleado asignado
+      if (updatedReserva.empleado) {
+        await this.prisma.notificacion.create({
+          data: {
+            usuario_Id_Usuario: updatedReserva.empleado.Id_Usuario,
+            descripcion_notificacion: `El estado de la reserva #${updatedReserva.ID_Reserva} ha cambiado a: ${estado}.`,
+            fecha_notificacion: new Date(),
+          },
+        }).catch(e => console.log('Error creando notificacion DB estado empleado:', e));
+      }
+    }
 
     if (estado === 'Confirmado' && updatedReserva.cliente && updatedReserva.cliente.Correo) {
       const total = updatedReserva.servicios.reduce((sum, s) => sum + Number(s.Precio || 0), 0);
@@ -330,7 +464,6 @@ export class ReservasService {
       }).catch(err => console.error('Error al enviar correo de actualización de estado:', err));
     }
 
-    // Notificar al cliente si tiene un token de app instalado (en este caso enviamos al topic general del cliente o user id si la app de cliente lo maneja)
     try {
       await this.notificationsService.sendToTopic(
         `user_${updatedReserva.cliente.Id_Usuario}`,
@@ -340,7 +473,6 @@ export class ReservasService {
       );
     } catch (e) { }
 
-    // Notificar al empleado si se cambia de estado y tiene empleado asignado
     if (updatedReserva.empleado) {
       try {
         await this.notificationsService.sendToTopic(
@@ -366,6 +498,31 @@ export class ReservasService {
       include: { cliente: true, empleado: true }
     });
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // PERSISTENCIA EN BD: Notificación de cancelación en tabla `notificaciones`
+    // ─────────────────────────────────────────────────────────────────────────
+    if (this.prisma.notificacion?.create) {
+      if (updatedReserva.cliente) {
+        await this.prisma.notificacion.create({
+          data: {
+            usuario_Id_Usuario: updatedReserva.cliente.Id_Usuario,
+            descripcion_notificacion: `La reserva #${updatedReserva.ID_Reserva} ha sido cancelada. Motivo: ${motivo}`,
+            fecha_notificacion: new Date(),
+          },
+        }).catch(e => console.log('Error creando notificacion DB cancelacion cliente:', e));
+      }
+
+      if (updatedReserva.empleado) {
+        await this.prisma.notificacion.create({
+          data: {
+            usuario_Id_Usuario: updatedReserva.empleado.Id_Usuario,
+            descripcion_notificacion: `Se ha cancelado la reserva #${updatedReserva.ID_Reserva} que tenías asignada.`,
+            fecha_notificacion: new Date(),
+          },
+        }).catch(e => console.log('Error creando notificacion DB cancelacion empleado:', e));
+      }
+    }
+
     if (updatedReserva.cliente && updatedReserva.cliente.Correo) {
       const dateFormatter = new Intl.DateTimeFormat('es-CO', {
         weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
@@ -380,7 +537,6 @@ export class ReservasService {
       }).catch(err => console.error('Error al enviar correo de cancelación:', err));
     }
 
-    // Notificar al administrador
     try {
       await this.notificationsService.sendToTopic(
         'topic_admin',
@@ -390,7 +546,6 @@ export class ReservasService {
       );
     } catch (e) { }
 
-    // Notificar al empleado si lo tiene asignado
     if (updatedReserva.empleado) {
       try {
         await this.notificationsService.sendToTopic(
@@ -410,5 +565,14 @@ export class ReservasService {
     const exists = await this.prisma.reserva.findUnique({ where: { ID_Reserva: id } });
     if (!exists) throw new NotFoundException('Reserva no encontrada');
     return this.prisma.reserva.delete({ where: { ID_Reserva: id } });
+  }
+
+  // GET reservas por cliente
+  async findByCliente(clienteId: number) {
+    return this.prisma.reserva.findMany({
+      where: { Id_Usuario: clienteId },
+      include: { servicios: true, observacion: true, empleado: { select: { Nombre: true } } },
+      orderBy: { fecha: 'desc' },
+    });
   }
 }

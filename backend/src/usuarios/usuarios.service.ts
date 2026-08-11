@@ -2,6 +2,7 @@
 import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
+
 @Injectable()
 export class UsuariosService {
   constructor(private prisma: PrismaService) {}
@@ -46,6 +47,7 @@ export class UsuariosService {
           include: {
             servicios: true,
             observacion: true,
+            empleado: { select: { Nombre: true } },
           },
           orderBy: { fecha: 'desc' },
         },
@@ -92,39 +94,51 @@ export class UsuariosService {
     const updateData: any = {};
 
     if (data.Nombre      !== undefined) updateData.Nombre      = data.Nombre;
+    if (data.nombre      !== undefined && data.Nombre === undefined) updateData.Nombre = data.nombre;
     if (data.Telefono    !== undefined) updateData.Telefono    = data.Telefono;
+    if (data.telefono    !== undefined && data.Telefono === undefined) updateData.Telefono = data.telefono;
     if (data.Direccion   !== undefined) updateData.Direccion   = data.Direccion;
+    if (data.direccion   !== undefined && data.Direccion === undefined) updateData.Direccion = data.direccion;
     if (data.foto_perfil !== undefined) updateData.foto_perfil = data.foto_perfil;
 
-    // ✅ Permitir edición de Correo con validación de duplicado
-    if (data.Correo !== undefined) {
-      if (data.Correo) {
-        const duplicado = await this.prisma.usuario.findFirst({
-          where: {
-            Correo: data.Correo,
-            NOT: { Id_Usuario: id },
-          },
-        });
-        if (duplicado) throw new ConflictException('El correo ya está registrado en otro usuario');
-        updateData.Correo = data.Correo;
+    // Permitir edición de Correo con validación de duplicado
+    if (data.Correo !== undefined || data.correo !== undefined) {
+      const targetCorreo = data.Correo ?? data.correo;
+      if (targetCorreo) {
+        const duplicado = await this.prisma.usuario.findFirst
+          ? await this.prisma.usuario.findFirst({
+              where: {
+                Correo: targetCorreo,
+                NOT: { Id_Usuario: id },
+              },
+            })
+          : await this.prisma.usuario.findUnique({ where: { Correo: targetCorreo } });
+        if (duplicado && duplicado.Id_Usuario !== id) throw new ConflictException('El correo ya está registrado en otro usuario');
+        updateData.Correo = targetCorreo;
       } else {
         updateData.Correo = null;
       }
     }
 
-    // ✅ Tarea 7 — permitir edición de cédula con validación de duplicado
+    // Permitir edición de cédula con validación de duplicado
     if (data.N_Documento !== undefined) {
-      const duplicado = await this.prisma.usuario.findFirst({
-        where: {
-          N_Documento: data.N_Documento,
-          NOT: { Id_Usuario: id },
-        },
-      });
-      if (duplicado) throw new ConflictException('El número de documento ya está registrado en otro usuario');
-      updateData.N_Documento = data.N_Documento;
+      if (data.N_Documento) {
+        const duplicado = await this.prisma.usuario.findFirst
+          ? await this.prisma.usuario.findFirst({
+              where: {
+                N_Documento: data.N_Documento,
+                NOT: { Id_Usuario: id },
+              },
+            })
+          : await this.prisma.usuario.findUnique({ where: { N_Documento: data.N_Documento } });
+        if (duplicado && duplicado.Id_Usuario !== id) throw new ConflictException('El número de documento ya está registrado en otro usuario');
+        updateData.N_Documento = data.N_Documento;
+      } else {
+        updateData.N_Documento = null;
+      }
     }
 
-    // ✅ Tarea 9 — permitir cambio de tipo de documento con validación
+    // Permitir cambio de tipo de documento con validación
     if (data.tipo_de_documento_id_tipo_de_documento !== undefined) {
       const tipo = await this.prisma.tipoDeDocumento.findUnique({
         where: { idTipo_de_Documento: data.tipo_de_documento_id_tipo_de_documento },
@@ -133,20 +147,25 @@ export class UsuariosService {
       updateData.tipo_de_documento_id_tipo_de_documento = data.tipo_de_documento_id_tipo_de_documento;
     }
 
-    // ✅ Actualizar datos de Empleado si aplica
+    // Actualizar datos de Empleado si aplica
     const hasEmpleadoFields =
       data.cargo !== undefined ||
+      data.especialidad !== undefined ||
+      data.especialidades !== undefined ||
+      data.certificaciones !== undefined ||
       data.fecha_nacimiento !== undefined ||
       data.fecha_ingreso !== undefined ||
       data.dias_laborales !== undefined ||
-      data.horario !== undefined ||
-      data.especialidades !== undefined ||
-      data.certificaciones !== undefined;
+      data.horario !== undefined;
 
-    if (hasEmpleadoFields && exists.rol_Id_Rol === 2) {
+    if (hasEmpleadoFields && (exists.rol_Id_Rol === 2 || data.cargo !== undefined)) {
       const empleadoData: any = {};
       if (data.cargo !== undefined) empleadoData.cargo = data.cargo;
-      
+      if (data.especialidad !== undefined || data.especialidades !== undefined) {
+        empleadoData.especialidades = data.especialidades ?? data.especialidad;
+      }
+      if (data.certificaciones !== undefined) empleadoData.certificaciones = data.certificaciones;
+
       if (data.fecha_nacimiento !== undefined) {
         if (!data.fecha_nacimiento || data.fecha_nacimiento.toString().trim() === '' || data.fecha_nacimiento === 'Invalid Date') {
           empleadoData.fecha_nacimiento = null;
@@ -173,8 +192,6 @@ export class UsuariosService {
 
       if (data.dias_laborales !== undefined) empleadoData.dias_laborales = data.dias_laborales;
       if (data.horario !== undefined) empleadoData.horario = data.horario;
-      if (data.especialidades !== undefined) empleadoData.especialidades = data.especialidades;
-      if (data.certificaciones !== undefined) empleadoData.certificaciones = data.certificaciones;
 
       const existingEmp = await this.prisma.empleado.findFirst({
         where: { usuario_Id_Usuario: id },
@@ -213,23 +230,56 @@ export class UsuariosService {
             nombre_del_documento: true,
           },
         },
+        empleado: true,
       },
     });
   }
 
   async createEmpleado(data: any) {
-    const { nombre, correo, password, telefono, cargo, especialidad, fecha_ingreso, certificaciones } = data;
+    const {
+      nombre, Nombre,
+      correo, Correo,
+      password,
+      telefono, Telefono,
+      N_Documento,
+      Direccion, direccion,
+      cargo,
+      especialidad, especialidades,
+      fecha_ingreso,
+      certificaciones,
+      dias_laborales,
+      horario,
+      contacto_emergencia_nombre,
+      contacto_emergencia_telefono,
+    } = data;
 
-    if (!correo) {
-      throw new BadRequestException('El correo es obligatorio');
+    const userNombre = (nombre || Nombre || '').trim();
+    const userCorreo = (correo || Correo || '').trim().toLowerCase();
+    const userTel = (telefono || Telefono || '').trim();
+    const userDir = (direccion || Direccion || '').trim();
+    const userDoc = N_Documento ? N_Documento.toString().trim() : null;
+
+    if (!userNombre) {
+      throw new BadRequestException('El nombre completo del empleado es obligatorio');
     }
 
-    const existing = await this.prisma.usuario.findUnique({ where: { Correo: correo } });
-    if (existing) {
-      throw new ConflictException('El correo ya está registrado');
+    if (!userCorreo) {
+      throw new BadRequestException('El correo electrónico es obligatorio');
     }
 
-    const password_hash = await bcrypt.hash(password || '123456', 12);
+    const existingEmail = await this.prisma.usuario.findUnique({ where: { Correo: userCorreo } });
+    if (existingEmail) {
+      throw new ConflictException('El correo ya está registrado en el sistema');
+    }
+
+    if (userDoc) {
+      const existingDoc = await this.prisma.usuario.findUnique({ where: { N_Documento: userDoc } });
+      if (existingDoc) {
+        throw new ConflictException('El número de documento ya está registrado en otro usuario');
+      }
+    }
+
+    const password_hash = await bcrypt.hash(password || '123456', 10);
 
     let parsedFecha = null;
     if (fecha_ingreso && fecha_ingreso.toString().trim() !== '') {
@@ -241,26 +291,31 @@ export class UsuariosService {
 
     const newUser = await this.prisma.usuario.create({
       data: {
-        Nombre: nombre,
-        Correo: correo,
+        Nombre: userNombre,
+        Correo: userCorreo,
         password_hash,
-        Telefono: telefono || null,
+        Telefono: userTel || null,
+        Direccion: userDir || null,
+        N_Documento: userDoc || null,
         rol_Id_Rol: 2, // 2 = Empleado
         estado: 'activo',
         empleado: {
           create: {
             cargo: cargo || null,
-            especialidades: especialidad || null,
+            especialidades: especialidades || especialidad || null,
             fecha_ingreso: parsedFecha,
             certificaciones: certificaciones || null,
+            dias_laborales: dias_laborales || null,
+            horario: horario || null,
+            contacto_emergencia_nombre: contacto_emergencia_nombre || null,
+            contacto_emergencia_telefono: contacto_emergencia_telefono || null,
           },
         },
       },
-      select: {
-        Id_Usuario: true,
-        Nombre: true,
-        Correo: true,
-        Telefono: true,
+      include: {
+        empleado: true,
+        rol: { select: { Rol: true } },
+        tipo_de_documento: true,
       },
     });
 

@@ -209,7 +209,7 @@ const PerfilCliente = ({ onBackToHome, onCotizacion, onServicios, onEditarPerfil
                             </div>
                         </div>
 
-                        {/* Actividad Reciente */}
+                        {/* Últimos Servicios */}
                         <div className="detail-card" style={{ opacity: 0, transform: 'translateY(20px)', transition: 'all 0.3s ease' }}>
                             <h2 className="card-title">
                                 <span className="card-icon">
@@ -218,35 +218,45 @@ const PerfilCliente = ({ onBackToHome, onCotizacion, onServicios, onEditarPerfil
                                         <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
                                     </svg>
                                 </span>
-                                Actividad Reciente
+                                Últimos Servicios
                             </h2>
                             <div className="activity-list">
-                                {perfil?.reservasComoCliente?.length > 0 ? (
-                                    perfil.reservasComoCliente.map((item, i) => (
-                                        <div key={i} className="activity-item">
-                                            <div className="activity-icon">🧹</div>
-                                            <div className="activity-content">
-                                                <div className="activity-title">
-                                                    {item.servicios?.[0]?.Nombre_Servicio || 'Servicio'}
+                                {(() => {
+                                    const serviciosTerminados = (perfil?.reservasComoCliente || [])
+                                        .filter(item => item.Estado === 'Completado' || item.Estado === 'Cancelado')
+                                        .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime() || b.ID_Reserva - a.ID_Reserva)
+                                        .slice(0, 5);
+
+                                    if (serviciosTerminados.length > 0) {
+                                        return serviciosTerminados.map((item, i) => {
+                                            const serviceNames = (item.servicios || []).map(s => s.Nombre_Servicio).join(' + ') || 'Servicio';
+                                            return (
+                                                <div key={i} className="activity-item">
+                                                    <div className="activity-icon">🧹</div>
+                                                    <div className="activity-content">
+                                                        <div className="activity-title" title={serviceNames}>
+                                                            {serviceNames}
+                                                        </div>
+                                                        <div className="activity-date">
+                                                            {formatearFecha(item.fecha)} — {item.Hora}
+                                                        </div>
+                                                    </div>
+                                                    <span className={`activity-status ${
+                                                        item.Estado === 'Completado' ? 'status-completed' : 'status-cancelled'
+                                                    }`}>
+                                                        {item.Estado}
+                                                    </span>
                                                 </div>
-                                                <div className="activity-date">
-                                                    {formatearFecha(item.fecha)} — {item.Hora}
-                                                </div>
-                                            </div>
-                                            <span className={`activity-status ${
-                                                item.Estado === 'Completado' ? 'status-completed' :
-                                                item.Estado === 'Cancelado'  ? 'status-cancelled' :
-                                                'status-pending'
-                                            }`}>
-                                                {item.Estado}
-                                            </span>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p style={{ color: '#bbb', textAlign: 'center', padding: '28px', fontSize: 14, fontFamily: 'Kanit' }}>
-                                        No hay actividad reciente
-                                    </p>
-                                )}
+                                            );
+                                        });
+                                    } else {
+                                        return (
+                                            <p style={{ color: '#bbb', textAlign: 'center', padding: '28px', fontSize: 14, fontFamily: 'Kanit' }}>
+                                                No tienes servicios realizados recientemente
+                                            </p>
+                                        );
+                                    }
+                                })()}
                             </div>
                         </div>
 

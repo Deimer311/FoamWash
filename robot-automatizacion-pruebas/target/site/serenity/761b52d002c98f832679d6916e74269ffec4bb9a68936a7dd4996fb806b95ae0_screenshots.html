@@ -152,7 +152,7 @@
             <a href="576946480b52ad056d6f5bddf874399c83582ecf90963cc074a14c70580e7d9f.html"><i class="bi bi-chat-text"></i> Features</a>
         </li>
     </ul>
-    <span class="date-and-time"><a href="build-info.html"><i class="bi bi-info-circle"></i></a> Report generated 09-07-2026 07:35</span>
+    <span class="date-and-time"><a href="build-info.html"><i class="bi bi-info-circle"></i></a> Report generated 11-08-2026 13:19</span>
     <br style="clear:left"/>
 </div>
 
@@ -183,14 +183,14 @@ Para que los clientes, administradores y empleados interactuen sin problemas
                         <td valign="top" align="right">
                             <p class="tag">
                                 <span class="badge tag-badge" style="background:default;"
-                                    <i class="bi bi-tag-fill"></i>&nbsp;<a class="tagLink" style="background:default;" href="9afed4dff6bc037edc1f1ab3861affc9d1fe894d85789047ea8eb9c7379bb3de.html">Hu-E2e-01
+                                    <i class="bi bi-tag-fill"></i>&nbsp;<a class="tagLink" style="background:default;" href="c68fd6639ab29c4b0ac02a78bc39f4e22557bcaa40ef14c903ac0e584626edfe.html">1 To 2 Minutes
+                                        (Duration)
                                 </a>
                                 </span>
                             </p>
                             <p class="tag">
                                 <span class="badge tag-badge" style="background:default;"
-                                    <i class="bi bi-tag-fill"></i>&nbsp;<a class="tagLink" style="background:default;" href="5698da923f295f46ce5ab64ced2311fc60caa4e36b32112606d3adcfdce3f60b.html">30 To 60 Seconds
-                                        (Duration)
+                                    <i class="bi bi-tag-fill"></i>&nbsp;<a class="tagLink" style="background:default;" href="9afed4dff6bc037edc1f1ab3861affc9d1fe894d85789047ea8eb9c7379bb3de.html">Hu-E2e-01
                                 </a>
                                 </span>
                             </p>
@@ -202,9 +202,9 @@ Para que los clientes, administradores y empleados interactuen sin problemas
                 <table class="outcome-header">
                     <tr>
                         <td colspan="2" class="test-title-bar">
-                            <span class="outcome-icon"><a href='##beforetable'><i class='bi bi-check-circle-fill success-icon fa-2x' title='SUCCESS'></i></a></span>
+                            <span class="outcome-icon"><a href='##beforetable'><i class='bi bi-exclamation-triangle-fill error-icon fa-2x' title='ERROR'></i></a></span>
                             <span class="test-case-title">
-                                <span class="success-color">Ciclo de vida completo de un servicio (Agendar -> Aprobar -> Completar)
+                                <span class="error-color">Ciclo de vida completo de un servicio (Agendar -> Aprobar -> Completar)
                                     <span class="related-issue-title"></span>
                                 </span>
                             </span>
@@ -221,59 +221,90 @@ Para que los clientes, administradores y empleados interactuen sin problemas
 
     <div id="beforetable"></div>
     <div id="contenttilttle">
+            <div class="screenshotFailure panel panel-danger">
+    <div style="display:block">
+        <div class="table">
+            <div class="row">
+                <div class="col-sm-10" style="padding-left:1.5em; padding-top:0.5em; padding-bottom:0.5em;">
+                    <span class="error-message error-message-title">No such session exception: invalid session id</span>
+                </div>
+                <div class="col-sm-2">
+                    <a class="btn btn-warning details-button" data-toggle="collapse" href="#stacktraceModal-overall"
+                       role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><i class="bi bi-eye"></i> More details</a>
+                </div>
+             </div>
+        </div>
+    <div>
+
+    <!-- Details Section -->
+    <div class="row stacktrace-details">
+      <div class="col">
+        <div class="collapse multi-collapse" id="stacktraceModal-overall">
+            <div class="card">
+                <div class="card-header">
+                    <h4>org.openqa.selenium.NoSuchSessionException </h4>
+                </div>
+                <div class="card-body">
+                    <div>
+                        <pre>com.foamwash.tasks.AbrirPagina.performAs(AbrirPagina.java:12)<br />com.foamwash.stepdefinitions.FlujoE2EStepDefinitions.clienteVerificaHistorial(FlujoE2EStepDefinitions.java:58)<br /></pre>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+            </div>
         <div class="slider-wrapper theme-default">
             <div id="slider">
-                <img src="e0ce52ed55f9bb8fff58dc8d4b4818281759cf5bf2185ed84bd60955f31ca45d.png" title=" Dado que &quot;Carlos el Cliente&quot; agenda un servicio de limpieza" width="0"/>
-                <img src="e0ce52ed55f9bb8fff58dc8d4b4818281759cf5bf2185ed84bd60955f31ca45d.png" title=" Carlos el cliente abrir pagina" width="0"/>
-                <img src="e0ce52ed55f9bb8fff58dc8d4b4818281759cf5bf2185ed84bd60955f31ca45d.png" title=" Carlos el Cliente opens the browser at http://localhost:3000" width="0"/>
-                <img src="e0ce52ed55f9bb8fff58dc8d4b4818281759cf5bf2185ed84bd60955f31ca45d.png" title=" Carlos el cliente abrir pagina (completed)" width="0"/>
-                <img src="e0ce52ed55f9bb8fff58dc8d4b4818281759cf5bf2185ed84bd60955f31ca45d.png" title=" Carlos el Cliente clicks on bot&oacute;n login" width="0"/>
-                <img src="50b8e3f67f07d6faff4c0ac188495d041f8a82ed864d71a656541dda5b5ccb60.png" title=" Carlos el Cliente clicks on bot&oacute;n login (completed)" width="0"/>
-                <img src="50b8e3f67f07d6faff4c0ac188495d041f8a82ed864d71a656541dda5b5ccb60.png" title=" Carlos el cliente ingresar credenciales" width="0"/>
-                <img src="50b8e3f67f07d6faff4c0ac188495d041f8a82ed864d71a656541dda5b5ccb60.png" title=" Carlos el Cliente enters 'cliente@gmail.com' into campo email" width="0"/>
-                <img src="c14e2715aa6dcb5430b4814b47c52b61c845654ca8095cdfddf9ad2e26e07643.png" title=" Carlos el Cliente enters 'cliente@gmail.com' into campo email (completed)" width="0"/>
-                <img src="c14e2715aa6dcb5430b4814b47c52b61c845654ca8095cdfddf9ad2e26e07643.png" title=" Carlos el Cliente enters '123456' into campo contrase&ntilde;a" width="0"/>
-                <img src="0c5d3f22e7b64c136763bd88e04c7d2d63a3ab01906a26add556dc3ca8eda975.png" title=" Carlos el Cliente enters '123456' into campo contrase&ntilde;a (completed)" width="0"/>
-                <img src="0c5d3f22e7b64c136763bd88e04c7d2d63a3ab01906a26add556dc3ca8eda975.png" title=" Carlos el Cliente clicks on bot&oacute;n de iniciar sesi&oacute;n" width="0"/>
-                <img src="491bcaa9b583143ab6ee2b1a3b2fe6b6dcac6b7e8dd2a2da1b91afe829c49773.png" title=" Carlos el Cliente clicks on bot&oacute;n de iniciar sesi&oacute;n (completed)" width="0"/>
-                <img src="491bcaa9b583143ab6ee2b1a3b2fe6b6dcac6b7e8dd2a2da1b91afe829c49773.png" title=" Carlos el cliente ingresar credenciales (completed)" width="0"/>
-                <img src="004f84e9315a9a6e5096b3115e0c2bb87147e20dabdc3be48b5eae779fff3aae.png" title=" Dado que &quot;Carlos el Cliente&quot; agenda un servicio de limpieza (completed)" width="0"/>
-                <img src="2d0fcb55608341984172b4ad909585ece4726ec75e0aad77d4e5c8e8b3d9ce4d.png" title=" Cuando &quot;Ana la Administradora&quot; aprueba la orden y se la asigna a &quot;Pedro el Trabajador&quot;" width="0"/>
-                <img src="2d0fcb55608341984172b4ad909585ece4726ec75e0aad77d4e5c8e8b3d9ce4d.png" title=" Ana la administradora abrir pagina" width="0"/>
-                <img src="2d0fcb55608341984172b4ad909585ece4726ec75e0aad77d4e5c8e8b3d9ce4d.png" title=" Ana la Administradora opens the browser at http://localhost:3000" width="0"/>
-                <img src="49118877c6b19cfd410971ec88db69c81d7f3cb685f13039e423920850ad999e.png" title=" Ana la Administradora opens the browser at http://localhost:3000 (completed)" width="0"/>
-                <img src="49118877c6b19cfd410971ec88db69c81d7f3cb685f13039e423920850ad999e.png" title=" Ana la administradora abrir pagina (completed)" width="0"/>
-                <img src="49118877c6b19cfd410971ec88db69c81d7f3cb685f13039e423920850ad999e.png" title=" Ana la Administradora clicks on bot&oacute;n login" width="0"/>
-                <img src="5d4bf325f00d26a4915b755e3b3cd1f41e7458a18d8034d41dfd0ec1ab67d18a.png" title=" Ana la Administradora clicks on bot&oacute;n login (completed)" width="0"/>
-                <img src="5d4bf325f00d26a4915b755e3b3cd1f41e7458a18d8034d41dfd0ec1ab67d18a.png" title=" Ana la administradora ingresar credenciales" width="0"/>
-                <img src="5d4bf325f00d26a4915b755e3b3cd1f41e7458a18d8034d41dfd0ec1ab67d18a.png" title=" Ana la Administradora enters 'admin@gmail.com' into campo email" width="0"/>
-                <img src="57d62f86559d4e1992c5a9c8cddef54e22686f61919b322a768888f197f1091e.png" title=" Ana la Administradora enters 'admin@gmail.com' into campo email (completed)" width="0"/>
-                <img src="57d62f86559d4e1992c5a9c8cddef54e22686f61919b322a768888f197f1091e.png" title=" Ana la Administradora enters '123456' into campo contrase&ntilde;a" width="0"/>
-                <img src="3665799955015ed955ff7cb32d9f2038d881e1d4d8898e680bac132819022fc4.png" title=" Ana la Administradora enters '123456' into campo contrase&ntilde;a (completed)" width="0"/>
-                <img src="3665799955015ed955ff7cb32d9f2038d881e1d4d8898e680bac132819022fc4.png" title=" Ana la Administradora clicks on bot&oacute;n de iniciar sesi&oacute;n" width="0"/>
-                <img src="22c0789e1793c4a8067d6bfc3ccab4d1ac24f9ce8a216f73746c0513f76f49e0.png" title=" Ana la Administradora clicks on bot&oacute;n de iniciar sesi&oacute;n (completed)" width="0"/>
-                <img src="22c0789e1793c4a8067d6bfc3ccab4d1ac24f9ce8a216f73746c0513f76f49e0.png" title=" Ana la administradora ingresar credenciales (completed)" width="0"/>
-                <img src="5d4bf325f00d26a4915b755e3b3cd1f41e7458a18d8034d41dfd0ec1ab67d18a.png" title=" Cuando &quot;Ana la Administradora&quot; aprueba la orden y se la asigna a &quot;Pedro el Trabajador&quot; (completed)" width="0"/>
-                <img src="5d4bf325f00d26a4915b755e3b3cd1f41e7458a18d8034d41dfd0ec1ab67d18a.png" title=" Y &quot;Pedro el Trabajador&quot; atiende y marca la orden como completada" width="0"/>
-                <img src="842b8c58c9a36e8e519ac6221a47188afd284fadd816beb2f0309dbb1f23a040.png" title=" Pedro el trabajador abrir pagina" width="0"/>
-                <img src="842b8c58c9a36e8e519ac6221a47188afd284fadd816beb2f0309dbb1f23a040.png" title=" Pedro el Trabajador opens the browser at http://localhost:3000" width="0"/>
-                <img src="842b8c58c9a36e8e519ac6221a47188afd284fadd816beb2f0309dbb1f23a040.png" title=" Pedro el trabajador abrir pagina (completed)" width="0"/>
-                <img src="5d4bf325f00d26a4915b755e3b3cd1f41e7458a18d8034d41dfd0ec1ab67d18a.png" title=" Pedro el Trabajador clicks on bot&oacute;n login" width="0"/>
-                <img src="4499e3d0b6824930c24d9de12825fb1bcef237e22c5e6c0ede2a884bc6c500aa.png" title=" Pedro el trabajador ingresar credenciales" width="0"/>
-                <img src="4499e3d0b6824930c24d9de12825fb1bcef237e22c5e6c0ede2a884bc6c500aa.png" title=" Pedro el Trabajador enters 'trabajador@gmail.com' into campo email" width="0"/>
-                <img src="42e83a56856fc57593b0612def2a95592f12eadd69fad4b2f33475fda8bd6f68.png" title=" Pedro el Trabajador enters 'trabajador@gmail.com' into campo email (completed)" width="0"/>
-                <img src="42e83a56856fc57593b0612def2a95592f12eadd69fad4b2f33475fda8bd6f68.png" title=" Pedro el Trabajador enters '123456' into campo contrase&ntilde;a" width="0"/>
-                <img src="e78d79635987a50ec19159499daf7076746e9aec42df0e2db2d3895ba4f8c475.png" title=" Pedro el Trabajador enters '123456' into campo contrase&ntilde;a (completed)" width="0"/>
-                <img src="e78d79635987a50ec19159499daf7076746e9aec42df0e2db2d3895ba4f8c475.png" title=" Pedro el Trabajador clicks on bot&oacute;n de iniciar sesi&oacute;n" width="0"/>
-                <img src="45c43208a676fd79f3981df5754dcece9a2621800abb3bc23c275dba03a44a5c.png" title=" Pedro el Trabajador clicks on bot&oacute;n de iniciar sesi&oacute;n (completed)" width="0"/>
-                <img src="45c43208a676fd79f3981df5754dcece9a2621800abb3bc23c275dba03a44a5c.png" title=" Pedro el trabajador ingresar credenciales (completed)" width="0"/>
-                <img src="324da6b08157fe98b30bf0858ed1248ced232ad62da19eefc6a722d084f08db4.png" title=" Entonces &quot;Carlos el Cliente&quot; deberia ver la orden como finalizada en su historial" width="0"/>
-                <img src="324da6b08157fe98b30bf0858ed1248ced232ad62da19eefc6a722d084f08db4.png" title=" Carlos el cliente abrir pagina" width="0"/>
-                <img src="324da6b08157fe98b30bf0858ed1248ced232ad62da19eefc6a722d084f08db4.png" title=" Carlos el Cliente opens the browser at http://localhost:3000" width="0"/>
-                <img src="324da6b08157fe98b30bf0858ed1248ced232ad62da19eefc6a722d084f08db4.png" title=" Carlos el cliente abrir pagina (completed)" width="0"/>
-                <img src="324da6b08157fe98b30bf0858ed1248ced232ad62da19eefc6a722d084f08db4.png" title=" Then perfil nav should be an element that is visible" width="0"/>
+                <img src="dea17103f9877d526dafdf4a68c4a1308124ded097e3291c21c06df21129a732.png" title=" Dado que &quot;Carlos el Cliente&quot; agenda un servicio de limpieza" width="0"/>
+                <img src="dea17103f9877d526dafdf4a68c4a1308124ded097e3291c21c06df21129a732.png" title=" Carlos el cliente abrir pagina" width="0"/>
+                <img src="dea17103f9877d526dafdf4a68c4a1308124ded097e3291c21c06df21129a732.png" title=" Carlos el Cliente opens the browser at http://localhost:3000" width="0"/>
+                <img src="fff8da5b798db7660945e72f2e58d7f60eed554447dd7b539d3774cc63d37b34.png" title=" Carlos el cliente abrir pagina (completed)" width="0"/>
+                <img src="bee026c208817890917404d34baa6cbfd24d81bc5ea79bcb4262ef7b4170753d.png" title=" Carlos el Cliente clicks on bot&oacute;n login" width="0"/>
+                <img src="d25960cba64cc7b1ce51979ab0ec11898ada8ecb499fc00d21763ba03a58a5fd.png" title=" Carlos el Cliente clicks on bot&oacute;n login (completed)" width="0"/>
+                <img src="d25960cba64cc7b1ce51979ab0ec11898ada8ecb499fc00d21763ba03a58a5fd.png" title=" Carlos el cliente ingresar credenciales" width="0"/>
+                <img src="80d71591ee451b6ccdd4dbc902b1a1345c9c0e8efe14468f53e5a38a580925dc.png" title=" Carlos el Cliente enters 'cliente@gmail.com' into campo email" width="0"/>
+                <img src="59ee1506eb162c43d624dfc11711a323e0c153678d21c94544bcd7b4f3eb5914.png" title=" Carlos el Cliente enters 'cliente@gmail.com' into campo email (completed)" width="0"/>
+                <img src="59ee1506eb162c43d624dfc11711a323e0c153678d21c94544bcd7b4f3eb5914.png" title=" Carlos el Cliente enters '123456' into campo contrase&ntilde;a" width="0"/>
+                <img src="23097003fb61b88a5f507a36ceeb96f9820a3ba0f1e86d2e0fd422c85bdce7c5.png" title=" Carlos el Cliente enters '123456' into campo contrase&ntilde;a (completed)" width="0"/>
+                <img src="23097003fb61b88a5f507a36ceeb96f9820a3ba0f1e86d2e0fd422c85bdce7c5.png" title=" Carlos el Cliente clicks on bot&oacute;n de iniciar sesi&oacute;n" width="0"/>
+                <img src="f2b981fea2f284bea3b8b1db966fae993e5ef45c9321b932e13e891214d7b37d.png" title=" Carlos el Cliente clicks on bot&oacute;n de iniciar sesi&oacute;n (completed)" width="0"/>
+                <img src="76795cf7777dbaaab630408875dc30ebc7d5bda0cec5e021a4164473d5e298af.png" title=" Carlos el cliente ingresar credenciales (completed)" width="0"/>
+                <img src="d1cfae09e218bc2bc8770679fa58f83fa47250593c524b571d5bcb5645a3e177.png" title=" Dado que &quot;Carlos el Cliente&quot; agenda un servicio de limpieza (completed)" width="0"/>
+                <img src="216bf59c741082147f29542076372eaa10476404871ac839ff690563a06eeb14.png" title=" Cuando &quot;Ana la Administradora&quot; aprueba la orden y se la asigna a &quot;Pedro el Trabajador&quot;" width="0"/>
+                <img src="216bf59c741082147f29542076372eaa10476404871ac839ff690563a06eeb14.png" title=" Ana la administradora abrir pagina" width="0"/>
+                <img src="216bf59c741082147f29542076372eaa10476404871ac839ff690563a06eeb14.png" title=" Ana la Administradora opens the browser at http://localhost:3000" width="0"/>
+                <img src="5e6c5cf4ca22b5127ccd9237bb3bec2a6aa62d3223e1034bdabb0cd782538b2b.png" title=" Ana la Administradora opens the browser at http://localhost:3000 (completed)" width="0"/>
+                <img src="d1cfae09e218bc2bc8770679fa58f83fa47250593c524b571d5bcb5645a3e177.png" title=" Ana la administradora abrir pagina (completed)" width="0"/>
+                <img src="d1cfae09e218bc2bc8770679fa58f83fa47250593c524b571d5bcb5645a3e177.png" title=" Ana la Administradora clicks on bot&oacute;n login" width="0"/>
+                <img src="69e736296b684a6d8041f60797119713b7031010e81ec0f381b7a7a39d2debe5.png" title=" Ana la administradora ingresar credenciales" width="0"/>
+                <img src="69e736296b684a6d8041f60797119713b7031010e81ec0f381b7a7a39d2debe5.png" title=" Ana la Administradora enters 'admin@gmail.com' into campo email" width="0"/>
+                <img src="95f6d1d8738ef8407dfa30c92bd872f9c1b74c08e986b8f7495085208233b859.png" title=" Ana la Administradora enters 'admin@gmail.com' into campo email (completed)" width="0"/>
+                <img src="95f6d1d8738ef8407dfa30c92bd872f9c1b74c08e986b8f7495085208233b859.png" title=" Ana la Administradora enters '123456' into campo contrase&ntilde;a" width="0"/>
+                <img src="e30d892140cb6e94dd6929518ffba360dbfab0f22f8e3e9bdb7f294502a17461.png" title=" Ana la Administradora enters '123456' into campo contrase&ntilde;a (completed)" width="0"/>
+                <img src="e30d892140cb6e94dd6929518ffba360dbfab0f22f8e3e9bdb7f294502a17461.png" title=" Ana la Administradora clicks on bot&oacute;n de iniciar sesi&oacute;n" width="0"/>
+                <img src="9512caa7ead75457c5dce6a41ef4693fbf1aa92b20a76665e8cc7237e3b63015.png" title=" Ana la Administradora clicks on bot&oacute;n de iniciar sesi&oacute;n (completed)" width="0"/>
+                <img src="9512caa7ead75457c5dce6a41ef4693fbf1aa92b20a76665e8cc7237e3b63015.png" title=" Ana la administradora ingresar credenciales (completed)" width="0"/>
+                <img src="092f2202fe02337bd60e8a4e86ad5a9595f245e49599034ea98613da83d65f5c.png" title=" Cuando &quot;Ana la Administradora&quot; aprueba la orden y se la asigna a &quot;Pedro el Trabajador&quot; (completed)" width="0"/>
+                <img src="216bf59c741082147f29542076372eaa10476404871ac839ff690563a06eeb14.png" title=" Y &quot;Pedro el Trabajador&quot; atiende y marca la orden como completada" width="0"/>
+                <img src="216bf59c741082147f29542076372eaa10476404871ac839ff690563a06eeb14.png" title=" Pedro el trabajador abrir pagina" width="0"/>
+                <img src="216bf59c741082147f29542076372eaa10476404871ac839ff690563a06eeb14.png" title=" Pedro el Trabajador opens the browser at http://localhost:3000" width="0"/>
+                <img src="da7d2a2f7ae469c9f5b6f1733332510a3e7eec3d18b5774a8227d6d191ad0133.png" title=" Pedro el Trabajador opens the browser at http://localhost:3000 (completed)" width="0"/>
+                <img src="da7d2a2f7ae469c9f5b6f1733332510a3e7eec3d18b5774a8227d6d191ad0133.png" title=" Pedro el trabajador abrir pagina (completed)" width="0"/>
+                <img src="7771d56b996cdc0b6d39f26632b5a66885f894fa1a0d226c73eb1130a0650368.png" title=" Pedro el Trabajador clicks on bot&oacute;n login" width="0"/>
+                <img src="065ef7b350ae671325b46bf8d8b31201e4a1f439164ce249eaf8412baef54de5.png" title=" Pedro el Trabajador clicks on bot&oacute;n login (completed)" width="0"/>
+                <img src="8a3202707c520233d950347f3e5897a91f54e08225c04ab3a62350f70bfda5a2.png" title=" Pedro el trabajador ingresar credenciales" width="0"/>
+                <img src="69e736296b684a6d8041f60797119713b7031010e81ec0f381b7a7a39d2debe5.png" title=" Pedro el Trabajador enters 'trabajador@gmail.com' into campo email" width="0"/>
+                <img src="ff3f857204d203cb5731beca9ec065b0d3c72907eebafcaecca87e9db83120c4.png" title=" Pedro el Trabajador enters 'trabajador@gmail.com' into campo email (completed)" width="0"/>
+                <img src="ff3f857204d203cb5731beca9ec065b0d3c72907eebafcaecca87e9db83120c4.png" title=" Pedro el Trabajador enters '123456' into campo contrase&ntilde;a" width="0"/>
+                <img src="d9c7dfc38bd3fb18cc9485ef3c16d04c1421085a1fe5f454df511020c6d5e8d7.png" title=" Pedro el Trabajador enters '123456' into campo contrase&ntilde;a (completed)" width="0"/>
+                <img src="d9c7dfc38bd3fb18cc9485ef3c16d04c1421085a1fe5f454df511020c6d5e8d7.png" title=" Pedro el Trabajador clicks on bot&oacute;n de iniciar sesi&oacute;n" width="0"/>
+                <img src="3a9de0a7f085241cf2491345e55629616268bed86ab91163bd8d073f2203cf5b.png" title=" Pedro el Trabajador clicks on bot&oacute;n de iniciar sesi&oacute;n (completed)" width="0"/>
+                <img src="3a9de0a7f085241cf2491345e55629616268bed86ab91163bd8d073f2203cf5b.png" title=" Pedro el trabajador ingresar credenciales (completed)" width="0"/>
+                <img src="420be393212c6de0cd49ccb530e37888c6a480ded3d98d499571307bb8cfb836.png" title=" Y &quot;Pedro el Trabajador&quot; atiende y marca la orden como completada (completed)" width="0"/>
+                <img src="420be393212c6de0cd49ccb530e37888c6a480ded3d98d499571307bb8cfb836.png" title=" Entonces &quot;Carlos el Cliente&quot; deberia ver la orden como finalizada en su historial" width="0"/>
 
-                <img src="324da6b08157fe98b30bf0858ed1248ced232ad62da19eefc6a722d084f08db4.png" title=" Entonces "Carlos el Cliente" deberia ver la orden como finalizada en su historial (completed): <span class='success-color'>SUCCESS</span>" width="0"/>
+                <img src="420be393212c6de0cd49ccb530e37888c6a480ded3d98d499571307bb8cfb836.png" title=" Carlos el cliente abrir pagina: <span class='error-color'>ERROR</span>" width="0"/>
             </div>
         </div>
 

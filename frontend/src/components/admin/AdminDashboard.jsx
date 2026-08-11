@@ -21,6 +21,7 @@ const IcBar     = ({ s = 14, c = '#0066ff' }) => <svg width={s} height={s} viewB
 const IcPhone   = ({ s = 12, c = 'currentColor' }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 4.11 12 19.79 19.79 0 0 1 2 3.18 2 2 0 0 1 4 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>;
 const IcZap     = ({ s = 14, c = '#0066ff' }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
 const IcGrid    = ({ s = 20, c = '#0066ff' }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>;
+const IcDownload = ({ s = 16, c = 'currentColor' }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;
 
 // KPI icon map
 const KPI_SVG = {
@@ -180,6 +181,25 @@ const AdminDashboard = ({
                 activeTab="panel"
             />
 
+            <style>{`
+                @media print {
+                    body { background: #fff !important; }
+                    .ad-page { padding-top: 0 !important; background: #fff !important; padding-bottom: 0 !important; }
+                    .ad-pdf-btn { display: none !important; }
+                    .ad-kpi, .ad-card { border: 1px solid #e0e8f5 !important; box-shadow: none !important; page-break-inside: avoid; transform: none !important; }
+                    nav, footer, .admin-footer, [class*="footer"], [class*="header"] { display: none !important; }
+                    .ad-page-header { margin-bottom: 24px !important; }
+                }
+                .ad-pdf-btn {
+                    display: flex; align-items: center; gap: 8px;
+                    padding: 8px 16px; border-radius: 8px; border: none;
+                    background: #1a2540; color: #fff;
+                    font-weight: 600; font-size: 13px; font-family: inherit;
+                    cursor: pointer; transition: all 0.2s ease;
+                    box-shadow: 0 4px 12px rgba(26, 37, 64, 0.15);
+                }
+                .ad-pdf-btn:hover { background: #0a1435; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(26, 37, 64, 0.2); }
+            `}</style>
             <div className="ad-container">
 
                 {/* ── Page header ── */}
@@ -193,9 +213,15 @@ const AdminDashboard = ({
                             <p className="ad-page-subtitle">Visión general del negocio en tiempo real</p>
                         </div>
                     </div>
-                    <div style={{ fontSize: 12, color: 'var(--ad-text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#00c853', display: 'inline-block', animation: 'adPulse 2s infinite' }} />
-                        Sistema activo
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                        <div style={{ fontSize: 12, color: 'var(--ad-text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#00c853', display: 'inline-block', animation: 'adPulse 2s infinite' }} />
+                            Sistema activo
+                        </div>
+                        <button className="ad-pdf-btn" onClick={() => window.print()}>
+                            <IcDownload s={16} />
+                            Generar PDF
+                        </button>
                     </div>
                 </div>
 

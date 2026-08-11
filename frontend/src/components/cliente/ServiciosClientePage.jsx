@@ -118,6 +118,11 @@ const ServiciosClientePage = ({ onBackToHome, onCotizacion, onPerfil, onMisAgend
 
     const handlePedidoConfirmado = () => {
         agregarNotificacion('¡Servicio agendado con éxito!', 'exito');
+        if (typeof vaciarCarrito === 'function') {
+            vaciarCarrito();
+        } else {
+            carrito.forEach(item => actualizarCantidad(item.id, 0));
+        }
         if (typeof window !== 'undefined') localStorage.removeItem('foamwash_carrito_local');
     };
 

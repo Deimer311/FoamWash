@@ -1,0 +1,33 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    # Phase 1: Warm up (Doble intensidad de calentamiento)
+    - duration: 10
+      arrivalRate: 4
+      name: "Warm up (Calentamiento x2)"
+    
+    # Phase 2: Sustained Load (Doble intensidad de carga sostenida)
+    - duration: 30
+      arrivalRate: 20
+      name: "Sustained load (Carga Sostenida x2)"
+      
+    # Phase 3: Stress Spike (Doble pico máximo de estrés: 100 usuarios/seg)
+    - duration: 10
+      arrivalRate: 100
+      name: "Stress Spike (Pico de Estrés x2)"
+
+plugins:
+  # Plugins nativos
+
+scenarios:
+  - name: "Flujo de Cliente: Consultar Servicios Públicos (Doble Carga)"
+    flow:
+      - get:
+          url: "/api/servicios"
+          expect:
+            - statusCode: 200
+      - think: 1
+      - get:
+          url: "/api/configuracion"
+          expect:
+            - statusCode: 200

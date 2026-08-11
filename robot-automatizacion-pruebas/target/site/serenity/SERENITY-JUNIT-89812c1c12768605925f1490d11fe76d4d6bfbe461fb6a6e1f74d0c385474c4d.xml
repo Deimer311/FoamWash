@@ -1,1 +1,1 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><testsuite errors="0" failures="0" name="Seguridad y Proteccion de Rutas" skipped="0" tests="1" time="12.74" timestamp="2026-07-09 07:36:39"><testcase name="Un cliente no puede acceder al panel de administrador"/></testsuite>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><testsuite errors="0" failures="0" name="Seguridad y Proteccion de Rutas" skipped="0" tests="1" time="15.34" timestamp="2026-08-11 01:20:23"><testcase name="Un cliente no puede acceder al panel de administrador"/></testsuite>

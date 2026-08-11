@@ -106,6 +106,8 @@ export default function MisAgendamientosCliente({ onBackToHome, onCotizacion, on
                     hour12: true,
                     timeZone: 'UTC'
                 });
+                const localDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+                return localDate.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true });
             }
             return h;
         } catch {
@@ -123,12 +125,53 @@ export default function MisAgendamientosCliente({ onBackToHome, onCotizacion, on
         }
     };
 
+    const obtenerServiciosDetallados = (reserva) => {
+        if (!reserva) return [];
+        const info = reserva.Informacion_adicional || '';
+        if (info.includes('|||')) {
+            try {
+                const jsonStr = info.split('|||')[1].trim();
+                const parsed = JSON.parse(jsonStr);
+                if (Array.isArray(parsed)) {
+                    return parsed;
+                }
+            } catch (err) {
+                console.error('Error al deserializar servicios de la reserva:', err);
+            }
+        }
+        return (reserva.servicios || []).map(s => ({
+            id: s.Id_Servicio,
+            nombre: s.Nombre_Servicio,
+            cantidad: 1,
+            tamano: 'Estándar',
+            precio: Number(s.Precio || 0)
+        }));
+    };
+
     const calcularTotalReserva = (reserva) => {
-        if (!reserva.servicios) return 0;
-        return reserva.servicios.reduce((sum, s) => sum + Number(s.Precio || 0), 0);
+        const det = obtenerServiciosDetallados(reserva);
+        return det.reduce((sum, s) => sum + (s.precio * s.cantidad), 0);
     };
 
     const filteredReservas = reservas.filter(r => {
+        // 1. Ocultar completados o cancelados después de 2 días de la fecha de reserva
+        if (r.Estado === 'Completado' || r.Estado === 'Cancelado') {
+            const d = new Date(r.fecha);
+            const fechaReserva = new Date(d.getTime() + d.getTimezoneOffset() * 60000);
+            fechaReserva.setHours(0, 0, 0, 0);
+
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+
+            const fechaLimite = new Date(fechaReserva);
+            fechaLimite.setDate(fechaLimite.getDate() + 2); // 2 días más
+
+            if (hoy > fechaLimite) {
+                return false;
+            }
+        }
+
+        // 2. Filtros normales de estado y búsqueda
         const matchesEstado = filterEstado === 'Todos' || r.Estado === filterEstado;
         const serviceNames = (r.servicios || []).map(s => s.Nombre_Servicio.toLowerCase()).join(' ');
         const matchesSearch = serviceNames.includes(searchTerm.toLowerCase()) ||
@@ -653,10 +696,19 @@ export default function MisAgendamientosCliente({ onBackToHome, onCotizacion, on
                             <div className="detail-section">
                                 <div className="detail-section-title">Servicios Contratados</div>
                                 <div className="services-list-detail">
-                                    {(selectedReserva.servicios || []).map((s, idx) => (
-                                        <div key={idx} className="service-item-detail">
-                                            <span>{s.Nombre_Servicio}</span>
-                                            <span className="service-price">{formatMoneda(s.Precio)}</span>
+                                    {obtenerServiciosDetallados(selectedReserva).map((s, idx) => (
+                                        <div key={idx} className="service-item-detail" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: '4px', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px', marginBottom: '10px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <span style={{ fontWeight: 'bold', color: '#0a1435' }}>{s.nombre}</span>
+                                                <span className="service-price" style={{ fontWeight: '800', color: '#16a34a' }}>
+                                                    {formatMoneda(s.precio * s.cantidad)}
+                                                </span>
+                                            </div>
+                                            <div style={{ display: 'flex', gap: '12px', fontSize: '12.5px', color: '#6c7a9c' }}>
+                                                <span>📏 Tamaño: {s.tamano || 'Estándar'}</span>
+                                                <span>× Cantidad: {s.cantidad || 1}</span>
+                                                <span>💵 Unitario: {formatMoneda(s.precio)}</span>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -674,7 +726,21 @@ export default function MisAgendamientosCliente({ onBackToHome, onCotizacion, on
                                 </div>
                                 <div className="info-row">
                                     <IcMapPin />
-                                    <span><strong>Dirección:</strong> {user?.Direccion || 'Dirección no registrada'}</span>
+                                    <span>
+                                        <strong>Dirección:</strong> {(() => {
+                                            const info = selectedReserva.Informacion_adicional || '';
+                                            if (info.startsWith('Dirección:')) {
+                                                let addr = info.substring(10);
+                                                if (addr.includes('. Tel:')) {
+                                                    addr = addr.split('. Tel:')[0];
+                                                } else if (addr.includes('Tel:')) {
+                                                    addr = addr.split('Tel:')[0];
+                                                }
+                                                return addr.trim();
+                                            }
+                                            return info || user?.Direccion || 'Dirección no registrada';
+                                        })()}
+                                    </span>
                                 </div>
                             </div>
 
@@ -689,7 +755,8 @@ export default function MisAgendamientosCliente({ onBackToHome, onCotizacion, on
                                         </span>
                                     </span>
                                 </div>
-                                {selectedReserva.observacion?.Observaciones && (
+                                {selectedReserva.observacion?.Observaciones && 
+                                 selectedReserva.observacion.Observaciones !== selectedReserva.Informacion_adicional && (
                                     <div className="info-row" style={{ alignItems: 'flex-start' }}>
                                         <div style={{ marginTop: '2px', display: 'flex' }}><IcInfo /></div>
                                         <span><strong>Notas:</strong> {selectedReserva.observacion.Observaciones}</span>

@@ -1,22 +1,23 @@
 package com.foamwash.stepdefinitions;
 
-import com.foamwash.questions.MensajeRegistro;
+import static net.serenitybdd.screenplay.GivenWhenThen.*;
+
+import org.openqa.selenium.By;
+
 import com.foamwash.questions.ElDashboard;
 import com.foamwash.tasks.AbrirPagina;
 import com.foamwash.tasks.IngresarCredenciales;
 import com.foamwash.tasks.RegistrarUsuario;
+import com.foamwash.userinterfaces.CrossPlatform;
 import com.foamwash.userinterfaces.RegisterPage;
-import io.cucumber.java.es.Dado;
-import io.cucumber.java.es.Cuando;
-import io.cucumber.java.es.Entonces;
+
 import io.cucumber.java.Before;
+import io.cucumber.java.es.Cuando;
+import io.cucumber.java.es.Dado;
+import io.cucumber.java.es.Entonces;
+import net.serenitybdd.screenplay.actions.Click;
 import net.serenitybdd.screenplay.actors.OnStage;
 import net.serenitybdd.screenplay.actors.OnlineCast;
-import net.serenitybdd.screenplay.actions.Click;
-import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
-import static org.hamcrest.Matchers.containsString;
-import com.foamwash.userinterfaces.CrossPlatform;
-import org.openqa.selenium.By;
 
 public class AutenticacionStepDefinitions {
 

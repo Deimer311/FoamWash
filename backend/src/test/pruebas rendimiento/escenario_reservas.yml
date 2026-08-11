@@ -1,0 +1,25 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    - duration: 10
+      arrivalRate: 10
+      name: "Carga Inicial de Reservas x2"
+    - duration: 25
+      arrivalRate: 40
+      name: "Consulta Concurrente de Agendamiento x2"
+    - duration: 10
+      arrivalRate: 120
+      name: "Pico Máximo de Concurrencia en Reservas x2 (120 usuarios/seg)"
+
+scenarios:
+  - name: "Estrés de Agendamiento: Consulta de Disponibilidad y Servicios (Doble Carga)"
+    flow:
+      - get:
+          url: "/api/reservas"
+          expect:
+            - statusCode: 200
+      - think: 1
+      - get:
+          url: "/api/servicios"
+          expect:
+            - statusCode: 200

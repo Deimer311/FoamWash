@@ -15,6 +15,7 @@ const IcUsers  = ({ s=22, c='#f59e0b' }) => <svg width={s} height={s} viewBox="0
 const IcStar   = ({ s=22, c='#7c3aed' }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
 const IcTrend  = ({ s=14, c='currentColor' }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>;
 const IcTrendD = ({ s=14, c='currentColor' }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>;
+const IcDownload = ({ s=18, c='currentColor' }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;
 
 const ReportesAdmin = ({
   onGoDashboard, onGoAgenda, onGoEmpleados,
@@ -205,6 +206,16 @@ const ReportesAdmin = ({
           color: #fff; box-shadow: 0 2px 10px rgba(0,102,255,0.28);
         }
 
+        .rp-pdf-btn {
+          display: flex; align-items: center; gap: 8px;
+          padding: 9px 20px; border-radius: var(--rp-r-md); border: none;
+          background: #1a2540; color: #fff;
+          font-weight: 600; font-size: 13.5px; font-family: inherit;
+          cursor: pointer; transition: all 0.2s ease;
+          box-shadow: 0 4px 12px rgba(26, 37, 64, 0.15);
+        }
+        .rp-pdf-btn:hover { background: #0a1435; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(26, 37, 64, 0.2); }
+
         /* ── KPI grid ── */
         .rp-kpi-grid {
           display: grid;
@@ -366,6 +377,19 @@ const ReportesAdmin = ({
           .rp-page-title { font-size: 22px; }
         }
         @media (max-width: 480px) { .rp-kpi-grid { grid-template-columns: 1fr; } }
+
+        /* ── Print Styles (Para PDF) ── */
+        @media print {
+          body { background: #fff !important; }
+          .rp-page { padding-top: 0 !important; background: #fff !important; padding-bottom: 0 !important; }
+          .rp-periods, .rp-pdf-btn { display: none !important; }
+          .rp-kpi { border: 1px solid #e0e8f5 !important; box-shadow: none !important; transform: none !important; }
+          .rp-card { border: 1px solid #e0e8f5 !important; box-shadow: none !important; page-break-inside: avoid; }
+          .rp-table-wrap { border: 1px solid #e0e8f5 !important; box-shadow: none !important; page-break-inside: avoid; }
+          /* Ocultar barra de navegación/footer global asumiendo que usan nav/footer o clases genéricas */
+          nav, footer, .admin-footer, [class*="footer"], [class*="header"] { display: none !important; }
+          .rp-page-head { margin-bottom: 24px !important; }
+        }
       `}</style>
 
       <div className="rp-page">
@@ -382,13 +406,20 @@ const ReportesAdmin = ({
             </div>
           </div>
 
-          {/* Period filter */}
-          <div className="rp-periods">
-            {['semanal','mensual','trimestral','anual'].map((p) => (
-              <button key={p} className={`rp-period-btn${periodoActivo === p ? ' active' : ''}`} onClick={() => setPeriodoActivo(p)}>
-                {p.charAt(0).toUpperCase() + p.slice(1)}
-              </button>
-            ))}
+          {/* Controls (Filter & PDF) */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '32px' }}>
+            <div className="rp-periods" style={{ marginBottom: 0 }}>
+              {['semanal','mensual','trimestral','anual'].map((p) => (
+                <button key={p} className={`rp-period-btn${periodoActivo === p ? ' active' : ''}`} onClick={() => setPeriodoActivo(p)}>
+                  {p.charAt(0).toUpperCase() + p.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            <button className="rp-pdf-btn" onClick={() => window.print()}>
+              <IcDownload s={16} />
+              Generar PDF
+            </button>
           </div>
 
           {loading && <div className="rp-loading">Cargando datos...</div>}

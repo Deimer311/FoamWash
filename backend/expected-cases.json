@@ -1,0 +1,788 @@
+[
+  {
+    "id": "CP-001",
+    "rf": "RF-01",
+    "title": "Verificar que el cliente pueda registrarse correctamente con información válida.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-002",
+    "rf": "RF-01",
+    "title": "Verificar que el sistema no permita registrar un correo electrónico ya existente.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-003",
+    "rf": "RF-01",
+    "title": "Verificar que el sistema valide los campos obligatorios vacíos.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-004",
+    "rf": "RF-01",
+    "title": "Verificar que el sistema valide el formato de los datos ingresados.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-005",
+    "rf": "RF-01",
+    "title": "Verificar el comportamiento del sistema cuando ocurre un error de conexión con el servidor durante el registro.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-006",
+    "rf": "RF-02",
+    "title": "Verificar que el cliente pueda iniciar sesión con credenciales válidas.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-007",
+    "rf": "RF-02",
+    "title": "Verificar que el cliente pueda cerrar sesión correctamente",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-008",
+    "rf": "RF-02",
+    "title": "Verificar que la sesión expire por inactividad.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-009",
+    "rf": "RF-02",
+    "title": "Verificar que el sistema no permita iniciar sesión cuando existan campos obligatorios vacíos.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-010",
+    "rf": "RF-02",
+    "title": "Verificar que el sistema valide el formato del correo electrónico antes de iniciar sesión.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-011",
+    "rf": "RF-02",
+    "title": "Verificar que el sistema no permita iniciar sesión con una contraseña incorrecta.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-012",
+    "rf": "RF-02",
+    "title": "Verificar el comportamiento del sistema cuando ocurre un error de conexión con el servidor durante el inicio de sesión.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-013",
+    "rf": "RF-03",
+    "title": "Verificar que el cliente pueda recuperar su contraseña correctamente mediante un código enviado al correo.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-014",
+    "rf": "RF-03",
+    "title": "Verificar que el sistema no envíe un código a un correo no registrado.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-015",
+    "rf": "RF-03",
+    "title": "Verificar que el correo electrónico sea obligatorio.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-016",
+    "rf": "RF-03",
+    "title": "Verificar que el sistema valide el formato del correo electrónico.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-017",
+    "rf": "RF-03",
+    "title": "Verificar que el sistema rechace un código de verificación incorrecto.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-018",
+    "rf": "RF-03",
+    "title": "Verificar que el sistema rechace un código de verificación vencido.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-019",
+    "rf": "RF-03",
+    "title": "Verificar que el sistema no permita continuar sin ingresar el código de verificación.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-020",
+    "rf": "RF-03",
+    "title": "Verificar que el sistema valide que las contraseñas coincidan.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-021",
+    "rf": "RF-03",
+    "title": "Verificar que el sistema no permita registrar una contraseña que incumpla las políticas de seguridad.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-022",
+    "rf": "RF-03",
+    "title": "Verificar que el usuario pueda iniciar sesión con la nueva contraseña.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-023",
+    "rf": "RF-04",
+    "title": "Verificar que el cliente pueda consultar el listado de servicios disponibles.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-024",
+    "rf": "RF-04",
+    "title": "Verificar que el sistema muestre la tarifa correspondiente a cada servicio.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-025",
+    "rf": "RF-04",
+    "title": "Verificar que el cliente pueda visualizar la información detallada de un servicio.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-026",
+    "rf": "RF-04",
+    "title": "Verificar que el sistema permita consultar los servicios sin iniciar sesión.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-027",
+    "rf": "RF-04",
+    "title": "Verificar que las tarifas mostradas correspondan a las registradas en el sistema.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-028",
+    "rf": "RF-04",
+    "title": "Verificar que el sistema cargue correctamente la información de los servicios.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-029",
+    "rf": "RF-04",
+    "title": "Verificar que el sistema muestre una imagen representativa del servicio (si aplica).",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-030",
+    "rf": "RF-05",
+    "title": "Verificar que el cliente pueda solicitar una cotización correctamente.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-031",
+    "rf": "RF-05",
+    "title": "Verificar que el sistema valide los campos obligatorios del formulario.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-032",
+    "rf": "RF-05",
+    "title": "Verificar que el cliente pueda seleccionar un servicio para cotizar.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-033",
+    "rf": "RF-05",
+    "title": "Verificar que el sistema genere una cotización estimada (si aplica).",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-034",
+    "rf": "RF-05",
+    "title": "Verificar que la solicitud quede registrada en el sistema.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-035",
+    "rf": "RF-06",
+    "title": "Verificar que el cliente pueda programar un servicio de lavado correctamente.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-036",
+    "rf": "RF-06",
+    "title": "Verificar que el sistema valide los campos obligatorios del formulario.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-037",
+    "rf": "RF-06",
+    "title": "Verificar que el sistema no permita programar un servicio con una fecha anterior a la actual.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-038",
+    "rf": "RF-06",
+    "title": "Verificar que el sistema no permita seleccionar una hora no disponible.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-039",
+    "rf": "RF-06",
+    "title": "Verificar que el cliente pueda seleccionar un horario disponible.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-040",
+    "rf": "RF-06",
+    "title": "Verificar que el sistema registre correctamente la dirección donde se realizará el servicio.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-041",
+    "rf": "RF-06",
+    "title": "Verificar que el sistema permita registrar observaciones adicionales para el servicio.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-042",
+    "rf": "RF-06",
+    "title": "Verificar que el servicio programado quede registrado en el historial o listado de servicios del cliente.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-043",
+    "rf": "RF-07",
+    "title": "Validar que el usuario reciba una notificación cuando el estado del servicio cambie.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-044",
+    "rf": "RF-07",
+    "title": "Validar que el usuario no tenga un canal externo en el que  se vea el cambio del estado , el estado deber ser visible dentro de la plataforma",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-045",
+    "rf": "RF-07",
+    "title": "Validar que el usuario reciba una notificación cuando se crea el servicio.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-046",
+    "rf": "RF-07",
+    "title": "Validar que el contenido de la notificación sea correcto.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-047",
+    "rf": "RF-07",
+    "title": "Validar que la notificación se envíe a los canales externos habilitados (correo, SMS, etc.).",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-048",
+    "rf": "RF-07",
+    "title": "Validar que no se envíen notificaciones duplicadas por un mismo cambio de estado.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-049",
+    "rf": "RF-07",
+    "title": "Validar que las notificaciones se reciban en el orden correcto cuando existen varios cambios de estado.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-050",
+    "rf": "RF-08",
+    "title": "Validar que el usuario pueda consultar el historial de servicios realizados.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-051",
+    "rf": "RF-08",
+    "title": "Validar que el usuario solo consulte su propio historial.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-052",
+    "rf": "RF-08",
+    "title": "Validar actualización del historial después de finalizar un servicio.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-053",
+    "rf": "RF-08",
+    "title": "Validar que el usuario pueda consultar el detalle de un servicio del historial.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-054",
+    "rf": "RF-08",
+    "title": "Validar filtros del historial de servicios.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-055",
+    "rf": "RF-08",
+    "title": "Validar comportamiento cuando ocurre una falla al cargar el historial",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-056",
+    "rf": "RF-09",
+    "title": "Validar que el empleado pueda iniciar sesión correctamente",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-057",
+    "rf": "RF-09",
+    "title": "Validar que no permita acceso con contraseña incorrecta",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-058",
+    "rf": "RF-09",
+    "title": "Validar que no permita acceso con usuario inexistente",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-059",
+    "rf": "RF-09",
+    "title": "Validar campos obligatorios",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-060",
+    "rf": "RF-09",
+    "title": "Validar funcionalidad de mostrar/ocultar contraseña",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-061",
+    "rf": "RF-09",
+    "title": "Validar recuperación de contraseña",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-062",
+    "rf": "RF-10",
+    "title": "Validar que el empleado pueda visualizar su agenda de servicios",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-063",
+    "rf": "RF-10",
+    "title": "Validar que se muestren correctamente los datos del servicio",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-064",
+    "rf": "RF-10",
+    "title": "Validar que solo se muestren servicios del empleado logueado",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-065",
+    "rf": "RF-10",
+    "title": "Validar comportamiento cuando no hay servicios asignados",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-066",
+    "rf": "RF-10",
+    "title": "Validar actualización de agenda",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-067",
+    "rf": "RF-10",
+    "title": "Validar acceso a detalle del servicio",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-068",
+    "rf": "RF-10",
+    "title": "Validar carga de la agenda (rendimiento)",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-069",
+    "rf": "RF-11",
+    "title": "Validar que el empleado pueda consultar el detalle de una orden de servicio",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-070",
+    "rf": "RF-11",
+    "title": "Validar que se visualicen correctamente los datos de la orden",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-071",
+    "rf": "RF-11",
+    "title": "Validar comportamiento si la orden no existe",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-072",
+    "rf": "RF-11",
+    "title": "Validar actualización de datos en el detalle",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-073",
+    "rf": "RF-11",
+    "title": "Validar visualización del estado de la orden",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-074",
+    "rf": "RF-12",
+    "title": "Validar que el empleado pueda marcar un servicio como finalizado",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-075",
+    "rf": "RF-12",
+    "title": "Validar confirmación de la acciónValidar confirmación de la acción",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-076",
+    "rf": "RF-12",
+    "title": "Validar actualización en la lista de servicios",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-077",
+    "rf": "RF-12",
+    "title": "Validar restricción de servicios no asignados",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-078",
+    "rf": "RF-12",
+    "title": "Validar persistencia del estado",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-079",
+    "rf": "RF-12",
+    "title": "Validar actualización en tiempo real",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-080",
+    "rf": "RF-13",
+    "title": "El trabajador puede registrar correctamente las observaciones de un servicio realizado",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-081",
+    "rf": "RF-13",
+    "title": "El trabajador puede registrar en blanco las observaciones, en el caso de que el servicio no requiera de ninguna observacion",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-082",
+    "rf": "RF-13",
+    "title": "El administrador puede ver las observaciones que dejo el trabajador",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-083",
+    "rf": "RF-14",
+    "title": "El empleado puede consultar correctamente los servicios que tenga realizados, asignados y en progreso",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-084",
+    "rf": "RF-14",
+    "title": "El empleado puede ver su dashboard limpio, si no tiene historial de servicios",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-085",
+    "rf": "RF-15",
+    "title": "El empleado recibe una notificacion donde se le indica la informacion de el servicio que se le asigno",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-086",
+    "rf": "RF-15",
+    "title": "El empleado recibe una notificacion donde se le indica la informacion de el servicio que se le reasigno",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-087",
+    "rf": "RF-16",
+    "title": "El administrador ingresa correctamente a la lista de usuarios del sistema, y puede modificar una parte de sus datos, como su rol dentro del sistema",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-088",
+    "rf": "RF-16",
+    "title": "El administrador ingresa correctamente a la lista de usuarios del sistema, y puede modificar una parte de sus datos, como su rol dentro del sistema",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-089",
+    "rf": "RF-16",
+    "title": "El administrador ingresa correctamente a la lista de usuarios del sistema, y puede modificar una parte de sus datos, como su rol dentro del sistema",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-090",
+    "rf": "RF-16",
+    "title": "El administrador ingresa correctamente a la lista de usuarios del sistema, y puede modificar una parte de sus datos, como su rol dentro del sistema",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-091",
+    "rf": "RF-16",
+    "title": "El administrador ingresa correctamente a la lista de usuarios del sistema, y puede modificar una parte de sus datos, como su rol dentro del sistema",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-092",
+    "rf": "RF-17",
+    "title": "El sistema deberá permitir al administrador revisar, aprobar, modificar o cancelar las órdenes de servicio generadas por los clientes, gestionando su ciclo de vida completo.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-093",
+    "rf": "RF-17",
+    "title": "El sistema deberá permitir al administrador revisar, aprobar, modificar o cancelar las órdenes de servicio generadas por los clientes, gestionando su ciclo de vida completo.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-094",
+    "rf": "RF-17",
+    "title": "El sistema deberá permitir al administrador revisar, aprobar, modificar o cancelar las órdenes de servicio generadas por los clientes, gestionando su ciclo de vida completo.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-095",
+    "rf": "RF-17",
+    "title": "El sistema deberá permitir al administrador revisar, aprobar, modificar o cancelar las órdenes de servicio generadas por los clientes, gestionando su ciclo de vida completo.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-096",
+    "rf": "RF-18",
+    "title": "El sistema deberá permitir al administrador asignar una orden de servicio aprobada a un trabajador disponible, o reasignarla a otro trabajador en caso de indisponibilidad o falla en la ejecución.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-097",
+    "rf": "RF-18",
+    "title": "El sistema deberá permitir al administrador asignar una orden de servicio aprobada a un trabajador disponible, o reasignarla a otro trabajador en caso de indisponibilidad o falla en la ejecución.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-098",
+    "rf": "RF-18",
+    "title": "El sistema deberá permitir al administrador asignar una orden de servicio aprobada a un trabajador disponible, o reasignarla a otro trabajador en caso de indisponibilidad o falla en la ejecución.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-099",
+    "rf": "RF-18",
+    "title": "El sistema deberá permitir al administrador asignar una orden de servicio aprobada a un trabajador disponible, o reasignarla a otro trabajador en caso de indisponibilidad o falla en la ejecución.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-100",
+    "rf": "RF-19",
+    "title": "El sistema deberá validar automáticamente la disponibilidad de los trabajadores según su agenda y capacidad, antes de confirmar una asignación de servicio.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-101",
+    "rf": "RF-19",
+    "title": "El sistema deberá validar automáticamente la disponibilidad de los trabajadores según su agenda y capacidad, antes de confirmar una asignación de servicio.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-102",
+    "rf": "RF-19",
+    "title": "El sistema deberá validar automáticamente la disponibilidad de los trabajadores según su agenda y capacidad, antes de confirmar una asignación de servicio.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-103",
+    "rf": "RF-20",
+    "title": "Generación Y Visualizacion Exitoza de los Graficos Administrativos y Finacieros del Sistema.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-104",
+    "rf": "RF-20",
+    "title": "Generación Y Visualizacion Exitoza de los Graficos Administrativos y Finacieros del Sistema,Al Seleccionar un Periodo en el Cual la Empresa no haya Tenido Funcionamiento los Reportes y Analisis del Sistema deben ser \"0\".",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-105",
+    "rf": "RF-20",
+    "title": "Generación exitosa de los reportes en el sistema en formato PDF.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-106",
+    "rf": "RF-21",
+    "title": "Visualizacion Exitoza de los Estadisticos del sistema.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-107",
+    "rf": "RF-21",
+    "title": "Visualizar los Graficos en el Sistema Donde se Encuetre Sin datos suficientes en Caso de los Periodos de Inactividad del Sistema o la Empresa.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-108",
+    "rf": "RF-22",
+    "title": "Generación exitosa de los reportes en el sistema en formato PDF.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-001",
+    "rf": "RF-22",
+    "title": "Proteger los Datos de los Usuarios del Sistema.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-002",
+    "rf": "RF-22",
+    "title": "Verificar que un usuario no pueda acceder a información de otros usuarios.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-003",
+    "rf": "RF-22",
+    "title": "Verificar Acceso Permitido Según el Rol del Usuario en el Sistema.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-004",
+    "rf": "RF-22",
+    "title": "Verificar el bloqueo de acceso a funcionalidades no autorizadas.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-005",
+    "rf": "RF-22",
+    "title": "Verificar el registro del inicio de sesión.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-006",
+    "rf": "RF-22",
+    "title": "Verificar el registro de modificaciones.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-007",
+    "rf": "RF-22",
+    "title": "Verificar el registro de eliminación de información.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-008",
+    "rf": "RF-22",
+    "title": "Verificar la disponibilidad durante el horario de operación.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-009",
+    "rf": "RF-22",
+    "title": "Verificar la recuperación del sistema después de una falla.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-010",
+    "rf": "RF-22",
+    "title": "Simular múltiples usuarios concurrentes.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-011",
+    "rf": "RF-22",
+    "title": "Verificar el tiempo de respuesta bajo carga.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-012",
+    "rf": "RF-22",
+    "title": "Verificar funcionamiento en teléfonos móviles.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-013",
+    "rf": "RF-22",
+    "title": "Verificar funcionamiento en tabletas.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-014",
+    "rf": "RF-22",
+    "title": "Verificar la facilidad de navegación.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-015",
+    "rf": "RF-22",
+    "title": "Verificar la comprensión de la interfaz.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-016",
+    "rf": "RF-22",
+    "title": "Verificar actualización sin pérdida de información.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-017",
+    "rf": "RF-22",
+    "title": "Verificar continuidad del servicio durante la actualización.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-018",
+    "rf": "RF-22",
+    "title": "Verificar la integración de un nuevo módulo.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-019",
+    "rf": "RF-22",
+    "title": "Verificar el funcionamiento de los módulos existentes después de la integración.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-020",
+    "rf": "RF-22",
+    "title": "Verificar funcionamiento en Google Chrome",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-021",
+    "rf": "RF-22",
+    "title": "Verificar funcionamiento en Microsoft Edge.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-022",
+    "rf": "RF-22",
+    "title": "Verificar funcionamiento en Mozilla Firefox.",
+    "category": "Funcionales"
+  },
+  {
+    "id": "CP-023",
+    "rf": "RF-22",
+    "title": "Verificar funcionamiento en Safari.",
+    "category": "Funcionales"
+  }
+]
