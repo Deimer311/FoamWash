@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><testsuite errors="0" failures="3" name="Reportes y Estadísticas" skipped="0" tests="3" time="47.35" timestamp="2026-08-17 01:13:44"><testcase name="Visualizacion de estadisticas del sistema"><failure message="&#13;&#10;Expected: an element that is visible&#13;&#10;     but: no matching element found by [panel admin located with: xpath: //span[text()='Panel']/..]" type="java.lang.AssertionError">&#13;
+Expected: an element that is visible&#13;
+     but: no matching element found by [panel admin located with: xpath: //span[text()='Panel']/..]</failure><system-err>&#13;
+Expected: an element that is visible&#13;
+     but: no matching element found by [panel admin located with: xpath: //span[text()='Panel']/..]&#13;
+com.foamwash.stepdefinitions.ReportesEstadisticasStepDefinitions.queElAdministradorNecesitaUnInformeMensual(ReportesEstadisticasStepDefinitions.java:20)&#13;
+com.foamwash.stepdefinitions.ReportesEstadisticasStepDefinitions.queElAdministradorAccedeAlDashboardDeEstadisticas(ReportesEstadisticasStepDefinitions.java:86)&#13;
+</system-err></testcase><testcase name="Generacion de reportes de servicios e ingresos"><failure message="&#13;&#10;Expected: an element that is visible&#13;&#10;     but: no matching element found by [panel admin located with: xpath: //span[text()='Panel']/..]" type="java.lang.AssertionError">&#13;
+Expected: an element that is visible&#13;
+     but: no matching element found by [panel admin located with: xpath: //span[text()='Panel']/..]</failure><system-err>&#13;
+Expected: an element that is visible&#13;
+     but: no matching element found by [panel admin located with: xpath: //span[text()='Panel']/..]&#13;
+com.foamwash.stepdefinitions.ReportesEstadisticasStepDefinitions.queElAdministradorNecesitaUnInformeMensual(ReportesEstadisticasStepDefinitions.java:20)&#13;
+com.foamwash.stepdefinitions.ReportesEstadisticasStepDefinitions.queElAdministradorNecesitaUnReporteDetallado(ReportesEstadisticasStepDefinitions.java:70)&#13;
+</system-err></testcase><testcase name="Exportacion de datos historicos"><failure message="&#13;&#10;Expected: an element that is visible&#13;&#10;     but: no matching element found by [panel admin located with: xpath: //span[text()='Panel']/..]" type="java.lang.AssertionError">&#13;
+Expected: an element that is visible&#13;
+     but: no matching element found by [panel admin located with: xpath: //span[text()='Panel']/..]</failure><system-err>&#13;
+Expected: an element that is visible&#13;
+     but: no matching element found by [panel admin located with: xpath: //span[text()='Panel']/..]&#13;
+com.foamwash.stepdefinitions.ReportesEstadisticasStepDefinitions.queElAdministradorNecesitaUnInformeMensual(ReportesEstadisticasStepDefinitions.java:20)&#13;
+com.foamwash.stepdefinitions.ReportesEstadisticasStepDefinitions.queElAdministradorRequiereRespaldarLaInformacion(ReportesEstadisticasStepDefinitions.java:54)&#13;
+</system-err></testcase></testsuite>

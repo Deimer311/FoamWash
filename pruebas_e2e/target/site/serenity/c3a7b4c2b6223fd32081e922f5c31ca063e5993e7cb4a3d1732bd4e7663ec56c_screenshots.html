@@ -1,0 +1,298 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Screenshots</title>
+
+<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" sizes="57x57" href="apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+<link rel="stylesheet" href="bootstrap-icons/bootstrap-icons.css">
+<!-- JQuery -->
+<script type="text/javascript" src="scripts/jquery-1.11.1.min.js"></script><!-- Required Stylesheets -->
+<link href="bootstrap-treeview/dist/bootstrap-treeview.min.css" rel="stylesheet">
+
+<!-- Required Javascript -->
+<script src="bootstrap-treeview/dist/bootstrap-treeview.min.js"></script><!-- DataTables -->
+<link type="text/css" href="datatables/1.13.1/datatables.min.css" rel="stylesheet" />
+<script type="text/javascript" src="datatables/1.13.1/datatables.min.js"></script>
+<script type="text/javascript" src="datatables/1.13.1/time-elapsed-dhms.js"></script>
+
+<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<script src="bootstrap/js/bootstrap.min.js"></script>
+
+
+<script>
+    jQuery.fn.dataTable.ext.type.order['time-elapsed-dhms-pre'] = function(data) {
+
+        var matches = data.match(/^(\d+(?:\.\d+)?)\s*([a-z]+)/i);
+        var multipliers = {
+            ms: 1,
+            s: 1000,
+            m: 60000,
+            h: 3600000,
+            d: 86400000
+        };
+
+        if (matches) {
+            var multiplier = multipliers[matches[2].toLowerCase()];
+            return parseFloat(matches[1]) * multiplier;
+        } else {
+            return -1;
+        };
+    };
+</script>
+<link rel="stylesheet" href="css/core.css"/>
+<link rel="stylesheet" href="css/link.css"/>
+<link type="text/css" media="screen" href="css/screen.css" rel="Stylesheet"/>
+<!--CHART.JS-->
+<script src="chartjs/chart.js"></script>
+<script src="chartjs/chartjs-plugin-datalabels@2.0.0.min.js"></script>
+<script src="chartjs/patternomaly.min.js"></script>
+<script>
+    // Register the plugin to all charts:
+    Chart.register(ChartDataLabels);
+</script>
+<!-- Nivo Slider -->
+<link rel="stylesheet" href="nivo-slider/3.2/nivo-slider.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="nivo-slider/3.2/themes/default/default.css" type="text/css" media="screen" />
+<script src="nivo-slider/3.2/jquery.nivo.slider.pack.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+
+        function getUrlVars() {
+            var vars = {};
+            var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
+                vars[key] = value;
+            });
+            return vars;
+        }
+
+        var screenshotIndex = getUrlVars()["screenshot"];
+
+        $(window).load(function () {
+            $('#slider').nivoSlider({
+                startSlide: screenshotIndex,
+                effect: 'fade',
+                animSpeed: 200,
+                manualAdvance: true
+            });
+        });
+
+        $(window).keydown(function(e) {
+            switch(e.which) {
+                case 37:
+                    $('a.nivo-prevNav').click();
+                    break;
+                case 39:
+                    $('a.nivo-nextNav').click();
+                    break;
+            }
+        });
+    </script>
+
+</head>
+
+<body>
+<div id="topheader">
+    <div id="topbanner">
+        <div id="logo"><a href="index.html"><img src="images/serenity-logo.png" border="0"/></a></div>
+        <div id="projectname-banner" style="float:right">
+            <span class="projectname">
+                <span class="projecttitle">Serenity BDD Report</span>
+                <span class="projectsubtitle"></span>
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="middlecontent">
+    <div id="contenttop">
+        <div class="middlebg">
+            <span class="breadcrumbs">
+                <a href="index.html">Home</a>
+                > <span class="truncate-40"><a
+                    href="cb6e5fd8719d7492a68bdc7b00a73a8bf3716d6eface344ca5b7a76e128438e5.html">Gestion Ordenes Admin</a></span>
+                > <span class="truncate-60"><a
+                    href="c3a7b4c2b6223fd32081e922f5c31ca063e5993e7cb4a3d1732bd4e7663ec56c.html">Asignacion de servicio a un empleado disponible </a></span>
+                > Screenshots
+            </span>
+        </div>
+        <div class="rightbg"></div>
+    </div>
+
+    <div class="clr"></div>
+
+    <!--/* starts second table*/-->
+<div>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#"><i class="bi bi-journal-check"></i> Overall Test Results</a>
+        </li>
+        <li >
+            <a href="capabilities.html"><i class="bi bi-journal-text"></i> Requirements</a>
+        </li>
+        <li >
+            <a href="576946480b52ad056d6f5bddf874399c83582ecf90963cc074a14c70580e7d9f.html"><i class="bi bi-chat-text"></i> Features</a>
+        </li>
+    </ul>
+    <span class="date-and-time"><a href="build-info.html"><i class="bi bi-info-circle"></i></a> Report generated 17-08-2026 13:12</span>
+    <br style="clear:left"/>
+</div>
+
+    <div class="clr"></div>
+
+
+    <div id="contentbody">
+        <div class="titlebar">
+            <div class="story-title">
+                <table class="outcome-header">
+                    <tr>
+                        <td>
+                            <div>
+                                <h3 class="discreet-story-header">
+                                    <i class="fs-2 bi bi-chat-left-quote large-icon"></i>
+                                    <span class="story-header-title">Gestión De Órdenes Por El Administrador </span>
+                                    <span class="badge tag-badge" style="">Feature</span>
+                                </h3>
+
+                                <div class="discreet-requirement-narrative-title">
+                                Como administrador del sistema<br />
+Quiero administrar órdenes de servicio y asignar empleados<br />
+Para asegurar la correcta atención y distribución del trabajo
+                                </div>
+                            </div>
+
+                        </td>
+                        <td valign="top" align="right">
+                            <p class="tag">
+                                <span class="badge tag-badge" style="background:default;"
+                                    <i class="bi bi-tag-fill"></i>&nbsp;<a class="tagLink" style="background:default;" href="34658a1663fcf042bd7acb3325affbe4e647c8acd84d0228be2f52e1381e61b9.html">10 To 30 Seconds
+                                        (Duration)
+                                </a>
+                                </span>
+                            </p>
+                            <p class="tag">
+                                <span class="badge tag-badge" style="background:default;"
+                                    <i class="bi bi-tag-fill"></i>&nbsp;<a class="tagLink" style="background:default;" href="8a14e62620a7dd1b97db790e19c33482e44f92ed4411d9450e83382d391f4e26.html">Hu-13
+                                </a>
+                                </span>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="story-title">
+                <table class="outcome-header">
+                    <tr>
+                        <td colspan="2" class="test-title-bar">
+                            <span class="outcome-icon"><a href='##beforetable'><i class='bi bi-x-circle-fill failure-icon fa-2x' title='FAILURE'></i></a></span>
+                            <span class="test-case-title">
+                                <span class="failing-color">Asignacion de servicio a un empleado disponible
+                                    <span class="related-issue-title"></span>
+                                </span>
+                            </span>
+
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="clr"></div>
+
+
+    <div id="beforetable"></div>
+    <div id="contenttilttle">
+            <div class="screenshotFailure panel panel-danger">
+    <div style="display:block">
+        <div class="table">
+            <div class="row">
+                <div class="col-sm-10" style="padding-left:1.5em; padding-top:0.5em; padding-bottom:0.5em;">
+                    <span class="error-message error-message-title">Element should be present exception: Expected condition failed: waiting for By.cssSelector: .ag-action-btn.edit to be present (tried for 5 second(s) with 100 milliseconds interval)Build info: version: '4.21.0', revision: '79ed462ef4'System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'Driver info: driver.version: unknown</span>
+                </div>
+                <div class="col-sm-2">
+                    <a class="btn btn-warning details-button" data-toggle="collapse" href="#stacktraceModal-overall"
+                       role="button" aria-expanded="false" aria-controls="multiCollapseExample1"><i class="bi bi-eye"></i> More details</a>
+                </div>
+             </div>
+        </div>
+    <div>
+
+    <!-- Details Section -->
+    <div class="row stacktrace-details">
+      <div class="col">
+        <div class="collapse multi-collapse" id="stacktraceModal-overall">
+            <div class="card">
+                <div class="card-header">
+                    <h4>net.thucydides.core.webdriver.exceptions.ElementShouldBePresentException </h4>
+                </div>
+                <div class="card-body">
+                    <div>
+                        <pre>com.foamwash.stepdefinitions.GestionOrdenesAdminStepDefinitions.seleccionaCrearUnaNuevaOrdenDeServicio(GestionOrdenesAdminStepDefinitions.java:31)<br />com.foamwash.stepdefinitions.GestionOrdenesAdminStepDefinitions.asignaUnaOrdenAUnEmpleadoLibre(GestionOrdenesAdminStepDefinitions.java:81)<br /></pre>
+                    </div>
+
+                    <h4>
+                        Caused by: org.openqa.selenium.TimeoutException
+                    </h4>
+                    <div>
+                            <pre>Expected condition failed: waiting for By.cssSelector: .ag-action-btn.edit to be present (tried for 5 second(s) with 100 milliseconds interval)<br>Build info: version: '4.21.0', revision: '79ed462ef4'<br>System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'<br>Driver info: driver.version: unknown</pre>
+                        <pre>com.foamwash.stepdefinitions.GestionOrdenesAdminStepDefinitions.seleccionaCrearUnaNuevaOrdenDeServicio(GestionOrdenesAdminStepDefinitions.java :31)<br />com.foamwash.stepdefinitions.GestionOrdenesAdminStepDefinitions.asignaUnaOrdenAUnEmpleadoLibre(GestionOrdenesAdminStepDefinitions.java :81)<br /></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+            </div>
+        <div class="slider-wrapper theme-default">
+            <div id="slider">
+                <img src="b9a9ca06f2b0b9a2195aa833f77e0a2b19823b1bec1fff136a3b2104c36cc714.png" title=" Dado que el administrador ha validado la disponibilidad" width="0"/>
+                <img src="b9a9ca06f2b0b9a2195aa833f77e0a2b19823b1bec1fff136a3b2104c36cc714.png" title=" Admin abrir pagina" width="0"/>
+                <img src="b9a9ca06f2b0b9a2195aa833f77e0a2b19823b1bec1fff136a3b2104c36cc714.png" title=" Admin opens the browser at http://localhost:3000" width="0"/>
+                <img src="b9a9ca06f2b0b9a2195aa833f77e0a2b19823b1bec1fff136a3b2104c36cc714.png" title=" Admin abrir pagina (completed)" width="0"/>
+                <img src="b9a9ca06f2b0b9a2195aa833f77e0a2b19823b1bec1fff136a3b2104c36cc714.png" title=" Admin clicks on bot&oacute;n login" width="0"/>
+                <img src="5e227b41a75941fbdf49b9e3ceff878bbf1cc23caed229d94c583da7bfd7fb3c.png" title=" Admin clicks on bot&oacute;n login (completed)" width="0"/>
+                <img src="5e227b41a75941fbdf49b9e3ceff878bbf1cc23caed229d94c583da7bfd7fb3c.png" title=" Admin ingresar credenciales" width="0"/>
+                <img src="5e227b41a75941fbdf49b9e3ceff878bbf1cc23caed229d94c583da7bfd7fb3c.png" title=" Admin enters 'admin@gmail.com' into campo email" width="0"/>
+                <img src="95f6d1d8738ef8407dfa30c92bd872f9c1b74c08e986b8f7495085208233b859.png" title=" Admin enters 'admin@gmail.com' into campo email (completed)" width="0"/>
+                <img src="95f6d1d8738ef8407dfa30c92bd872f9c1b74c08e986b8f7495085208233b859.png" title=" Admin enters '123456' into campo contrase&ntilde;a" width="0"/>
+                <img src="73e382c4724bb60b1c3983aaf62c8a52b13b7fb23cd0516eb60a50e1da5a5364.png" title=" Admin enters '123456' into campo contrase&ntilde;a (completed)" width="0"/>
+                <img src="73e382c4724bb60b1c3983aaf62c8a52b13b7fb23cd0516eb60a50e1da5a5364.png" title=" Admin clicks on bot&oacute;n de iniciar sesi&oacute;n" width="0"/>
+                <img src="c091e0eb04e3ef39c6c59187caafb075a72429818eca02a78533d2a3dd810c48.png" title=" Admin clicks on bot&oacute;n de iniciar sesi&oacute;n (completed)" width="0"/>
+                <img src="c091e0eb04e3ef39c6c59187caafb075a72429818eca02a78533d2a3dd810c48.png" title=" Admin ingresar credenciales (completed)" width="0"/>
+                <img src="66b5854e1f342f520c76ccec4e62017e442b779314af57a52c3890b4aa5d1653.png" title=" Admin clicks on nav ordenes" width="0"/>
+                <img src="3dd144948f226360cd8de551f2861b9271c51671026d053a0731ee0501f425a7.png" title=" Admin clicks on nav ordenes (completed)" width="0"/>
+                <img src="3dd144948f226360cd8de551f2861b9271c51671026d053a0731ee0501f425a7.png" title=" Dado que el administrador ha validado la disponibilidad (completed)" width="0"/>
+                <img src="3dd144948f226360cd8de551f2861b9271c51671026d053a0731ee0501f425a7.png" title=" Cuando asigna una orden a un empleado libre" width="0"/>
+                <img src="3dd144948f226360cd8de551f2861b9271c51671026d053a0731ee0501f425a7.png" title=" Admin clicks on nav ordenes" width="0"/>
+
+                <img src="3dd144948f226360cd8de551f2861b9271c51671026d053a0731ee0501f425a7.png" title=" Admin clicks on btn editar asignacion: <span class='failing-color'>FAILURE</span>" width="0"/>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+<div id="beforefooter"></div>
+<div id="bottomfooter">
+    <span class="version">Serenity BDD version 4.1.20</span>
+</div>
+</body>
+</html>

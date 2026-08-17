@@ -16,8 +16,6 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:all": "powershell -ExecutionPolicy Bypass -File scripts/run-all-tests.ps1",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
     "test:rendimiento": "artillery run \"src/test/pruebas rendimiento/escenario_estres.yml\" --output test-reports/reporte_rendimiento.json && node scripts/generate-artillery-html.js test-reports/reporte_rendimiento.json test-reports/reporte_rendimiento.html",
     "test:rendimiento:autenticacion": "artillery run \"src/test/pruebas rendimiento/escenario_autenticacion.yml\" --output test-reports/reporte_autenticacion.json && node scripts/generate-artillery-html.js test-reports/reporte_autenticacion.json test-reports/reporte_autenticacion.html",
     "test:rendimiento:reservas": "artillery run \"src/test/pruebas rendimiento/escenario_reservas.yml\" --output test-reports/reporte_reservas.json && node scripts/generate-artillery-html.js test-reports/reporte_reservas.json test-reports/reporte_reservas.html"
@@ -50,7 +48,6 @@
     "@faker-js/faker": "^8.4.1",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/testing": "^10.4.22",
-    "@playwright/test": "^1.61.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/cookie-parser": "^1.4.7",
     "@types/jest": "^30.0.0",
