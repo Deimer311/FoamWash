@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><testsuite errors="0" failures="3" name="Gestión de órdenes por el Administrador" skipped="0" tests="3" time="46.37" timestamp="2026-08-17 01:11:31"><testcase name="Creacion y administracion de ordenes de servicio"><failure message="Expected condition failed: waiting for By.cssSelector: .ag-action-btn.edit to be present (tried for 5 second(s) with 100 milliseconds interval)&#10;Build info: version: '4.21.0', revision: '79ed462ef4'&#10;System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'&#10;Driver info: driver.version: unknown" type="net.thucydides.core.webdriver.exceptions.ElementShouldBePresentException">Expected condition failed: waiting for By.cssSelector: .ag-action-btn.edit to be present (tried for 5 second(s) with 100 milliseconds interval)
+Build info: version: '4.21.0', revision: '79ed462ef4'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: driver.version: unknown</failure><system-err>Expected condition failed: waiting for By.cssSelector: .ag-action-btn.edit to be present (tried for 5 second(s) with 100 milliseconds interval)
+Build info: version: '4.21.0', revision: '79ed462ef4'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: driver.version: unknown&#13;
+com.foamwash.stepdefinitions.GestionOrdenesAdminStepDefinitions.seleccionaCrearUnaNuevaOrdenDeServicio(GestionOrdenesAdminStepDefinitions.java:31)&#13;
+com.foamwash.stepdefinitions.GestionOrdenesAdminStepDefinitions.creaUnaNuevaOrdenAsociadaAUnCliente(GestionOrdenesAdminStepDefinitions.java:100)&#13;
+</system-err></testcase><testcase name="Validacion de disponibilidad de empleados"><failure message="&#13;&#10;Expected: an element that is visible&#13;&#10;     but: no matching element found by [lista de ordenes asignadas located with: xpath: //*[contains(@class, 'ag-card')]]" type="java.lang.AssertionError">&#13;
+Expected: an element that is visible&#13;
+     but: no matching element found by [lista de ordenes asignadas located with: xpath: //*[contains(@class, 'ag-card')]]</failure><system-err>&#13;
+Expected: an element that is visible&#13;
+     but: no matching element found by [lista de ordenes asignadas located with: xpath: //*[contains(@class, 'ag-card')]]&#13;
+com.foamwash.stepdefinitions.GestionOrdenesAdminStepDefinitions.deberiaPoderVerLosBloquesOcupadosYLibres(GestionOrdenesAdminStepDefinitions.java:65)&#13;
+</system-err></testcase><testcase name="Asignacion de servicio a un empleado disponible"><failure message="Expected condition failed: waiting for By.cssSelector: .ag-action-btn.edit to be present (tried for 5 second(s) with 100 milliseconds interval)&#10;Build info: version: '4.21.0', revision: '79ed462ef4'&#10;System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'&#10;Driver info: driver.version: unknown" type="net.thucydides.core.webdriver.exceptions.ElementShouldBePresentException">Expected condition failed: waiting for By.cssSelector: .ag-action-btn.edit to be present (tried for 5 second(s) with 100 milliseconds interval)
+Build info: version: '4.21.0', revision: '79ed462ef4'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: driver.version: unknown</failure><system-err>Expected condition failed: waiting for By.cssSelector: .ag-action-btn.edit to be present (tried for 5 second(s) with 100 milliseconds interval)
+Build info: version: '4.21.0', revision: '79ed462ef4'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '17.0.12'
+Driver info: driver.version: unknown&#13;
+com.foamwash.stepdefinitions.GestionOrdenesAdminStepDefinitions.seleccionaCrearUnaNuevaOrdenDeServicio(GestionOrdenesAdminStepDefinitions.java:31)&#13;
+com.foamwash.stepdefinitions.GestionOrdenesAdminStepDefinitions.asignaUnaOrdenAUnEmpleadoLibre(GestionOrdenesAdminStepDefinitions.java:81)&#13;
+</system-err></testcase></testsuite>

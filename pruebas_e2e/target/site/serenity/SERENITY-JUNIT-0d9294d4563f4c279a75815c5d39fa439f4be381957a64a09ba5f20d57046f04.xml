@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><testsuite errors="0" failures="1" name="Autenticación y gestión de perfil" skipped="0" tests="5" time="110.35" timestamp="2026-08-17 01:09:11"><testcase name="Registro exitoso en el sistema como cliente"/><testcase name="Inicio de sesión exitoso"/><testcase name="Inicio de sesión fallido por credenciales invalidas"/><testcase name="Recuperacion de contraseña"/><testcase name="Edicion del perfil de usuario"><failure message="&#13;&#10;Expected: an element that is clickable&#13;&#10;     but: no matching element found by [btn mi perfil located with: xpath: //button[contains(., 'Mi Perfil')]] was not clickable" type="java.lang.AssertionError">&#13;
+Expected: an element that is clickable&#13;
+     but: no matching element found by [btn mi perfil located with: xpath: //button[contains(., 'Mi Perfil')]] was not clickable</failure><system-err>&#13;
+Expected: an element that is clickable&#13;
+     but: no matching element found by [btn mi perfil located with: xpath: //button[contains(., 'Mi Perfil')]] was not clickable&#13;
+com.foamwash.stepdefinitions.AutenticacionStepDefinitions.editaSuPerfilConNuevaInformacion(AutenticacionStepDefinitions.java:146)&#13;
+</system-err></testcase></testsuite>

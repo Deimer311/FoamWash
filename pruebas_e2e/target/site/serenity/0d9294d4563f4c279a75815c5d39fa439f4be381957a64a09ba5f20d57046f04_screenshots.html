@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Screenshots</title>
+
+<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" sizes="57x57" href="apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+<link rel="stylesheet" href="bootstrap-icons/bootstrap-icons.css">
+<!-- JQuery -->
+<script type="text/javascript" src="scripts/jquery-1.11.1.min.js"></script><!-- Required Stylesheets -->
+<link href="bootstrap-treeview/dist/bootstrap-treeview.min.css" rel="stylesheet">
+
+<!-- Required Javascript -->
+<script src="bootstrap-treeview/dist/bootstrap-treeview.min.js"></script><!-- DataTables -->
+<link type="text/css" href="datatables/1.13.1/datatables.min.css" rel="stylesheet" />
+<script type="text/javascript" src="datatables/1.13.1/datatables.min.js"></script>
+<script type="text/javascript" src="datatables/1.13.1/time-elapsed-dhms.js"></script>
+
+<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<script src="bootstrap/js/bootstrap.min.js"></script>
+
+
+<script>
+    jQuery.fn.dataTable.ext.type.order['time-elapsed-dhms-pre'] = function(data) {
+
+        var matches = data.match(/^(\d+(?:\.\d+)?)\s*([a-z]+)/i);
+        var multipliers = {
+            ms: 1,
+            s: 1000,
+            m: 60000,
+            h: 3600000,
+            d: 86400000
+        };
+
+        if (matches) {
+            var multiplier = multipliers[matches[2].toLowerCase()];
+            return parseFloat(matches[1]) * multiplier;
+        } else {
+            return -1;
+        };
+    };
+</script>
+<link rel="stylesheet" href="css/core.css"/>
+<link rel="stylesheet" href="css/link.css"/>
+<link type="text/css" media="screen" href="css/screen.css" rel="Stylesheet"/>
+<!--CHART.JS-->
+<script src="chartjs/chart.js"></script>
+<script src="chartjs/chartjs-plugin-datalabels@2.0.0.min.js"></script>
+<script src="chartjs/patternomaly.min.js"></script>
+<script>
+    // Register the plugin to all charts:
+    Chart.register(ChartDataLabels);
+</script>
+<!-- Nivo Slider -->
+<link rel="stylesheet" href="nivo-slider/3.2/nivo-slider.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="nivo-slider/3.2/themes/default/default.css" type="text/css" media="screen" />
+<script src="nivo-slider/3.2/jquery.nivo.slider.pack.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+
+        function getUrlVars() {
+            var vars = {};
+            var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
+                vars[key] = value;
+            });
+            return vars;
+        }
+
+        var screenshotIndex = getUrlVars()["screenshot"];
+
+        $(window).load(function () {
+            $('#slider').nivoSlider({
+                startSlide: screenshotIndex,
+                effect: 'fade',
+                animSpeed: 200,
+                manualAdvance: true
+            });
+        });
+
+        $(window).keydown(function(e) {
+            switch(e.which) {
+                case 37:
+                    $('a.nivo-prevNav').click();
+                    break;
+                case 39:
+                    $('a.nivo-nextNav').click();
+                    break;
+            }
+        });
+    </script>
+
+</head>
+
+<body>
+<div id="topheader">
+    <div id="topbanner">
+        <div id="logo"><a href="index.html"><img src="images/serenity-logo.png" border="0"/></a></div>
+        <div id="projectname-banner" style="float:right">
+            <span class="projectname">
+                <span class="projecttitle">Serenity BDD Report</span>
+                <span class="projectsubtitle"></span>
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="middlecontent">
+    <div id="contenttop">
+        <div class="middlebg">
+            <span class="breadcrumbs">
+                <a href="index.html">Home</a>
+                > <span class="truncate-40"><a
+                    href="911cfd9a435e99ef997dd7ddce9744c1d9b30e6c8273b2b89b518a0b40d1453a.html">Autenticacion Y Perfil</a></span>
+                > <span class="truncate-60"><a
+                    href="0d9294d4563f4c279a75815c5d39fa439f4be381957a64a09ba5f20d57046f04.html">Registro exitoso en el sistema como cliente </a></span>
+                > Screenshots
+            </span>
+        </div>
+        <div class="rightbg"></div>
+    </div>
+
+    <div class="clr"></div>
+
+    <!--/* starts second table*/-->
+<div>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#"><i class="bi bi-journal-check"></i> Overall Test Results</a>
+        </li>
+        <li >
+            <a href="capabilities.html"><i class="bi bi-journal-text"></i> Requirements</a>
+        </li>
+        <li >
+            <a href="576946480b52ad056d6f5bddf874399c83582ecf90963cc074a14c70580e7d9f.html"><i class="bi bi-chat-text"></i> Features</a>
+        </li>
+    </ul>
+    <span class="date-and-time"><a href="build-info.html"><i class="bi bi-info-circle"></i></a> Report generated 17-08-2026 13:09</span>
+    <br style="clear:left"/>
+</div>
+
+    <div class="clr"></div>
+
+
+    <div id="contentbody">
+        <div class="titlebar">
+            <div class="story-title">
+                <table class="outcome-header">
+                    <tr>
+                        <td>
+                            <div>
+                                <h3 class="discreet-story-header">
+                                    <i class="fs-2 bi bi-chat-left-quote large-icon"></i>
+                                    <span class="story-header-title">Autenticación Y Gestión De Perfil </span>
+                                    <span class="badge tag-badge" style="">Feature</span>
+                                </h3>
+
+                                <div class="discreet-requirement-narrative-title">
+                                Como usuario del sistema Foam Wash<br />
+Quiero registrarme, iniciar sesión y gestionar mi perfil<br />
+Para poder acceder a los servicios y mantener mi información actualizada
+                                </div>
+                            </div>
+
+                        </td>
+                        <td valign="top" align="right">
+                            <p class="tag">
+                                <span class="badge tag-badge" style="background:default;"
+                                    <i class="bi bi-tag-fill"></i>&nbsp;<a class="tagLink" style="background:default;" href="5698da923f295f46ce5ab64ced2311fc60caa4e36b32112606d3adcfdce3f60b.html">30 To 60 Seconds
+                                        (Duration)
+                                </a>
+                                </span>
+                            </p>
+                            <p class="tag">
+                                <span class="badge tag-badge" style="background:default;"
+                                    <i class="bi bi-tag-fill"></i>&nbsp;<a class="tagLink" style="background:default;" href="2a72fb205c18e295dd29f1300881ab4fef8fbb73802b737b0f70162639caff5e.html">Hu-01
+                                </a>
+                                </span>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="story-title">
+                <table class="outcome-header">
+                    <tr>
+                        <td colspan="2" class="test-title-bar">
+                            <span class="outcome-icon"><a href='##beforetable'><i class='bi bi-check-circle-fill success-icon fa-2x' title='SUCCESS'></i></a></span>
+                            <span class="test-case-title">
+                                <span class="success-color">Registro exitoso en el sistema como cliente
+                                    <span class="related-issue-title"></span>
+                                </span>
+                            </span>
+
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="clr"></div>
+
+
+    <div id="beforetable"></div>
+    <div id="contenttilttle">
+        <div class="slider-wrapper theme-default">
+            <div id="slider">
+                <img src="b5a5c7d56c565d54483d45503654ecc6b65563d96c38e5f90542c3be93dfd974.png" title=" Dado que el usuario se encuentra en la pagina de registro" width="0"/>
+                <img src="b5a5c7d56c565d54483d45503654ecc6b65563d96c38e5f90542c3be93dfd974.png" title=" Cliente nuevo abrir pagina" width="0"/>
+                <img src="b5a5c7d56c565d54483d45503654ecc6b65563d96c38e5f90542c3be93dfd974.png" title=" Cliente Nuevo opens the browser at http://localhost:3000" width="0"/>
+                <img src="b5a5c7d56c565d54483d45503654ecc6b65563d96c38e5f90542c3be93dfd974.png" title=" Cliente nuevo abrir pagina (completed)" width="0"/>
+                <img src="dea17103f9877d526dafdf4a68c4a1308124ded097e3291c21c06df21129a732.png" title=" Cliente Nuevo clicks on bot&oacute;n login" width="0"/>
+                <img src="89b80c763b0e216e3a99cfc29f0f8c4dd84eb08abff760f298787c631675e029.png" title=" Cliente Nuevo clicks on bot&oacute;n login (completed)" width="0"/>
+                <img src="89b80c763b0e216e3a99cfc29f0f8c4dd84eb08abff760f298787c631675e029.png" title=" Cliente Nuevo clicks on bot&oacute;n para abrir modal de registro" width="0"/>
+                <img src="f3cc7914fc119e409751e7e90fb213389575cce4af6023d7540d07d37e7d7b00.png" title=" Cliente Nuevo clicks on bot&oacute;n para abrir modal de registro (completed)" width="0"/>
+                <img src="f3cc7914fc119e409751e7e90fb213389575cce4af6023d7540d07d37e7d7b00.png" title=" Dado que el usuario se encuentra en la pagina de registro (completed)" width="0"/>
+                <img src="95d3751194aaefe6558e43fbcdc8a3dbe3b223ad6c94e27fdf9dcfb85dc99b24.png" title=" Cuando llena el formulario con sus datos validos" width="0"/>
+                <img src="95d3751194aaefe6558e43fbcdc8a3dbe3b223ad6c94e27fdf9dcfb85dc99b24.png" title=" Cliente nuevo registrar usuario" width="0"/>
+                <img src="95d3751194aaefe6558e43fbcdc8a3dbe3b223ad6c94e27fdf9dcfb85dc99b24.png" title=" Cliente Nuevo enters 'Juan Perez' into campo nombre" width="0"/>
+                <img src="658ab44e9019004e1f4a6a11871587ab9d0422d3a39259215379037a284f088f.png" title=" Cliente Nuevo enters 'Juan Perez' into campo nombre (completed)" width="0"/>
+                <img src="658ab44e9019004e1f4a6a11871587ab9d0422d3a39259215379037a284f088f.png" title=" Cliente Nuevo enters '3001234567' into campo telefono" width="0"/>
+                <img src="c386b51d12794f37a37854a1290e6515c05535f6136645be03cf5cdd092024a4.png" title=" Cliente Nuevo enters '3001234567' into campo telefono (completed)" width="0"/>
+                <img src="c386b51d12794f37a37854a1290e6515c05535f6136645be03cf5cdd092024a4.png" title=" Cliente Nuevo enters 'usuario1786990183149@gmail.com' into campo email" width="0"/>
+                <img src="5a4b5092389e360deedf73a57e42300d337d01560d7b3851251fc441f515b3aa.png" title=" Cliente Nuevo enters 'usuario1786990183149@gmail.com' into campo email (completed)" width="0"/>
+                <img src="5a4b5092389e360deedf73a57e42300d337d01560d7b3851251fc441f515b3aa.png" title=" Cliente Nuevo enters 'Calle Falsa 123' into campo direccion" width="0"/>
+                <img src="950c0aeec5f283e1759a67e5ada24cda78c019b12e0b7d738c79d97b8bf2d512.png" title=" Cliente Nuevo enters 'Calle Falsa 123' into campo direccion (completed)" width="0"/>
+                <img src="950c0aeec5f283e1759a67e5ada24cda78c019b12e0b7d738c79d97b8bf2d512.png" title=" Cliente Nuevo enters '123456' into campo contrase&ntilde;a" width="0"/>
+                <img src="855f0d4e5a9e4ef2be2d9fd4b56397fadc0d1ba557c12e9a37b7d0730f9f53e9.png" title=" Cliente Nuevo enters '123456' into campo contrase&ntilde;a (completed)" width="0"/>
+                <img src="855f0d4e5a9e4ef2be2d9fd4b56397fadc0d1ba557c12e9a37b7d0730f9f53e9.png" title=" Cliente Nuevo clicks on bot&oacute;n de finalizar registro" width="0"/>
+                <img src="58b6c7119a82bff28e3d59f8081e601ecf90100057a792f5e7aab3cc6ee67694.png" title=" Cliente Nuevo clicks on bot&oacute;n de finalizar registro (completed)" width="0"/>
+                <img src="58b6c7119a82bff28e3d59f8081e601ecf90100057a792f5e7aab3cc6ee67694.png" title=" Cliente nuevo registrar usuario (completed)" width="0"/>
+                <img src="58b6c7119a82bff28e3d59f8081e601ecf90100057a792f5e7aab3cc6ee67694.png" title=" Cuando llena el formulario con sus datos validos (completed)" width="0"/>
+                <img src="8a07d3a2746ace6c074f95ffd57031c0419a0c0d91c4a3dde9c982544ec8ed0f.png" title=" Entonces deberia ver un mensaje de confirmacion de registro" width="0"/>
+                <img src="8a07d3a2746ace6c074f95ffd57031c0419a0c0d91c4a3dde9c982544ec8ed0f.png" title=" Then header confirmacion should be an element that is visible" width="0"/>
+                <img src="0ebc3cc0465acd9524da9bb51ae3dca35dfe649e0d5327f67f3a33a0db438692.png" title=" Then header confirmacion should be an element that is visible (completed)" width="0"/>
+
+                <img src="0ebc3cc0465acd9524da9bb51ae3dca35dfe649e0d5327f67f3a33a0db438692.png" title=" Entonces deberia ver un mensaje de confirmacion de registro (completed): <span class='success-color'>SUCCESS</span>" width="0"/>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+<div id="beforefooter"></div>
+<div id="bottomfooter">
+    <span class="version">Serenity BDD version 4.1.20</span>
+</div>
+</body>
+</html>

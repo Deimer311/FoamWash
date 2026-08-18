@@ -28,6 +28,7 @@ const CrudUsuarios = () => {
     const [modalAbierto, setModalAbierto] = useState(false);
     const [usuarioEditando, setUsuarioEditando] = useState(null);
     const [formData, setFormData] = useState({ nombre: '', usuario: '', correo: '' });
+    const [toastMsg, setToastMsg] = useState('');
 
     useEffect(() => {
         api.get('/usuarios')
@@ -79,14 +80,14 @@ const CrudUsuarios = () => {
     };
 
     const eliminarUsuario = async (id) => {
-        if (window.confirm('¿Estás seguro de eliminar este usuario?')) {
-            try {
-                await api.delete('/usuarios/' + id);
-                setUsuarios(usuarios.filter(u => u.id !== id));
-            } catch (err) {
-                console.error('Error eliminando usuario:', err);
-                setUsuarios(usuarios.filter(u => u.id !== id));
-            }
+        try {
+            await api.delete('/usuarios/' + id);
+            setUsuarios(usuarios.filter(u => u.id !== id));
+            setToastMsg('Usuario desactivado');
+            setTimeout(() => setToastMsg(''), 3000);
+        } catch (err) {
+            console.error('Error eliminando usuario:', err);
+            setUsuarios(usuarios.filter(u => u.id !== id));
         }
     };
 
@@ -242,6 +243,7 @@ const CrudUsuarios = () => {
 
             <div className="cu-page">
                 <div className="cu-wrap">
+                {toastMsg && <div className="toast-success" style={{background: '#00c853', color: '#fff', padding: '10px 20px', borderRadius: '8px', marginBottom: '20px'}}>{toastMsg}</div>}
 
                     {/* Header */}
                     <div className="cu-header">

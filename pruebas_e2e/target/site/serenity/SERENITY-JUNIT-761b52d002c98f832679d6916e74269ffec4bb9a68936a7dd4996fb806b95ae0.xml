@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><testsuite errors="0" failures="1" name="Flujo End-to-End de Servicio" skipped="0" tests="1" time="20.73" timestamp="2026-08-17 01:11:10"><testcase name="Ciclo de vida completo de un servicio (Agendar -&gt; Aprobar -&gt; Completar)"><failure message="&#13;&#10;Expected: an element that is visible&#13;&#10;     but: no matching element found by [btn finalizar compra located with: xpath: //button[contains(text(), 'Ver cotización')]|//button[contains(@class, 'fwm-btn-primary')]]" type="java.lang.AssertionError">&#13;
+Expected: an element that is visible&#13;
+     but: no matching element found by [btn finalizar compra located with: xpath: //button[contains(text(), 'Ver cotización')]|//button[contains(@class, 'fwm-btn-primary')]]</failure><system-err>&#13;
+Expected: an element that is visible&#13;
+     but: no matching element found by [btn finalizar compra located with: xpath: //button[contains(text(), 'Ver cotización')]|//button[contains(@class, 'fwm-btn-primary')]]&#13;
+com.foamwash.stepdefinitions.FlujoE2EStepDefinitions.queClienteAgendaServicio(FlujoE2EStepDefinitions.java:22)&#13;
+</system-err></testcase></testsuite>
