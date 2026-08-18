@@ -442,7 +442,13 @@ export const ConfirmationModal = ({ carrito, user, onCerrar, onActualizarDetalle
             onPedidoConfirmado?.();
         } catch (err) {
             console.error('Error al confirmar pedido:', err);
-            setErrorGuardar('Hubo un error al guardar tu pedido. Por favor intenta nuevamente.');
+            let msg = 'Hubo un error al guardar tu pedido. Por favor intenta nuevamente.';
+            if (err.response?.data?.message) {
+                msg = err.response.data.message;
+            } else if (err.message) {
+                msg = err.message;
+            }
+            setErrorGuardar(msg);
         } finally { setGuardando(false); }
     };
 

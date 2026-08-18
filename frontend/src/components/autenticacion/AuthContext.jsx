@@ -104,7 +104,7 @@ export const AuthProvider = ({ children }) => {
                 redirectPage: getRedirectByRole(normalized.role),
             };
         } catch (error) {
-            return { success: false, message: error?.error?.message || 'Error al iniciar sesión' };
+            return { success: false, message: error?.message || error?.error?.message || 'Error al iniciar sesión' };
         }
     };
 
@@ -140,7 +140,7 @@ export const AuthProvider = ({ children }) => {
                 redirectPage: 'servicios-cliente',
             };
         } catch (error) {
-            return { success: false, message: error?.error?.message || 'Error al registrar usuario' };
+            return { success: false, message: error?.message || error?.error?.message || 'Error al registrar usuario' };
         }
     };
 
