@@ -10,7 +10,7 @@ dotenv.config();
 export async function sendResetCode(correo: string, codigo: string): Promise<void> {
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.EMAIL_PORT || '587'),
+    port: Number.parseInt(process.env.EMAIL_PORT || '587'),
     secure: false,
     auth: {
       user: process.env.EMAIL_USER,
@@ -47,7 +47,7 @@ export interface ReservationDetails {
 export async function sendServiceConfirmationEmail(correo: string, details: ReservationDetails): Promise<void> {
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.EMAIL_PORT || '587'),
+    port: Number.parseInt(process.env.EMAIL_PORT || '587'),
     secure: false,
     auth: {
       user: process.env.EMAIL_USER,
@@ -108,7 +108,7 @@ export async function sendServiceConfirmationEmail(correo: string, details: Rese
 export async function sendWelcomeEmail(correo: string, nombre: string): Promise<void> {
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.EMAIL_PORT || '587'),
+    port: Number.parseInt(process.env.EMAIL_PORT || '587'),
     secure: false,
     auth: {
       user: process.env.EMAIL_USER,
@@ -133,7 +133,7 @@ export async function sendWelcomeEmail(correo: string, nombre: string): Promise<
 export async function sendCancellationEmail(correo: string, details: { id: string; fecha: string; motivo: string }): Promise<void> {
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.EMAIL_PORT || '587'),
+    port: Number.parseInt(process.env.EMAIL_PORT || '587'),
     secure: false,
     auth: {
       user: process.env.EMAIL_USER,
@@ -178,7 +178,7 @@ export async function sendCancellationEmail(correo: string, details: { id: strin
 export async function sendServiceUpdateEmail(correo: string, details: { id: string; estado: string }): Promise<void> {
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.EMAIL_PORT || '587'),
+    port: Number.parseInt(process.env.EMAIL_PORT || '587'),
     secure: false,
     auth: {
       user: process.env.EMAIL_USER,

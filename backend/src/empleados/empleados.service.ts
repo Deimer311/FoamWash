@@ -97,7 +97,7 @@ export class EmpleadosService {
     let parsedFecha = null;
     if (fecha_ingreso && fecha_ingreso.toString().trim() !== '') {
       parsedFecha = new Date(fecha_ingreso);
-      if (isNaN(parsedFecha.getTime())) {
+      if (Number.isNaN(parsedFecha.getTime())) {
         throw new BadRequestException('La fecha de ingreso ingresada no es válida');
       }
     }

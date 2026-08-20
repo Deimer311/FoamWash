@@ -171,7 +171,7 @@ export class UsuariosService {
           empleadoData.fecha_nacimiento = null;
         } else {
           const d = new Date(data.fecha_nacimiento);
-          if (isNaN(d.getTime())) {
+          if (Number.isNaN(d.getTime())) {
             throw new BadRequestException('Fecha de nacimiento no es válida');
           }
           empleadoData.fecha_nacimiento = d;
@@ -183,7 +183,7 @@ export class UsuariosService {
           empleadoData.fecha_ingreso = null;
         } else {
           const d = new Date(data.fecha_ingreso);
-          if (isNaN(d.getTime())) {
+          if (Number.isNaN(d.getTime())) {
             throw new BadRequestException('Fecha de ingreso no es válida');
           }
           empleadoData.fecha_ingreso = d;
@@ -284,7 +284,7 @@ export class UsuariosService {
     let parsedFecha = null;
     if (fecha_ingreso && fecha_ingreso.toString().trim() !== '') {
       parsedFecha = new Date(fecha_ingreso);
-      if (isNaN(parsedFecha.getTime())) {
+      if (Number.isNaN(parsedFecha.getTime())) {
         throw new BadRequestException('Fecha de ingreso no es válida');
       }
     }

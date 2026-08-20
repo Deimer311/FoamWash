@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const jsonPath = process.argv[2] || path.join(__dirname, '../test-reports/reporte_rendimiento.json');
-const htmlPath = process.argv[3] || jsonPath.replace(/\.json$/, '.html');
+const htmlPath = process.argv[3] || jsonPath.replace(/\.json$/g, '.html');
 
 if (!fs.existsSync(jsonPath)) {
   console.log(`⚠️ Archivo JSON no encontrado: ${jsonPath}`);

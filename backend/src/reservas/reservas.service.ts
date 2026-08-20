@@ -168,11 +168,11 @@ export class ReservasService {
     let horaISO: Date | undefined = undefined;
     if (data.Hora && data.Hora.match(/^\d{2}:\d{2}$/)) {
       const horaStr = data.Hora.split(':')[0];
-      const horaNum = parseInt(horaStr, 10);
+      const horaNum = Number.parseInt(horaStr, 10);
 
       // Validar horario laboral: 08:00 a 17:00
       if (horaNum < 8 || horaNum > 17) {
-        throw new BadRequestException('La hora de reserva debe estar dentro del horario laboral (08:00 a 17:00).');
+        throw new BadRequestException({ code: 'TIME_NOT_ALLOWED', message: 'La hora seleccionada no está permitida' });
       }
 
       horaISO = new Date(`1970-01-01T${data.Hora}:00.000Z`);
@@ -203,10 +203,13 @@ export class ReservasService {
     if (empleadoId && fechaISO && horaISO) {
       const disponible = await this.verificarDisponibilidad(empleadoId, fechaISO, horaISO);
       if (!disponible) {
-         throw new BadRequestException('El trabajador seleccionado ya tiene una reserva que se cruza en ese horario (margen de 2h).');
+         throw new BadRequestException({ code: 'TIME_UNAVAILABLE', message: 'El horario ya está ocupado' });
       }
     } else if (!empleadoId && fechaISO && horaISO) {
       empleadoId = await this.asignarEmpleadoAutomatico(fechaISO, horaISO);
+      if (!empleadoId) {
+         throw new BadRequestException({ code: 'TIME_UNAVAILABLE', message: 'El horario ya está ocupado' });
+      }
     }
 
     const reserva = await this.prisma.reserva.create({

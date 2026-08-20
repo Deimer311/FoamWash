@@ -109,7 +109,7 @@
       });
 
       if (!user) {
-        throw new UnauthorizedException({ code: 'INVALID_CREDENTIALS', message: 'Credenciales inválidas' });
+        throw new UnauthorizedException({ code: 'EMAIL_NOT_FOUND', message: 'El correo ingresado no está registrado' });
       }
 
       if (user.estado !== 'activo') {
@@ -118,7 +118,7 @@
 
       const passwordMatch = await bcrypt.compare(password, user.password_hash);
       if (!passwordMatch) {
-        throw new UnauthorizedException({ code: 'INVALID_CREDENTIALS', message: 'Credenciales inválidas' });
+        throw new UnauthorizedException({ code: 'INVALID_PASSWORD', message: 'La contraseña es incorrecta' });
       }
 
       const rolName = user.rol.Rol.toLowerCase();
