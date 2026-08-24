@@ -48,7 +48,7 @@ describe('Registro', () => {
     prismaService = module.get(PrismaService);
   });
 
-  it('CP-001: Pueda registrarse correctamente con información válida.', async () => {
+  it('CP-001: El cliente pueda registrarse correctamente con informaci¾n vßlida', async () => {
     mockPrismaService.usuario.findUnique.mockResolvedValue(null);
     mockPrismaService.usuario.create.mockResolvedValue({
       Id_Usuario: 1,
@@ -75,7 +75,7 @@ describe('Registro', () => {
     expect(result.tokens.accessToken).toBe('mock_token');
   });
 
-  it('CP-002: No permita registrar un correo electrónico ya existente.', async () => {
+  it('CP-002: El sistema no permita registrar un correo electr¾nico', async () => {
     mockPrismaService.usuario.findUnique.mockResolvedValue({
       Id_Usuario: 2,
       Correo: 'existente@gmail.com',
@@ -92,7 +92,7 @@ describe('Registro', () => {
     expect(mockPrismaService.usuario.create).not.toHaveBeenCalled();
   });
 
-  it('CP-003: Valide los campos obligatorios vacíos.', async () => {
+  it('CP-003: El sistema valide los campos obligatorios vacÝos', async () => {
     mockPrismaService.usuario.findUnique.mockResolvedValue(null);
     try {
       await authService.register({
@@ -105,13 +105,13 @@ describe('Registro', () => {
     }
   });
 
-  it('CP-004: Valide el formato de los datos ingresados.', async () => {
+  it('CP-004: El sistema valide el formato de los datos', async () => {
     const isHashValid = await bcrypt.hash('Password123!', 1);
     expect(isHashValid).toBeDefined();
     expect(typeof isHashValid).toBe('string');
   });
 
-  it('CP-005: Verificar el comportamiento del sistema cuando ocurre un error de conexión con el servidor durante el registro.', async () => {
+  it('CP-005: Comportamiento del sistema cuando ocurre un error de', async () => {
     mockPrismaService.usuario.findUnique.mockRejectedValue(
       new Error('Database connection failed'),
     );

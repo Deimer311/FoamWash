@@ -31,7 +31,7 @@ describe('ConsultarServicios', () => {
     prismaService = module.get(PrismaService);
   });
 
-  it('CP-023: Pueda consultar el listado de servicios disponibles.', async () => {
+  it('CP-023: El cliente pueda consultar el listado de servicios', async () => {
     const serviciosMock = [
       { Id_Servicio: 1, Nombre_Servicio: 'Lavado Mueble 3 Puestos', Precio: 120000, estado: 'activo' },
       { Id_Servicio: 2, Nombre_Servicio: 'Lavado Colchón Queen', Precio: 140000, estado: 'activo' },
@@ -44,7 +44,7 @@ describe('ConsultarServicios', () => {
     expect(result[0].Nombre_Servicio).toBe('Lavado Mueble 3 Puestos');
   });
 
-  it('CP-024: Muestre la tarifa correspondiente a cada servicio.', async () => {
+  it('CP-024: El sistema muestre la tarifa correspondiente a cada', async () => {
     mockPrismaService.servicio.findMany.mockResolvedValue([
       { Id_Servicio: 1, Nombre_Servicio: 'Lavado Sofa', Precio: 95000 },
     ]);
@@ -53,7 +53,7 @@ describe('ConsultarServicios', () => {
     expect(result[0].Precio).toBe(95000);
   });
 
-  it('CP-025: Pueda visualizar la información detallada de un servicio.', async () => {
+  it('CP-025: El cliente pueda visualizar la informaci¾n detallada de', async () => {
     mockPrismaService.servicio.findUnique.mockResolvedValue({
       Id_Servicio: 1,
       Nombre_Servicio: 'Lavado de Alfombra',
@@ -66,13 +66,13 @@ describe('ConsultarServicios', () => {
     expect(result.descripcion).toContain('espuma seca');
   });
 
-  it('CP-026: Permita consultar los servicios sin iniciar sesión.', async () => {
+  it('CP-026: El sistema permita consultar los servicios sin iniciar', async () => {
     mockPrismaService.servicio.findMany.mockResolvedValue([]);
     const result = await serviciosService.findAll();
     expect(Array.isArray(result)).toBe(true);
   });
 
-  it('CP-027: Las tarifas mostradas correspondan a las registradas en el sistema.', async () => {
+  it('CP-027: Las tarifas mostradas correspondan a las registradas en', async () => {
     mockPrismaService.servicio.findUnique.mockResolvedValue({
       Id_Servicio: 5,
       Nombre_Servicio: 'Limpieza Premium',
@@ -83,12 +83,12 @@ describe('ConsultarServicios', () => {
     expect(result.Precio).toBeGreaterThan(0);
   });
 
-  it('CP-028: Cargue correctamente la información de los servicios o lance 404 si no existe.', async () => {
+  it('CP-028: El sistema cargue correctamente la informaci¾n de los', async () => {
     mockPrismaService.servicio.findUnique.mockResolvedValue(null);
     await expect(serviciosService.findOne(999)).rejects.toThrow(NotFoundException);
   });
 
-  it('CP-029: Muestre una imagen representativa del servicio (si aplica).', async () => {
+  it('CP-029: El sistema muestre una imagen representativa del servicio', async () => {
     mockPrismaService.servicio.findUnique.mockResolvedValue({
       Id_Servicio: 1,
       Nombre_Servicio: 'Lavado Autos',

@@ -31,7 +31,7 @@ describe('SolicitarCotizacion', () => {
     prismaService = module.get(PrismaService);
   });
 
-  it('CP-030: Pueda solicitar una cotización correctamente.', async () => {
+  it('CP-030: El cliente pueda solicitar una cotizaci¾n correctamente', async () => {
     mockPrismaService.cotizacion.create.mockResolvedValue({
       Id_Cotizacion: 1,
       Precio_cotizado: 150000,
@@ -53,7 +53,7 @@ describe('SolicitarCotizacion', () => {
     expect(mockPrismaService.cotizacion.create).toHaveBeenCalled();
   });
 
-  it('CP-031: Valide los campos obligatorios del formulario.', async () => {
+  it('CP-031: El sistema valide los campos obligatorios del formulario', async () => {
     mockPrismaService.cotizacion.create.mockRejectedValue(new Error('Missing fields'));
 
     await expect(
@@ -65,7 +65,7 @@ describe('SolicitarCotizacion', () => {
     ).rejects.toThrow();
   });
 
-  it('CP-032: Pueda seleccionar un servicio para cotizar.', async () => {
+  it('CP-032: El cliente pueda seleccionar un servicio para cotizar', async () => {
     mockPrismaService.servicio.findMany.mockResolvedValue([
       { Id_Servicio: 1, Nombre_Servicio: 'Sofá 2 puestos', Precio: 90000 },
     ]);
@@ -75,7 +75,7 @@ describe('SolicitarCotizacion', () => {
     expect(servicios[0].Nombre_Servicio).toBe('Sofá 2 puestos');
   });
 
-  it('CP-033: Genere una cotización estimada (si aplica).', async () => {
+  it('CP-033: El sistema genere una cotizaci¾n estimada (si aplica)', async () => {
     mockPrismaService.cotizacion.create.mockResolvedValue({
       Id_Cotizacion: 2,
       Precio_cotizado: 220000,
@@ -93,7 +93,7 @@ describe('SolicitarCotizacion', () => {
     expect(result.Precio_cotizado).toBe(220000);
   });
 
-  it('CP-034: La solicitud quede registrada en el sistema.', async () => {
+  it('CP-034: La solicitud quede registrada en el sistema', async () => {
     mockPrismaService.cotizacion.findMany.mockResolvedValue([
       { Id_Cotizacion: 1, Id_usuario: 10, Precio_cotizado: 150000 },
     ]);

@@ -46,7 +46,7 @@ describe('Login', () => {
     prismaService = module.get(PrismaService);
   });
 
-  it('CP-006: Pueda iniciar sesión con credenciales válidas.', async () => {
+  it('CP-006: El cliente pueda iniciar sesi¾n con credenciales vßlidas', async () => {
     const passwordHash = await bcrypt.hash('123456', 10);
     mockPrismaService.usuario.findUnique.mockResolvedValue({
       Id_Usuario: 1,
@@ -66,7 +66,7 @@ describe('Login', () => {
     expect(result.user.correo).toBe('cliente@gmail.com');
   });
 
-  it('CP-007: Pueda cerrar sesión correctamente', async () => {
+  it('CP-007: El cliente pueda cerrar sesi¾n correctamente', async () => {
     mockPrismaService.usuario.update.mockResolvedValue({});
 
     const response = await authService.logout(1);
@@ -83,26 +83,26 @@ describe('Login', () => {
     expect(response.message).toContain('cerrada');
   });
 
-  it('CP-008: La sesión expire por inactividad.', async () => {
+  it('CP-008: La sesi¾n expire por inactividad', async () => {
     const isExpired = new Date(Date.now() - 1000) < new Date();
     expect(isExpired).toBe(true);
   });
 
-  it('CP-009: No permita iniciar sesión cuando existan campos obligatorios vacíos.', async () => {
+  it('CP-009: El sistema no permita iniciar sesi¾n cuando existan', async () => {
     mockPrismaService.usuario.findUnique.mockResolvedValue(null);
     await expect(
       authService.login({ correo: '', password: '' }),
     ).rejects.toThrow(UnauthorizedException);
   });
 
-  it('CP-010: Valide el formato del correo electrónico antes de iniciar sesión.', async () => {
+  it('CP-010: El sistema valide el formato del correo electr¾nico', async () => {
     mockPrismaService.usuario.findUnique.mockResolvedValue(null);
     await expect(
       authService.login({ correo: 'correo_invalido', password: '123' }),
     ).rejects.toThrow(UnauthorizedException);
   });
 
-  it('CP-011: No permita iniciar sesión con una contraseña incorrecta.', async () => {
+  it('CP-011: El sistema no permita iniciar sesi¾n con una', async () => {
     const passwordHash = await bcrypt.hash('123456', 10);
     mockPrismaService.usuario.findUnique.mockResolvedValue({
       Id_Usuario: 1,
@@ -117,7 +117,7 @@ describe('Login', () => {
     ).rejects.toThrow(UnauthorizedException);
   });
 
-  it('CP-012: Verificar el comportamiento del sistema cuando ocurre un error de conexión con el servidor durante el inicio de sesión.', async () => {
+  it('CP-012: Comportamiento del sistema cuando ocurre un error de', async () => {
     mockPrismaService.usuario.findUnique.mockRejectedValue(
       new Error('DB Connection Timeout'),
     );

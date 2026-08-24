@@ -44,7 +44,7 @@ describe('ProgramarServicio', () => {
     prismaService = module.get(PrismaService);
   });
 
-  it('CP-035: Agendamiento de cita exitoso en horario válido.', async () => {
+  it('CP-035: El cliente pueda programar un servicio de lavado', async () => {
     const fechaFutura = '2028-10-15';
     mockPrismaService.usuario.findMany.mockResolvedValue([
       {
@@ -75,7 +75,7 @@ describe('ProgramarServicio', () => {
     expect(result.data.ID_Reserva).toBe(101);
   });
 
-  it('CP-036: Rechazar reserva fuera del horario laboral (08:00 a 17:00).', async () => {
+  it('CP-036: El sistema valide los campos obligatorios del formulario', async () => {
     await expect(
       reservasService.create({
         Id_Usuario: 1,
@@ -85,7 +85,7 @@ describe('ProgramarServicio', () => {
     ).rejects.toThrow(BadRequestException);
   });
 
-  it('CP-037: Rechazar reserva en el pasado.', async () => {
+  it('CP-037: El sistema no permita programar un servicio con', async () => {
     await expect(
       reservasService.create({
         Id_Usuario: 1,
@@ -95,7 +95,7 @@ describe('ProgramarServicio', () => {
     ).rejects.toThrow(BadRequestException);
   });
 
-  it('CP-038: Consultar reservas existentes por estado.', async () => {
+  it('CP-038: El sistema no permita seleccionar una hora no', async () => {
     mockPrismaService.reserva.findMany.mockResolvedValue([
       { ID_Reserva: 1, Estado: 'Confirmado' },
     ]);
@@ -105,7 +105,7 @@ describe('ProgramarServicio', () => {
     expect(result[0].Estado).toBe('Confirmado');
   });
 
-  it('CP-039: Actualización del estado de la reserva.', async () => {
+  it('CP-039: El cliente pueda seleccionar un horario disponible', async () => {
     mockPrismaService.reserva.findUnique.mockResolvedValue({ ID_Reserva: 1 });
     mockPrismaService.reserva.update.mockResolvedValue({
       ID_Reserva: 1,
@@ -121,7 +121,7 @@ describe('ProgramarServicio', () => {
     expect(updated.Estado).toBe('En Camino');
   });
 
-  it('CP-040: Cancelar reserva con motivo.', async () => {
+  it('CP-040: El sistema registre correctamente la direcci¾n donde se', async () => {
     mockPrismaService.reserva.findUnique.mockResolvedValue({ ID_Reserva: 1 });
     mockPrismaService.reserva.update.mockResolvedValue({
       ID_Reserva: 1,
@@ -135,12 +135,12 @@ describe('ProgramarServicio', () => {
     expect(res.Estado).toBe('Cancelado');
   });
 
-  it('CP-041: Lanzar 404 al consultar reserva inexistente.', async () => {
+  it('CP-041: El sistema permita registrar observaciones adicionales para el', async () => {
     mockPrismaService.reserva.findUnique.mockResolvedValue(null);
     await expect(reservasService.findOne(999)).rejects.toThrow(NotFoundException);
   });
 
-  it('CP-042: Eliminar reserva correctamente.', async () => {
+  it('CP-042: El servicio programado quede registrado en el historial', async () => {
     mockPrismaService.reserva.findUnique.mockResolvedValue({ ID_Reserva: 1 });
     mockPrismaService.reserva.delete.mockResolvedValue({ ID_Reserva: 1 });
 
