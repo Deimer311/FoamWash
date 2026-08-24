@@ -84,11 +84,7 @@ describe('AgendaEmpleados', () => {
     expect(desempeno.total_calificaciones).toBe(2);
   });
 
-  it('CP-067: Acceso a detalle del servicio', () => {
-    expect(true).toBe(true);
-  });
+  it.todo('CP-067: Acceso a detalle del servicio');
 
-  it('CP-068: Carga de la agenda (rendimiento)', () => {
-    expect(true).toBe(true);
-  });
+  it.todo('CP-068: Carga de la agenda (rendimiento)');
 });

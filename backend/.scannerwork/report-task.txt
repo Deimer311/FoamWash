@@ -1,6 +1,6 @@
-projectKey=Foam-Wash-Backend
+projectKey=FoamWash
 serverUrl=http://localhost:9000
 serverVersion=26.8.0.126808
-dashboardUrl=http://localhost:9000/dashboard?id=Foam-Wash-Backend
-ceTaskId=19051097-7901-4203-b830-b47beb47493b
-ceTaskUrl=http://localhost:9000/api/ce/task?id=19051097-7901-4203-b830-b47beb47493b
+dashboardUrl=http://localhost:9000/dashboard?id=FoamWash
+ceTaskId=af7bc5dd-922b-4968-b057-f5674f610014
+ceTaskUrl=http://localhost:9000/api/ce/task?id=af7bc5dd-922b-4968-b057-f5674f610014

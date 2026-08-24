@@ -5,6 +5,12 @@ import { useEffect } from 'react';
  * La lógica está refactorizada directamente de tu index.js original.
  */
 const useBubbles = (containerSelector = '.container') => {
+    const secureRandom = () => {
+        const array = new Uint32Array(1);
+        window.crypto.getRandomValues(array);
+        return array[0] / (0xffffffff + 1);
+    };
+
     useEffect(() => {
         const container = document.querySelector(containerSelector);
         if (!container) return;
@@ -13,16 +19,16 @@ const useBubbles = (containerSelector = '.container') => {
             const bubble = document.createElement('div');
             
             // Lógica de estilos y propiedades replicada de tu JS original:
-            const size = Math.random() * 20 + 5;
-            const duration = Math.random() * 8 + 7; // 7s-15s
-            const delay = Math.random() * 5; // 0s-5s
+            const size = secureRandom() * 20 + 5;
+            const duration = secureRandom() * 8 + 7; // 7s-15s
+            const delay = secureRandom() * 5; // 0s-5s
 
             bubble.style.width = size + 'px';
             bubble.style.height = size + 'px';
             bubble.style.position = 'absolute';
             bubble.style.borderRadius = '50%';
             bubble.style.background = 'rgba(255, 255, 255, 0.3)';
-            bubble.style.left = Math.random() * 100 + '%';
+            bubble.style.left = secureRandom() * 100 + '%';
             bubble.style.bottom = '-50px';
             bubble.style.pointerEvents = 'none';
             bubble.style.boxShadow = '0 0 10px rgba(255, 255, 255, 0.5)';

@@ -103,7 +103,5 @@ describe('GestionEmpleados', () => {
     expect(updated.estado).toBe('inactivo');
   });
 
-  it('CP-061: Recuperaci¾n de contrase±a', () => {
-    expect(true).toBe(true);
-  });
+  it.todo('CP-061: Recuperaci¾n de contrase±a');
 });

@@ -89,7 +89,5 @@ describe('Reportes y Estadísticas', () => {
     expect(result.Servicios_Ofrecidos).toBe(12);
   });
 
-  it('CP-079: Actualizaci¾n en tiempo real', () => {
-    expect(true).toBe(true);
-  });
+  it.todo('CP-079: Actualizaci¾n en tiempo real');
 });

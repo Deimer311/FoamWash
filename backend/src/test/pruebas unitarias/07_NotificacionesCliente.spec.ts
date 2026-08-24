@@ -140,7 +140,5 @@ describe('Notificaciones', () => {
     );
   });
 
-  it('CP-049: Las notificaciones se reciban en el orden correcto', () => {
-    expect(true).toBe(true);
-  });
+  it.todo('CP-049: Las notificaciones se reciban en el orden correcto');
 });

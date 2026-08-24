@@ -84,7 +84,5 @@ describe('HistorialServicios', () => {
     await expect(reservasService.findByCliente(10)).rejects.toThrow('DB Error');
   });
 
-  it('CP-055: Comportamiento cuando ocurre una falla al cargar el', () => {
-    expect(true).toBe(true);
-  });
+  it.todo('CP-055: Comportamiento cuando ocurre una falla al cargar el');
 });

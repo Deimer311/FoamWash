@@ -104,15 +104,9 @@ describe('RecuperarPassword', () => {
     expect(res.message).toContain('exitosa');
   });
 
-  it('CP-020: El sistema valide que las contrase±as coincidan', () => {
-    expect(true).toBe(true);
-  });
+  it.todo('CP-020: El sistema valide que las contrase±as coincidan');
 
-  it('CP-021: El sistema no permita registrar una contrase±a que', () => {
-    expect(true).toBe(true);
-  });
+  it.todo('CP-021: El sistema no permita registrar una contrase±a que');
 
-  it('CP-022: El usuario pueda iniciar sesi¾n con la nueva', () => {
-    expect(true).toBe(true);
-  });
+  it.todo('CP-022: El usuario pueda iniciar sesi¾n con la nueva');
 });

@@ -79,6 +79,44 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     // =========================================================================
+    // EFECTO: Cierre de sesión automático por inactividad (15 minutos)
+    // =========================================================================
+    useEffect(() => {
+        if (!isAuthenticated) return;
+
+        const INACTIVITY_LIMIT_MS = 15 * 60 * 1000; // 15 minutos
+        let timeoutId;
+
+        const resetTimer = () => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(async () => {
+                console.warn('Cerrando sesión por inactividad...');
+                try {
+                    await authService.logout();
+                } catch (e) {} // Ignorar errores
+                
+                // Limpiar localStorage
+                ['foamwash_carrito', 'foamwash_pedidos', 'foamwash_carrito_local'].forEach(k => localStorage.removeItem(k));
+                setUser(null);
+                
+                alert('Tu sesión ha expirado por inactividad.');
+                window.location.href = '/login';
+            }, INACTIVITY_LIMIT_MS);
+        };
+
+        // Eventos que reinician el contador
+        const events = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'];
+        
+        events.forEach(evt => window.addEventListener(evt, resetTimer));
+        resetTimer(); // Iniciar temporizador al montar
+
+        return () => {
+            clearTimeout(timeoutId);
+            events.forEach(evt => window.removeEventListener(evt, resetTimer));
+        };
+    }, [isAuthenticated]);
+
+    // =========================================================================
     // LOGIN
     // =========================================================================
     const login = async (correo, password) => {
