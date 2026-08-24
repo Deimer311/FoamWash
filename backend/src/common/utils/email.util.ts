@@ -7,8 +7,8 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-export async function sendResetCode(correo: string, codigo: string): Promise<void> {
-  const transporter = nodemailer.createTransport({
+function getTransporter() {
+  return nodemailer.createTransport({
     host: process.env.EMAIL_HOST || 'smtp.gmail.com',
     port: Number.parseInt(process.env.EMAIL_PORT || '587'),
     secure: false,
@@ -17,6 +17,10 @@ export async function sendResetCode(correo: string, codigo: string): Promise<voi
       pass: process.env.EMAIL_PASS,
     },
   });
+}
+
+export async function sendResetCode(correo: string, codigo: string): Promise<void> {
+  const transporter = getTransporter();
 
   await transporter.sendMail({
     from: process.env.EMAIL_FROM || `"Foam Wash" <${process.env.EMAIL_USER}>`,
@@ -45,15 +49,7 @@ export interface ReservationDetails {
 }
 
 export async function sendServiceConfirmationEmail(correo: string, details: ReservationDetails): Promise<void> {
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: Number.parseInt(process.env.EMAIL_PORT || '587'),
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+  const transporter = getTransporter();
 
   const formatter = new Intl.NumberFormat('es-CO', {
     style: 'currency',
@@ -106,15 +102,7 @@ export async function sendServiceConfirmationEmail(correo: string, details: Rese
 }
 
 export async function sendWelcomeEmail(correo: string, nombre: string): Promise<void> {
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: Number.parseInt(process.env.EMAIL_PORT || '587'),
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+  const transporter = getTransporter();
 
   await transporter.sendMail({
     from: process.env.EMAIL_FROM || `"Foam Wash" <${process.env.EMAIL_USER}>`,
@@ -131,15 +119,7 @@ export async function sendWelcomeEmail(correo: string, nombre: string): Promise<
 }
 
 export async function sendCancellationEmail(correo: string, details: { id: string; fecha: string; motivo: string }): Promise<void> {
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: Number.parseInt(process.env.EMAIL_PORT || '587'),
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+  const transporter = getTransporter();
 
   await transporter.sendMail({
     from: process.env.EMAIL_FROM || `"Foam Wash" <${process.env.EMAIL_USER}>`,
@@ -176,15 +156,7 @@ export async function sendCancellationEmail(correo: string, details: { id: strin
 }
 
 export async function sendServiceUpdateEmail(correo: string, details: { id: string; estado: string }): Promise<void> {
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-    port: Number.parseInt(process.env.EMAIL_PORT || '587'),
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+  const transporter = getTransporter();
 
   let color = '#3b82f6';
   let emoji = 'ℹ️';

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CotizacionesService } from '../../cotizaciones/cotizaciones.service';
 import { PrismaService } from '../../prisma/prisma.service';
 
-describe('SolicitarCotizacion (RF-05)', () => {
+describe('SolicitarCotizacion', () => {
   let cotizacionesService: CotizacionesService;
   let prismaService: jest.Mocked<PrismaService>;
 

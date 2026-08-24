@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-describe('Configuración del Sistema (RF-22)', () => {
+describe('Configuración del Sistema', () => {
   interface AppConfig {
     horarioApertura: string;
     horarioCierre: string;

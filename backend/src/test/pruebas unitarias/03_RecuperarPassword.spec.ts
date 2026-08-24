@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 
-describe('RecuperarPassword (RF-03)', () => {
+describe('RecuperarPassword', () => {
   let authService: AuthService;
   let prismaService: jest.Mocked<PrismaService>;
 
@@ -47,26 +47,13 @@ describe('RecuperarPassword (RF-03)', () => {
     expect(mockPrismaService.usuario.update).toHaveBeenCalled();
   });
 
-  it('CP-014: No envíe un código a un correo no registrado.', async () => {
+  it.each([
+    ['CP-014: No envíe un código a un correo no registrado.', 'no_existe@gmail.com'],
+    ['CP-015: El correo electrónico sea obligatorio.', ''],
+    ['CP-016: Valide el formato del correo electrónico.', 'formato_incorrecto']
+  ])('%s', async (name, correo) => {
     mockPrismaService.usuario.findUnique.mockResolvedValue(null);
-
-    await expect(
-      authService.requestPasswordReset({ correo: 'no_existe@gmail.com' }),
-    ).rejects.toThrow(NotFoundException);
-  });
-
-  it('CP-015: El correo electrónico sea obligatorio.', async () => {
-    mockPrismaService.usuario.findUnique.mockResolvedValue(null);
-    await expect(
-      authService.requestPasswordReset({ correo: '' }),
-    ).rejects.toThrow(NotFoundException);
-  });
-
-  it('CP-016: Valide el formato del correo electrónico.', async () => {
-    mockPrismaService.usuario.findUnique.mockResolvedValue(null);
-    await expect(
-      authService.requestPasswordReset({ correo: 'formato_incorrecto' }),
-    ).rejects.toThrow(NotFoundException);
+    await expect(authService.requestPasswordReset({ correo })).rejects.toThrow(NotFoundException);
   });
 
   it('CP-017: Rechace un código de verificación incorrecto.', async () => {
@@ -93,14 +80,13 @@ describe('RecuperarPassword (RF-03)', () => {
   });
 
   it('CP-020: Valide que las contraseñas coincidan.', async () => {
-    const p1 = 'Password123!';
-    const p2 = 'Password123!';
-    expect(p1 === p2).toBe(true);
+    const checkMatch = (p1: string, p2: string) => p1 === p2;
+    expect(checkMatch('Password123!', 'Password123!')).toBe(true);
   });
 
   it('CP-021: No permita registrar una contraseña que incumpla las políticas de seguridad.', async () => {
-    const isWeak = '123'.length < 6;
-    expect(isWeak).toBe(true);
+    const isWeakPassword = (pwd: string) => pwd.length < 6;
+    expect(isWeakPassword('123')).toBe(true);
   });
 
   it('CP-022: Pueda iniciar sesión con la nueva contraseña.', async () => {

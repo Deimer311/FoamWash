@@ -4,7 +4,7 @@
 
   @Injectable()
   export class CotizacionesService {
-    constructor(private prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService) {}
 
     async getServicios() {
       return this.prisma.servicio.findMany({
@@ -61,7 +61,7 @@
     }
 
     async sincronizar(items: any[], userId: number) {
-      const results = [];21
+      const results = [];
       for (const item of items) {
         const existing = await this.prisma.cotizacion.findFirst({
           where: { Id_usuario: userId, servicios: { some: { Id_Servicio: item.servicioId || item.id } } },

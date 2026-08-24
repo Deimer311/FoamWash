@@ -4,7 +4,7 @@ import { NotificacionesService } from '../../notificaciones/notificaciones.servi
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 
-describe('Notificaciones (RF-07)', () => {
+describe('Notificaciones', () => {
   let notificationsService: NotificationsService;
   let notificacionesService: NotificacionesService;
   let prismaService: jest.Mocked<PrismaService>;

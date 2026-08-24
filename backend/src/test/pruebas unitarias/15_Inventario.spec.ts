@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-describe('Inventario (RF-15)', () => {
+describe('Inventario', () => {
   it('CP-080: Control de stock de insumos de limpieza.', () => {
     const inventario = [
       { id: 1, nombre: 'Shampoo de Espuma Seca', stock: 15, minimo: 5 },
@@ -14,18 +14,12 @@ describe('Inventario (RF-15)', () => {
   });
 
   it('CP-081: Descuento automático de insumos al completar un servicio.', () => {
-    let stockActual = 10;
-    const consumoPorServicio = 2;
-
-    stockActual -= consumoPorServicio;
-
-    expect(stockActual).toBe(8);
+    const simularConsumo = (stockActual: number, consumo: number) => stockActual - consumo;
+    expect(simularConsumo(10, 2)).toBe(8);
   });
 
   it('CP-082: Alerta de reposición cuando el insumo llega a 0.', () => {
-    const stock = 0;
-    const requiereAlerta = stock === 0;
-
-    expect(requiereAlerta).toBe(true);
+    const verificarAlerta = (stock: number) => stock === 0;
+    expect(verificarAlerta(0)).toBe(true);
   });
 });

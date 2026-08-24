@@ -8,7 +8,7 @@ import { ConsultasService } from './consultas.service';
 
 @ApiTags('Consultas')
 export class ConsultasController {
-  constructor(private consultasService: ConsultasService) {}
+  constructor(private readonly consultasService: ConsultasService) {}
 
   @Get('1-usuarios-por-rol')
   @ApiOperation({ summary: 'Usuarios por rol' })

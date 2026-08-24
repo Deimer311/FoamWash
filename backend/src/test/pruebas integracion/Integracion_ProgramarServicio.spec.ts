@@ -34,15 +34,13 @@ describe('ProgramarServicio (Integración)', () => {
     jwtService = app.get<JwtService>(JwtService);
     
     await prisma.calificacion.deleteMany().catch(() => {});
-    await prisma.servicio.deleteMany().catch(() => {});
     await prisma.cotizacion.deleteMany().catch(() => {});
     await prisma.reserva.deleteMany().catch(() => {});
+    await prisma.servicio.deleteMany().catch(() => {});
     await prisma.observacion.deleteMany().catch(() => {});
     await prisma.notificacion.deleteMany().catch(() => {});
     await prisma.empleado.deleteMany().catch(() => {});
-    await prisma.usuario.deleteMany({
-      where: { Correo: mockClient.correo }
-    }).catch(() => {});
+    await prisma.usuario.deleteMany().catch(() => {});
 
     const rolCliente = await prisma.rol.upsert({
       where: { Id_Rol: 3 },
@@ -62,6 +60,27 @@ describe('ProgramarServicio (Integración)', () => {
     });
     clientId = cliente.Id_Usuario;
 
+    const rolEmpleado = await prisma.rol.upsert({
+      where: { Id_Rol: 2 },
+      update: { Rol: 'Empleado' },
+      create: { Id_Rol: 2, Rol: 'Empleado' }
+    });
+
+    await prisma.usuario.create({
+      data: {
+        Nombre: 'Empleado Prueba',
+        Correo: 'empleado_programar@test.com',
+        estado: 'activo',
+        rol_Id_Rol: rolEmpleado.Id_Rol,
+        N_Documento: '87654321',
+        empleado: {
+          create: {
+            dias_laborales: 'lunes, martes, miercoles, jueves, viernes, sabado, domingo'
+          }
+        }
+      }
+    });
+
     authToken = jwtService.sign({ id: clientId, email: mockClient.correo, role: 'cliente' });
 
     await prisma.usuario.update({
@@ -77,15 +96,13 @@ describe('ProgramarServicio (Integración)', () => {
 
   afterAll(async () => {
     await prisma.calificacion.deleteMany().catch(() => {});
-    await prisma.servicio.deleteMany().catch(() => {});
     await prisma.cotizacion.deleteMany().catch(() => {});
     await prisma.reserva.deleteMany().catch(() => {});
+    await prisma.servicio.deleteMany().catch(() => {});
     await prisma.observacion.deleteMany().catch(() => {});
     await prisma.notificacion.deleteMany().catch(() => {});
     await prisma.empleado.deleteMany().catch(() => {});
-    await prisma.usuario.deleteMany({
-      where: { Correo: mockClient.correo }
-    }).catch(() => {});
+    await prisma.usuario.deleteMany().catch(() => {});
     await prisma.$disconnect();
     await app.close();
   });
@@ -116,15 +133,39 @@ describe('ProgramarServicio (Integración)', () => {
       });
 
     expect(res.status).toBe(400);
-    expect(res.body.message).toContain('horario laboral');
+    expect(res.body.message).toContain('La hora seleccionada no está permitida');
   });
 
   it('Permite seleccionar un horario disponible dentro del rango laboral.', async () => {
-    const res = await request(app.getHttpServer())
-      .get(`/reservas/estado/Pendiente`)
-      .set('Authorization', `Bearer ${authToken}`);
-    expect(res.status).toBe(200);
-    expect(res.body).toBeDefined();
+    let booked = false;
+    let res;
+
+    // Intentar opciones de fecha y hora sucesivamente hasta encontrar una desocupada
+    for (let hora = 8; hora <= 17; hora++) {
+      const horaStr = hora < 10 ? `0${hora}:00` : `${hora}:00`;
+      
+      res = await request(app.getHttpServer())
+        .post('/reservas')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          Id_Usuario: clientId,
+          fecha: '2026-10-16T10:00:00.000Z',
+          Hora: horaStr,
+          observacion_Id_Observaciones: obsId
+        });
+
+      if (res.status === 201) {
+        booked = true;
+        break; // Encontró un horario desocupado y lo reservó
+      } else if (res.status === 400 && res.body.message === 'El horario ya está ocupado') {
+        continue; // Está ocupado, intentar con la siguiente hora
+      } else {
+        break;
+      }
+    }
+
+    expect(booked).toBe(true);
+    if (res) expect(res.status).toBe(201);
   });
 
   it('Registra correctamente la dirección donde se realizará el servicio.', async () => {

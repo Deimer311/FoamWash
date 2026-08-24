@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-describe('Promociones (RF-16)', () => {
+describe('Promociones', () => {
   const aplicarDescuento = (monto: number, codigo: string) => {
     const cuponesValidos: Record<string, number> = {
       FOAM10: 0.1, // 10%

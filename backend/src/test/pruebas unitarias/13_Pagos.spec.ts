@@ -3,7 +3,7 @@ import { ReservasService } from '../../reservas/reservas.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../../notifications/notifications.service';
 
-describe('Pagos (RF-13)', () => {
+describe('Pagos', () => {
   let reservasService: ReservasService;
   let prismaService: jest.Mocked<PrismaService>;
 

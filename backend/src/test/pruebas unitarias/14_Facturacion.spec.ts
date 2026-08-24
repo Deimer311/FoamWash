@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-describe('Facturación (RF-14)', () => {
+describe('Facturación', () => {
   it('CP-077: Generar estructura de comprobante de servicio con consecutivo.', () => {
     const generarFactura = (reservaId: number, clienteNombre: string, total: number) => ({
       numeroFactura: `FAC-${reservaId.toString().padStart(5, '0')}`,

@@ -40,15 +40,13 @@ describe('HistorialServicios (Integración)', () => {
     jwtService = app.get<JwtService>(JwtService);
 
     await prisma.calificacion.deleteMany().catch(() => {});
-    await prisma.servicio.deleteMany().catch(() => {});
     await prisma.cotizacion.deleteMany().catch(() => {});
     await prisma.reserva.deleteMany().catch(() => {});
+    await prisma.servicio.deleteMany().catch(() => {});
     await prisma.observacion.deleteMany().catch(() => {});
     await prisma.notificacion.deleteMany().catch(() => {});
     await prisma.empleado.deleteMany().catch(() => {});
-    await prisma.usuario.deleteMany({
-      where: { Correo: { in: [mockClient1.correo, mockClient2.correo] } }
-    }).catch(() => {});
+    await prisma.usuario.deleteMany().catch(() => {});
 
     const rolCliente = await prisma.rol.upsert({
       where: { Id_Rol: 3 },
@@ -103,15 +101,13 @@ describe('HistorialServicios (Integración)', () => {
 
   afterAll(async () => {
     await prisma.calificacion.deleteMany().catch(() => {});
-    await prisma.servicio.deleteMany().catch(() => {});
     await prisma.cotizacion.deleteMany().catch(() => {});
     await prisma.reserva.deleteMany().catch(() => {});
+    await prisma.servicio.deleteMany().catch(() => {});
     await prisma.observacion.deleteMany().catch(() => {});
     await prisma.notificacion.deleteMany().catch(() => {});
     await prisma.empleado.deleteMany().catch(() => {});
-    await prisma.usuario.deleteMany({
-      where: { Correo: { in: [mockClient1.correo, mockClient2.correo] } }
-    }).catch(() => {});
+    await prisma.usuario.deleteMany().catch(() => {});
     await prisma.$disconnect();
     await app.close();
   });
@@ -132,7 +128,7 @@ describe('HistorialServicios (Integración)', () => {
       .set('Authorization', `Bearer ${authToken}`);
     expect(res.status).toBe(200);
     const data = res.body.data || res.body;
-    expect(data.length).toBe(0);
+    expect(data).toHaveLength(0);
   });
 
   it('Actualiza el historial después de finalizar un servicio.', async () => {

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-describe('Exportación de Datos (RF-20)', () => {
+describe('Exportación de Datos', () => {
   const exportarACSV = (datos: Array<Record<string, any>>) => {
     if (!datos || datos.length === 0) return '';
     const headers = Object.keys(datos[0]).join(',');
@@ -8,7 +8,7 @@ describe('Exportación de Datos (RF-20)', () => {
     return `${headers}\n${rows}`;
   };
 
-  it('CP-102: Generar formato CSV de reservas realizadas.', () => {
+  it('CP-102: Generar formato pdf de reservas realizadas.', () => {
     const data = [
       { id: 1, servicio: 'Lavado Sofa', precio: 120000, estado: 'Completado' },
       { id: 2, servicio: 'Lavado Colchón', precio: 140000, estado: 'Pendiente' },

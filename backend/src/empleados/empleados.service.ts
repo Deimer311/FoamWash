@@ -6,9 +6,21 @@ import { Injectable, NotFoundException, BadRequestException, ConflictException }
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
 
+const EMPLEADO_SELECT_FIELDS = {
+  cargo: true,
+  fecha_nacimiento: true,
+  fecha_ingreso: true,
+  dias_laborales: true,
+  horario: true,
+  especialidades: true,
+  certificaciones: true,
+  contacto_emergencia_nombre: true,
+  contacto_emergencia_telefono: true,
+};
+
 @Injectable()
 export class EmpleadosService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   // GET /api/empleados — lista todos los empleados
   async findAll() {
@@ -30,17 +42,7 @@ export class EmpleadosService {
           },
         },
         empleado: {
-          select: {
-            cargo: true,
-            fecha_nacimiento: true,
-            fecha_ingreso: true,
-            dias_laborales: true,
-            horario: true,
-            especialidades: true,
-            certificaciones: true,
-            contacto_emergencia_nombre: true,
-            contacto_emergencia_telefono: true,
-          },
+          select: EMPLEADO_SELECT_FIELDS,
           take: 1,
         },
       },
@@ -305,17 +307,7 @@ export class EmpleadosService {
           select: { Rol: true },
         },
         empleado: {
-          select: {
-            cargo:                        true,
-            fecha_nacimiento:             true,
-            fecha_ingreso:                true,
-            dias_laborales:               true,
-            horario:                      true,
-            especialidades:               true,
-            certificaciones:              true,
-            contacto_emergencia_nombre:   true,
-            contacto_emergencia_telefono: true,
-          },
+          select: EMPLEADO_SELECT_FIELDS,
           take: 1,
         },
       },

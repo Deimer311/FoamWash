@@ -6,9 +6,8 @@ import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class ReservasService {
-  constructor(
-    private prisma: PrismaService,
-    private notificationsService: NotificationsService
+  constructor(private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService
   ) { }
 
   // GET /api/reservas
@@ -146,28 +145,16 @@ export class ReservasService {
   }
 
   // POST /api/reservas
-  async create(data: {
-    Estado?: string;
-    Id_Usuario: number;
-    fecha?: string;
-    Hora?: string;
-    Informacion_adicional?: string;
-    observacion_Id_Observaciones?: number;
-    empleado_Id_Usuario?: number;
-    servicios?: Array<{ Id_Servicio: number; cantidad?: number; tamano?: string }>;
-    observaciones?: string;
-  }) {
-    // FIX fecha: usar explícitamente UTC para evitar desplazamientos por zona horaria
+  private parseAndValidateDateTime(fecha?: string, Hora?: string): { fechaISO?: Date, horaISO?: Date } {
     let fechaISO: Date | undefined = undefined;
-    if (data.fecha) {
-      const soloFecha = data.fecha.split('T')[0];
+    if (fecha) {
+      const soloFecha = fecha.split('T')[0];
       fechaISO = new Date(`${soloFecha}T00:00:00.000Z`);
     }
 
-    // FIX Hora: usar explícitamente UTC para evitar desplazamientos
     let horaISO: Date | undefined = undefined;
-    if (data.Hora && data.Hora.match(/^\d{2}:\d{2}$/)) {
-      const horaStr = data.Hora.split(':')[0];
+    if (Hora && /^\d{2}:\d{2}$/.test(Hora)) {
+      const horaStr = Hora.split(':')[0];
       const horaNum = Number.parseInt(horaStr, 10);
 
       // Validar horario laboral: 08:00 a 17:00
@@ -175,7 +162,7 @@ export class ReservasService {
         throw new BadRequestException({ code: 'TIME_NOT_ALLOWED', message: 'La hora seleccionada no está permitida' });
       }
 
-      horaISO = new Date(`1970-01-01T${data.Hora}:00.000Z`);
+      horaISO = new Date(`1970-01-01T${Hora}:00.000Z`);
     }
 
     // Validar que la reserva no sea en el pasado
@@ -193,35 +180,84 @@ export class ReservasService {
       }
     }
 
-    // FIX observacion: NOT NULL en schema → crear vacía si no se pasa
-    const observacionData = data.observacion_Id_Observaciones
-      ? { connect: { Id_Observaciones: data.observacion_Id_Observaciones } }
-      : { create: { Observaciones: data.observaciones ?? data.Informacion_adicional ?? '', estado: 'Pendiente' } };
+    return { fechaISO, horaISO };
+  }
 
-    // ASIGNACIÓN AUTOMÁTICA O MANUAL: Validar disponibilidad (RF19)
-    let empleadoId = data.empleado_Id_Usuario ?? null;
-    if (empleadoId && fechaISO && horaISO) {
-      const disponible = await this.verificarDisponibilidad(empleadoId, fechaISO, horaISO);
-      if (!disponible) {
-         throw new BadRequestException({ code: 'TIME_UNAVAILABLE', message: 'El horario ya está ocupado' });
-      }
-    } else if (!empleadoId && fechaISO && horaISO) {
-      empleadoId = await this.asignarEmpleadoAutomatico(fechaISO, horaISO);
-      if (!empleadoId) {
-         throw new BadRequestException({ code: 'TIME_UNAVAILABLE', message: 'El horario ya está ocupado' });
-      }
+  private async calcularTotalServicios(servicios?: Array<{ Id_Servicio: number; cantidad?: number }>): Promise<number> {
+    if (!servicios || servicios.length === 0) return 0;
+    const servicioIds = servicios.map(s => s.Id_Servicio);
+    const serviciosDb = await this.prisma.servicio.findMany({
+      where: { Id_Servicio: { in: servicioIds } },
+    });
+    return servicios.reduce((sum, reqSvc) => {
+       const dbSvc = serviciosDb.find(s => s.Id_Servicio === reqSvc.Id_Servicio);
+       return sum + (dbSvc ? Number(dbSvc.Precio) * (reqSvc.cantidad || 1) : 0);
+    }, 0);
+  }
+
+  private async enviarCorreoConfirmacion(correo: string, reserva: any, total: number) {
+    const dateFormatter = new Intl.DateTimeFormat('es-CO', { 
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+      timeZone: 'UTC'
+    });
+    const timeFormatter = new Intl.DateTimeFormat('es-CO', { 
+      hour: '2-digit', minute: '2-digit',
+      timeZone: 'UTC'
+    });
+
+    await sendServiceConfirmationEmail(correo, {
+      id: `PED-${reserva.ID_Reserva}`,
+      fecha: reserva.fecha ? dateFormatter.format(new Date(reserva.fecha)) : 'Fecha no especificada',
+      hora: reserva.Hora ? timeFormatter.format(new Date(reserva.Hora)) : 'Hora no especificada',
+      direccion: reserva.cliente.Direccion || 'No especificada',
+      total: total
+    }).catch(err => console.error('Error al enviar correo de confirmación:', err));
+  }
+
+  private async asignarYValidarEmpleado(fechaISO?: Date, horaISO?: Date, empleadoId?: number): Promise<number | null> {
+    if (!fechaISO || !horaISO) return empleadoId ?? null;
+    
+    let assignedId = empleadoId ?? null;
+    if (assignedId) {
+      const disponible = await this.verificarDisponibilidad(assignedId, fechaISO, horaISO);
+      if (!disponible) throw new BadRequestException({ code: 'TIME_UNAVAILABLE', message: 'El horario ya está ocupado' });
+    } else {
+      assignedId = await this.asignarEmpleadoAutomatico(fechaISO, horaISO);
+      if (!assignedId) throw new BadRequestException({ code: 'TIME_UNAVAILABLE', message: 'El horario ya está ocupado' });
     }
+    return assignedId;
+  }
+
+  private prepararDatosObservacion(data: any) {
+    if (data.observacion_Id_Observaciones) {
+      return { connect: { Id_Observaciones: data.observacion_Id_Observaciones } };
+    }
+    return { create: { Observaciones: data.observaciones || data.Informacion_adicional || '', estado: 'Pendiente' } };
+  }
+
+  async create(data: {
+    Estado?: string;
+    Id_Usuario: number;
+    fecha?: string;
+    Hora?: string;
+    Informacion_adicional?: string;
+    observacion_Id_Observaciones?: number;
+    empleado_Id_Usuario?: number;
+    servicios?: Array<{ Id_Servicio: number; cantidad?: number; tamano?: string }>;
+    observaciones?: string;
+  }) {
+    const { fechaISO, horaISO } = this.parseAndValidateDateTime(data.fecha, data.Hora);
+    const observacionData = this.prepararDatosObservacion(data);
+    const empleadoId = await this.asignarYValidarEmpleado(fechaISO, horaISO, data.empleado_Id_Usuario);
 
     const reserva = await this.prisma.reserva.create({
       data: {
-        Estado: data.Estado ?? 'Pendiente',
+        Estado: data.Estado || 'Pendiente',
         fecha: fechaISO,
         Hora: horaISO,
         Informacion_adicional: data.Informacion_adicional,
         cliente: { connect: { Id_Usuario: data.Id_Usuario } },
-        empleado: empleadoId
-          ? { connect: { Id_Usuario: empleadoId } }
-          : undefined,
+        empleado: empleadoId ? { connect: { Id_Usuario: empleadoId } } : undefined,
         observacion: observacionData,
         servicios: data.servicios && data.servicios.length > 0
           ? { connect: data.servicios.map(s => ({ Id_Servicio: s.Id_Servicio })) }
@@ -234,88 +270,15 @@ export class ReservasService {
       },
     });
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // PERSISTENCIA EN BD: Guardar notificación para el cliente
-    // ─────────────────────────────────────────────────────────────────────────
-    if (reserva.cliente && this.prisma.notificacion?.create) {
-      await this.prisma.notificacion.create({
-        data: {
-          usuario_Id_Usuario: reserva.cliente.Id_Usuario,
-          descripcion_notificacion: `Tu reserva #${reserva.ID_Reserva} ha sido agendada exitosamente.`,
-          fecha_notificacion: new Date(),
-        },
-      }).catch(e => console.log('Error creando notificacion DB cliente:', e));
-    }
-
-    // Notificar al administrador
-    try {
-      await this.notificationsService.sendToTopic(
-        'topic_admin',
-        'Nueva Reserva Creada',
-        `Reserva #${reserva.ID_Reserva} para el cliente ${reserva.cliente.Nombre}.`,
-        { type: 'nueva_reserva', reservaId: reserva.ID_Reserva.toString() }
-      );
-    } catch (e) {
-      console.log('Error enviando push notification:', e);
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // CP-044 PERSISTENCIA EN BD: Notificación por asignación a trabajador
-    // ─────────────────────────────────────────────────────────────────────────
-    if (empleadoId) {
-      if (this.prisma.notificacion?.create) {
-        await this.prisma.notificacion.create({
-          data: {
-            usuario_Id_Usuario: empleadoId,
-            descripcion_notificacion: `Tienes una nueva orden de servicio #${reserva.ID_Reserva} asignada.`,
-            fecha_notificacion: new Date(),
-          },
-        }).catch(e => console.log('Error creando notificacion DB empleado:', e));
-      }
-
-      try {
-        await this.notificationsService.sendToTopic(
-          `user_${empleadoId}`,
-          'Nueva Cita Asignada',
-          `Tienes una nueva reserva #${reserva.ID_Reserva} asignada.`,
-          { type: 'nueva_reserva', reservaId: reserva.ID_Reserva.toString() }
-        );
-      } catch (e) {
-        console.log('Error enviando push notification al empleado:', e);
-      }
-    }
+    // Notificaciones delegadas
+    await this._notificarCreacion(reserva, empleadoId);
 
     // Calcular total
-    let total = 0;
-    if (data.servicios && data.servicios.length > 0) {
-      const servicioIds = data.servicios.map(s => s.Id_Servicio);
-      const serviciosDb = await this.prisma.servicio.findMany({
-        where: { Id_Servicio: { in: servicioIds } },
-      });
-      total = data.servicios.reduce((sum, reqSvc) => {
-         const dbSvc = serviciosDb.find(s => s.Id_Servicio === reqSvc.Id_Servicio);
-         return sum + (dbSvc ? Number(dbSvc.Precio) * (reqSvc.cantidad || 1) : 0);
-      }, 0);
-    }
+    const total = await this.calcularTotalServicios(data.servicios);
 
     // Enviar correo si el cliente tiene correo
-    if (reserva.cliente && reserva.cliente.Correo) {
-      const dateFormatter = new Intl.DateTimeFormat('es-CO', { 
-        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-        timeZone: 'UTC'
-      });
-      const timeFormatter = new Intl.DateTimeFormat('es-CO', { 
-        hour: '2-digit', minute: '2-digit',
-        timeZone: 'UTC'
-      });
-
-      await sendServiceConfirmationEmail(reserva.cliente.Correo, {
-        id: `PED-${reserva.ID_Reserva}`,
-        fecha: reserva.fecha ? dateFormatter.format(new Date(reserva.fecha)) : 'Fecha no especificada',
-        hora: reserva.Hora ? timeFormatter.format(new Date(reserva.Hora)) : 'Hora no especificada',
-        direccion: reserva.cliente.Direccion || 'No especificada',
-        total: total
-      }).catch(err => console.error('Error al enviar correo de confirmación:', err));
+    if (reserva.cliente?.Correo) {
+      await this.enviarCorreoConfirmacion(reserva.cliente.Correo, reserva, total);
     }
 
     return {
@@ -426,7 +389,7 @@ export class ReservasService {
       }
     }
 
-    if (estado === 'Confirmado' && updatedReserva.cliente && updatedReserva.cliente.Correo) {
+    if (estado === 'Confirmado' && updatedReserva.cliente?.Correo) {
       const total = updatedReserva.servicios.reduce((sum, s) => sum + Number(s.Precio || 0), 0);
 
       const dateFormatter = new Intl.DateTimeFormat('es-CO', {
@@ -445,7 +408,7 @@ export class ReservasService {
         direccion: updatedReserva.cliente.Direccion || 'No especificada',
         total: total
       }).catch(err => console.error('Error al enviar correo de confirmación (empleado):', err));
-    } else if (['En Camino', 'En Progreso', 'Completado'].includes(estado) && updatedReserva.cliente && updatedReserva.cliente.Correo) {
+    } else if (['En Camino', 'En Progreso', 'Completado'].includes(estado) && updatedReserva.cliente?.Correo) {
       await sendServiceUpdateEmail(updatedReserva.cliente.Correo, {
         id: `PED-${updatedReserva.ID_Reserva}`,
         estado: estado,
@@ -511,7 +474,7 @@ export class ReservasService {
       }
     }
 
-    if (updatedReserva.cliente && updatedReserva.cliente.Correo) {
+    if (updatedReserva.cliente?.Correo) {
       const dateFormatter = new Intl.DateTimeFormat('es-CO', {
         weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
         timeZone: 'America/Bogota'
@@ -562,5 +525,51 @@ export class ReservasService {
       include: { servicios: true, observacion: true, empleado: { select: { Nombre: true } } },
       orderBy: { fecha: 'desc' },
     });
+  }
+
+  private async _notificarCreacion(reserva: any, empleadoId: number | null) {
+    if (reserva.cliente && this.prisma.notificacion?.create) {
+      await this.prisma.notificacion.create({
+        data: {
+          usuario_Id_Usuario: reserva.cliente.Id_Usuario,
+          descripcion_notificacion: `Tu reserva #${reserva.ID_Reserva} ha sido agendada exitosamente.`,
+          fecha_notificacion: new Date(),
+        },
+      }).catch(e => console.log('Error creando notificacion DB cliente:', e));
+    }
+
+    try {
+      await this.notificationsService.sendToTopic(
+        'topic_admin',
+        'Nueva Reserva Creada',
+        `Reserva #${reserva.ID_Reserva} para el cliente ${reserva.cliente.Nombre}.`,
+        { type: 'nueva_reserva', reservaId: reserva.ID_Reserva.toString() }
+      );
+    } catch (e) {
+      console.log('Error enviando push notification:', e);
+    }
+
+    if (empleadoId) {
+      if (this.prisma.notificacion?.create) {
+        await this.prisma.notificacion.create({
+          data: {
+            usuario_Id_Usuario: empleadoId,
+            descripcion_notificacion: `Tienes una nueva orden de servicio #${reserva.ID_Reserva} asignada.`,
+            fecha_notificacion: new Date(),
+          },
+        }).catch(e => console.log('Error creando notificacion DB empleado:', e));
+      }
+
+      try {
+        await this.notificationsService.sendToTopic(
+          `user_${empleadoId}`,
+          'Nueva Cita Asignada',
+          `Tienes una nueva reserva #${reserva.ID_Reserva} asignada.`,
+          { type: 'nueva_reserva', reservaId: reserva.ID_Reserva.toString() }
+        );
+      } catch (e) {
+        console.log('Error enviando push notification al empleado:', e);
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-describe('Importación de Datos (RF-21)', () => {
+describe('Importación de Datos', () => {
   const importarClientesJSON = (jsonString: string) => {
     try {
       const data = JSON.parse(jsonString);

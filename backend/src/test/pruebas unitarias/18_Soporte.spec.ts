@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-describe('Soporte y PQRS (RF-18)', () => {
+describe('Soporte y PQRS', () => {
   const crearTicketSoporte = (usuarioId: number, asunto: string, mensaje: string) => {
     if (!asunto || !mensaje) {
       throw new Error('Asunto y mensaje son requeridos');
@@ -31,13 +31,14 @@ describe('Soporte y PQRS (RF-18)', () => {
 
   it('CP-096: Cambio de estado de ticket a Resuelto.', () => {
     const ticket = crearTicketSoporte(10, 'Consulta', 'Duda sobre precios');
-    ticket.estado = 'Resuelto';
-    expect(ticket.estado).toBe('Resuelto');
+    const resolverTicket = (t: any) => { t.estado = 'Resuelto'; return t; };
+    const ticketResuelto = resolverTicket(ticket);
+    expect(ticketResuelto.estado).toBe('Resuelto');
   });
 
   it('CP-097: Asignación de respuesta al ticket por el administrador.', () => {
-    const respuestaAdmin = 'Buenas tardes, con gusto le colaboramos';
-    expect(respuestaAdmin).toBeDefined();
-    expect(respuestaAdmin.length).toBeGreaterThan(5);
+    const asignarRespuesta = (respuesta: string) => respuesta.length > 5 ? respuesta : null;
+    const respuestaAsignada = asignarRespuesta('Buenas tardes, con gusto le colaboramos');
+    expect(respuestaAsignada).not.toBeNull();
   });
 });

@@ -3,17 +3,17 @@ import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, ParseIntPip
 import { ApiTags, ApiOperation, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { ServiciosService } from './servicios.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
+
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname, join } from 'path';
+import { extname, join } from 'node:path';
 
 const UPLOADS_PATH = join(process.cwd(), 'uploads', 'servicios');
 
 @Controller('servicios') // → /api/servicios
 @ApiTags('Servicios')
 export class ServiciosController {
-  constructor(private serviciosService: ServiciosService) {}
+  constructor(private readonly serviciosService: ServiciosService) {}
 
   // Rutas públicas (sin @UseGuards)
   @Get()

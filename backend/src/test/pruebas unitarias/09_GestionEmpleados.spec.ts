@@ -4,7 +4,7 @@ import { UsuariosService } from '../../usuarios/usuarios.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 
-describe('GestionEmpleados (RF-09)', () => {
+describe('GestionEmpleados', () => {
   let empleadosService: EmpleadosService;
   let usuariosService: UsuariosService;
   let prismaService: jest.Mocked<PrismaService>;
@@ -13,6 +13,7 @@ describe('GestionEmpleados (RF-09)', () => {
     usuario: {
       findMany: jest.fn(),
       findUnique: jest.fn(),
+      findFirst: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
     },
@@ -40,7 +41,7 @@ describe('GestionEmpleados (RF-09)', () => {
   });
 
   it('CP-053: Crear un nuevo empleado exitosamente con rol_Id_Rol = 2.', async () => {
-    mockPrismaService.usuario.findUnique.mockResolvedValue(null);
+    mockPrismaService.usuario.findFirst.mockResolvedValue(null);
     mockPrismaService.usuario.create.mockResolvedValue({
       Id_Usuario: 5,
       Nombre: 'Empleado Nuevo',
@@ -60,7 +61,7 @@ describe('GestionEmpleados (RF-09)', () => {
   });
 
   it('CP-054: Rechazar creación de empleado con correo ya existente.', async () => {
-    mockPrismaService.usuario.findUnique.mockResolvedValue({ Id_Usuario: 1, Correo: 'emp@test.com' });
+    mockPrismaService.usuario.findFirst.mockResolvedValue({ Id_Usuario: 1, Correo: 'emp@test.com' });
 
     await expect(
       usuariosService.createEmpleado({

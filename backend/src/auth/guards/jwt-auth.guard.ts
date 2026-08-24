@@ -3,7 +3,7 @@
 // Reemplaza el middleware authenticateToken
 // Uso: @UseGuards(JwtAuthGuard) en cualquier controller o método
 // ============================================================
-import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()

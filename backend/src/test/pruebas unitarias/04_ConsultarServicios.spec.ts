@@ -3,7 +3,7 @@ import { ServiciosService } from '../../servicios/servicios.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 
-describe('ConsultarServicios (RF-04)', () => {
+describe('ConsultarServicios', () => {
   let serviciosService: ServiciosService;
   let prismaService: jest.Mocked<PrismaService>;
 

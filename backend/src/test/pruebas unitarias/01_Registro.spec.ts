@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { ConflictException } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 
-describe('Registro (RF-01)', () => {
+describe('Registro', () => {
   let authService: AuthService;
   let prismaService: jest.Mocked<PrismaService>;
 

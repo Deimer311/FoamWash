@@ -4,7 +4,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../../notifications/notifications.service';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
-describe('ProgramarServicio (RF-06)', () => {
+describe('ProgramarServicio', () => {
   let reservasService: ReservasService;
   let prismaService: jest.Mocked<PrismaService>;
 
@@ -46,7 +46,14 @@ describe('ProgramarServicio (RF-06)', () => {
 
   it('CP-035: Agendamiento de cita exitoso en horario válido.', async () => {
     const fechaFutura = '2028-10-15';
-    mockPrismaService.usuario.findMany.mockResolvedValue([]);
+    mockPrismaService.usuario.findMany.mockResolvedValue([
+      {
+        Id_Usuario: 2,
+        Nombre: 'Empleado 1',
+        empleado: [{ dias_laborales: 'domingo, lunes, martes, miercoles, jueves, viernes, sabado' }]
+      }
+    ]);
+    mockPrismaService.reserva.findMany.mockResolvedValue([]);
     mockPrismaService.servicio.findMany.mockResolvedValue([{ Id_Servicio: 1, Precio: 100000 }]);
     mockPrismaService.reserva.create.mockResolvedValue({
       ID_Reserva: 101,

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-describe('Auditoría y Logs (RF-19)', () => {
+describe('Auditoría y Logs', () => {
   const registrarLogAuditoria = (accion: string, usuarioId: number, IP: string) => {
     return {
       timestamp: new Date(),

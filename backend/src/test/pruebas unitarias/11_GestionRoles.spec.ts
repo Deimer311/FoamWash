@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsuariosService } from '../../usuarios/usuarios.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { EmpleadosService } from '../../empleados/empleados.service';
 
-describe('GestionRoles (RF-11)', () => {
+describe('GestionRoles', () => {
   let usuariosService: UsuariosService;
   let prismaService: jest.Mocked<PrismaService>;
 
@@ -22,6 +23,7 @@ describe('GestionRoles (RF-11)', () => {
       providers: [
         UsuariosService,
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: EmpleadosService, useValue: {} },
       ],
     }).compile();
 

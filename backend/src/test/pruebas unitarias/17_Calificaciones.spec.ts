@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-describe('Calificaciones (RF-17)', () => {
+describe('Calificaciones', () => {
   const registrarCalificacion = (puntaje: number, comentario?: string) => {
     if (puntaje < 1 || puntaje > 5) {
       throw new Error('El puntaje debe estar entre 1 y 5 estrellas');

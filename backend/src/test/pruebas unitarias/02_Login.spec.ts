@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { UnauthorizedException, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 
-describe('Login (RF-02)', () => {
+describe('Login', () => {
   let authService: AuthService;
   let prismaService: jest.Mocked<PrismaService>;
 
