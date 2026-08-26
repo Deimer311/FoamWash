@@ -82,7 +82,7 @@ export default function MisAgendamientosCliente({ onBackToHome, onCotizacion, on
 
     const formatMoneda = (val) => {
         const num = Number(val);
-        return isNaN(num) ? '$0' : `$${num.toLocaleString('es-CO')}`;
+        return Number.isNaN(num) ? '$0' : `$${num.toLocaleString('es-CO')}`;
     };
 
     const formatFecha = (f) => {
@@ -98,7 +98,7 @@ export default function MisAgendamientosCliente({ onBackToHome, onCotizacion, on
         if (!h) return '—';
         try {
             const date = new Date(h);
-            if (!isNaN(date.getTime())) {
+            if (!Number.isNaN(date.getTime())) {
                 const localDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
                 return localDate.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true });
             }
@@ -167,8 +167,8 @@ export default function MisAgendamientosCliente({ onBackToHome, onCotizacion, on
         // 2. Filtros normales de estado y búsqueda
         const matchesEstado = filterEstado === 'Todos' || r.Estado === filterEstado;
         const serviceNames = (r.servicios || []).map(s => s.Nombre_Servicio.toLowerCase()).join(' ');
-        const matchesSearch = serviceNames.includes(searchTerm.toLowerCase()) || 
-                              (r.ID_Reserva && `PED-${r.ID_Reserva}`.toLowerCase().includes(searchTerm.toLowerCase()));
+        const matchesSearch = serviceNames.includes(searchTerm.toLowerCase()) ||
+            (r.ID_Reserva && `PED-${r.ID_Reserva}`.toLowerCase().includes(searchTerm.toLowerCase()));
         return matchesEstado && matchesSearch;
     });
 
@@ -618,7 +618,7 @@ export default function MisAgendamientosCliente({ onBackToHome, onCotizacion, on
                         {filteredReservas.map(reserva => {
                             const total = calcularTotalReserva(reserva);
                             const serviceNames = (reserva.servicios || []).map(s => s.Nombre_Servicio).join(' + ');
-                            
+
                             return (
                                 <div
                                     key={reserva.ID_Reserva}
@@ -685,7 +685,7 @@ export default function MisAgendamientosCliente({ onBackToHome, onCotizacion, on
                             </p>
                         </div>
                         <div className="modal-body-content">
-                            
+
                             <div className="detail-section">
                                 <div className="detail-section-title">Servicios Contratados</div>
                                 <div className="services-list-detail">
@@ -742,19 +742,19 @@ export default function MisAgendamientosCliente({ onBackToHome, onCotizacion, on
                                 <div className="info-row">
                                     <IcInfo />
                                     <span>
-                                        <strong>Estado:</strong> 
+                                        <strong>Estado:</strong>
                                         <span className={getStatusClass(selectedReserva.Estado)} style={{ marginLeft: '8px', display: 'inline-block' }}>
                                             {selectedReserva.Estado}
                                         </span>
                                     </span>
                                 </div>
-                                {selectedReserva.observacion?.Observaciones && 
-                                 selectedReserva.observacion.Observaciones !== selectedReserva.Informacion_adicional && (
-                                    <div className="info-row" style={{ alignItems: 'flex-start' }}>
-                                        <div style={{ marginTop: '2px', display: 'flex' }}><IcInfo /></div>
-                                        <span><strong>Notas:</strong> {selectedReserva.observacion.Observaciones}</span>
-                                    </div>
-                                )}
+                                {selectedReserva.observacion?.Observaciones &&
+                                    selectedReserva.observacion.Observaciones !== selectedReserva.Informacion_adicional && (
+                                        <div className="info-row" style={{ alignItems: 'flex-start' }}>
+                                            <div style={{ marginTop: '2px', display: 'flex' }}><IcInfo /></div>
+                                            <span><strong>Notas:</strong> {selectedReserva.observacion.Observaciones}</span>
+                                        </div>
+                                    )}
                                 <div className="info-row">
                                     <IcUser />
                                     <span><strong>Empleado Asignado:</strong> {selectedReserva.empleado?.Nombre || 'Por asignar'}</span>

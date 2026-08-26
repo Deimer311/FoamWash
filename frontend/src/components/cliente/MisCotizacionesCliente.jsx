@@ -99,7 +99,7 @@ export default function MisCotizacionesCliente({ onBackToHome, onCotizacion, onP
 
     const formatMoneda = (val) => {
         const num = Number(val);
-        return isNaN(num) ? '$0' : `$${num.toLocaleString('es-CO')}`;
+        return Number.isNaN(num) ? '$0' : `$${num.toLocaleString('es-CO')}`;
     };
 
     const formatFecha = (f) => {

@@ -11,13 +11,13 @@ import { useAuth } from '../autenticacion/AuthContext';
 import api from '../../services/api';
 
 const axiosUpload = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-    withCredentials: true,
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  withCredentials: true,
 });
 
 const API_BASE_URL = import.meta.env.VITE_API_URL
-    ? import.meta.env.VITE_API_URL.replace('/api', '')
-    : 'http://localhost:5000';
+  ? import.meta.env.VITE_API_URL.replace('/api', '')
+  : 'http://localhost:5000';
 
 const TIPOS_DOCUMENTO = [
   { id: 1, nombre: 'Cédula de Ciudadanía' },
@@ -32,11 +32,11 @@ const TIPOS_DOCUMENTO = [
 const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
   const { user, updateUser, refreshUser } = useAuth();
   const [imagePreview, setImagePreview] = useState(null);
-  const [archivoFoto,  setArchivoFoto]  = useState(null);
-  const [showSuccess,  setShowSuccess]  = useState(false);
-  const [isLoading,    setIsLoading]    = useState(true);
-  const [guardando,    setGuardando]    = useState(false);
-  const [errorMsg,     setErrorMsg]     = useState('');
+  const [archivoFoto, setArchivoFoto] = useState(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [guardando, setGuardando] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const [formData, setFormData] = useState({
     nombre: '',
     cargo: 'Administrador General',
@@ -65,16 +65,16 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
           const d = res.data.data;
           setFormData(prev => ({
             ...prev,
-            nombre:    d.Nombre   || '',
-            email:     d.Correo   || '',
-            telefono:  d.Telefono || '',
-            cedula:    d.N_Documento || '',
+            nombre: d.Nombre || '',
+            email: d.Correo || '',
+            telefono: d.Telefono || '',
+            cedula: d.N_Documento || '',
             tipoDocId: d.tipo_de_documento?.idTipo_de_Documento || 1,
           }));
           if (d.foto_perfil) {
             const url = d.foto_perfil.startsWith('http')
-                ? d.foto_perfil
-                : `${API_BASE_URL}${d.foto_perfil}`;
+              ? d.foto_perfil
+              : `${API_BASE_URL}${d.foto_perfil}`;
             setImagePreview(url);
           }
         }
@@ -97,8 +97,8 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
     reader.readAsDataURL(file);
   };
 
-  const handleUploadClick  = () => fileInputRef.current?.click();
-  const handleChangePhoto  = () => fileInputRef.current?.click();
+  const handleUploadClick = () => fileInputRef.current?.click();
+  const handleChangePhoto = () => fileInputRef.current?.click();
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -127,7 +127,7 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
       }
 
       await api.put(`/usuarios/${user.id}`, {
-        Nombre:   formData.nombre,
+        Nombre: formData.nombre,
         Telefono: formData.telefono,
         N_Documento: formData.cedula || undefined,
         tipo_de_documento_id_tipo_de_documento: formData.tipoDocId ? Number(formData.tipoDocId) : undefined,
@@ -583,8 +583,8 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
               >
                 {imagePreview
                   ? <img src={imagePreview} alt="Foto" style={S.photoImg}
-                      onError={(e) => { e.target.style.display = 'none'; }}
-                    />
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                  />
                   : <span>👤</span>
                 }
               </div>
@@ -674,8 +674,8 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
                 </div>
                 <div className="paei-form-grid" style={S.formGrid}>
                   {[
-                    { id: 'nombre',   label: 'Nombre Completo *',    type: 'text',  placeholder: 'Tu nombre completo', required: true },
-                    { id: 'cargo',    label: 'Cargo *',               type: 'text',  placeholder: 'Administrador General', required: true },
+                    { id: 'nombre', label: 'Nombre Completo *', type: 'text', placeholder: 'Tu nombre completo', required: true },
+                    { id: 'cargo', label: 'Cargo *', type: 'text', placeholder: 'Administrador General', required: true },
                   ].map(f => (
                     <div key={f.id} style={S.fg}>
                       <label style={S.label}>{f.label}</label>
@@ -727,10 +727,10 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
                 </div>
                 <div className="paei-form-grid" style={S.formGrid}>
                   {[
-                    { id: 'email',      label: 'Correo Corporativo *',   type: 'email', placeholder: 'admin@empresa.com',     required: true  },
-                    { id: 'emailAlt',   label: 'Correo Alternativo',      type: 'email', placeholder: 'correo.alt@email.com',  required: false },
-                    { id: 'telefono',   label: 'Teléfono Principal *',    type: 'tel',   placeholder: '+57 300 000 0000',       required: true  },
-                    { id: 'telefonoAlt',label: 'Teléfono Alternativo',    type: 'tel',   placeholder: '+57 300 000 0000',       required: false },
+                    { id: 'email', label: 'Correo Corporativo *', type: 'email', placeholder: 'admin@empresa.com', required: true },
+                    { id: 'emailAlt', label: 'Correo Alternativo', type: 'email', placeholder: 'correo.alt@email.com', required: false },
+                    { id: 'telefono', label: 'Teléfono Principal *', type: 'tel', placeholder: '+57 300 000 0000', required: true },
+                    { id: 'telefonoAlt', label: 'Teléfono Alternativo', type: 'tel', placeholder: '+57 300 000 0000', required: false },
                   ].map(f => (
                     <div key={f.id} style={S.fg}>
                       <label style={S.label}>{f.label}</label>
@@ -757,12 +757,12 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
                 </div>
                 <div className="paei-perm-grid" style={S.permGrid}>
                   {[
-                    { icon: '👥', title: 'Gestión de Usuarios',   desc: 'Crear, editar y eliminar usuarios' },
-                    { icon: '👨‍💼', title: 'Gestión de Empleados',  desc: 'Administrar personal y horarios'   },
-                    { icon: '💰', title: 'Acceso Financiero',      desc: 'Ver y gestionar finanzas'          },
-                    { icon: '📊', title: 'Reportes Avanzados',     desc: 'Generar y exportar reportes'       },
-                    { icon: '⚙️', title: 'Configuración Sistema',  desc: 'Modificar parámetros del sistema'  },
-                    { icon: '🔒', title: 'Seguridad y Auditoría',  desc: 'Acceso a logs y auditorías'        }
+                    { icon: '👥', title: 'Gestión de Usuarios', desc: 'Crear, editar y eliminar usuarios' },
+                    { icon: '👨‍💼', title: 'Gestión de Empleados', desc: 'Administrar personal y horarios' },
+                    { icon: '💰', title: 'Acceso Financiero', desc: 'Ver y gestionar finanzas' },
+                    { icon: '📊', title: 'Reportes Avanzados', desc: 'Generar y exportar reportes' },
+                    { icon: '⚙️', title: 'Configuración Sistema', desc: 'Modificar parámetros del sistema' },
+                    { icon: '🔒', title: 'Seguridad y Auditoría', desc: 'Acceso a logs y auditorías' }
                   ].map((perm, idx) => (
                     <div key={idx} className="paei-perm-card" style={{ ...S.permCard, transition: 'all 0.2s ease' }}>
                       <div style={S.permHeader}>
@@ -809,7 +809,7 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
                 </div>
                 <div className="paei-form-grid" style={S.formGrid}>
                   {[
-                    { id: 'passwordNueva',     label: 'Nueva Contraseña'    },
+                    { id: 'passwordNueva', label: 'Nueva Contraseña' },
                     { id: 'passwordConfirmar', label: 'Confirmar Contraseña' },
                   ].map(f => (
                     <div key={f.id} style={S.fg}>

@@ -7,8 +7,8 @@
 import React, { useState } from 'react';
 
 const CotizacionServiceCard = ({ service, onAgregar }) => {
-    const [isAdding,      setIsAdding]      = useState(false);
-    const [added,         setAdded]         = useState(false);
+    const [isAdding, setIsAdding] = useState(false);
+    const [added, setAdded] = useState(false);
     const [showFullImage, setShowFullImage] = useState(false);
 
     const handleAgregar = async () => {
@@ -102,8 +102,7 @@ const CotizacionServiceCard = ({ service, onAgregar }) => {
                 }
 
                 .csc-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-                .csc-rating { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #555; font-family: 'Kanit', sans-serif; }
-                .csc-star { color: #ffc107; font-size: 13px; }
+
                 .csc-tags { display: flex; gap: 5px; }
                 .csc-tag { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; font-family: 'Kanit', sans-serif; }
                 .csc-tag-green { background: #e8f5e9; color: #2e7d32; }
@@ -199,8 +198,7 @@ const CotizacionServiceCard = ({ service, onAgregar }) => {
             <article className="csc-card">
                 <div className="csc-img-wrap" onClick={() => setShowFullImage(true)}>
                     <div className="csc-badges-row">
-                        {service.ecologico && <span className="csc-badge-mini">🌿 Eco</span>}
-                        {service.garantia  && <span className="csc-badge-mini">✓ Garantía</span>}
+
                     </div>
                     {service.popular && <span className="csc-badge-popular">✨ Popular</span>}
                     <img
@@ -217,16 +215,9 @@ const CotizacionServiceCard = ({ service, onAgregar }) => {
                     <h3 className="csc-title">{service.nombre}</h3>
                     <p className="csc-desc">{service.descripcion}</p>
                     <div className="csc-meta">
-                        {service.rating && (
-                            <div className="csc-rating">
-                                <span className="csc-star">★</span>
-                                <strong>{service.rating}</strong>
-                                <span style={{ color: '#bbb' }}>(4.8k)</span>
-                            </div>
-                        )}
+
                         <div className="csc-tags">
-                            {service.ecologico && <span className="csc-tag csc-tag-green">Eco</span>}
-                            {service.garantia  && <span className="csc-tag csc-tag-blue">Garantía</span>}
+
                         </div>
                     </div>
                 </div>
@@ -243,8 +234,8 @@ const CotizacionServiceCard = ({ service, onAgregar }) => {
                     >
                         <svg height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'relative', zIndex: 1, flexShrink: 0 }}>
                             {added
-                                ? <polyline points="20 6 9 17 4 12"/>
-                                : <><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></>
+                                ? <polyline points="20 6 9 17 4 12" />
+                                : <><circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" /><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" /></>
                             }
                         </svg>
                         <span style={{ position: 'relative', zIndex: 1 }}>

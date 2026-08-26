@@ -31,7 +31,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL
 const formatFecha = (fecha) => {
     if (!fecha) return null;
     const d = new Date(fecha);
-    if (isNaN(d.getTime())) return null;
+    if (Number.isNaN(d.getTime())) return null;
     return d.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
 };
 

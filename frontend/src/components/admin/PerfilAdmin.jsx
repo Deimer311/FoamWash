@@ -10,7 +10,7 @@ import { useAuth } from '../autenticacion/AuthContext';
 import api from '../../services/api';
 import './estilos_admin/PerfilAdmin.css';
 import QuickActionsApp from './acciones-rapidas';
-import ConsultasAdmin  from './ConsultasAdmin';
+import ConsultasAdmin from './ConsultasAdmin';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL
     ? import.meta.env.VITE_API_URL.replace('/api', '')
@@ -31,8 +31,8 @@ const PerfilAdmin = ({
 }) => {
     const { user } = useAuth();
     const [activeModal, setActiveModal] = useState(null);
-    const [perfil, setPerfil]           = useState(null);
-    const [isLoading, setIsLoading]     = useState(true);
+    const [perfil, setPerfil] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     // ── Cargar datos del admin ────────────────────────────────────────────────
     useEffect(() => {
@@ -68,20 +68,20 @@ const PerfilAdmin = ({
     const fotoUrl = getFotoUrl(perfil?.foto_perfil || user?.foto_perfil);
 
     // ── Handlers (lógica original intacta) ───────────────────────────────────
-    const handleEditProfile  = ()  => { if (onEditarPerfil) onEditarPerfil(); };
-    const handleCrudUsuarios = ()  => { if (onCrudUsuarios) onCrudUsuarios(); };
+    const handleEditProfile = () => { if (onEditarPerfil) onEditarPerfil(); };
+    const handleCrudUsuarios = () => { if (onCrudUsuarios) onCrudUsuarios(); };
     const handleCrudServicios = (e) => { e.preventDefault(); if (onCrudServicios) onCrudServicios(); };
-    const handleCerrarSesion = ()  => {
+    const handleCerrarSesion = () => {
         if (window.confirm('¿Estás seguro de que deseas cerrar sesión?')) {
             if (onLogout) onLogout();
             else { localStorage.removeItem('foamwash_active_session'); if (onBackToHome) onBackToHome(); }
         }
     };
     const handleReportesAdmin = () => { if (onReportesAdmin) onReportesAdmin(); };
-    const handleServicios     = (e) => { e.preventDefault(); if (onServicios) onServicios(); };
+    const handleServicios = (e) => { e.preventDefault(); if (onServicios) onServicios(); };
     const handleCrudEmpleados = (e) => { e.preventDefault(); if (onCrudEmpleados) onCrudEmpleados(); };
-    const handleConsultas     = (e) => { e.preventDefault(); if (onConsultas) onConsultas(); };
-    const handleGoToDashboard = ()  => { if (onDashboard) onDashboard(); };
+    const handleConsultas = (e) => { e.preventDefault(); if (onConsultas) onConsultas(); };
+    const handleGoToDashboard = () => { if (onDashboard) onDashboard(); };
 
     if (isLoading) {
         return (
@@ -110,7 +110,7 @@ const PerfilAdmin = ({
                                     src={fotoUrl}
                                     alt="Foto perfil"
                                     onError={(e) => { e.target.style.display = 'none'; }}
-                                  />
+                                />
                                 : <span>👤</span>
                             }
                         </div>
@@ -187,12 +187,12 @@ const PerfilAdmin = ({
                             </h2>
                             <div className="pa-perms-grid">
                                 {[
-                                    { icon: '👥', title: 'Gestión de Usuarios',    desc: 'Crear, editar y eliminar usuarios'    },
-                                    { icon: '👨‍💼', title: 'Gestión de Empleados',   desc: 'Administrar personal y horarios'      },
-                                    { icon: '💰', title: 'Acceso Financiero',       desc: 'Ver y gestionar finanzas'             },
-                                    { icon: '📊', title: 'Reportes Avanzados',      desc: 'Generar y exportar reportes'          },
-                                    { icon: '⚙️', title: 'Configuración Sistema',   desc: 'Modificar parámetros del sistema'     },
-                                    { icon: '🔒', title: 'Seguridad y Auditoría',   desc: 'Acceso a logs y auditorías'           },
+                                    { icon: '👥', title: 'Gestión de Usuarios', desc: 'Crear, editar y eliminar usuarios' },
+                                    { icon: '👨‍💼', title: 'Gestión de Empleados', desc: 'Administrar personal y horarios' },
+                                    { icon: '💰', title: 'Acceso Financiero', desc: 'Ver y gestionar finanzas' },
+                                    { icon: '📊', title: 'Reportes Avanzados', desc: 'Generar y exportar reportes' },
+                                    { icon: '⚙️', title: 'Configuración Sistema', desc: 'Modificar parámetros del sistema' },
+                                    { icon: '🔒', title: 'Seguridad y Auditoría', desc: 'Acceso a logs y auditorías' },
                                 ].map((p, i) => (
                                     <div key={i} className="pa-perm-item">
                                         <div className="pa-perm-icon">{p.icon}</div>
