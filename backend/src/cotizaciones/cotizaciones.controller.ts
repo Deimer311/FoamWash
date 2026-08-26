@@ -3,12 +3,12 @@ import { Controller, Get, Post, Body, UseGuards, Req, Param, ParseIntPipe } from
 import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { CotizacionesService } from './cotizaciones.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
+
 
 @Controller('cotizaciones')
 @ApiTags('Cotizaciones')
 export class CotizacionesController {
-  constructor(private cotizacionesService: CotizacionesService) {}
+  constructor(private readonly cotizacionesService: CotizacionesService) {}
 
   // Pública — lista de servicios para cotizar
   @Get('servicios')

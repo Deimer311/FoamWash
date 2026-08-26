@@ -17,6 +17,8 @@ const mockEmpleado = {
   password: faker.internet.password({ length: 10 }) + 'A1!'
 };
 
+import { setupTestEnvironment, registerAndLoginAdmin } from '../test-utils';
+
 describe('Empleados (Integracion)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
@@ -24,15 +26,9 @@ describe('Empleados (Integracion)', () => {
   let adminId: number;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-    await app.init();
-
-    prisma = app.get<PrismaService>(PrismaService);
+    const env = await setupTestEnvironment();
+    app = env.app;
+    prisma = env.prisma;
     
     // Limpiar BD
     await prisma.empleado.deleteMany();
@@ -40,21 +36,9 @@ describe('Empleados (Integracion)', () => {
       where: { Correo: { in: [mockAdmin.correo, mockEmpleado.correo] } }
     });
 
-    // Setup de datos base
-    await prisma.rol.upsert({ where: { Id_Rol: 1 }, update: { Rol: 'admin' }, create: { Id_Rol: 1, Rol: 'admin' } });
-    await prisma.rol.upsert({ where: { Id_Rol: 2 }, update: { Rol: 'empleado' }, create: { Id_Rol: 2, Rol: 'empleado' } });
-
-    // Registrar y loguear Admin
-    const resAdmin = await request(app.getHttpServer())
-      .post('/auth/register')
-      .send({
-        nombre: mockAdmin.nombre,
-        correo: mockAdmin.correo,
-        password: mockAdmin.password,
-        role: 'admin'
-      });
-    tokenAdmin = resAdmin.body.access_token;
-    adminId = resAdmin.body.data.id;
+    const admin = await registerAndLoginAdmin(app, mockAdmin);
+    tokenAdmin = admin.token;
+    adminId = admin.id;
     
     // Registrar Empleado de prueba
     await request(app.getHttpServer())

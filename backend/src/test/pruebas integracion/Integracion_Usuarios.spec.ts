@@ -17,6 +17,8 @@ const mockClient = {
   password: faker.internet.password({ length: 10 }) + 'A1!'
 };
 
+import { setupTestEnvironment, registerAndLoginAdmin, registerAndLoginClient } from '../test-utils';
+
 describe('Usuarios (Integracion)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
@@ -25,47 +27,21 @@ describe('Usuarios (Integracion)', () => {
   let adminId: number;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
+    const env = await setupTestEnvironment();
+    app = env.app;
+    prisma = env.prisma;
 
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-    await app.init();
-
-    prisma = app.get<PrismaService>(PrismaService);
-    
     // Limpiar BD
     await prisma.usuario.deleteMany({
       where: { Correo: { in: [mockAdmin.correo, mockClient.correo] } }
     });
 
-    // Setup de datos base
-    await prisma.rol.upsert({ where: { Id_Rol: 1 }, update: { Rol: 'admin' }, create: { Id_Rol: 1, Rol: 'admin' } });
-    await prisma.rol.upsert({ where: { Id_Rol: 3 }, update: { Rol: 'cliente' }, create: { Id_Rol: 3, Rol: 'cliente' } });
+    const admin = await registerAndLoginAdmin(app, mockAdmin);
+    tokenAdmin = admin.token;
+    adminId = admin.id;
 
-    // Registrar y loguear Admin
-    const resAdmin = await request(app.getHttpServer())
-      .post('/auth/register')
-      .send({
-        nombre: mockAdmin.nombre,
-        correo: mockAdmin.correo,
-        password: mockAdmin.password,
-        role: 'admin'
-      });
-    tokenAdmin = resAdmin.body.access_token;
-    adminId = resAdmin.body.data.id;
-
-    // Registrar y loguear Cliente
-    const resCliente = await request(app.getHttpServer())
-      .post('/auth/register')
-      .send({
-        nombre: mockClient.nombre,
-        correo: mockClient.correo,
-        password: mockClient.password,
-        role: 'Cliente'
-      });
-    tokenCliente = resCliente.body.access_token;
+    const cliente = await registerAndLoginClient(app, mockClient);
+    tokenCliente = cliente.token;
   });
 
   afterAll(async () => {

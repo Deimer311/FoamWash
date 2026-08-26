@@ -3,11 +3,11 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class EstadisticasService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getDashboard(periodo?: string) {
     const today = new Date();
-    let startDate = new Date('2000-01-01'); // Por defecto todo el tiempo
+    let startDate = new Date('2000-01-01'); // Por defecto desde siempre
 
     if (periodo) {
       switch (periodo.toLowerCase()) {

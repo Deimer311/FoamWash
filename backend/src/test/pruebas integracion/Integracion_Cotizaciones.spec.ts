@@ -30,11 +30,15 @@ describe('Cotizaciones (Integracion)', () => {
     prisma = app.get<PrismaService>(PrismaService);
     
     // Limpiar BD
-    await prisma.cotizacion.deleteMany();
-    await prisma.servicio.deleteMany();
-    await prisma.usuario.deleteMany({ where: { Correo: mockUser.correo } });
-
-    // Setup de datos base
+    await prisma.calificacion.deleteMany().catch(() => {});
+    await prisma.cotizacion.deleteMany().catch(() => {});
+    await prisma.reserva.deleteMany().catch(() => {});
+    await prisma.servicio.deleteMany().catch(() => {});
+    await prisma.observacion.deleteMany().catch(() => {});
+    await prisma.notificacion.deleteMany().catch(() => {});
+    await prisma.empleado.deleteMany().catch(() => {});
+    await prisma.usuario.deleteMany().catch(() => {});
+// Setup de datos base
     await prisma.rol.upsert({
       where: { Id_Rol: 3 },
       update: { Rol: 'Cliente' },
@@ -64,10 +68,15 @@ describe('Cotizaciones (Integracion)', () => {
   });
 
   afterAll(async () => {
-    await prisma.cotizacion.deleteMany();
-    await prisma.servicio.deleteMany();
-    await prisma.usuario.deleteMany({ where: { Correo: mockUser.correo } });
-    await prisma.$disconnect();
+    await prisma.calificacion.deleteMany().catch(() => {});
+    await prisma.cotizacion.deleteMany().catch(() => {});
+    await prisma.reserva.deleteMany().catch(() => {});
+    await prisma.servicio.deleteMany().catch(() => {});
+    await prisma.observacion.deleteMany().catch(() => {});
+    await prisma.notificacion.deleteMany().catch(() => {});
+    await prisma.empleado.deleteMany().catch(() => {});
+    await prisma.usuario.deleteMany().catch(() => {});
+await prisma.$disconnect();
     await app.close();
   });
 

@@ -8,7 +8,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 @UseGuards(JwtAuthGuard)
 @ApiTags('Notificaciones')
 export class NotificacionesController {
-  constructor(private notificacionesService: NotificacionesService) {}
+  constructor(private readonly notificacionesService: NotificacionesService) {}
 
   @Get(':userId')
   @ApiOperation({ summary: 'Obtener notificaciones del usuario (últimas 72 horas)' })

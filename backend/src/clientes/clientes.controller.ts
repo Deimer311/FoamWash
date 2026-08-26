@@ -2,12 +2,12 @@
 import { Controller, Get, Put, Post, Param, Body, UseGuards, ParseIntPipe, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { extname } from 'node:path';
 import { ApiTags, ApiOperation, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { ClientesService } from './clientes.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { Roles } from '../common/decorators/roles.decorator';
+
+
 
 @Controller('clientes')
 @UseGuards(JwtAuthGuard)
@@ -15,7 +15,7 @@ import { Roles } from '../common/decorators/roles.decorator';
 // @Roles('admin', 'cliente') // Temporalmente desactivado para debug
 @ApiTags('Clientes')
 export class ClientesController {
-  constructor(private clientesService: ClientesService) {}
+  constructor(private readonly clientesService: ClientesService) {}
 
   @Get(':id/perfil')
   @ApiOperation({ summary: 'Obtener el perfil del cliente' })

@@ -35,16 +35,14 @@ describe('Notificaciones (Integración)', () => {
     prisma = app.get<PrismaService>(PrismaService);
 
     // Limpiar BD
-    await prisma.calificacion.deleteMany();
-    await prisma.servicio.deleteMany();
-    await prisma.cotizacion.deleteMany();
-    await prisma.reserva.deleteMany();
-    await prisma.observacion.deleteMany();
-    await prisma.notificacion.deleteMany();
-    await prisma.empleado.deleteMany();
-    await prisma.usuario.deleteMany({
-      where: { Correo: { in: [mockClient.correo, mockEmpleado.correo] } }
-    });
+    await prisma.calificacion.deleteMany().catch(() => {});
+    await prisma.cotizacion.deleteMany().catch(() => {});
+    await prisma.reserva.deleteMany().catch(() => {});
+    await prisma.servicio.deleteMany().catch(() => {});
+    await prisma.observacion.deleteMany().catch(() => {});
+    await prisma.notificacion.deleteMany().catch(() => {});
+    await prisma.empleado.deleteMany().catch(() => {});
+    await prisma.usuario.deleteMany().catch(() => {});
 
     const rolCliente = await prisma.rol.upsert({
       where: { Id_Rol: 3 },
@@ -82,16 +80,14 @@ describe('Notificaciones (Integración)', () => {
   });
 
   afterAll(async () => {
-    await prisma.calificacion.deleteMany();
-    await prisma.servicio.deleteMany();
-    await prisma.cotizacion.deleteMany();
-    await prisma.reserva.deleteMany();
-    await prisma.observacion.deleteMany();
-    await prisma.notificacion.deleteMany();
-    await prisma.empleado.deleteMany();
-    await prisma.usuario.deleteMany({
-      where: { Correo: { in: [mockClient.correo, mockEmpleado.correo] } }
-    });
+    await prisma.calificacion.deleteMany().catch(() => {});
+    await prisma.cotizacion.deleteMany().catch(() => {});
+    await prisma.reserva.deleteMany().catch(() => {});
+    await prisma.servicio.deleteMany().catch(() => {});
+    await prisma.observacion.deleteMany().catch(() => {});
+    await prisma.notificacion.deleteMany().catch(() => {});
+    await prisma.empleado.deleteMany().catch(() => {});
+    await prisma.usuario.deleteMany().catch(() => {});
     await prisma.$disconnect();
     await app.close();
   });

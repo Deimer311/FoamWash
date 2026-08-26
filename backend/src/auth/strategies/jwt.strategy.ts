@@ -11,9 +11,8 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private configService: ConfigService,
-    private prisma: PrismaService,
+  constructor(private readonly configService: ConfigService,
+    private readonly prisma: PrismaService,
   ) {
     super({
       // Extraer token de la COOKIE o del Header Authorization
@@ -51,6 +50,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
 
     if (!user) {
+      console.log('JWT_VALIDATE_ERROR: User not found or inactive. Payload:', payload);
       throw new UnauthorizedException({
         code: 'USER_NOT_FOUND',
         message: 'Usuario no encontrado o inactivo',
@@ -59,6 +59,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     // Verificar que el token coincida con el almacenado en BD
     if (user.access_token !== token) {
+      console.log('JWT_VALIDATE_ERROR: Token mismatch', { dbToken: user.access_token, requestToken: token });
       throw new UnauthorizedException({
         code: 'TOKEN_MISMATCH',
         message: 'Token inválido o sesión cerrada',

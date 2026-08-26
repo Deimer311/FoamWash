@@ -9,6 +9,7 @@
   import { JwtService } from '@nestjs/jwt';
   import { ConfigService } from '@nestjs/config';
   import * as bcrypt from 'bcryptjs';
+  import * as crypto from 'node:crypto';
   import { PrismaService } from '../prisma/prisma.service';
   import {
     RegisterDto,
@@ -19,10 +20,9 @@
   import { sendResetCode, sendWelcomeEmail } from '../common/utils/email.util';
   @Injectable()
   export class AuthService {
-    constructor(
-      private prisma: PrismaService,
-      private jwtService: JwtService,
-      private config: ConfigService,
+    constructor(private readonly prisma: PrismaService,
+      private readonly jwtService: JwtService,
+      private readonly config: ConfigService,
     ) {}
 
     // ── GENERAR PAR DE TOKENS ─────────────────────────────────────────────────
@@ -185,7 +185,7 @@
       const user = await this.prisma.usuario.findUnique({ where: { Correo: dto.correo } });
       if (!user) throw new NotFoundException('No existe usuario con ese correo');
 
-      const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const resetCode = crypto.randomInt(100000, 999999).toString();
       const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
       await this.prisma.usuario.update({

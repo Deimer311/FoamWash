@@ -3,14 +3,14 @@ import { Controller, Get, Post, Put, Patch, Delete, Param, Body, UseGuards, Pars
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { ReservasService } from './reservas.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
+
 
 @Controller('reservas') // → /api/reservas
 @UseGuards(JwtAuthGuard)
 @ApiTags('Reservas')
 @ApiBearerAuth()
 export class ReservasController {
-  constructor(private reservasService: ReservasService) {}
+  constructor(private readonly reservasService: ReservasService) {}
 
   @Get()
   @ApiOperation({ summary: 'Obtener todas las reservas' })

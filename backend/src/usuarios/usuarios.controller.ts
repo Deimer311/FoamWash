@@ -1,3 +1,5 @@
+import { Roles } from '../common/decorators/roles.decorator';
+import { RolesGuard } from '../common/guards/roles.guard';
 // src/usuarios/usuarios.controller.ts
 import {
   Controller, Get, Put, Post, Delete,
@@ -6,12 +8,12 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname, join } from 'path';
+import { extname, join } from 'node:path';
 import { UsuariosService } from './usuarios.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
+
 import { SelfOrAdminGuard } from '../common/guards/self-or-admin.guard';
-import { Roles } from '../common/decorators/roles.decorator';
+
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 
 // Ruta absoluta basada en process.cwd() para evitar problemas con CWD relativo en Docker
@@ -23,7 +25,7 @@ const UPLOADS_PATH = join(process.cwd(), 'uploads', 'perfiles');
 @UseGuards(JwtAuthGuard)
 @Roles('admin')
 export class UsuariosController {
-  constructor(private usuariosService: UsuariosService) {}
+  constructor(private readonly usuariosService: UsuariosService) {}
 
   @Get()
   @UseGuards(RolesGuard)

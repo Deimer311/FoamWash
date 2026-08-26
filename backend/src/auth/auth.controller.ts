@@ -19,7 +19,7 @@ import {
   ResetPasswordDto,
 } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
+
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
 const cookieOptions = (maxAge: number) => ({
@@ -32,7 +32,7 @@ const cookieOptions = (maxAge: number) => ({
 @Controller('auth')
 @ApiTags('Auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   // POST /api/auth/register
   @Post('register')

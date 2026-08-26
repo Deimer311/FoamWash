@@ -4,8 +4,8 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { join } from 'path';
-import { mkdirSync } from 'fs';
+import { join } from 'node:path';
+import { mkdirSync } from 'node:fs';
 import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 

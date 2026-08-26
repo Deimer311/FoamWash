@@ -1,3 +1,5 @@
+import { Roles } from '../common/decorators/roles.decorator';
+import { RolesGuard } from '../common/guards/roles.guard';
 // src/empleados/empleados.controller.ts
 import {
   Controller, Get, Post, Body, Param, UseGuards,
@@ -5,18 +7,18 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { extname } from 'node:path';
 import { ApiTags, ApiOperation, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { EmpleadosService } from './empleados.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { Roles } from '../common/decorators/roles.decorator';
+
+
 
 @Controller('empleados') // → /api/empleados
 @UseGuards(JwtAuthGuard)
 @ApiTags('Empleados')
 export class EmpleadosController {
-  constructor(private empleadosService: EmpleadosService) { }
+  constructor(private readonly empleadosService: EmpleadosService) { }
 
   @Get()
   @ApiOperation({ summary: 'Obtener todos los empleados' })
@@ -143,7 +145,7 @@ export class EmpleadosController {
         },
       }),
       fileFilter: (req, file, cb) => {
-        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+        if (!/(jpg|jpeg|png|gif|webp)$/.test(file.mimetype)) {
           return cb(new Error('Solo se permiten imágenes'), false);
         }
         cb(null, true);

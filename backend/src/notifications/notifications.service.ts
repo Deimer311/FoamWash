@@ -1,7 +1,7 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getMessaging } from 'firebase-admin/messaging';
-import * as path from 'path';
+import * as path from 'node:path';
 
 @Injectable()
 export class NotificationsService implements OnModuleInit {
