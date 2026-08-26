@@ -205,15 +205,6 @@ const ServiceCardCliente = ({ servicio, onNotificacion }) => {
                     justify-content: space-between;
                     margin-bottom: 14px;
                 }
-                .sc-rating {
-                    display: flex;
-                    align-items: center;
-                    gap: 4px;
-                    font-size: 12px;
-                    color: #555;
-                    font-family: 'Kanit', sans-serif;
-                }
-                .sc-star { color: #ffc107; font-size: 13px; }
 
                 .sc-tags {
                     display: flex;
@@ -447,8 +438,7 @@ const ServiceCardCliente = ({ servicio, onNotificacion }) => {
                 <div className="sc-img-wrap" onClick={() => setShowFullImage(true)}>
                     {/* Badges top-left */}
                     <div className="sc-badges-row">
-                        {servicio.ecologico  && <span className="sc-badge-mini"><IcLeaf /> Eco</span>}
-                        {servicio.garantia   && <span className="sc-badge-mini"><IcShield /> Garantía</span>}
+
                     </div>
                     {servicio.popular && <span className="sc-badge-popular"><IcTrending /> Popular</span>}
 
@@ -468,16 +458,8 @@ const ServiceCardCliente = ({ servicio, onNotificacion }) => {
                     <p className="sc-desc">{servicio.descripcion}</p>
 
                     <div className="sc-meta">
-                        {servicio.rating && (
-                            <div className="sc-rating">
-                                <IcStar />
-                                <strong>{servicio.rating}</strong>
-                                <span style={{ color: '#bbb' }}>(4.8k)</span>
-                            </div>
-                        )}
                         <div className="sc-tags">
-                            {servicio.ecologico && <span className="sc-tag sc-tag-green">Eco</span>}
-                            {servicio.garantia  && <span className="sc-tag sc-tag-blue">Garantía</span>}
+
                         </div>
                     </div>
                 </div>

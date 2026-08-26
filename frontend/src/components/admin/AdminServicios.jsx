@@ -678,7 +678,7 @@ const AdminServicios = ({
       return;
     }
     // duracion puede ser string ("60-90") o número
-    const durVal = isNaN(Number(formData.duracion)) ? formData.duracion : Number(formData.duracion);
+    const durVal = Number.isNaN(Number(formData.duracion)) ? formData.duracion : Number(formData.duracion);
 
     if (editando) {
       setServicios(prev => prev.map(s =>

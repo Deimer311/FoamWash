@@ -10,8 +10,8 @@ import { useAuth } from '../autenticacion/AuthContext';
 
 const ServiceCard = ({ servicio, onSolicitar, onGoToLogin }) => {
     const { isAuthenticated } = useAuth();
-    const [isHovered,     setIsHovered]     = useState(false);
-    const [isRequesting,  setIsRequesting]  = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
+    const [isRequesting, setIsRequesting] = useState(false);
     const [showFullImage, setShowFullImage] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
 
@@ -26,10 +26,10 @@ const ServiceCard = ({ servicio, onSolicitar, onGoToLogin }) => {
         }
     };
 
-    const handleCloseModal   = () => setShowAuthModal(false);
-    const handleGoToLogin    = () => { setShowAuthModal(false); if (onGoToLogin) onGoToLogin(); };
+    const handleCloseModal = () => setShowAuthModal(false);
+    const handleGoToLogin = () => { setShowAuthModal(false); if (onGoToLogin) onGoToLogin(); };
     const handleGoToRegister = () => { setShowAuthModal(false); if (onGoToLogin) onGoToLogin(); };
-    const handleImageClick   = (e) => { e.stopPropagation(); setShowFullImage(true); };
+    const handleImageClick = (e) => { e.stopPropagation(); setShowFullImage(true); };
 
     const precioFormato = `$${(servicio.precio ?? 0).toLocaleString('es-CO')}`;
 
@@ -157,12 +157,6 @@ const ServiceCard = ({ servicio, onSolicitar, onGoToLogin }) => {
                     justify-content: space-between;
                     margin-bottom: 14px;
                 }
-                .sc-rating {
-                    display: flex; align-items: center; gap: 4px;
-                    font-size: 12px; color: #555;
-                    font-family: 'Kanit', sans-serif;
-                }
-                .sc-star { color: #ffc107; font-size: 13px; }
                 .sc-tags { display: flex; gap: 5px; }
                 .sc-tag {
                     font-size: 10px; font-weight: 600;
@@ -312,8 +306,7 @@ const ServiceCard = ({ servicio, onSolicitar, onGoToLogin }) => {
                 {/* Image */}
                 <div className="sc-img-wrap" onClick={handleImageClick}>
                     <div className="sc-badges-row">
-                        {servicio.ecologico && <span className="sc-badge-mini">🌿 Eco</span>}
-                        {servicio.garantia  && <span className="sc-badge-mini">✓ Garantía</span>}
+
                     </div>
                     {servicio.popular && <span className="sc-badge-popular">✨ Popular</span>}
                     <img
@@ -332,16 +325,9 @@ const ServiceCard = ({ servicio, onSolicitar, onGoToLogin }) => {
                     <p className="sc-desc">{servicio.descripcion}</p>
 
                     <div className="sc-meta">
-                        {servicio.rating && (
-                            <div className="sc-rating">
-                                <span className="sc-star">★</span>
-                                <strong>{servicio.rating}</strong>
-                                <span style={{ color: '#bbb' }}>(4.8k)</span>
-                            </div>
-                        )}
+
                         <div className="sc-tags">
-                            {servicio.ecologico && <span className="sc-tag sc-tag-green">Eco</span>}
-                            {servicio.garantia  && <span className="sc-tag sc-tag-blue">Garantía</span>}
+
                         </div>
                     </div>
                 </div>
@@ -360,11 +346,11 @@ const ServiceCard = ({ servicio, onSolicitar, onGoToLogin }) => {
                     >
                         <span className="sc-btn-icon">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'relative', zIndex: 1 }}>
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                                <line x1="16" y1="13" x2="8" y2="13"/>
-                                <line x1="16" y1="17" x2="8" y2="17"/>
-                                <polyline points="10 9 9 9 8 9"/>
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                                <polyline points="10 9 9 9 8 9" />
                             </svg>
                         </span>
                         <span className="sc-btn-label">

@@ -217,7 +217,6 @@ export default function CotizacionPage({ onBackToHome, onGoToServicios, onGoToLo
                         tamanos: ['Estándar'],
                     }));
                     setServicios(serviciosBD);
-                    setServicios(SERVICIOS_FALLBACK.map(s => ({ ...s, imagen: getImageUrl(s.imagen_url) })));
                 }
             } catch {
                 setServicios(SERVICIOS_FALLBACK.map(s => ({ ...s, imagen: getImageUrl(s.imagen_url) })));
