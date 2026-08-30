@@ -83,7 +83,7 @@ export const useVoiceAssistant = (onCommandDetected, isVoiceChatSuspended = fals
 
     rec.onresult = (event) => {
       // Ignorar sonido si la IA está hablando para evitar eco
-      if (isTtsSpeakingRef.current || (window.speechSynthesis && window.speechSynthesis.speaking)) {
+      if (isTtsSpeakingRef.current) {
         return;
       }
 

@@ -44,6 +44,12 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
   const welcomeGreetedRef = useRef(false);
   const [modifyingField, setModifyingField] = useState('');
 
+  // Estados para Llenado de Formularios Dinámico (Accesibilidad)
+  const [formInputs, setFormInputs] = useState([]);
+  const [currentInputIndex, setCurrentInputIndex] = useState(0);
+  const [formFillingState, setFormFillingState] = useState('idle'); // 'idle' | 'ask_field' | 'confirm_field' | 'submit_confirm'
+  const [tempValue, setTempValue] = useState('');
+
   let navigate;
   try {
     navigate = useNavigate();
@@ -111,6 +117,39 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
     }
   };
 
+  const getVisibleInputs = () => {
+    return Array.from(document.querySelectorAll('input:not([type="submit"]):not([type="button"]):not([type="hidden"]), select, textarea'))
+      .filter(el => {
+        const rect = el.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0 && !el.disabled && !el.readOnly;
+      });
+  };
+
+  const getLabelOrPlaceholder = (el) => {
+    if (el.getAttribute('aria-label')) return el.getAttribute('aria-label');
+    if (el.getAttribute('placeholder')) return el.getAttribute('placeholder');
+    if (el.id) {
+      const label = document.querySelector(`label[for="${el.id}"]`);
+      if (label && label.innerText) return label.innerText.replace(':', '').trim();
+    }
+    const parentLabel = el.closest('label');
+    if (parentLabel && parentLabel.innerText) {
+      return parentLabel.innerText.replace(':', '').trim();
+    }
+    return el.name || el.type || 'campo';
+  };
+
+  const askField = (index, inputsList = formInputs) => {
+    const el = inputsList[index];
+    if (!el) return;
+    const fieldName = getLabelOrPlaceholder(el);
+    const msg = `¿Qué valor deseas ingresar en el campo ${fieldName}?`;
+    pushAssistantMsg(msg);
+    speakText(msg, () => {
+      startListening(false);
+    });
+  };
+
   // Función para leer la página actual (Accesibilidad)
   const readCurrentPage = () => {
     const mainTitle = document.querySelector('h1')?.innerText || document.title || 'Página de Foam Wash';
@@ -131,6 +170,12 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
     if (contentText) {
       summary += `El contenido dice: ${contentText}. `;
     }
+
+    const inputsList = getVisibleInputs();
+    if (inputsList.length > 0) {
+      summary += `Esta página contiene un formulario con ${inputsList.length} campos editables. Puedes decir "completar formulario" para llenarlo por comandos de voz paso a paso. `;
+    }
+
     if (buttonTexts) {
       summary += `Las opciones disponibles son: ${buttonTexts}.`;
     }
@@ -159,6 +204,108 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
     const wasListeningBefore = isListening;
     if (isListening) {
       stopListening();
+    }
+
+    // ==========================================
+    // 0. MÁQUINA DE ESTADOS DE FORMULARIO DINÁMICO (Prioritaria)
+    // ==========================================
+    if (formFillingState === 'ask_field') {
+      pushUserMsg(messageText);
+      setTempValue(messageText);
+      setFormFillingState('confirm_field');
+      const el = formInputs[currentInputIndex];
+      const fieldName = getLabelOrPlaceholder(el);
+      const msg = `El valor que quieres ingresar en ${fieldName} es: ${messageText}. ¿Es correcto?`;
+      pushAssistantMsg(msg);
+      speakText(msg, () => {
+        startListening(false);
+      });
+      return;
+    }
+
+    if (formFillingState === 'confirm_field') {
+      pushUserMsg(messageText);
+      const isAffirmative = ['sí', 'si', 'correcto', 'está bien', 'aceptar', 'afirmativo'].some(w => cleanMsg.includes(w));
+      const isNegative = ['no', 'incorrecto', 'negativo', 'cancelar'].some(w => cleanMsg.includes(w));
+
+      if (isAffirmative) {
+        const el = formInputs[currentInputIndex];
+        let val = tempValue;
+        // Quitar espacios si es contraseña, número o teléfono
+        if (el.type === 'password' || el.type === 'number' || el.type === 'tel') {
+          val = tempValue.replace(/\s+/g, '');
+        }
+        
+        el.value = val;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+
+        const nextIndex = currentInputIndex + 1;
+        setCurrentInputIndex(nextIndex);
+        if (nextIndex < formInputs.length) {
+          setFormFillingState('ask_field');
+          askField(nextIndex);
+        } else {
+          setFormFillingState('submit_confirm');
+          const msg = 'Formulario completado. ¿Deseas enviar o guardar el formulario?';
+          pushAssistantMsg(msg);
+          speakText(msg, () => {
+            startListening(false);
+          });
+        }
+      } else if (isNegative) {
+        // Verificar si contiene corrección explícita, ej: "no, es cliente@gmail.com" o "no era cliente"
+        const correctionMatch = cleanMsg.match(/(?:no era|no es|era|es|cambia a)\s+(.+)/i);
+        if (correctionMatch && correctionMatch[1]) {
+          const correctedVal = correctionMatch[1].trim();
+          setTempValue(correctedVal);
+          const el = formInputs[currentInputIndex];
+          const fieldName = getLabelOrPlaceholder(el);
+          const msg = `Corregido. El nuevo valor para ${fieldName} es: ${correctedVal}. ¿Es correcto?`;
+          pushAssistantMsg(msg);
+          speakText(msg, () => {
+            startListening(false);
+          });
+        } else {
+          setFormFillingState('ask_field');
+          askField(currentInputIndex);
+        }
+      } else {
+        // Tratar como corrección directa directa si no dijo explícitamente sí o no
+        setTempValue(messageText);
+        const el = formInputs[currentInputIndex];
+        const fieldName = getLabelOrPlaceholder(el);
+        const msg = `Entendido. El nuevo valor para ${fieldName} es: ${messageText}. ¿Es correcto?`;
+        pushAssistantMsg(msg);
+        speakText(msg, () => {
+          startListening(false);
+        });
+      }
+      return;
+    }
+
+    if (formFillingState === 'submit_confirm') {
+      pushUserMsg(messageText);
+      const isAffirmative = ['sí', 'si', 'enviar', 'guardar', 'confirmar', 'proceder'].some(w => cleanMsg.includes(w));
+      if (isAffirmative) {
+        const submitBtn = document.querySelector('button[type="submit"]') || document.querySelector('.submit-btn') || document.querySelector('.login-btn');
+        if (submitBtn) {
+          submitBtn.click();
+          const msg = 'Formulario enviado.';
+          pushAssistantMsg(msg);
+          speakText(msg);
+        } else {
+          const msg = 'No se encontró un botón de envío.';
+          pushAssistantMsg(msg);
+          speakText(msg);
+        }
+      } else {
+        const msg = 'Envío cancelado.';
+        pushAssistantMsg(msg);
+        speakText(msg);
+      }
+      setFormFillingState('idle');
+      return;
     }
 
     // ==========================================
@@ -234,6 +381,24 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
       return;
     }
 
+    // Iniciar llenado de formulario manualmente
+    if (cleanMsg.includes('completar formulario') || cleanMsg.includes('llenar formulario') || cleanMsg.includes('iniciar llenado')) {
+      const inputs = getVisibleInputs();
+      if (inputs.length === 0) {
+        const msg = 'No se encontraron campos editables en esta página.';
+        pushAssistantMsg(msg);
+        speakText(msg, () => {
+          if (wasListeningBefore && !isVoiceChatSuspended) startListening(false);
+        });
+        return;
+      }
+      setFormInputs(inputs);
+      setCurrentInputIndex(0);
+      setFormFillingState('ask_field');
+      askField(0, inputs);
+      return;
+    }
+
     // ==========================================
     // 2. COMANDOS DE AUTOMATIZACIÓN LOCAL (LOGOUT, LOGIN, VOUCHER, AGENDAMIENTO)
     // ==========================================
@@ -253,7 +418,7 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
       return;
     }
 
-    // Iniciar Sesión con credenciales de prueba
+    // Iniciar Sesión con credenciales o guiado
     if (
       cleanMsg.includes('inicia sesión') ||
       cleanMsg.includes('iniciar sesión') ||
@@ -267,28 +432,22 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
       const isSetupPhase = assistantState === 'welcome_read_page' || assistantState === 'welcome_voice_active';
       if (!isSetupPhase) pushUserMsg(messageText);
 
-      let email = 'cliente@gmail.com';
-      let password = '123456';
-      const emailMatch = cleanMsg.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-      if (emailMatch) email = emailMatch[0];
-      const passMatch = cleanMsg.match(/\b\d{4,8}\b/);
-      if (passMatch) password = passMatch[0];
-
-      setStatusText('Iniciando sesión...');
-      setAriaLiveMessage(`Iniciando sesión con el correo ${email}.`);
-      const loginMsg = 'Redirigiendo a inicio de sesión e ingresando credenciales.';
+      const loginMsg = 'Redirigiendo a inicio de sesión.';
       pushAssistantMsg(loginMsg);
+
       speakText(loginMsg, () => {
         executeNavigation('/login');
         setTimeout(() => {
-          const emailInput = document.querySelector('input[type="email"]') || document.querySelector('input[placeholder*="correo" i]');
-          const passInput = document.querySelector('input[type="password"]') || document.querySelector('input[placeholder*="contraseña" i]');
-          const loginBtn = document.querySelector('button[type="submit"]') || document.querySelector('.login-btn');
-          if (emailInput) { emailInput.value = email; emailInput.dispatchEvent(new Event('input', { bubbles: true })); }
-          if (passInput) { passInput.value = password; passInput.dispatchEvent(new Event('input', { bubbles: true })); }
-          setTimeout(() => { if (loginBtn) loginBtn.click(); }, 300);
-        }, 800);
-        if (!isVoiceChatSuspended) startListening(false);
+          const inputs = getVisibleInputs();
+          if (inputs.length > 0) {
+            setFormInputs(inputs);
+            setCurrentInputIndex(0);
+            setFormFillingState('ask_field');
+            askField(0, inputs);
+          } else {
+            if (!isVoiceChatSuspended) startListening(false);
+          }
+        }, 1200);
       });
       return;
     }
@@ -705,7 +864,7 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
               onClick={toggleListening}
               disabled={isVoiceChatSuspended || isProcessing}
             >
-              {isListening ? '🎙️ Detener mic' : '🎤 Hablar'}
+              {isListening ? '🎙' : '🎤 Hablar'}
             </button>
             {isVoiceChatSuspended && (
               <button
@@ -731,7 +890,7 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="pulse-ring"></span>
-        {isListening ? '🎙️' : isProcessing ? '⏳' : '💬'}
+        {isListening ? '🎙' : isProcessing ? '⏳' : '💬'}
       </button>
 
       {/* Reactivate Floating Button */}
