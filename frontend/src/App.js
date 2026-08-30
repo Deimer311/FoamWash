@@ -61,6 +61,7 @@ import './styles.css'
 
 // 🎵 AUDIO — Música de fondo
 import AudioManager from './components/audio/AudioManager';
+import VoiceAssistant from './components/comun/VoiceAssistant';
 // 🔊 AUDIO — Sonido global en todos los botones
 import useGlobalButtonSound from './hooks/useGlobalButtonSound';
 import useSound from './hooks/useSound';
@@ -601,6 +602,7 @@ case 'perfil-trabajador':
             {renderPage()}
             {/* 🎵 Música de fondo en todas las páginas */}
             <AudioManager />
+            <VoiceAssistant onNavigate={setCurrentPage} currentPage={currentPage} />
         </div>
     );
 };
