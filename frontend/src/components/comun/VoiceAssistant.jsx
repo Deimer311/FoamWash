@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useVoiceAssistant } from '../../hooks/useVoiceAssistant';
+import { useAuth } from '../autenticacion/AuthContext';
+import { useCarrito } from '../modales/CarritoContext';
 import api from '../../services/api';
 import './VoiceAssistant.css';
 
 /**
- * Componente visual y accesible del Asistente de Voz.
+ * Componente visual y accesible del Asistente de Voz de FoamWash.
  */
 const VoiceAssistant = ({ onNavigate, currentPage }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,17 +15,17 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
   const [statusText, setStatusText] = useState('Asistente activo');
   const [ariaLiveMessage, setAriaLiveMessage] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [serviciosList, setServiciosList] = useState([]);
 
   // Historial del chat en burbujas
   const [chatHistory, setChatHistory] = useState([]);
   const chatEndRef = useRef(null);
 
-  // Estados persistidos en localStorage (Retentiva)
-  const [isReadingPage, setIsReadingPage] = useState(() => {
-    const saved = localStorage.getItem('foamwash_isReadingPage');
-    return saved !== null ? JSON.parse(saved) : true;
-  });
+  // Auth & Carrito Context
+  const { isAuthenticated } = useAuth();
+  const { carrito, agregarAlCarrito } = useCarrito();
 
+  // Comandos de voz siempre activos por defecto
   const [isVoiceChatSuspended, setIsVoiceChatSuspended] = useState(() => {
     const saved = localStorage.getItem('foamwash_isVoiceChatSuspended');
     return saved !== null ? JSON.parse(saved) : false;
@@ -35,12 +37,13 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
       servicio: 'Lavado de sofás',
       direccion: 'calle 91 63',
       fecha: '29 de agosto',
-      hora: '3:00 PM'
+      hora: '3:00 PM',
+      servicioObj: null
     };
   });
 
-  // Estados del Flujo de Configuración y Agendamiento
-  const [assistantState, setAssistantState] = useState('welcome_read_page');
+  // Estados del Flujo (Empieza en 'idle' directamente)
+  const [assistantState, setAssistantState] = useState('idle');
   const welcomeGreetedRef = useRef(false);
   const [modifyingField, setModifyingField] = useState('');
 
@@ -57,6 +60,21 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
     // Fuera de enrutador
   }
 
+  // Cargar lista de servicios desde la base de datos
+  useEffect(() => {
+    const fetchServicios = async () => {
+      try {
+        const res = await api.get('/cotizaciones/servicios');
+        if (res.data.success) {
+          setServiciosList(res.data.data);
+        }
+      } catch (err) {
+        console.error('Error al cargar servicios en VoiceAssistant:', err);
+      }
+    };
+    fetchServicios();
+  }, []);
+
   // Hook de Voz Reutilizable
   const { isListening, transcript, speak, startListening, stopListening, toggleListening } = useVoiceAssistant(
     (detectedText) => {
@@ -64,11 +82,6 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
     },
     isVoiceChatSuspended
   );
-
-  // Guardar configuraciones en LocalStorage
-  useEffect(() => {
-    localStorage.setItem('foamwash_isReadingPage', JSON.stringify(isReadingPage));
-  }, [isReadingPage]);
 
   useEffect(() => {
     localStorage.setItem('foamwash_isVoiceChatSuspended', JSON.stringify(isVoiceChatSuspended));
@@ -107,7 +120,11 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
       if (cleanPath === '' || cleanPath === 'inicio') {
         onNavigate('home');
       } else if (cleanPath === 'agendamiento' || cleanPath === 'pasarela-pago') {
-        onNavigate('cotizacion-publica');
+        if (isAuthenticated) {
+          onNavigate('cotizacion-cliente');
+        } else {
+          onNavigate('cotizacion-publica');
+        }
       } else {
         onNavigate(cleanPath);
       }
@@ -144,13 +161,10 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
 
   const normalizeEmailValue = (val) => {
     let clean = val.toLowerCase().trim();
-    // Reemplazar la palabra "arroba" y variantes por @
     clean = clean.replace(/\barroba\b/g, '@');
     clean = clean.replace(/\s*arroba\s*/g, '@');
-    // Reemplazar la palabra "punto" por .
     clean = clean.replace(/\s*punto\s*/g, '.');
     clean = clean.replace(/\bpunto\b/g, '.');
-    // Quitar todos los espacios
     clean = clean.replace(/\s+/g, '');
     return clean;
   };
@@ -165,50 +179,6 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
       startListening(false);
     });
   };
-
-  // Función para leer la página actual (Accesibilidad)
-  const readCurrentPage = () => {
-    const mainTitle = document.querySelector('h1')?.innerText || document.title || 'Página de Foam Wash';
-    
-    const contentText = Array.from(document.querySelectorAll('p, h2, h3, h4, span.service-title, div.service-desc'))
-      .map(el => el.innerText)
-      .filter(text => text.trim().length > 10 && text.length < 300)
-      .slice(0, 4)
-      .join('. ');
-
-    const buttonTexts = Array.from(document.querySelectorAll('button, a.btn, .nav-link, .login-btn'))
-      .map(el => el.innerText || el.getAttribute('aria-label') || '')
-      .filter(text => text.trim().length > 1 && text.length < 40)
-      .slice(0, 6)
-      .join(', ');
-
-    let summary = `Estás en la pantalla: ${mainTitle}. `;
-    if (contentText) {
-      summary += `El contenido dice: ${contentText}. `;
-    }
-
-    const inputsList = getVisibleInputs();
-    if (inputsList.length > 0) {
-      summary += `Esta página contiene un formulario con ${inputsList.length} campos editables. Puedes decir "completar formulario" para llenarlo por comandos de voz paso a paso. `;
-    }
-
-    if (buttonTexts) {
-      summary += `Las opciones disponibles son: ${buttonTexts}.`;
-    }
-
-    setAriaLiveMessage(summary);
-    speakText(summary);
-  };
-
-  // Leer la página automáticamente al cambiar de pantalla
-  useEffect(() => {
-    if (isReadingPage && assistantState === 'idle') {
-      const timer = setTimeout(() => {
-        readCurrentPage();
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [currentPage, isReadingPage, assistantState]);
 
   // Manejar entrada de texto/voz
   const handleCommandResponse = async (messageText) => {
@@ -254,7 +224,6 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
       if (isAffirmative) {
         const el = formInputs[currentInputIndex];
         let val = tempValue;
-        // Quitar espacios si es contraseña, número o teléfono
         if (el.type === 'password' || el.type === 'number' || el.type === 'tel') {
           val = tempValue.replace(/\s+/g, '');
         }
@@ -277,7 +246,6 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
           });
         }
       } else if (isNegative) {
-        // Verificar si contiene corrección explícita, ej: "no, es cliente@gmail.com" o "no era cliente"
         const correctionMatch = cleanMsg.match(/(?:no era|no es|era|es|cambia a)\s+(.+)/i);
         if (correctionMatch && correctionMatch[1]) {
           let correctedVal = correctionMatch[1].trim();
@@ -298,7 +266,6 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
           askField(currentInputIndex);
         }
       } else {
-        // Evitar bucles de falsas correcciones (ej: palabras cortas raras transcritas)
         const isCorrection = cleanMsg.includes('correo') || cleanMsg.includes('@') || cleanMsg.match(/\d+/) || cleanMsg.length > 5;
         if (isCorrection) {
           let processedVal = messageText;
@@ -327,9 +294,11 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
 
     if (formFillingState === 'submit_confirm') {
       pushUserMsg(messageText);
-      const isAffirmative = ['sí', 'si', 'enviar', 'guardar', 'confirmar', 'proceder'].some(w => cleanMsg.includes(w));
+      const isAffirmative = ['sí', 'si', 'enviar', 'guardar', 'confirmar', 'proceder', 'formulario'].some(w => cleanMsg.includes(w));
+      const isNegative = ['no', 'cancelar', 'incorrecto', 'negativo'].some(w => cleanMsg.includes(w));
+
       if (isAffirmative) {
-        const submitBtn = document.querySelector('button[type="submit"]') || document.querySelector('.submit-btn') || document.querySelector('.login-btn');
+        const submitBtn = document.querySelector('button[type="submit"]') || document.querySelector('.submit-btn') || document.querySelector('.login-btn') || document.querySelector('.fwm-btn-success');
         if (submitBtn) {
           submitBtn.click();
           const msg = 'Formulario enviado.';
@@ -340,53 +309,25 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
           pushAssistantMsg(msg);
           speakText(msg);
         }
-      } else {
+        setFormFillingState('idle');
+      } else if (isNegative) {
         const msg = 'Envío cancelado.';
         pushAssistantMsg(msg);
         speakText(msg);
+        setFormFillingState('idle');
+      } else {
+        const msg = 'No logré entender. ¿Deseas enviar o guardar el formulario? Di sí o no.';
+        pushAssistantMsg(msg);
+        speakText(msg, () => {
+          startListening(false);
+        });
       }
-      setFormFillingState('idle');
       return;
     }
 
     // ==========================================
     // 1. COMANDOS DE CONTROL LOCAL (TOGGLES DE ESTADO)
     // ==========================================
-
-    // Desactivar Lectura de Página
-    if (
-      cleanMsg.includes('suspender lectura de página') ||
-      cleanMsg.includes('desactivar lectura') ||
-      cleanMsg.includes('suspender lectura') ||
-      cleanMsg.includes('desactivar lectura de pagina')
-    ) {
-      setIsReadingPage(false);
-      const msg = 'Lectura de página desactivada.';
-      setAriaLiveMessage(msg);
-      pushAssistantMsg(msg);
-      speakText(msg, () => {
-        if (wasListeningBefore && !isVoiceChatSuspended) startListening(false);
-      });
-      return;
-    }
-
-    // Activar Lectura de Página
-    if (
-      cleanMsg.includes('activar lectura de página') ||
-      cleanMsg.includes('activar lectura de la página') ||
-      cleanMsg.includes('activar lectura') ||
-      cleanMsg.includes('prender lectura') ||
-      cleanMsg.includes('habilitar lectura')
-    ) {
-      setIsReadingPage(true);
-      const msg = 'Lectura de página activada.';
-      setAriaLiveMessage(msg);
-      pushAssistantMsg(msg);
-      speakText(msg, () => {
-        if (wasListeningBefore && !isVoiceChatSuspended) startListening(false);
-      });
-      return;
-    }
 
     // Suspender/Apagar Comandos de Voz
     if (
@@ -446,13 +387,11 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
 
     // Cerrar sesión
     if (cleanMsg.includes('cierra') || cleanMsg.includes('cerrar sesión') || cleanMsg.includes('cerrar sesion') || cleanMsg.includes('salir')) {
-      const isSetupPhase = assistantState === 'welcome_read_page' || assistantState === 'welcome_voice_active';
-      if (!isSetupPhase) pushUserMsg(messageText);
-
+      pushUserMsg(messageText);
       const logoutMsg = 'Cerrando sesión de manera segura.';
       pushAssistantMsg(logoutMsg);
       speakText(logoutMsg, () => {
-        const logoutBtn = document.querySelector('.logout-btn');
+        const logoutBtn = document.querySelector('.logout-btn') || document.querySelector('button[onClick*="handleLogout" i]');
         if (logoutBtn) { logoutBtn.click(); } else { executeNavigation('/'); }
         if (!isVoiceChatSuspended) startListening(false);
       });
@@ -470,9 +409,7 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
       cleanMsg.includes('login') ||
       cleanMsg.includes('ve a iniciar')
     ) {
-      const isSetupPhase = assistantState === 'welcome_read_page' || assistantState === 'welcome_voice_active';
-      if (!isSetupPhase) pushUserMsg(messageText);
-
+      pushUserMsg(messageText);
       const loginMsg = 'Redirigiendo a inicio de sesión.';
       pushAssistantMsg(loginMsg);
 
@@ -491,16 +428,14 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
           } else {
             if (!isVoiceChatSuspended) startListening(false);
           }
-        }, 1500); // 1.5s para asegurar la carga completa
+        }, 1500);
       });
       return;
     }
 
     // Ir a mis agendamientos
     if (cleanMsg.includes('mis agendamientos') || cleanMsg.includes('mis reservas') || cleanMsg.includes('agendamientos')) {
-      const isSetupPhase = assistantState === 'welcome_read_page' || assistantState === 'welcome_voice_active';
-      if (!isSetupPhase) pushUserMsg(messageText);
-
+      pushUserMsg(messageText);
       const navMsg = 'Abriendo tu panel de reservas y agendamientos.';
       pushAssistantMsg(navMsg);
       speakText(navMsg, () => {
@@ -512,9 +447,7 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
 
     // Abrir último voucher
     if (cleanMsg.includes('abre') || cleanMsg.includes('último voucher') || cleanMsg.includes('ultimo voucher') || cleanMsg.includes('selecciona')) {
-      const isSetupPhase = assistantState === 'welcome_read_page' || assistantState === 'welcome_voice_active';
-      if (!isSetupPhase) pushUserMsg(messageText);
-
+      pushUserMsg(messageText);
       const voucherMsg = 'Buscando y abriendo tu último voucher registrado.';
       pushAssistantMsg(voucherMsg);
       speakText(voucherMsg, () => {
@@ -525,225 +458,194 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
       return;
     }
 
-    // Buscar o iniciar flujo de agendamiento
-    if (cleanMsg.includes('busca') || cleanMsg.includes('buscar') || cleanMsg.includes('servicio sobre')) {
-      const isSetupPhase = assistantState === 'welcome_read_page' || assistantState === 'welcome_voice_active';
-      if (!isSetupPhase) pushUserMsg(messageText);
+    // Finalizar agendamiento / Ir a programar
+    if (
+      cleanMsg.includes('finalizar agendamiento') ||
+      cleanMsg.includes('finalizar') ||
+      cleanMsg.includes('programar') ||
+      cleanMsg.includes('ir a programar') ||
+      cleanMsg.includes('finalizar el agendamiento') ||
+      cleanMsg.includes('damiento')
+    ) {
+      pushUserMsg(messageText);
+      const msg = 'Entendido. Vamos a finalizar el agendamiento redirigiendo a la pantalla de programación.';
+      pushAssistantMsg(msg);
 
-      let servicioBuscado = 'lavado de sofás';
-      if (cleanMsg.includes('muebles')) servicioBuscado = 'lavado de muebles';
-      else if (cleanMsg.includes('colchones')) servicioBuscado = 'lavado de colchones';
+      stopListening();
 
-      setBookingData(prev => ({ ...prev, servicio: servicioBuscado }));
-      setAssistantState('service_found_waiting');
-
-      const foundMsg = `Encontré el servicio de ${servicioBuscado}. ¿Quieres cotizar o agendar?`;
-      setAriaLiveMessage(foundMsg);
-      pushAssistantMsg(foundMsg);
-      speakText(foundMsg, () => {
-        if (!isVoiceChatSuspended) startListening(false);
+      speakText(msg, () => {
+        const targetPage = isAuthenticated ? '/cotizacion-cliente' : '/cotizacion-publica';
+        executeNavigation(targetPage);
+        
+        // Esperar la carga de la página, luego abrir el modal del carrito
+        setTimeout(() => {
+          const cartBtn = document.querySelector('.btn-carrito-flotante');
+          if (cartBtn) {
+            cartBtn.click();
+            setAssistantState('cart_modal_open');
+            setTimeout(() => {
+              const openMsg = 'He abierto tu carrito de servicios. Para continuar con tu compra, di "ver cotización" o "continuar".';
+              pushAssistantMsg(openMsg);
+              speakText(openMsg, () => {
+                if (!isVoiceChatSuspended) startListening(false);
+              });
+            }, 600);
+          } else {
+            if (!isVoiceChatSuspended) startListening(false);
+          }
+        }, 1500);
       });
       return;
     }
 
-    // ==========================================
-    // 3. MÁQUINA DE ESTADOS: CONFIGURACIÓN INICIAL (SÍ / NO)
-    // ==========================================
+    // Buscar o iniciar flujo de agendamiento (Búsqueda super flexible)
+    const mentionsService = cleanMsg.includes('alfombra') || cleanMsg.includes('colchón') || cleanMsg.includes('colchon') ||
+                            cleanMsg.includes('mueble') || cleanMsg.includes('sofá') || cleanMsg.includes('sofa') ||
+                            cleanMsg.includes('silla') || cleanMsg.includes('cortina') || cleanMsg.includes('tapete');
 
-    // 1. Confirmar lectura de página
-    if (assistantState === 'welcome_read_page') {
-      const isAffirmative = ['sí', 'si', 'aceptar', 'activar', 'proceder', 'ok', 'afirmativo'].some(w => cleanMsg.includes(w));
-      const isNegative = ['no', 'desactivar', 'cancelar', 'apagar', 'negativo'].some(w => cleanMsg.includes(w));
-
-      if (isAffirmative) {
-        setIsReadingPage(true);
-        setAssistantState('welcome_voice_active');
-        const askVoiceMsg = 'Lectura de página activada. ¿Quieres mantener los comandos de voz activos?';
-        pushAssistantMsg(askVoiceMsg);
-        speakText(askVoiceMsg, () => {
-          if (!isVoiceChatSuspended) startListening(false);
+    if (mentionsService && (cleanMsg.includes('busca') || cleanMsg.includes('buscar') || cleanMsg.includes('servicio') ||
+                            cleanMsg.includes('necesito') || cleanMsg.includes('lave') || cleanMsg.includes('limpie') ||
+                            cleanMsg.includes('quiero') || cleanMsg.includes('agenda') || assistantState === 'idle')) {
+      
+      let matchedService = null;
+      
+      if (cleanMsg.includes('mueble') || cleanMsg.includes('sofá') || cleanMsg.includes('sofa') || cleanMsg.includes('silla')) {
+        matchedService = serviciosList.find(s => {
+          const name = (s.Nombre_Servicio || s.nombre || '').toLowerCase();
+          return name.includes('mueble') || name.includes('sofá') || name.includes('sofa') || name.includes('silla');
         });
-      } else if (isNegative) {
-        setIsReadingPage(false);
-        setAssistantState('welcome_voice_active');
-        const askVoiceMsg = 'Lectura de página desactivada. ¿Quieres mantener los comandos de voz activos?';
-        pushAssistantMsg(askVoiceMsg);
-        speakText(askVoiceMsg, () => {
-          if (!isVoiceChatSuspended) startListening(false);
+      } else if (cleanMsg.includes('colchón') || cleanMsg.includes('colchon') || cleanMsg.includes('colchones')) {
+        matchedService = serviciosList.find(s => {
+          const name = (s.Nombre_Servicio || s.nombre || '').toLowerCase();
+          return name.includes('colchón') || name.includes('colchon') || name.includes('colchones');
         });
-      } else {
-        const repeatMsg = 'No logré entender tu respuesta. ¿Quieres activar la lectura de la página? Di sí o no.';
-        speakText(repeatMsg, () => {
-          if (!isVoiceChatSuspended) startListening(false);
+      } else if (cleanMsg.includes('alfombra') || cleanMsg.includes('alfombras') || cleanMsg.includes('tapete') || cleanMsg.includes('tapetes')) {
+        matchedService = serviciosList.find(s => {
+          const name = (s.Nombre_Servicio || s.nombre || '').toLowerCase();
+          return name.includes('alfombra') || name.includes('alfombras') || name.includes('tapete') || name.includes('tapetes');
+        });
+      } else if (cleanMsg.includes('cortina') || cleanMsg.includes('cortinas')) {
+        matchedService = serviciosList.find(s => {
+          const name = (s.Nombre_Servicio || s.nombre || '').toLowerCase();
+          return name.includes('cortina') || name.includes('cortinas');
         });
       }
-      return;
-    }
 
-    // 2. Confirmar comandos de voz activos
-    if (assistantState === 'welcome_voice_active') {
-      const isAffirmative = ['sí', 'si', 'aceptar', 'activar', 'proceder', 'ok', 'afirmativo'].some(w => cleanMsg.includes(w));
-      const isNegative = ['no', 'desactivar', 'cancelar', 'apagar', 'negativo'].some(w => cleanMsg.includes(w));
+      if (matchedService) {
+        pushUserMsg(messageText);
+        
+        const mappedService = {
+          ...matchedService,
+          id: matchedService.Id_Servicio || matchedService.id,
+          nombre: matchedService.Nombre_Servicio || matchedService.nombre || 'Sin nombre',
+          descripcion: matchedService.Descripcion || matchedService.descripcion || '',
+          precio: Number(matchedService.Precio || matchedService.precio || 0),
+          tamanos: ['Estándar']
+        };
 
-      if (isAffirmative) {
-        setIsVoiceChatSuspended(false);
-        setAssistantState('idle');
-        const activeMsg = 'Comandos de voz activos. ¿Cuál es tu petición?';
-        pushAssistantMsg(activeMsg);
-        speakText(activeMsg, () => {
+        setBookingData(prev => ({ ...prev, servicio: mappedService.nombre, servicioObj: mappedService }));
+        setAssistantState('service_found_waiting');
+
+        const foundMsg = `Encontré el servicio de ${mappedService.nombre}. ¿Qué deseas hacer? Puedes decir "agéndamelo al carrito" o "finalizar agendamiento".`;
+        setAriaLiveMessage(foundMsg);
+        pushAssistantMsg(foundMsg);
+        speakText(foundMsg, () => {
           if (!isVoiceChatSuspended) startListening(false);
         });
-      } else if (isNegative) {
-        setIsVoiceChatSuspended(true);
-        setAssistantState('idle');
-        const inactiveMsg = 'Entendido. Comandos de voz desactivados. Puedes reactivarlos en el panel.';
-        pushAssistantMsg(inactiveMsg);
-        speak(inactiveMsg);
-      } else {
-        const repeatMsg = 'No logré entender tu respuesta. ¿Quieres mantener los comandos de voz activos? Di sí o no.';
-        speakText(repeatMsg, () => {
-          if (!isVoiceChatSuspended) startListening(false);
-        });
+        return;
       }
-      return;
     }
 
     // ==========================================
-    // 4. MÁQUINA DE ESTADOS: PROCESAMIENTO DE RESERVA / AGENDAMIENTO
+    // 3. PASOS DE NAVEGACIÓN Y CONFIGURACIÓN DEL CARRITO / CONFIRMACIÓN
+    // ==========================================
+    if (assistantState === 'cart_modal_open') {
+      if (cleanMsg.includes('ver cotización') || cleanMsg.includes('ver cotizacion') || cleanMsg.includes('continuar') ||
+          cleanMsg.includes('generar cotización') || cleanMsg.includes('generar cotizacion') || cleanMsg.includes('agendar')) {
+        pushUserMsg(messageText);
+        const primaryBtn = document.querySelector('.fwm-footer .fwm-btn-primary');
+        if (primaryBtn) {
+          primaryBtn.click();
+          setAssistantState('stage0_details_open');
+          setTimeout(() => {
+            const nextMsg = 'Detalles de servicio abiertos. Por favor, di "generar cotización" para avanzar a la visualización de costos.';
+            pushAssistantMsg(nextMsg);
+            speakText(nextMsg, () => {
+              if (!isVoiceChatSuspended) startListening(false);
+            });
+          }, 600);
+        } else {
+          if (!isVoiceChatSuspended) startListening(false);
+        }
+        return;
+      }
+    }
+
+    if (assistantState === 'stage0_details_open') {
+      if (cleanMsg.includes('generar cotización') || cleanMsg.includes('generar cotizacion') || cleanMsg.includes('continuar') || cleanMsg.includes('aceptar')) {
+        pushUserMsg(messageText);
+        const primaryBtn = document.querySelector('.fwm-footer .fwm-btn-primary');
+        if (primaryBtn) {
+          primaryBtn.click();
+          setAssistantState('stage1_quote_ready');
+          setTimeout(() => {
+            const nextMsg = 'Cotización generada con éxito. Di "agendar servicio" o "continuar" para pasar al ingreso de datos.';
+            pushAssistantMsg(nextMsg);
+            speakText(nextMsg, () => {
+              if (!isVoiceChatSuspended) startListening(false);
+            });
+          }, 800);
+        } else {
+          if (!isVoiceChatSuspended) startListening(false);
+        }
+        return;
+      }
+    }
+
+    if (assistantState === 'stage1_quote_ready') {
+      if (cleanMsg.includes('agendar servicio') || cleanMsg.includes('agendar') || cleanMsg.includes('continuar') ||
+          cleanMsg.includes('aceptar') || cleanMsg.includes('sí') || cleanMsg.includes('si')) {
+        pushUserMsg(messageText);
+        const primaryBtn = document.querySelector('.fwm-footer .fwm-btn-primary');
+        if (primaryBtn) {
+          primaryBtn.click();
+          setAssistantState('stage2_form_open');
+          setTimeout(() => {
+            const inputs = getVisibleInputs();
+            if (inputs.length > 0) {
+              setFormInputs(inputs);
+              setCurrentInputIndex(0);
+              setFormFillingState('ask_field');
+              askField(0, inputs);
+            } else {
+              if (!isVoiceChatSuspended) startListening(false);
+            }
+          }, 800);
+        } else {
+          if (!isVoiceChatSuspended) startListening(false);
+        }
+        return;
+      }
+    }
+
+    // ==========================================
+    // 4. MÁQUINA DE ESTADOS: PROCESAMIENTO DE RESERVA / AGENDAMIENTO (Agregar al carrito real)
     // ==========================================
 
-    // Agendar servicio
-    if (assistantState === 'service_found_waiting' && (cleanMsg.includes('agendar') || cleanMsg.includes('agendarlo'))) {
+    // Agendar servicio (Agregar al carrito)
+    if (assistantState === 'service_found_waiting' && (cleanMsg.includes('carrito') || cleanMsg.includes('agendar') || cleanMsg.includes('agendarlo') || cleanMsg.includes('dámelo') || cleanMsg.includes('damelo'))) {
       pushUserMsg(messageText);
-      setAssistantState('booking_waiting_direction');
-      const askDirMsg = `Para agendar tu ${bookingData.servicio}, dime tu dirección de entrega.`;
-      setAriaLiveMessage(askDirMsg);
-      pushAssistantMsg(askDirMsg);
-      speakText(askDirMsg, () => {
-        if (!isVoiceChatSuspended) startListening(false);
-      });
-      return;
-    }
-
-    // Guardar dirección
-    if (assistantState === 'booking_waiting_direction') {
-      pushUserMsg(messageText);
-      setBookingData(prev => ({ ...prev, direccion: messageText }));
-      setAssistantState('booking_waiting_datetime');
-      const askDateMsg = 'Dirección guardada. Ahora, dime la fecha y hora deseada. Por ejemplo: 29 de agosto a las 3 de la tarde.';
-      setAriaLiveMessage(askDateMsg);
-      pushAssistantMsg(askDateMsg);
-      speakText(askDateMsg, () => {
-        if (!isVoiceChatSuspended) startListening(false);
-      });
-      return;
-    }
-
-    // Guardar fecha y hora (100% dinámico)
-    if (assistantState === 'booking_waiting_datetime') {
-      pushUserMsg(messageText);
-      const dateText = messageText;
-      setBookingData(prev => ({ ...prev, fecha: dateText, hora: '' }));
-      setAssistantState('booking_confirm_review');
-      const reviewMsg = `Revisemos: Servicio ${bookingData.servicio}, dirección ${bookingData.direccion}, para el día ${dateText}. ¿Son correctos los datos?`;
-      setAriaLiveMessage(reviewMsg);
-      pushAssistantMsg(reviewMsg);
-      speakText(reviewMsg, () => {
-        if (!isVoiceChatSuspended) startListening(false);
-      });
-      return;
-    }
-
-    // Confirmación de revisión
-    if (assistantState === 'booking_confirm_review') {
-      pushUserMsg(messageText);
-      const isAffirmative = ['sí', 'si', 'correcto', 'están bien'].some(w => cleanMsg.includes(w));
-      const isNegative = ['no', 'modificar', 'cambiar'].some(w => cleanMsg.includes(w));
-
-      if (isAffirmative) {
-        setAssistantState('booking_confirm_final');
-        const askFinalMsg = '¿Deseas confirmar la reserva definitivamente?';
-        setAriaLiveMessage(askFinalMsg);
-        pushAssistantMsg(askFinalMsg);
-        speakText(askFinalMsg, () => {
-          if (!isVoiceChatSuspended) startListening(false);
-        });
-      } else if (isNegative) {
-        setAssistantState('booking_modifying');
-        const askModMsg = '¿Qué deseas modificar? ¿La dirección o el horario?';
-        setAriaLiveMessage(askModMsg);
-        pushAssistantMsg(askModMsg);
-        speakText(askModMsg, () => {
-          if (!isVoiceChatSuspended) startListening(false);
-        });
-      }
-      return;
-    }
-
-    // Modificando campo
-    if (assistantState === 'booking_modifying') {
-      pushUserMsg(messageText);
-      if (cleanMsg.includes('dirección') || cleanMsg.includes('direccion')) {
-        setModifyingField('direccion');
-        setAssistantState('booking_waiting_modification');
-        const msg = 'Por favor dime la nueva dirección.';
+      if (bookingData.servicioObj) {
+        agregarAlCarrito(bookingData.servicioObj);
+        const msg = `${bookingData.servicio} ha sido agregado al carrito con éxito. ¿Deseas buscar otro servicio o deseas finalizar el agendamiento?`;
         pushAssistantMsg(msg);
         speakText(msg, () => {
           if (!isVoiceChatSuspended) startListening(false);
         });
       } else {
-        setModifyingField('datetime');
-        setAssistantState('booking_waiting_modification');
-        const msg = 'Por favor dime la nueva fecha y hora.';
+        const msg = 'No se encontró el objeto de servicio para agregar al carrito.';
         pushAssistantMsg(msg);
         speakText(msg, () => {
-          if (!isVoiceChatSuspended) startListening(false);
-        });
-      }
-      return;
-    }
-
-    // Guardar modificación
-    if (assistantState === 'booking_waiting_modification') {
-      pushUserMsg(messageText);
-      const val = messageText;
-      let newDir = bookingData.direccion;
-      let newFecha = bookingData.fecha;
-      if (modifyingField === 'direccion') {
-        newDir = val;
-        setBookingData(prev => ({ ...prev, direccion: val }));
-      } else {
-        newFecha = val;
-        setBookingData(prev => ({ ...prev, fecha: val }));
-      }
-      setAssistantState('booking_confirm_review');
-      const reviewMsg = `Dato modificado. Revisemos: Servicio ${bookingData.servicio}, dirección ${newDir}, para el día ${newFecha}. ¿Están bien los datos?`;
-      setAriaLiveMessage(reviewMsg);
-      pushAssistantMsg(reviewMsg);
-      speakText(reviewMsg, () => {
-        if (!isVoiceChatSuspended) startListening(false);
-      });
-      return;
-    }
-
-    // Confirmar definitivo
-    if (assistantState === 'booking_confirm_final') {
-      pushUserMsg(messageText);
-      const isAffirmative = ['sí', 'si', 'confirmar', 'proceder'].some(w => cleanMsg.includes(w));
-      if (isAffirmative) {
-        setAssistantState('idle');
-        const successMsg = `Servicio confirmado con éxito. Tu reserva para ${bookingData.servicio} en la dirección ${bookingData.direccion} quedó registrada para el día ${bookingData.fecha}. El valor total de la orden es de 90.000 pesos colombianos.`;
-        setAriaLiveMessage(successMsg);
-        pushAssistantMsg(successMsg);
-        speakText(successMsg, () => {
-          executeNavigation('/agendamiento');
-          if (!isVoiceChatSuspended) startListening(false);
-        });
-      } else {
-        setAssistantState('idle');
-        const cancelMsg = 'Reserva cancelada. Volviendo al estado de espera.';
-        pushAssistantMsg(cancelMsg);
-        speakText(cancelMsg, () => {
           if (!isVoiceChatSuspended) startListening(false);
         });
       }
@@ -760,12 +662,12 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
 
     try {
       const response = await api.post('/assistant/command', { message: messageText });
-      const { action, targetPath, spokenMessage, screenSummary } = response.data;
+      const { action, targetPath, spokenMessage } = response.data;
 
       setIsProcessing(false);
       setStatusText('Listo');
 
-      const fullMessage = isReadingPage && screenSummary ? `${spokenMessage}. ${screenSummary}` : spokenMessage;
+      const fullMessage = spokenMessage;
       setAriaLiveMessage(fullMessage);
       pushAssistantMsg(fullMessage);
 
@@ -793,7 +695,7 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
     const triggerWelcome = () => {
       if (welcomeGreetedRef.current) return;
       welcomeGreetedRef.current = true;
-      const welcomeText = 'Estás en Foam Wash, una plataforma para agendar lavados de mobiliario en Bogotá y alrededores. ¿Quieres activar la lectura de la página?';
+      const welcomeText = 'Hola, soy el asistente de Foam Wash. ¿Cuál es tu petición?';
       speak(welcomeText, () => {
         if (!isVoiceChatSuspended) {
           startListening(false);
@@ -854,7 +756,6 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
 
           {/* Estado badges */}
           <div className="voice-assistant-indicators">
-            <span className="voice-assistant-badge">Lectura: {isReadingPage ? '✅' : '❌'}</span>
             <span className="voice-assistant-badge">Voz: {isVoiceChatSuspended ? '🔇' : '🔊'}</span>
             <span className="voice-assistant-badge">{isListening ? 'Escuchando' : 'En línea'}</span>
           </div>

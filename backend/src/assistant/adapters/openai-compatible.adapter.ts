@@ -15,7 +15,7 @@ export class OpenAiCompatibleAdapter implements ILlmProvider {
   ): Promise<T> {
     const baseUrl = this.configService.get<string>('AI_BASE_URL') || 'https://api.openai.com/v1';
     const apiKey = this.configService.get<string>('AI_API_KEY') || '';
-    const model = this.configService.get<string>('AI_MODEL') || 'llama-3.1-8b-instant';
+    const model = this.configService.get<string>('AI_MODEL') || 'llama3-8b-8192';
     const temperature = parseFloat(this.configService.get<string>('AI_TEMPERATURE') || '0.2');
 
     const url = `${baseUrl.replace(/\/$/, '')}/chat/completions`;
