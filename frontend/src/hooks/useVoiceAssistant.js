@@ -11,6 +11,14 @@ export const useVoiceAssistant = (onCommandDetected, isVoiceChatSuspended = fals
   const recognitionRef = useRef(null);
   const isListeningRef = useRef(false);
   const isTtsSpeakingRef = useRef(false);
+  const silenceTimeoutRef = useRef(null);
+
+  // Guardar onCommandDetected en un Ref para evitar recrear la instancia de SpeechRecognition
+  // cada vez que el componente padre se renderiza y cambian sus estados/closures.
+  const onCommandDetectedRef = useRef(onCommandDetected);
+  useEffect(() => {
+    onCommandDetectedRef.current = onCommandDetected;
+  }, [onCommandDetected]);
 
   // Síntesis de voz (TTS)
   const speak = useCallback((text, onEndCallback) => {
@@ -63,85 +71,113 @@ export const useVoiceAssistant = (onCommandDetected, isVoiceChatSuspended = fals
     }, 50);
   }, []);
 
-  // Inicialización de SpeechRecognition
-  useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      console.warn('SpeechRecognition no está soportado en este navegador.');
-      return;
+  const stopListening = useCallback(() => {
+    isListeningRef.current = false;
+    setIsListening(false);
+    if (silenceTimeoutRef.current) {
+      clearTimeout(silenceTimeoutRef.current);
     }
-
-    const rec = new SpeechRecognition();
-    rec.continuous = false; // Captura de frases individuales para mayor precisión y robustez
-    rec.interimResults = false;
-    rec.lang = 'es-CO';
-
-    rec.onstart = () => {
-      setIsListening(true);
-      isListeningRef.current = true;
-    };
-
-    rec.onresult = (event) => {
-      // Ignorar sonido si la IA está hablando para evitar eco
-      if (isTtsSpeakingRef.current) {
-        return;
-      }
-
-      const resultText = event.results[0][0].transcript;
-      setTranscript(resultText);
-      if (onCommandDetected) {
-        onCommandDetected(resultText);
-      }
-    };
-
-    rec.onerror = (event) => {
-      console.error('Error de SpeechRecognition:', event.error);
-      if (event.error === 'no-speech') {
-        // Ignorar para reanudar silenciosamente en el onend
-      } else {
-        setIsListening(false);
-        isListeningRef.current = false;
-      }
-    };
-
-    rec.onend = () => {
-      // Reanudar la escucha si sigue activa la referencia y no está suspendido
-      if (isListeningRef.current && !isVoiceChatSuspended) {
-        setTimeout(() => {
-          try {
-            if (isListeningRef.current && !isVoiceChatSuspended) {
-              rec.start();
-            }
-          } catch (e) {
-            // Ignorar si ya está iniciado
-          }
-        }, 100);
-      } else {
-        setIsListening(false);
-        isListeningRef.current = false;
-      }
-    };
-
-    recognitionRef.current = rec;
-
-    return () => {
+    if (recognitionRef.current) {
       try {
+        const rec = recognitionRef.current;
+        rec.onstart = null;
+        rec.onresult = null;
+        rec.onerror = null;
+        rec.onend = null;
         rec.stop();
       } catch (e) {}
-    };
-  }, [onCommandDetected, speak, isVoiceChatSuspended]);
+      recognitionRef.current = null;
+    }
+  }, []);
 
   const startListening = useCallback((speakPrompt = true) => {
-    if (!recognitionRef.current) return;
+    // Si ya hay una instancia activa, limpiarla para forzar una nueva con buffer vacío
+    if (recognitionRef.current) {
+      try {
+        const oldRec = recognitionRef.current;
+        oldRec.onstart = null;
+        oldRec.onresult = null;
+        oldRec.onerror = null;
+        oldRec.onend = null;
+        oldRec.stop();
+      } catch (e) {}
+      recognitionRef.current = null;
+    }
 
     isListeningRef.current = true;
     setIsListening(true);
+    setTranscript('');
 
     const executeStart = () => {
       try {
-        recognitionRef.current.start();
-      } catch (e) {
-        console.warn('SpeechRecognition ya está activo.');
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) return;
+
+        const rec = new SpeechRecognition();
+        rec.continuous = true; // Permite pausas de habla sin cortar la grabación
+        rec.interimResults = false;
+        rec.lang = 'es-CO';
+
+        rec.onstart = () => {
+          setIsListening(true);
+          isListeningRef.current = true;
+        };
+
+        rec.onresult = (event) => {
+          if (isTtsSpeakingRef.current) {
+            return;
+          }
+
+          // Concatenar todos los resultados del buffer de la sesión actual
+          let currentTranscript = '';
+          for (let i = 0; i < event.results.length; i++) {
+            currentTranscript += event.results[i][0].transcript + ' ';
+          }
+
+          const cleanTranscript = currentTranscript.trim();
+          setTranscript(cleanTranscript);
+
+          // Reiniciar timeout de silencio
+          if (silenceTimeoutRef.current) {
+            clearTimeout(silenceTimeoutRef.current);
+          }
+
+          silenceTimeoutRef.current = setTimeout(() => {
+            if (cleanTranscript && onCommandDetectedRef.current) {
+              onCommandDetectedRef.current(cleanTranscript);
+              // Detener inmediatamente y destruir la instancia para limpiar el buffer
+              isListeningRef.current = false;
+              setIsListening(false);
+              try {
+                rec.stop();
+              } catch (e) {}
+            }
+          }, 1800);
+        };
+
+        rec.onerror = (event) => {
+          console.error('Error de SpeechRecognition:', event.error);
+          setIsListening(false);
+          isListeningRef.current = false;
+        };
+
+        rec.onend = () => {
+          if (isListeningRef.current && !isVoiceChatSuspended) {
+            setTimeout(() => {
+              if (isListeningRef.current && !isVoiceChatSuspended) {
+                executeStart();
+              }
+            }, 100);
+          } else {
+            setIsListening(false);
+            isListeningRef.current = false;
+          }
+        };
+
+        recognitionRef.current = rec;
+        rec.start();
+      } catch (err) {
+        console.error('Fallo al iniciar SpeechRecognition:', err);
       }
     };
 
@@ -150,16 +186,23 @@ export const useVoiceAssistant = (onCommandDetected, isVoiceChatSuspended = fals
     } else {
       executeStart();
     }
-  }, [speak]);
+  }, [speak, isVoiceChatSuspended]);
 
-  const stopListening = useCallback(() => {
-    isListeningRef.current = false;
-    setIsListening(false);
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch (e) {}
-    }
+  // Limpieza al desmontar
+  useEffect(() => {
+    return () => {
+      if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
+      if (recognitionRef.current) {
+        try {
+          const rec = recognitionRef.current;
+          rec.onstart = null;
+          rec.onresult = null;
+          rec.onerror = null;
+          rec.onend = null;
+          rec.stop();
+        } catch (e) {}
+      }
+    };
   }, []);
 
   const toggleListening = useCallback(() => {

@@ -120,6 +120,9 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
   const getVisibleInputs = () => {
     return Array.from(document.querySelectorAll('input:not([type="submit"]):not([type="button"]):not([type="hidden"]), select, textarea'))
       .filter(el => {
+        if (el.classList.contains('voice-assistant-input') || el.closest('.voice-assistant-panel') || el.closest('.voice-assistant-container')) {
+          return false;
+        }
         const rect = el.getBoundingClientRect();
         return rect.width > 0 && rect.height > 0 && !el.disabled && !el.readOnly;
       });
@@ -137,6 +140,19 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
       return parentLabel.innerText.replace(':', '').trim();
     }
     return el.name || el.type || 'campo';
+  };
+
+  const normalizeEmailValue = (val) => {
+    let clean = val.toLowerCase().trim();
+    // Reemplazar la palabra "arroba" y variantes por @
+    clean = clean.replace(/\barroba\b/g, '@');
+    clean = clean.replace(/\s*arroba\s*/g, '@');
+    // Reemplazar la palabra "punto" por .
+    clean = clean.replace(/\s*punto\s*/g, '.');
+    clean = clean.replace(/\bpunto\b/g, '.');
+    // Quitar todos los espacios
+    clean = clean.replace(/\s+/g, '');
+    return clean;
   };
 
   const askField = (index, inputsList = formInputs) => {
@@ -211,11 +227,18 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
     // ==========================================
     if (formFillingState === 'ask_field') {
       pushUserMsg(messageText);
-      setTempValue(messageText);
-      setFormFillingState('confirm_field');
       const el = formInputs[currentInputIndex];
       const fieldName = getLabelOrPlaceholder(el);
-      const msg = `El valor que quieres ingresar en ${fieldName} es: ${messageText}. ¿Es correcto?`;
+      const isEmail = el.type === 'email' || fieldName.toLowerCase().includes('correo') || fieldName.toLowerCase().includes('email');
+      
+      let processedVal = messageText;
+      if (isEmail) {
+        processedVal = normalizeEmailValue(messageText);
+      }
+
+      setTempValue(processedVal);
+      setFormFillingState('confirm_field');
+      const msg = `El valor que quieres ingresar en ${fieldName} es: ${processedVal}. ¿Es correcto?`;
       pushAssistantMsg(msg);
       speakText(msg, () => {
         startListening(false);
@@ -257,10 +280,14 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
         // Verificar si contiene corrección explícita, ej: "no, es cliente@gmail.com" o "no era cliente"
         const correctionMatch = cleanMsg.match(/(?:no era|no es|era|es|cambia a)\s+(.+)/i);
         if (correctionMatch && correctionMatch[1]) {
-          const correctedVal = correctionMatch[1].trim();
-          setTempValue(correctedVal);
+          let correctedVal = correctionMatch[1].trim();
           const el = formInputs[currentInputIndex];
           const fieldName = getLabelOrPlaceholder(el);
+          const isEmail = el.type === 'email' || fieldName.toLowerCase().includes('correo') || fieldName.toLowerCase().includes('email');
+          if (isEmail) {
+            correctedVal = normalizeEmailValue(correctedVal);
+          }
+          setTempValue(correctedVal);
           const msg = `Corregido. El nuevo valor para ${fieldName} es: ${correctedVal}. ¿Es correcto?`;
           pushAssistantMsg(msg);
           speakText(msg, () => {
@@ -271,15 +298,29 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
           askField(currentInputIndex);
         }
       } else {
-        // Tratar como corrección directa directa si no dijo explícitamente sí o no
-        setTempValue(messageText);
-        const el = formInputs[currentInputIndex];
-        const fieldName = getLabelOrPlaceholder(el);
-        const msg = `Entendido. El nuevo valor para ${fieldName} es: ${messageText}. ¿Es correcto?`;
-        pushAssistantMsg(msg);
-        speakText(msg, () => {
-          startListening(false);
-        });
+        // Evitar bucles de falsas correcciones (ej: palabras cortas raras transcritas)
+        const isCorrection = cleanMsg.includes('correo') || cleanMsg.includes('@') || cleanMsg.match(/\d+/) || cleanMsg.length > 5;
+        if (isCorrection) {
+          let processedVal = messageText;
+          const el = formInputs[currentInputIndex];
+          const fieldName = getLabelOrPlaceholder(el);
+          const isEmail = el.type === 'email' || fieldName.toLowerCase().includes('correo') || fieldName.toLowerCase().includes('email');
+          if (isEmail) {
+            processedVal = normalizeEmailValue(messageText);
+          }
+          setTempValue(processedVal);
+          const msg = `Entendido. El nuevo valor para ${fieldName} es: ${processedVal}. ¿Es correcto?`;
+          pushAssistantMsg(msg);
+          speakText(msg, () => {
+            startListening(false);
+          });
+        } else {
+          const msg = 'No logré entender. Por favor responde sí o no, o dime el nuevo valor empezando con "cambiar a".';
+          pushAssistantMsg(msg);
+          speakText(msg, () => {
+            startListening(false);
+          });
+        }
       }
       return;
     }
@@ -435,6 +476,9 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
       const loginMsg = 'Redirigiendo a inicio de sesión.';
       pushAssistantMsg(loginMsg);
 
+      // DETENER EL MICRÓFONO PARA EVITAR COLA DE AUDIO EN LA TRANSICIÓN
+      stopListening();
+
       speakText(loginMsg, () => {
         executeNavigation('/login');
         setTimeout(() => {
@@ -447,7 +491,7 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
           } else {
             if (!isVoiceChatSuspended) startListening(false);
           }
-        }, 1200);
+        }, 1500); // 1.5s para asegurar la carga completa
       });
       return;
     }
