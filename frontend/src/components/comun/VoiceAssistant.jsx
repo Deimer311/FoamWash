@@ -22,7 +22,7 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
   const chatEndRef = useRef(null);
 
   // Auth & Carrito Context
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { carrito, agregarAlCarrito } = useCarrito();
 
   // Comandos de voz siempre activos por defecto
@@ -116,21 +116,49 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
 
   const executeNavigation = (targetPath) => {
     if (onNavigate) {
-      const cleanPath = targetPath.replace(/^\//, '');
-      if (cleanPath === '' || cleanPath === 'inicio') {
+      const cleanPath = targetPath.replace(/^\//, '').toLowerCase();
+      if (cleanPath === '' || cleanPath === 'inicio' || cleanPath === 'home') {
         onNavigate('home');
-      } else if (cleanPath === 'agendamiento' || cleanPath === 'pasarela-pago') {
-        if (isAuthenticated) {
+      } else if (cleanPath === 'agendamiento' || cleanPath === 'pasarela-pago' || cleanPath === 'confirmacion') {
+        if (isAuthenticated && user?.role === 'cliente') {
           onNavigate('cotizacion-cliente');
+        } else if (isAuthenticated && user?.role === 'admin') {
+          onNavigate('admin-dashboard');
+        } else if (isAuthenticated && user?.role === 'trabajador') {
+          onNavigate('agenda-empleado');
         } else {
           onNavigate('cotizacion-publica');
+        }
+      } else if (cleanPath === 'perfil' || cleanPath === 'mi-perfil' || cleanPath === 'perfil-usuario') {
+        if (!isAuthenticated) {
+          onNavigate('login');
+        } else if (user?.role === 'admin') {
+          onNavigate('perfil-admin');
+        } else if (user?.role === 'trabajador') {
+          onNavigate('perfil-trabajador');
+        } else {
+          onNavigate('perfil');
+        }
+      } else if (cleanPath === 'mis-agendamientos' || cleanPath === 'mis-reservas' || cleanPath === 'agendamientos') {
+        if (isAuthenticated) {
+          onNavigate('mis-agendamientos');
+        } else {
+          onNavigate('login');
+        }
+      } else if (cleanPath === 'mis-cotizaciones' || cleanPath === 'cotizaciones') {
+        if (isAuthenticated) {
+          onNavigate('mis-cotizaciones');
+        } else {
+          onNavigate('login');
         }
       } else {
         onNavigate(cleanPath);
       }
     }
     if (navigate) {
-      navigate(targetPath);
+      try {
+        navigate(targetPath);
+      } catch (e) {}
     }
   };
 
@@ -382,8 +410,44 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
     }
 
     // ==========================================
-    // 2. COMANDOS DE AUTOMATIZACIÓN LOCAL (LOGOUT, LOGIN, VOUCHER, AGENDAMIENTO)
+    // 2. COMANDOS DE AUTOMATIZACIÓN LOCAL (LOGOUT, LOGIN, VOUCHER, AGENDAMIENTO, PERFIL, COTIZACIONES)
     // ==========================================
+
+    // Mi Perfil
+    if (cleanMsg.includes('mi perfil') || cleanMsg.includes('ver perfil') || cleanMsg.includes('ir a mi perfil') || cleanMsg.includes('perfil')) {
+      pushUserMsg(messageText);
+      const navMsg = isAuthenticated ? 'Abriendo tu perfil de usuario.' : 'Para ver tu perfil debes iniciar sesión.';
+      pushAssistantMsg(navMsg);
+      speakText(navMsg, () => {
+        executeNavigation('perfil');
+        if (!isVoiceChatSuspended) startListening(false);
+      });
+      return;
+    }
+
+    // Mis Cotizaciones
+    if (cleanMsg.includes('mis cotizaciones') || cleanMsg.includes('ver cotizaciones') || cleanMsg.includes('cotizaciones guardadas')) {
+      pushUserMsg(messageText);
+      const navMsg = isAuthenticated ? 'Abriendo tus cotizaciones guardadas.' : 'Para ver tus cotizaciones debes iniciar sesión.';
+      pushAssistantMsg(navMsg);
+      speakText(navMsg, () => {
+        executeNavigation('mis-cotizaciones');
+        if (!isVoiceChatSuspended) startListening(false);
+      });
+      return;
+    }
+
+    // Mis agendamientos / reservas
+    if (cleanMsg.includes('mis agendamientos') || cleanMsg.includes('mis reservas') || cleanMsg.includes('agendamientos')) {
+      pushUserMsg(messageText);
+      const navMsg = isAuthenticated ? 'Abriendo tu panel de reservas y agendamientos.' : 'Para ver tus agendamientos debes iniciar sesión.';
+      pushAssistantMsg(navMsg);
+      speakText(navMsg, () => {
+        executeNavigation('mis-agendamientos');
+        if (!isVoiceChatSuspended) startListening(false);
+      });
+      return;
+    }
 
     // Cerrar sesión
     if (cleanMsg.includes('cierra') || cleanMsg.includes('cerrar sesión') || cleanMsg.includes('cerrar sesion') || cleanMsg.includes('salir')) {
@@ -429,18 +493,6 @@ const VoiceAssistant = ({ onNavigate, currentPage }) => {
             if (!isVoiceChatSuspended) startListening(false);
           }
         }, 1500);
-      });
-      return;
-    }
-
-    // Ir a mis agendamientos
-    if (cleanMsg.includes('mis agendamientos') || cleanMsg.includes('mis reservas') || cleanMsg.includes('agendamientos')) {
-      pushUserMsg(messageText);
-      const navMsg = 'Abriendo tu panel de reservas y agendamientos.';
-      pushAssistantMsg(navMsg);
-      speakText(navMsg, () => {
-        executeNavigation('/agendamiento');
-        if (!isVoiceChatSuspended) startListening(false);
       });
       return;
     }
