@@ -72,14 +72,14 @@ const CrudEmpleados = () => {
         
         setFormData(validEmpleado || {
             nombre: '', foto: '', cargo: '', especialidad: '',
-            descripcion: '', experiencia: '', telefono: '', correo: '', password: ''
+            descripcion: '', fecha_ingreso: '', telefono: '', correo: '', password: ''
         });
         setModalAbierto(true);
     };
 
     const cerrarModal = (e) => {
         setModalAbierto(false);
-        setFormData({ nombre: '', foto: '', cargo: '', especialidad: '', descripcion: '', experiencia: '', telefono: '', correo: '', password: '' });
+        setFormData({ nombre: '', foto: '', cargo: '', especialidad: '', descripcion: '', fecha_ingreso: '', telefono: '', correo: '', password: '' });
     };
 
     const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -97,7 +97,7 @@ const CrudEmpleados = () => {
                 cargo:          formData.cargo ? formData.cargo.trim() : '',
                 especialidad:   formData.especialidad ? formData.especialidad.trim() : '',
                 certificaciones: formData.descripcion ? formData.descripcion.trim() : '',
-                fecha_ingreso:  formData.experiencia
+                fecha_ingreso:  formData.fecha_ingreso
             };
 
             if (formData.id) {
@@ -107,7 +107,7 @@ const CrudEmpleados = () => {
                     cargo: formData.cargo ? formData.cargo.trim() : '',
                     especialidades: formData.especialidad ? formData.especialidad.trim() : '',
                     certificaciones: formData.descripcion ? formData.descripcion.trim() : '',
-                    fecha_ingreso: formData.experiencia
+                    fecha_ingreso: formData.fecha_ingreso
                 };
                 await api.put('/usuarios/' + formData.id, putPayload);
                 setEmpleados(empleados.map(e => e.id === formData.id ? { ...e, ...formData } : e));
@@ -135,7 +135,7 @@ const CrudEmpleados = () => {
                     cargo: formData.cargo || '—',
                     especialidad: formData.especialidad || '—',
                     descripcion: formData.descripcion || '',
-                    experiencia: formData.experiencia || '—',
+                    fecha_ingreso: formData.fecha_ingreso || '—',
                     telefono: formData.telefono || '—',
                 }]);
             }
@@ -322,7 +322,7 @@ const CrudEmpleados = () => {
                             <div className="form-row">
                                 <div className="form-group-modal">
                                     <label>Fecha de Ingreso</label>
-                                    <input type="date" name="experiencia" value={formData.experiencia} onChange={handleInputChange} />
+                                    <input type="date" name="fecha_ingreso" value={formData.fecha_ingreso || ''} onChange={handleInputChange} />
                                 </div>
                                 <div className="form-group-modal">
                                     <label>Teléfono</label>

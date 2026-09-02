@@ -380,13 +380,18 @@ const ReportesAdmin = ({
 
         /* ── Print Styles (Para PDF) ── */
         @media print {
-          body { background: #fff !important; }
-          .rp-page { padding-top: 0 !important; background: #fff !important; padding-bottom: 0 !important; }
+          body * { display: none; }
+          .rp-page, .rp-page * { display: block; visibility: visible; }
+          .rp-page { 
+             position: absolute; left: 0; top: 0;
+             width: 100%; 
+             margin: 0; 
+             padding: 0; 
+             background: white;
+          }
+          .rp-kpi-grid { display: block; }
+          .rp-kpi, .rp-card, .rp-table-wrap { page-break-inside: avoid; margin-bottom: 20px; border: 1px solid #e0e8f5 !important; box-shadow: none !important; }
           .rp-periods, .rp-pdf-btn { display: none !important; }
-          .rp-kpi { border: 1px solid #e0e8f5 !important; box-shadow: none !important; transform: none !important; }
-          .rp-card { border: 1px solid #e0e8f5 !important; box-shadow: none !important; page-break-inside: avoid; }
-          .rp-table-wrap { border: 1px solid #e0e8f5 !important; box-shadow: none !important; page-break-inside: avoid; }
-          /* Ocultar barra de navegación/footer global asumiendo que usan nav/footer o clases genéricas */
           nav, footer, .admin-footer, [class*="footer"], [class*="header"] { display: none !important; }
           .rp-page-head { margin-bottom: 24px !important; }
         }

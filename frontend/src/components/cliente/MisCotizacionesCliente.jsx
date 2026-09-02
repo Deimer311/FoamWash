@@ -4,6 +4,7 @@ import HeaderCliente from './HeaderCliente';
 import Footer from '../comun/Footer1';
 import api from '../../services/api';
 import { useNotificaciones, NotificacionContainer } from '../comun/Notificacion';
+import './estilos_cliente/estilos_cotizar_cliente.css';
 
 const IcDoc = () => (
     <svg height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -605,7 +606,7 @@ export default function MisCotizacionesCliente({ onBackToHome, onCotizacion, onP
 
             {/* MODAL DETALLES COTIZACION */}
             {selectedCotizacion && (
-                <div className="modal-overlay" onClick={() => setSelectedCotizacion(null)}>
+                <div className="modal-overlay show" onClick={() => setSelectedCotizacion(null)}>
                     <div className="detail-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header-banner">
                             <div className="modal-logo-icon">
@@ -669,7 +670,7 @@ export default function MisCotizacionesCliente({ onBackToHome, onCotizacion, onP
 
             {/* MODAL PROGRAMAR SERVICIO (AGENDAR DESDE COTIZACIÓN) */}
             {bookingCotizacion && (
-                <div className="modal-overlay" onClick={() => !guardando && setBookingCotizacion(null)}>
+                <div className="modal-overlay show" onClick={() => !guardando && setBookingCotizacion(null)}>
                     <div className="detail-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px' }}>
                         <div className="modal-header-banner" style={{ background: 'linear-gradient(135deg, #1e3a8a, #0f172a)' }}>
                             <div className="modal-logo-icon" style={{ color: '#60a5fa' }}>

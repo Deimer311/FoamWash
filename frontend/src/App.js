@@ -220,7 +220,7 @@ if (role === 'admin') {
                 }
                 return (
                     <CotizacionesCliente 
-                        onBackToHome={goToHome}
+                        onBackToHome={goToServiciosCliente}
                         onGoToServicios={goToServiciosCliente}
                         onPerfil={goToPerfil}
                         onServicios={goToServiciosCliente}
@@ -236,7 +236,7 @@ if (role === 'admin') {
                 }
                 return (
                     <ServiciosClientePage 
-                        onBackToHome={goToHome}
+                        onBackToHome={goToServiciosCliente}
                         onCotizacion={goToCotizacion}
                         onPerfil={goToPerfil}
                         onMisAgendamientos={() => setCurrentPage('mis-agendamientos')}
@@ -254,7 +254,7 @@ if (role === 'admin') {
                 }
                 return (
                     <PerfilCliente 
-                        onBackToHome={goToHome}
+                        onBackToHome={goToServiciosCliente}
                         onCotizacion={goToCotizacion}
                         onServicios={goToServiciosCliente}
                         onEditarPerfil={() => setCurrentPage('editar-perfil-cliente')}
@@ -271,7 +271,7 @@ if (role === 'admin') {
                 }
                 return (
                     <MisAgendamientosCliente
-                        onBackToHome={goToHome}
+                        onBackToHome={goToServiciosCliente}
                         onCotizacion={goToCotizacion}
                         onPerfil={goToPerfil}
                         onServicios={goToServiciosCliente}
@@ -287,7 +287,7 @@ if (role === 'admin') {
                 }
                 return (
                     <MisCotizacionesCliente
-                        onBackToHome={goToHome}
+                        onBackToHome={goToServiciosCliente}
                         onCotizacion={goToCotizacion}
                         onPerfil={goToPerfil}
                         onServicios={goToServiciosCliente}
@@ -305,7 +305,7 @@ if (role === 'admin') {
                 return (
                     <PerfilClienteEdi
                         onBackToProfile={() => setCurrentPage('perfil')}
-                        onBackToHome={goToHome}
+                        onBackToHome={goToServiciosCliente}
                     />
                 );
 
