@@ -780,7 +780,7 @@ export default function MisCotizacionesCliente({ onBackToHome, onCotizacion, onP
                                     style={{ width: '100%', flex: 'none' }}
                                     onClick={() => {
                                         setBookingCotizacion(null);
-                                        onAgendamientoSuccess();
+                                        if (onAgendamientoSuccess) onAgendamientoSuccess();
                                     }}
                                 >
                                     Ir a Mis Agendamientos ✓
@@ -813,4 +813,3 @@ export default function MisCotizacionesCliente({ onBackToHome, onCotizacion, onP
         </div>
     );
 }
-9
