@@ -380,19 +380,49 @@ const ReportesAdmin = ({
 
         /* ── Print Styles (Para PDF) ── */
         @media print {
-          body * { display: none; }
-          .rp-page, .rp-page * { display: block; visibility: visible; }
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          body * { visibility: hidden; }
+          
+          /* Ocultar elementos de navegación para que no ocupen espacio */
+          nav, header, footer, .admin-footer, [class*="footer"], [class*="header"], .ad-sidebar { 
+             display: none !important; 
+          }
+          
+          .rp-page, .rp-page * { visibility: visible; }
           .rp-page { 
-             position: absolute; left: 0; top: 0;
+             position: absolute;
+             left: 0;
+             top: 0;
              width: 100%; 
              margin: 0; 
              padding: 0; 
              background: white;
           }
-          .rp-kpi-grid { display: block; }
-          .rp-kpi, .rp-card, .rp-table-wrap { page-break-inside: avoid; margin-bottom: 20px; border: 1px solid #e0e8f5 !important; box-shadow: none !important; }
+          
+          /* Mejoras de layout para la impresión */
+          .rp-kpi-grid { 
+             display: grid !important; 
+             grid-template-columns: repeat(2, 1fr) !important; 
+             gap: 15px !important; 
+          }
+          .rp-charts-row { 
+             display: grid !important; 
+             grid-template-columns: 1fr !important; /* Apilar los gráficos para que se vean grandes */
+             gap: 20px !important; 
+          }
+          
+          .rp-kpi, .rp-card, .rp-table-wrap { 
+             page-break-inside: avoid; 
+             margin-bottom: 20px; 
+             border: 1px solid #e0e8f5 !important; 
+             box-shadow: none !important; 
+             position: static !important;
+          }
+          
           .rp-periods, .rp-pdf-btn { display: none !important; }
-          nav, footer, .admin-footer, [class*="footer"], [class*="header"] { display: none !important; }
           .rp-page-head { margin-bottom: 24px !important; }
         }
       `}</style>

@@ -50,6 +50,7 @@ import PerfilCliente from './components/cliente/PerfilCliente';
 import PerfilClienteEdi from './components/cliente/PerfilClienteEdi';
 import MisAgendamientosCliente from './components/cliente/MisAgendamientosCliente';
 import MisCotizacionesCliente from './components/cliente/MisCotizacionesCliente';
+import HeaderCliente from './components/cliente/HeaderCliente';
 
 //==============================================================================
 // Componentes de la Aplicación
@@ -169,8 +170,20 @@ if (role === 'admin') {
             case 'home':
                 return (
                     <div className="container">
-                        <Header onLoginClick={goToLogin} />
-                        <MainContent onServiciosClick={goToServicios} />
+                        {isAuthenticated && user?.role === 'cliente' ? (
+                            <HeaderCliente 
+                                activeLink="inicio"
+                                onBackToHome={goToHome}
+                                onCotizacion={goToCotizacion}
+                                onServicios={goToServiciosCliente}
+                                onPerfil={goToPerfil}
+                                onMisAgendamientos={() => setCurrentPage('mis-agendamientos')}
+                                onMisCotizaciones={() => setCurrentPage('mis-cotizaciones')}
+                            />
+                        ) : (
+                            <Header onLoginClick={goToLogin} />
+                        )}
+                        <MainContent onServiciosClick={isAuthenticated && user?.role === 'cliente' ? goToServiciosCliente : goToServicios} />
                         <Footer />
                         <div className='background-image-container'></div>
                     </div>
@@ -220,7 +233,7 @@ if (role === 'admin') {
                 }
                 return (
                     <CotizacionesCliente 
-                        onBackToHome={goToServiciosCliente}
+                        onBackToHome={goToHome}
                         onGoToServicios={goToServiciosCliente}
                         onPerfil={goToPerfil}
                         onServicios={goToServiciosCliente}
@@ -236,7 +249,7 @@ if (role === 'admin') {
                 }
                 return (
                     <ServiciosClientePage 
-                        onBackToHome={goToServiciosCliente}
+                        onBackToHome={goToHome}
                         onCotizacion={goToCotizacion}
                         onPerfil={goToPerfil}
                         onMisAgendamientos={() => setCurrentPage('mis-agendamientos')}
@@ -254,7 +267,7 @@ if (role === 'admin') {
                 }
                 return (
                     <PerfilCliente 
-                        onBackToHome={goToServiciosCliente}
+                        onBackToHome={goToHome}
                         onCotizacion={goToCotizacion}
                         onServicios={goToServiciosCliente}
                         onEditarPerfil={() => setCurrentPage('editar-perfil-cliente')}
@@ -271,7 +284,7 @@ if (role === 'admin') {
                 }
                 return (
                     <MisAgendamientosCliente
-                        onBackToHome={goToServiciosCliente}
+                        onBackToHome={goToHome}
                         onCotizacion={goToCotizacion}
                         onPerfil={goToPerfil}
                         onServicios={goToServiciosCliente}
@@ -287,7 +300,7 @@ if (role === 'admin') {
                 }
                 return (
                     <MisCotizacionesCliente
-                        onBackToHome={goToServiciosCliente}
+                        onBackToHome={goToHome}
                         onCotizacion={goToCotizacion}
                         onPerfil={goToPerfil}
                         onServicios={goToServiciosCliente}
@@ -305,7 +318,7 @@ if (role === 'admin') {
                 return (
                     <PerfilClienteEdi
                         onBackToProfile={() => setCurrentPage('perfil')}
-                        onBackToHome={goToServiciosCliente}
+                        onBackToHome={goToHome}
                     />
                 );
 
