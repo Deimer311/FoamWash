@@ -21,8 +21,11 @@ body {
 
 .pt-main {
     max-width: 1300px;
+    width: 100%;
     margin: 0 auto;
     padding: 156px 40px 80px;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 .pt-container {
@@ -386,7 +389,7 @@ body {
 /* ==================== DESEMPEÑO ==================== */
 .pt-perf-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
     gap: 16px;
 }
 
@@ -471,11 +474,9 @@ body {
     .pt-container { grid-template-columns: 1fr; }
     .pt-sidebar { position: static; padding: 28px 24px; }
     .pt-info-grid { grid-template-columns: 1fr; }
-    .pt-perf-grid { grid-template-columns: repeat(2, 1fr); }
     .pt-main { padding: 120px 16px 60px; }
 }
 
 @media (max-width: 480px) {
-    .pt-card { padding: 20px 18px; }
-    .pt-perf-grid { grid-template-columns: 1fr 1fr; }
+    .pt-card { padding: 20px 1rem; box-sizing: border-box; }
 }

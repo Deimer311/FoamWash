@@ -32,8 +32,8 @@ const formatFecha = (fecha) => {
     return d.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
 };
 
-const getFotoUrl = (fotoPerfil) => {
-    if (!fotoPerfil) return null;
+const getFotoUrl = (fotoPerfil, nombre = 'Usuario') => {
+    if (!fotoPerfil) return `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=0D8ABC&color=fff`;
     if (fotoPerfil.startsWith('http')) return fotoPerfil;
     return `${API_BASE_URL}${fotoPerfil}`;
 };
@@ -224,7 +224,7 @@ const PerfilTrabajador = ({ onBackToHome, onEditarPerfil, onLogout }) => {
     // ── Datos derivados ───────────────────────────────────────────────────────
     const certificaciones = parseCertificaciones(perfil?.certificaciones);
     const especialidades = parseEspecialidades(perfil?.especialidades);
-    const fotoUrl = getFotoUrl(perfil?.foto_perfil);
+    const fotoUrl = getFotoUrl(perfil?.foto_perfil, perfil?.Nombre);
 
     // Nombre del rol real o badge genérico como último recurso
     const rolBadge = perfil?.rol?.Rol || perfil?.cargo || null;
@@ -241,20 +241,14 @@ const PerfilTrabajador = ({ onBackToHome, onEditarPerfil, onLogout }) => {
 
                         {/* Foto */}
                         <div className="pt-photo">
-                            {fotoUrl
-                                ? <img
-                                    src={fotoUrl}
-                                    alt="Foto de perfil"
-                                    onError={(e) => {
-                                        e.target.style.display = 'none';
-                                        e.target.nextSibling.style.display = 'block';
-                                    }}
-                                />
-                                : null
-                            }
-                            <span style={{ fontSize: '3rem', display: fotoUrl ? 'none' : 'block' }}>
-                                <IcUser size={48} />
-                            </span>
+                            <img
+                                src={fotoUrl}
+                                alt="Foto de perfil"
+                                onError={(e) => {
+                                    e.currentTarget.onerror = null;
+                                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(perfil?.Nombre || 'Usuario')}&background=0D8ABC&color=fff`;
+                                }}
+                            />
                         </div>
 
                         <div className="pt-name">{perfil?.Nombre || '—'}</div>
@@ -380,9 +374,16 @@ const PerfilTrabajador = ({ onBackToHome, onEditarPerfil, onLogout }) => {
                                     ))}
                                 </div>
                             ) : (
-                                <p style={{ color: '#bbb', textAlign: 'center', padding: '28px', fontSize: 14, fontFamily: 'Kanit' }}>
-                                    No hay servicios programados para hoy.
-                                </p>
+                                <div style={{ textAlign: 'center', padding: '40px 20px', background: '#f9fafb', borderRadius: '12px', border: '1px dashed #d1d5db' }}>
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '12px' }}>
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                        <line x1="16" y1="2" x2="16" y2="6" />
+                                        <line x1="8" y1="2" x2="8" y2="6" />
+                                        <line x1="3" y1="10" x2="21" y2="10" />
+                                    </svg>
+                                    <h4 style={{ fontSize: '16px', color: '#4b5563', marginBottom: '6px', fontFamily: 'Kanit' }}>Sin servicios asignados</h4>
+                                    <p style={{ fontSize: '14px', color: '#9ca3af', fontFamily: 'Kanit', margin: 0 }}>No tienes servicios programados para hoy.</p>
+                                </div>
                             )}
                         </div>
 

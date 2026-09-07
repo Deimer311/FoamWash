@@ -99,7 +99,7 @@ CREATE TABLE `empleado` (
 --
 
 INSERT INTO `empleado` (`Id_Empleado`, `usuario_Id_Usuario`, `cargo`, `fecha_nacimiento`, `fecha_ingreso`, `dias_laborales`, `horario`, `especialidades`, `certificaciones`, `contacto_emergencia_nombre`, `contacto_emergencia_telefono`) VALUES
-(1, 3, 'Técnico de Limpieza Senior', '2000-02-25', NULL, 'martes, miercoles, jueves, viernes, sabado', '08:00 - 17:00', 'sillas, tapiceria', 'Tecnicas de limpieza de sillas, manejo de productos de tapiceria, manejo de productos de pintura.', NULL, NULL);
+(1, 3, 'Técnico de Limpieza Senior', '2000-02-25', '2023-01-15', 'martes, miercoles, jueves, viernes, sabado', '08:00 - 17:00', 'sillas, tapiceria', 'Tecnicas de limpieza de sillas, manejo de productos de tapiceria, manejo de productos de pintura.', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -242,6 +242,16 @@ CREATE TABLE `_ReservaToServicio` (
   `B` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `_ReservaToServicio`
+--
+
+INSERT INTO `_ReservaToServicio` (`A`, `B`) VALUES
+(8, 22),
+(9, 23),
+(10, 27),
+(26, 28);
+
 -- --------------------------------------------------------
 
 --
@@ -301,7 +311,7 @@ CREATE TABLE `usuario` (
 INSERT INTO `usuario` (`Id_Usuario`, `Nombre`, `Telefono`, `N_Documento`, `Direccion`, `Correo`, `password_hash`, `estado`, `rol_Id_Rol`, `tipo_de_documento_id_tipo_de_documento`, `reset_token`, `reset_token_expires`, `last_login`, `fecha_registro`, `access_token`, `refresh_token`, `token_created_at`, `token_expires_at`, `foto_perfil`) VALUES
 (1, 'Cristian Criollo', '3132572934', '0000000000', 'calle 41 b sur · 79-29', 'cristian.criollotovar@gmail.com', '$2b$10$9r3LdbPC7/b7Rpie0gZSPum7TKcv29BV8Z7epkM/YA2ASmvgDEwS6', 'activo', 3, 1, NULL, NULL, '2026-02-21 14:16:23', '2026-02-08 20:19:39', NULL, NULL, NULL, NULL, NULL),
 (2, 'cliente de prueba', '3123586749', NULL, 'calle 25 100-20', 'cliente@gmail.com', '$2b$10$YNEYJdUS1IWM/yeI4zoi8OtjIeyWiC/dRlOvQ2Xe3XIQWfP0JgjpK', 'activo', 3, 1, NULL, NULL, '2026-03-14 19:57:09', '2026-02-10 14:32:03', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJjbGllbnRlQGdtYWlsLmNvbSIsInJvbGUiOiJjbGllbnRlIiwiaWF0IjoxNzczNTE4MjI5LCJleHAiOjE3NzQxMjMwMjl9.6UKjwCXSenoewqB8yv1-j2mb3NOnydAdOEOt96HNhyQ', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJjbGllbnRlQGdtYWlsLmNvbSIsInJvbGUiOiJjbGllbnRlIiwiaWF0IjoxNzczNTE4MjI5LCJleHAiOjE3NzQxMjMwMjl9.oM9eJYYls2RLgA56JRAmeXZ0aMh7-_B_N_NsGcFdBTs', '2026-03-14 19:57:09', '2026-03-14 20:12:09', '/uploads/empleado_2_1772137208258.png'),
-(3, 'trabajador prueba 1', '3212568787', NULL, 'calle 106 A sur 7--26', 'trabajador@gmail.com', '$2b$10$ScBT/gtpto3b72O1AKzHz.Pdu2CufBJ4mmtB.9APbFqTOx7dtS8Ba', 'activo', 2, 1, NULL, NULL, '2026-03-14 19:52:58', '2026-02-10 14:35:10', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJ0cmFiYWphZG9yQGdtYWlsLmNvbSIsInJvbGUiOiJ0cmFiYWphZG9yIiwiaWF0IjoxNzczNTE3OTc4LCJleHAiOjE3NzQxMjI3Nzh9.tPtUbx1nDB_Jtf0TbrXf91XWZzwnX1V0CVnvH6xibAA', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJ0cmFiYWphZG9yQGdtYWlsLmNvbSIsInJvbGUiOiJ0cmFiYWphZG9yIiwiaWF0IjoxNzczNTE3OTc4LCJleHAiOjE3NzQxMjI3Nzh9.e8hEwVfXGGvF96qNkgM6DgETs23hRuJwfs0PIinKMSo', '2026-03-14 19:52:58', '2026-03-14 20:07:58', '/uploads/fotos/empleado_3_1772137647224.png'),
+(3, 'trabajador prueba 1', '3212568787', '1234567890', 'calle 106 A sur 7--26', 'trabajador@gmail.com', '$2b$10$ScBT/gtpto3b72O1AKzHz.Pdu2CufBJ4mmtB.9APbFqTOx7dtS8Ba', 'activo', 2, 1, NULL, NULL, '2026-03-14 19:52:58', '2026-02-10 14:35:10', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJ0cmFiYWphZG9yQGdtYWlsLmNvbSIsInJvbGUiOiJ0cmFiYWphZG9yIiwiaWF0IjoxNzczNTE3OTc4LCJleHAiOjE3NzQxMjI3Nzh9.tPtUbx1nDB_Jtf0TbrXf91XWZzwnX1V0CVnvH6xibAA', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJ0cmFiYWphZG9yQGdtYWlsLmNvbSIsInJvbGUiOiJ0cmFiYWphZG9yIiwiaWF0IjoxNzczNTE3OTc4LCJleHAiOjE3NzQxMjI3Nzh9.e8hEwVfXGGvF96qNkgM6DgETs23hRuJwfs0PIinKMSo', '2026-03-14 19:52:58', '2026-03-14 20:07:58', '/uploads/fotos/empleado_3_1772137647224.png'),
 (4, 'administrador prueba', '3205675987', NULL, 'calle 200 norte 14-7', 'admin@gmail.com', '$2b$10$uYBHcq7WfvaZBX5tMoTLBuRXMjBxVUnC/KJPtlqDnZkgCV0I5vW8C', 'activo', 1, 1, '572939', '2026-03-13 11:27:04', '2026-03-13 11:37:36', '2026-02-10 14:37:46', 'eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI0Iiwicm9sZSI6ImFkbWluIiwiaWQiOjQsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzczNDE5ODU2LCJleHAiOjE3NzQwMjQ2NTZ9.ltiLufE-WmLdvjxoj9ggvyrhpXYybYuBHCdHCUGZU2jP2ZFB6I7EeFUv1HzG7VpT', 'eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI0Iiwicm9sZSI6ImFkbWluIiwiaWQiOjQsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwiaWF0IjoxNzczNDE5ODU2LCJleHAiOjE3NzQwMjQ2NTZ9.KxaT2XE4PqEoQVq5KHigxUhPi5_r7ImTFA7UjJbSrnHahFuLKzbWF4c0M5TmB6wp', '2026-03-13 11:37:36', '2026-03-13 11:52:36', NULL),
 (5, 'michel quintero', '3485012019', NULL, 'calle 200 79-5', 'michel@gmail.com', '$2b$10$ucRuvQ2SxkYYnQJl2KnZTeEBmGqj5NElvF0TdOl0h4o3m/uifvr9m', 'activo', 3, 1, NULL, NULL, '2026-02-09 21:24:56', '2026-02-09 21:24:56', NULL, NULL, NULL, NULL, NULL),
 (6, 'jairo vega', '3194371546', NULL, 'carrera 69 j 73 a 26', 'jiar1530@hotmail.com', '$2b$10$RQ2ZxNoTXkru.EMK9qxBA.BzM5gN3zZ9tRr9YYNH04PmK9PDEhBwG', 'activo', 3, 1, NULL, NULL, '2026-02-10 17:19:09', '2026-02-10 17:19:09', NULL, NULL, NULL, NULL, NULL),

@@ -61,6 +61,11 @@ const HeaderEmpleado = ({
     return user.nombre.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase();
   };
 
+  const getAvatarUrl = (url, fallbackName = 'Usuario') => {
+    if (!url) return `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName)}&background=0D8ABC&color=fff`;
+    return url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
+  };
+
   return (
     <>
       <style>{`
@@ -68,11 +73,13 @@ const HeaderEmpleado = ({
           position: fixed;
           top: 0; left: 0; right: 0;
           z-index: 1000;
-          height: 64px;
+          min-height: 64px;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 40px;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          padding: 10px 40px;
           background: rgba(8,12,30,0.92);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
@@ -196,7 +203,7 @@ const HeaderEmpleado = ({
         .em-dd-item.logout .em-dd-icon { background: rgba(255,80,80,0.12); }
 
         @media (max-width: 800px) {
-          .em-header { padding: 0 20px; }
+          .em-header { padding: 10px 20px; }
           .em-nav-btn span { display: none; }
         }
       `}</style>
@@ -225,10 +232,14 @@ const HeaderEmpleado = ({
           <div className="em-avatar-wrap" ref={avatarRef}>
             <div className="em-avatar-btn" onClick={() => setAvatarOpen(o => !o)}>
               <div className="em-avatar-img">
-                {fotoUrl && !imgError
-                  ? <img src={fotoUrl} alt="Perfil" onError={() => setImgError(true)} />
-                  : getIniciales()
-                }
+                <img 
+                  src={getAvatarUrl(user?.foto_perfil, user?.nombre)} 
+                  alt="Perfil" 
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.nombre || 'Usuario')}&background=0D8ABC&color=fff`;
+                  }} 
+                />
               </div>
               <IcUser size={14} color="rgba(255,255,255,0.6)" />
             </div>
