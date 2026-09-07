@@ -10,8 +10,9 @@ COPY src/ ./src/
 COPY public/ ./public/
 COPY index.html vite.config.js eslint.config.js ./
 
-USER node
+RUN npm run build
+RUN npm install -g serve
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev", "--", "--host"]
+CMD ["serve", "-s", "dist", "-l", "3000"]
