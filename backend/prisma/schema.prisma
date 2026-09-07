@@ -126,7 +126,7 @@ model Servicio {
 model Cotizacion {
   Id_Cotizacion    Int        @id @default(autoincrement()) @map("Id_Cotizacion")
   Id_usuario       Int        @map("Id_usuario")
-  Precio_cotizado  Decimal    @map("Precio_cotizado") @db.Decimal(10, 2)
+  Precio_cotizado  Decimal    @map("Precio_cotizado") @db.Decimal(12, 2)
   Cantidad         Int        @map("Cantidad")
   Tamaño          String     @map("Tamaño") @db.VarChar(45)
   fecha_cotizacion DateTime?  @default(now()) @map("fecha_cotizacion") @db.DateTime(0)

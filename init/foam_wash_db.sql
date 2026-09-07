@@ -57,7 +57,7 @@ INSERT INTO `calificacion` (`Id_Calificacion`, `empleado_Id_Usuario`, `reserva_I
 CREATE TABLE `cotizacion` (
   `Id_Cotizacion` int NOT NULL COMMENT 'PK: Identificador único de la cotización',
   `Id_usuario` int NOT NULL COMMENT 'FK: Usuario que realizó la cotización',
-  `Precio_cotizado` decimal(10,2) NOT NULL COMMENT 'Precio final de la cotización',
+  `Precio_cotizado` decimal(12,2) NOT NULL COMMENT 'Precio final de la cotización',
   `Cantidad` int NOT NULL COMMENT 'Cantidad de servicios cotizados',
   `Tamaño` varchar(45) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'Tamaño del mueble',
   `fecha_cotizacion` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de creación de la cotización',
@@ -234,6 +234,17 @@ INSERT INTO `servicio` (`Id_Servicio`, `Nombre_Servicio`, `Precio`, `descripcion
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `_ReservaToServicio`
+--
+
+CREATE TABLE `_ReservaToServicio` (
+  `A` int NOT NULL,
+  `B` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `tipo_de_documento`
 --
 
@@ -359,6 +370,13 @@ ALTER TABLE `servicio`
   ADD PRIMARY KEY (`Id_Servicio`),
   ADD KEY `fk_servicio_cotizacion_idx` (`cotizacion_Id_Cotizacion`),
   ADD KEY `fk_servicio_reserva_idx` (`reserva_ID_Reserva`);
+
+--
+-- Indices de la tabla `_ReservaToServicio`
+--
+ALTER TABLE `_ReservaToServicio`
+  ADD UNIQUE KEY `_ReservaToServicio_AB_unique` (`A`,`B`),
+  ADD KEY `_ReservaToServicio_B_index` (`B`);
 
 --
 -- Indices de la tabla `tipo_de_documento`
@@ -487,6 +505,13 @@ ALTER TABLE `reserva`
 ALTER TABLE `servicio`
   ADD CONSTRAINT `fk_servicio_cotizacion` FOREIGN KEY (`cotizacion_Id_Cotizacion`) REFERENCES `cotizacion` (`Id_Cotizacion`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_servicio_reserva` FOREIGN KEY (`reserva_ID_Reserva`) REFERENCES `reserva` (`ID_Reserva`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `_ReservaToServicio`
+--
+ALTER TABLE `_ReservaToServicio`
+  ADD CONSTRAINT `_ReservaToServicio_ibfk_1` FOREIGN KEY (`A`) REFERENCES `reserva` (`ID_Reserva`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `_ReservaToServicio_ibfk_2` FOREIGN KEY (`B`) REFERENCES `servicio` (`Id_Servicio`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `usuario`

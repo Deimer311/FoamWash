@@ -46,7 +46,7 @@
     }) {
       return this.prisma.cotizacion.create({
         data: {
-          Precio_cotizado:  data.Precio_cotizado,
+          Precio_cotizado:  Number(data.Precio_cotizado),
           Cantidad:         data.Cantidad,
           // Acepta con ñ o sin ñ, prioriza el que venga
           'Tamaño':         data['Tamaño'] ?? data.Tamano ?? 'Estándar',
@@ -69,7 +69,7 @@
         if (!existing) {
           const created = await this.prisma.cotizacion.create({
             data: {
-              Precio_cotizado:  item.precio,
+              Precio_cotizado:  Number(item.precio),
               Cantidad:         item.cantidad || 1,
               // FIX: campo con ñ, acepta tamano/tamaño/Tamano/Tamaño
               'Tamaño':         item['Tamaño'] ?? item.Tamano ?? item.tamano ?? item['tamaño'] ?? 'Estándar',
