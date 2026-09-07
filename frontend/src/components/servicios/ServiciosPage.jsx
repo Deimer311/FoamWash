@@ -9,7 +9,7 @@ import ServicesHeader  from './ServicesHeader';
 import SearchSection   from './SearchSection';
 import ServicesGrid    from './ServicesGrid';
 import FooterPublic    from '../comun/FooterPublic';
-import api             from '../../services/api';
+import api, { getBackendUrl } from '../../services/api';
 import './estilos_servicios/servicios.css';
 
 const IMAGEN_FALLBACK = '/img/imag1.jpg';
@@ -29,7 +29,7 @@ const ServiciosPage = ({ onBackToHome, onGoToLogin, onCotizacionPublica }) => {
                         if (!path) return IMAGEN_FALLBACK;
                         if (path.startsWith('http')) return path;
                         const cleanPath = path.startsWith('/') ? path : `/${path}`;
-                        const baseUrl = (api.defaults.baseURL || 'http://localhost:5000').replace(/\/api$/, '');
+                        const baseUrl = getBackendUrl();
                         return `${baseUrl}${cleanPath}`;
                     };
                     const serviciosBD = res.data.data.map(s => ({

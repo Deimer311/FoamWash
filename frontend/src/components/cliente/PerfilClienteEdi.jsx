@@ -8,17 +8,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useAuth } from '../autenticacion/AuthContext';
-import api         from '../../services/api';
+import api, { getBackendUrl } from '../../services/api';
 import HeaderCliente from './HeaderCliente';
+import './estilos_cliente/PerfilCliente.css';
 
 const axiosUpload = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-    withCredentials: true,
+    baseURL: api.defaults.baseURL,
+    withCredentials: true
 });
 
-const API_BASE_URL = import.meta.env.VITE_API_URL
-    ? import.meta.env.VITE_API_URL.replace('/api', '')
-    : 'http://localhost:5000';
+const API_BASE_URL = getBackendUrl();
 
 // ── SVG icons ────────────────────────────────────────────────────────────────
 const IconUser = ({ size = 18, color = 'currentColor' }) => (

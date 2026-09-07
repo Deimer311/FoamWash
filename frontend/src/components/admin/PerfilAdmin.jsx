@@ -7,14 +7,12 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../autenticacion/AuthContext';
-import api from '../../services/api';
+import api, { getBackendUrl } from '../../services/api';
 import './estilos_admin/PerfilAdmin.css';
 import QuickActionsApp from './acciones-rapidas';
 import ConsultasAdmin from './ConsultasAdmin';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL
-    ? import.meta.env.VITE_API_URL.replace('/api', '')
-    : 'http://localhost:5000';
+const API_BASE_URL = getBackendUrl();
 
 const PerfilAdmin = ({
     onBackToHome,

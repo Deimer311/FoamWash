@@ -25,8 +25,14 @@
 
 import axios from 'axios';
 
+export const getBackendUrl = () => {
+    return import.meta.env.PROD 
+        ? '' 
+        : (import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/api$/, '') : 'http://localhost:5000');
+};
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+    baseURL: import.meta.env.PROD ? '/api' : (import.meta.env.VITE_API_URL || 'http://localhost:5000/api'),
     timeout: 10000,
     headers: { 'Content-Type': 'application/json' },
     withCredentials: true  // Permite enviar/recibir cookies automáticamente

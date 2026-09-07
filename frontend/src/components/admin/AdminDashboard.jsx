@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from "react";
 import HeaderAdmin from './HeaderAdmin';
 import FooterAdmin from './FooterAdmin';
-import api from '../../services/api';
+import api, { getBackendUrl } from '../../services/api';
 import "./estilos_admin/AdminGlobal.css";
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────────
@@ -142,9 +142,7 @@ const AdminDashboard = ({
                     clientName:     r.cliente?.Nombre || 'Cliente',
                 })));
 
-                const API_BASE = import.meta.env.VITE_API_URL
-                    ? import.meta.env.VITE_API_URL.replace('/api', '')
-                    : 'http://localhost:5000';
+                const API_BASE = getBackendUrl();
 
                 setActiveEmployees(
                     empleados.filter(e => e.estado === 'activo').slice(0, 5).map(e => ({

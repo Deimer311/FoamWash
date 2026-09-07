@@ -16,7 +16,7 @@ import { useNotificaciones, NotificacionContainer } from '../comun/Notificacion'
 import BotonCarritoFlotante from '../modales/BotonCarritoFlotante';
 import ServiceCardCliente from './ServiceCardCliente';
 import Footer from '../comun/Footer1';
-import api from '../../services/api';
+import api, { getBackendUrl } from '../../services/api';
 import { leerCotizacionLocal, sincronizarCotizacionConBD } from '../../services/cotizacionStorage';
 import { CartModal, ConfirmationModal, IcSearch, IcLoader } from './Modalescarrito';
 import './estilos_cliente/estilos_cotizar_cliente.css';
@@ -27,7 +27,7 @@ const getImageUrl = (path) => {
     if (!path) return IMAGEN_FALLBACK;
     if (path.startsWith('http')) return path;
     const cleanPath = path.startsWith('/') ? path : `/${path}`;
-    const baseUrl = (api.defaults.baseURL || 'http://localhost:5000').replace(/\/api$/, '');
+    const baseUrl = getBackendUrl();
     return `${baseUrl}${cleanPath}`;
 };
 

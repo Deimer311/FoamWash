@@ -5,13 +5,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../autenticacion/AuthContext';
-import api from '../../services/api';
+import api, { getBackendUrl } from '../../services/api';
 import HeaderCliente from './HeaderCliente';
 import './estilos_cliente/PerfilCliente.css';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL
-    ? import.meta.env.VITE_API_URL.replace('/api', '')
-    : 'http://localhost:5000';
+const API_BASE_URL = getBackendUrl();
 
 const PerfilCliente = ({ onBackToHome, onCotizacion, onServicios, onEditarPerfil, onLogout, onMisAgendamientos, onMisCotizaciones }) => {
     const { user } = useAuth();

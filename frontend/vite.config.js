@@ -18,6 +18,16 @@ export default defineConfig({
   plugins: [react()],// Agrega el plugin de React a la configuración de Vite
   server:{
     port: 3000, // Configura el puerto del servidor de desarrollo a 3000
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      },
+      '/uploads': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      }
+    }
   },
   esbuild:{
     include: /\.(js|jsx|ts|tsx)$/,// Configura esbuild para incluir archivos con extensiones .js, .jsx, .ts y .tsx

@@ -11,11 +11,9 @@
 // =============================================================================
 
 import React, { useState, useEffect } from 'react';
-import api from '../../services/api';
+import api, { getBackendUrl } from '../../services/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL
-    ? import.meta.env.VITE_API_URL.replace('/api', '')
-    : 'http://localhost:5000';
+const API_BASE_URL = getBackendUrl();
 
 const TIPOS_DOCUMENTO = [
   { id: 1, nombre: 'Cédula de Ciudadanía' },

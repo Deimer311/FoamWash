@@ -10,7 +10,7 @@ import { useCarrito }        from '../modales/CarritoContext';
 import { useAuth }           from '../autenticacion/AuthContext';
 import CotizacionServiceCard from './CotizacionServiceCard';
 import FooterPublic          from '../comun/FooterPublic';
-import api                   from '../../services/api';
+import api, { getBackendUrl } from '../../services/api';
 import {
     leerCotizacionLocal,
     guardarCotizacionLocal,
@@ -28,7 +28,7 @@ const getImageUrl = (path) => {
     if (!path) return IMAGEN_FALLBACK;
     if (path.startsWith('http')) return path;
     const cleanPath = path.startsWith('/') ? path : `/${path}`;
-    const baseUrl = (api.defaults.baseURL || 'http://localhost:5000').replace(/\/api$/, '');
+    const baseUrl = getBackendUrl();
     return `${baseUrl}${cleanPath}`;
 };
 
