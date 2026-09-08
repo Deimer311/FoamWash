@@ -19,8 +19,16 @@
 @font-face { font-family: 'Kanit'; src: url('/fonts/Kanit-BlackItalic.ttf') format('truetype'); font-weight: 900; font-style: italic; }
 
 /* ── Aplicación global ── */
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
   font-family: 'Plus Jakarta Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

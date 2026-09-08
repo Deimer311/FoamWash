@@ -40,7 +40,7 @@ const FooterPublic = () => {
                 <div style={{
                     maxWidth: '1400px',
                     margin: '0 auto',
-                    padding: '30px 40px',
+                    padding: '40px 20px',
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                     gap: '30px'

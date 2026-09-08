@@ -107,8 +107,9 @@ const ServicesHeader = ({ onBackToHome, onGoToLogin, onCotizacionPublica }) => {
                 .sv-login-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
                 @media (max-width: 800px) {
-                    .sv-header { padding: 0 20px; grid-template-columns: auto 1fr auto; }
+                    .sv-header { padding: 0 15px; grid-template-columns: auto 1fr auto; }
                     .sv-nav { justify-self: end; gap: 0; }
+                    .sv-nav-btn { padding: 7px 10px; }
                     .sv-nav-btn span { display: none; }
                     .sv-right { display: none; }
                 }

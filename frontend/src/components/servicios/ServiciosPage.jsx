@@ -134,8 +134,9 @@ const ServiciosPage = ({ onBackToHome, onGoToLogin, onCotizacionPublica }) => {
                 /* Services section */
                 .services-section {
                     background: #f6f7fb !important;
-                    padding: 52px 40px 80px !important;
+                    padding: 52px 20px 80px !important;
                     flex: 1;
+                    width: 100%;
                 }
                 .section-title {
                     font-size: 34px !important;
@@ -156,6 +157,7 @@ const ServiciosPage = ({ onBackToHome, onGoToLogin, onCotizacionPublica }) => {
                     grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)) !important;
                     gap: 28px !important;
                     max-width: 1320px !important;
+                    width: 100%;
                     margin: 0 auto !important;
                     padding: 0 !important;
                 }
@@ -171,10 +173,10 @@ const ServiciosPage = ({ onBackToHome, onGoToLogin, onCotizacionPublica }) => {
                 }
 
                 @media (max-width: 768px) {
-                    .services-section { padding: 36px 20px 60px !important; }
-                    .services-grid { grid-template-columns: 1fr 1fr !important; gap: 16px !important; }
+                    .services-section { padding: 36px 15px 60px !important; }
+                    .services-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important; gap: 16px !important; }
                 }
-                @media (max-width: 480px) {
+                @media (max-width: 600px) {
                     .services-grid { grid-template-columns: 1fr !important; }
                 }
             `}</style>
