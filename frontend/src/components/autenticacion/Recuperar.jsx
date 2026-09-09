@@ -72,7 +72,7 @@ const RecuperarContrasena = ({ onBackToLogin, onBackToHome }) => {
     } catch (error) {
       // 🔊 NUEVO
       playError();
-      setError(error?.error?.message || 'Error al enviar el código');
+      setError(error?.message || error?.error?.message || 'Error al enviar el código');
     } finally {
       setIsLoading(false);
     }
