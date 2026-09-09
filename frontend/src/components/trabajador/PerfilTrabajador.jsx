@@ -119,13 +119,7 @@ const PerfilTrabajador = ({ onBackToHome, onEditarPerfil, onLogout }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
 
-    // Animación de entrada
-    useEffect(() => {
-        const cards = document.querySelectorAll('.pt-card');
-        cards.forEach((card, i) => {
-            setTimeout(() => card.classList.add('visible'), i * 100);
-        });
-    }, [perfil]);
+    // Animación de entrada eliminada, ahora se maneja puramente en CSS para evitar que se queden ocultas (opacity: 0)
 
     useEffect(() => {
         if (!user?.id) {

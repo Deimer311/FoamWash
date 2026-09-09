@@ -127,19 +127,23 @@
     transform: rotateY(180deg);
 }
 
-.empleado-front,
-.empleado-back {
+/* ── Frontal y Trasera ── */
+.ea-empleado-front, .empleado-front,
+.ea-empleado-back, .empleado-back {
     position: absolute;
-    inset: 0;
-    border-radius: var(--fw-radius-md);
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    overflow: hidden;
+    box-sizing: border-box;
 }
 
-/* ── Cara frontal ── */
-.empleado-front {
-    background: var(--fw-white);
+.ea-empleado-front, .empleado-front {
+    background: var(--fw-white) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center;
     box-shadow: var(--fw-shadow-sm);
     display: flex;
     flex-direction: column;
@@ -223,14 +227,14 @@
 }
 
 /* ── Cara trasera ── */
-.empleado-back {
-    background: linear-gradient(145deg, #0052cc 0%, #0099ff 100%);
+.ea-empleado-back, .empleado-back {
+    background: linear-gradient(145deg, #0052cc 0%, #0099ff 100%) !important;
     transform: rotateY(180deg);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 22px 20px 18px;
-    color: white;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    padding: 22px 20px 18px !important;
+    color: white !important;
     box-shadow: 0 6px 24px rgba(0,102,255,0.30);
 }
 

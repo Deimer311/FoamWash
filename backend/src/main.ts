@@ -8,6 +8,7 @@ import { join } from 'node:path';
 import { mkdirSync } from 'node:fs';
 import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import { urlencoded, json } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -23,6 +24,10 @@ async function bootstrap() {
 
   // ── Cookie Parser ────────────────────────────────────────
   app.use(cookieParser());
+
+  // ── Aumento de límite de payload (Evita Error 413) ───────
+  app.use(json({ limit: '15mb' }));
+  app.use(urlencoded({ extended: true, limit: '15mb' }));
 
   // ── CORS ─────────────────────────────────────────────────
   app.enableCors({

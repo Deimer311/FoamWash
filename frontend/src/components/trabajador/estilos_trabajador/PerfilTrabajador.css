@@ -233,14 +233,14 @@ body {
     padding: 28px;
     border: 1px solid rgba(0,0,0,0.05);
     box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-    opacity: 0;
-    transform: translateY(20px);
-    transition: box-shadow 0.28s ease, transform 0.28s ease, opacity 0.4s ease;
+    animation: ptFadeUp 0.6s ease-out backwards;
+    transition: box-shadow 0.28s ease, transform 0.28s ease;
 }
-.pt-card.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
+.pt-card:nth-child(1) { animation-delay: 0.1s; }
+.pt-card:nth-child(2) { animation-delay: 0.2s; }
+.pt-card:nth-child(3) { animation-delay: 0.3s; }
+.pt-card:nth-child(4) { animation-delay: 0.4s; }
+.pt-card:nth-child(5) { animation-delay: 0.5s; }
 .pt-card:hover {
     box-shadow: 0 8px 28px rgba(26,86,255,0.10);
     transform: translateY(-2px);

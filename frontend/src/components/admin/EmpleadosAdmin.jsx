@@ -212,7 +212,7 @@ const CrudEmpleados = () => {
                                 <div className="empleado-flip-inner">
 
                                     {/* ── CARA FRONTAL ── */}
-                                    <div className="empleado-front">
+                                    <div className="ea-empleado-front empleado-front">
                                         <div className="empleado-foto-area">
                                             <Avatar foto={empleado.foto} nombre={empleado.nombre} size={96} />
                                             {empleado.cargo && empleado.cargo !== '—' && (
@@ -227,7 +227,7 @@ const CrudEmpleados = () => {
                                     </div>
 
                                     {/* ── CARA TRASERA ── */}
-                                    <div className="empleado-back">
+                                    <div className="ea-empleado-back empleado-back">
                                         <p className="back-nombre">{empleado.nombre}</p>
 
                                         {empleado.descripcion && (
