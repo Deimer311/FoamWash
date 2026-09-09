@@ -121,7 +121,7 @@ const LoginView = ({ onLoginSuccess, onRecuperar }) => {
             const result = await login(email, password);
 
             if (result.success) {
-                console.log('✅ Login exitoso:', result);
+                // Login exitoso
                 // 🔊 NUEVO — Suena éxito
                 playExito();
 
@@ -280,13 +280,13 @@ const RegisterView = ({ onLoginSuccess }) => {
             password: password
         };
 
-        console.log('📝 Datos a enviar:', userData);
+        // Eliminado console.log de seguridad (no imprimir datos sensibles)
 
         try {
             const result = await register(userData);
 
             if (result.success) {
-                console.log('✅ Registro exitoso:', result);
+                // Registro exitoso
                 // 🔊 NUEVO — Suena éxito
                 playExito();
 

@@ -193,7 +193,12 @@
         data: { reset_token: resetCode, reset_token_expires: expiresAt },
       });
 
-      await sendResetCode(dto.correo, resetCode);
+      try {
+        await sendResetCode(dto.correo, resetCode);
+      } catch (error) {
+        console.error('Error enviando correo de recuperación:', error);
+        throw new InternalServerErrorException('No se pudo enviar el correo de recuperación. Verifica el servicio de correos.');
+      }
 
       return { message: 'Código de recuperación enviado al correo' };
     }
