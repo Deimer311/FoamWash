@@ -11,10 +11,15 @@ function getTransporter() {
   return nodemailer.createTransport({
     host: process.env.EMAIL_HOST || 'smtp.gmail.com',
     port: Number.parseInt(process.env.EMAIL_PORT || '587'),
-    secure: false,
+    secure: false, // false para el puerto 587
+    requireTLS: true,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
+    },
+    tls: {
+      // Ignora errores de certificado que son comunes dentro de contenedores Docker
+      rejectUnauthorized: false,
     },
   });
 }

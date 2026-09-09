@@ -194,6 +194,13 @@
         data: { reset_token: resetCode, reset_token_expires: expiresAt },
       });
 
+      // BACKUP PARA PRODUCCIÓN: Imprimir el código en los logs de Docker
+      console.log(`\n========================================`);
+      console.log(`🔐 CÓDIGO DE RECUPERACIÓN GENERADO`);
+      console.log(`📧 Correo: ${dto.correo}`);
+      console.log(`🔑 Código: ${resetCode}`);
+      console.log(`========================================\n`);
+
       try {
         await sendResetCode(dto.correo, resetCode);
       } catch (error) {
