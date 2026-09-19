@@ -314,8 +314,8 @@ export const CartModal = ({ carrito, onActualizarCantidad, onCerrar, onFinalizar
                 </div>
 
                 <div className="fwm-footer">
-                    <button className="fwm-btn fwm-btn-secondary" onClick={onCerrar}>Seguir cotizando</button>
-                    <button className="fwm-btn fwm-btn-primary" onClick={onFinalizarCompra} disabled={carrito.length === 0}>
+                    <button className="fwm-btn fwm-btn-secondary" onClick={onCerrar} data-testid="boton-seguir-cotizando">Seguir cotizando</button>
+                    <button className="fwm-btn fwm-btn-primary" onClick={onFinalizarCompra} disabled={carrito.length === 0} data-testid="boton-ver-cotizacion">
                         Ver cotización →
                     </button>
                 </div>
@@ -503,6 +503,7 @@ export const ConfirmationModal = ({ carrito, user, onCerrar, onActualizarDetalle
                                         <select
                                             value={item.tamano || ''}
                                             onChange={(e) => onActualizarDetalle(item.id, 'tamano', e.target.value)}
+                                            data-testid={`select-tamano-${item.id}`}
                                         >
                                             <option value="">Seleccionar tamaño</option>
                                             {(item.tamanos || ['Estándar']).map(t => <option key={t} value={t}>{t}</option>)}
@@ -511,7 +512,8 @@ export const ConfirmationModal = ({ carrito, user, onCerrar, onActualizarDetalle
                                     <div className="fwm-form-group" style={{ marginBottom: 0 }}>
                                         <label>Cantidad *</label>
                                         <input type="number" min="1" value={item.cantidad}
-                                            onChange={(e) => onActualizarDetalle(item.id, 'cantidad', parseInt(e.target.value) || 1)} />
+                                            onChange={(e) => onActualizarDetalle(item.id, 'cantidad', parseInt(e.target.value) || 1)} 
+                                            data-testid={`input-cantidad-${item.id}`} />
                                     </div>
                                 </div>
                             ))}
@@ -529,7 +531,7 @@ export const ConfirmationModal = ({ carrito, user, onCerrar, onActualizarDetalle
                             <p>Código: <strong>{cotizacion.id}</strong></p>
 
                             {cotizacionGuardada && (
-                                <div className="fwm-saved-badge"><IcCheckCircle size={14} /> Guardada en Mis Cotizaciones</div>
+                                <div className="fwm-saved-badge" data-testid="badge-cotizacion-guardada"><IcCheckCircle size={14} /> Guardada en Mis Cotizaciones</div>
                             )}
 
                             <div className="fwm-resumen">
@@ -559,20 +561,23 @@ export const ConfirmationModal = ({ carrito, user, onCerrar, onActualizarDetalle
                                 <label><IcMapPin /> Dirección *</label>
                                 <input type="text" placeholder="Calle 123 #45-67"
                                     value={formData.direccion || ''}
-                                    onChange={(e) => setFormData(p => ({ ...p, direccion: e.target.value }))} />
+                                    onChange={(e) => setFormData(p => ({ ...p, direccion: e.target.value }))}
+                                    data-testid="input-direccion-agendamiento" />
                             </div>
                             <div className="fwm-form-row">
                                 <div className="fwm-form-group">
                                     <label>Ciudad</label>
                                     <input type="text" placeholder="Bogotá"
                                         value={formData.ciudad || ''}
-                                        onChange={(e) => setFormData(p => ({ ...p, ciudad: e.target.value }))} />
+                                        onChange={(e) => setFormData(p => ({ ...p, ciudad: e.target.value }))}
+                                        data-testid="input-ciudad-agendamiento" />
                                 </div>
                                 <div className="fwm-form-group">
                                     <label>Teléfono</label>
                                     <input type="tel" placeholder="300 123 4567"
                                         value={formData.telefono || ''}
-                                        onChange={(e) => setFormData(p => ({ ...p, telefono: e.target.value }))} />
+                                        onChange={(e) => setFormData(p => ({ ...p, telefono: e.target.value }))}
+                                        data-testid="input-telefono-agendamiento" />
                                 </div>
                             </div>
                             <div className="fwm-form-row">
@@ -582,20 +587,23 @@ export const ConfirmationModal = ({ carrito, user, onCerrar, onActualizarDetalle
                                         min={new Date().toISOString().split('T')[0]}
                                         max={(() => { const d = new Date(); d.setDate(d.getDate() + 30); return d.toISOString().split('T')[0]; })()}
                                         value={formData.fecha || ''}
-                                        onChange={(e) => setFormData(p => ({ ...p, fecha: e.target.value }))} />
+                                        onChange={(e) => setFormData(p => ({ ...p, fecha: e.target.value }))}
+                                        data-testid="input-fecha-agendamiento" />
                                 </div>
                                 <div className="fwm-form-group">
                                     <label><IcClock /> Hora *</label>
                                     <input type="time"
                                         value={formData.hora || ''}
-                                        onChange={(e) => setFormData(p => ({ ...p, hora: e.target.value }))} />
+                                        onChange={(e) => setFormData(p => ({ ...p, hora: e.target.value }))}
+                                        data-testid="input-hora-agendamiento" />
                                 </div>
                             </div>
                             <div className="fwm-form-group">
                                 <label>Observaciones (opcional)</label>
                                 <textarea rows="3" placeholder="Mascotas, instrucciones especiales, acceso..."
                                     value={formData.observaciones || ''}
-                                    onChange={(e) => setFormData(p => ({ ...p, observaciones: e.target.value }))} />
+                                    onChange={(e) => setFormData(p => ({ ...p, observaciones: e.target.value }))}
+                                    data-testid="input-observaciones-agendamiento" />
                             </div>
                             <div className="fwm-total">
                                 <span>Total</span>
@@ -608,8 +616,8 @@ export const ConfirmationModal = ({ carrito, user, onCerrar, onActualizarDetalle
                     {stage === 3 && pedidoFinal && (
                         <div className="fwm-success">
                             <div className="fwm-success-icon is-confirmed"><IcCheckCircle size={28} /></div>
-                            <h3>Pedido confirmado</h3>
-                            <p>ID: <strong>{pedidoFinal.id}</strong></p>
+                            <h3 data-testid="titulo-pedido-confirmado">Pedido confirmado</h3>
+                            <p>ID: <strong data-testid="pedido-final-id">{pedidoFinal.id}</strong></p>
                             <div className="fwm-detail-box">
                                 <div className="fwm-drow"><IcCalendar /> <strong>Fecha:</strong>&nbsp;{formatFecha(pedidoFinal.fecha)}</div>
                                 <div className="fwm-drow"><IcClock /> <strong>Hora:</strong>&nbsp;{pedidoFinal.hora}</div>
@@ -628,14 +636,15 @@ export const ConfirmationModal = ({ carrito, user, onCerrar, onActualizarDetalle
 
                 <div className="fwm-footer">
                     {stage === 0 && <>
-                        <button className="fwm-btn fwm-btn-secondary" onClick={onClose}>Cancelar</button>
-                        <button className="fwm-btn fwm-btn-primary" onClick={handleGenerarCotizacion}>Generar cotización →</button>
+                        <button className="fwm-btn fwm-btn-secondary" onClick={onClose} data-testid="boton-cancelar-cotizacion">Cancelar</button>
+                        <button className="fwm-btn fwm-btn-primary" onClick={handleGenerarCotizacion} data-testid="boton-generar-cotizacion">Generar cotización →</button>
                     </>}
                     {stage === 1 && <>
                         <button
                             className={`fwm-btn fwm-btn-ghost${cotizacionGuardada ? ' is-saved' : ''}`}
                             onClick={handleGuardarCotizacion}
                             disabled={guardandoCot || cotizacionGuardada}
+                            data-testid="boton-guardar-cotizacion"
                         >
                             <IcSave size={14} />
                             {cotizacionGuardada ? 'Guardada' : guardandoCot ? 'Guardando...' : 'Guardar cotización'}
@@ -650,12 +659,12 @@ export const ConfirmationModal = ({ carrito, user, onCerrar, onActualizarDetalle
                                 } else {
                                     setStage(2);
                                 }
-                            }}>Agendar servicio →</button>
+                            }} data-testid="boton-agendar-servicio">Agendar servicio →</button>
                         )}
                     </>}
                     {stage === 2 && <>
-                        <button className="fwm-btn fwm-btn-secondary" onClick={() => setStage(1)}>← Volver</button>
-                        <button className="fwm-btn fwm-btn-success" onClick={handleConfirmar} disabled={guardando}>
+                        <button className="fwm-btn fwm-btn-secondary" onClick={() => setStage(1)} data-testid="boton-volver-agendamiento">← Volver</button>
+                        <button className="fwm-btn fwm-btn-success" onClick={handleConfirmar} disabled={guardando} data-testid="boton-confirmar-pedido">
                             {guardando ? 'Guardando...' : 'Confirmar pedido'}
                         </button>
                     </>}
@@ -710,10 +719,10 @@ export const AuthPromptModal = ({ onClose, onLogin }) => {
                 </div>
 
                 <div className="fwm-footer">
-                    <button className="fwm-btn fwm-btn-secondary" style={{ flex: 1 }} onClick={onClose}>
+                    <button className="fwm-btn fwm-btn-secondary" style={{ flex: 1 }} onClick={onClose} data-testid="boton-cancelar-modal-auth">
                         Cancelar
                     </button>
-                    <button className="fwm-btn fwm-btn-primary" style={{ flex: 1 }} onClick={onLogin}>
+                    <button className="fwm-btn fwm-btn-primary" style={{ flex: 1 }} onClick={onLogin} data-testid="boton-login-modal">
                         Iniciar sesión
                     </button>
                 </div>

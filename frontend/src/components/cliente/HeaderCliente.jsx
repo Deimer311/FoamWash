@@ -228,7 +228,7 @@ const HeaderCliente = ({ onBackToHome, onCotizacion, onPerfil, onServicios, onMi
                 {/* Perfil / Avatar */}
                 <div className="hc-right">
                     <div className="hc-avatar-wrap" ref={avatarRef}>
-                        <div className="hc-avatar-btn" onClick={() => setAvatarOpen(!avatarOpen)}>
+                        <div className="hc-avatar-btn" onClick={() => setAvatarOpen(!avatarOpen)} data-testid="boton-avatar-perfil">
                             <div className="hc-avatar-img">
                                 {fotoUrl && !imgError
                                     ? <img src={fotoUrl} alt="User" onError={() => setImgError(true)} />
@@ -245,7 +245,7 @@ const HeaderCliente = ({ onBackToHome, onCotizacion, onPerfil, onServicios, onMi
                                     <div className="hc-dd-email">{user?.email || ''}</div>
                                 </div>
                                 
-                                <button className="hc-dd-item" onClick={() => { onPerfil?.(); setAvatarOpen(false); }}>
+                                <button className="hc-dd-item" onClick={() => { onPerfil?.(); setAvatarOpen(false); }} data-testid="opcion-mi-perfil">
                                     <span className="hc-dd-icon"><IcUser size={14} color="#0099ff" /></span>
                                     Mi Perfil
                                 </button>
@@ -260,7 +260,7 @@ const HeaderCliente = ({ onBackToHome, onCotizacion, onPerfil, onServicios, onMi
                                     Mis Cotizaciones
                                 </button>
 
-                                <button className="hc-dd-item logout" onClick={handleLogout}>
+                                <button className="hc-dd-item logout" onClick={handleLogout} data-testid="opcion-cerrar-sesion">
                                     <span className="hc-dd-icon"><IcLogout size={14} /></span>
                                     Cerrar sesión
                                 </button>

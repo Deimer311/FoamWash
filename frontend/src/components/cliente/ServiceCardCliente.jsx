@@ -475,6 +475,7 @@ const ServiceCardCliente = ({ servicio, onNotificacion }) => {
                         className={`sc-btn${added ? ' added' : ''}`}
                         onClick={handleAgregar}
                         disabled={isAdding}
+                        data-testid={`boton-solicitar-servicio-${servicio.id}`}
                     >
                         <span className="sc-btn-icon">
                             {isAdding ? <IcLoader /> : added ? <IcCheck /> : <IcCart />}

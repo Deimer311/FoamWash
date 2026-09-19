@@ -14,6 +14,7 @@ const CenterSection = ({ onServiciosClick }) => {
             <button
                 className="service-btn"
                 onClick={onServiciosClick}
+                data-testid="boton-ver-servicios"
             >
                 Ver servicios
             </button>

@@ -70,6 +70,7 @@ const LoginPage = ({ onBackToHome, onLoginSuccess, onRecuperar }) => {
                             <button
                                 className="toggle-button"
                                 onClick={switchToRegister}
+                                data-testid="boton-cambiar-a-registro"
                             >
                                 Registrar
                             </button>
@@ -84,6 +85,7 @@ const LoginPage = ({ onBackToHome, onLoginSuccess, onRecuperar }) => {
                             <button
                                 className="toggle-button"
                                 onClick={switchToLogin}
+                                data-testid="boton-cambiar-a-login"
                             >
                                 Iniciar sesión
                             </button>
@@ -183,6 +185,7 @@ const LoginView = ({ onLoginSuccess, onRecuperar }) => {
                         autoComplete="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        data-testid="input-correo-login"
                     />
                 </div>
 
@@ -195,6 +198,7 @@ const LoginView = ({ onLoginSuccess, onRecuperar }) => {
                         autoComplete="current-password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        data-testid="input-password-login"
                     />
                 </div>
 
@@ -208,6 +212,7 @@ const LoginView = ({ onLoginSuccess, onRecuperar }) => {
                             }
                         }}
                         className="forgot-link"
+                        data-testid="enlace-olvide-contrasena"
                     >
                         ¿Olvidaste tu contraseña?
                     </a>
@@ -217,6 +222,7 @@ const LoginView = ({ onLoginSuccess, onRecuperar }) => {
                     type="submit"
                     className="submit-button"
                     disabled={message.isLoading}
+                    data-testid="boton-submit-login"
                 >
                     {message.isLoading ? 'Cargando...' : 'Iniciar sesión'}
                 </button>
@@ -348,6 +354,7 @@ const RegisterView = ({ onLoginSuccess }) => {
                         autoComplete="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        data-testid="input-correo-registro"
                     />
                 </div>
 
@@ -360,6 +367,7 @@ const RegisterView = ({ onLoginSuccess }) => {
                         autoComplete="name"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, ''))}
+                        data-testid="input-nombre-registro"
                     />
                 </div>
 
@@ -373,6 +381,7 @@ const RegisterView = ({ onLoginSuccess }) => {
                         autoComplete="tel"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
+                        data-testid="input-telefono-registro"
                     />
                 </div>
 
@@ -384,6 +393,7 @@ const RegisterView = ({ onLoginSuccess }) => {
                         autoComplete="street-address"
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
+                        data-testid="input-direccion-registro"
                     />
                 </div>
 
@@ -396,6 +406,7 @@ const RegisterView = ({ onLoginSuccess }) => {
                         autoComplete="new-password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        data-testid="input-password-registro"
                     />
                 </div>
 
@@ -403,6 +414,7 @@ const RegisterView = ({ onLoginSuccess }) => {
                     type="submit"
                     className="submit-button register-submit"
                     disabled={message.isLoading}
+                    data-testid="boton-submit-registro"
                 >
                     {message.isLoading ? 'Procesando...' : 'Registrar'}
                 </button>

@@ -246,7 +246,7 @@ const RecuperarContrasena = ({ onBackToLogin, onBackToHome }) => {
                 <input type="email" placeholder="Correo electrónico" value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   onKeyPress={(e) => handleKeyPress(e, handleSendCode)}
-                  className="input-field" autoComplete="email" disabled={isLoading} />
+                  className="input-field" autoComplete="email" disabled={isLoading} data-testid="input-email-recuperar" />
                 {error && <p className="error-message">❌ {error}</p>}
                 {success && <p className="success-message">✅ {success}</p>}
                 <div className="link-container">
@@ -255,7 +255,7 @@ const RecuperarContrasena = ({ onBackToLogin, onBackToHome }) => {
                     ← Volver al inicio de sesión
                   </button>
                 </div>
-                <button onClick={handleSendCode} className="submit-button" disabled={isLoading}>
+                <button onClick={handleSendCode} className="submit-button" disabled={isLoading} data-testid="boton-enviar-codigo">
                   {isLoading ? '📧 Enviando...' : 'Enviar código'}
                 </button>
               </div>
@@ -272,7 +272,7 @@ const RecuperarContrasena = ({ onBackToLogin, onBackToHome }) => {
                 <input type="text" placeholder="000000" value={code}
                   onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
                   onKeyPress={(e) => handleKeyPress(e, handleVerifyCode)}
-                  className="input-field code-input" maxLength="6" autoComplete="off" />
+                  className="input-field code-input" maxLength="6" autoComplete="off" data-testid="input-codigo-recuperar" />
                 {error && <p className="error-message">❌ {error}</p>}
                 {success && <p className="success-message">✅ {success}</p>}
                 <div className="link-container">
@@ -280,7 +280,7 @@ const RecuperarContrasena = ({ onBackToLogin, onBackToHome }) => {
                     ← Usar otro correo
                   </button>
                 </div>
-                <button onClick={handleVerifyCode} className="submit-button" disabled={isLoading}>
+                <button onClick={handleVerifyCode} className="submit-button" disabled={isLoading} data-testid="boton-verificar-codigo">
                   {isLoading ? 'Verificando...' : 'Verificar código'}
                 </button>
               </div>
@@ -296,11 +296,11 @@ const RecuperarContrasena = ({ onBackToLogin, onBackToHome }) => {
               <div className="form-group">
                 <input type="password" placeholder="Nueva contraseña" value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="input-field" autoComplete="new-password" />
+                  className="input-field" autoComplete="new-password" data-testid="input-nueva-pass-recuperar" />
                 <input type="password" placeholder="Confirmar contraseña" value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   onKeyPress={(e) => handleKeyPress(e, handleChangePassword)}
-                  className="input-field" autoComplete="new-password" />
+                  className="input-field" autoComplete="new-password" data-testid="input-confirmar-pass-recuperar" />
                 {error && <p className="error-message">❌ {error}</p>}
                 {success && <p className="success-message">✅ {success}</p>}
                 <div className="link-container">
@@ -308,7 +308,7 @@ const RecuperarContrasena = ({ onBackToLogin, onBackToHome }) => {
                     ← Usar otro correo
                   </button>
                 </div>
-                <button onClick={handleChangePassword} className="submit-button" disabled={isLoading}>
+                <button onClick={handleChangePassword} className="submit-button" disabled={isLoading} data-testid="boton-cambiar-pass">
                   {isLoading ? 'Cambiando...' : 'Cambiar contraseña'}
                 </button>
               </div>

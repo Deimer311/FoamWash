@@ -76,6 +76,7 @@ const BotonCarritoFlotante = ({ onClick }) => {
                 onMouseLeave={() => setIsHovered(false)}
                 title={`Ver carrito (${cantidad} ${cantidad === 1 ? 'item' : 'items'})`}
                 aria-label={`Carrito de compras con ${cantidad} items`}
+                data-testid="boton-carrito-flotante"
             >
                 <span style={{ fontSize: '26px' }}>🛒</span>
                 

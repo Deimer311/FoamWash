@@ -37,6 +37,7 @@ const Header = ({ onLoginClick }) => {
                 <button
                     className="login-btn"
                     onClick={onLoginClick}
+                    data-testid="boton-iniciar-sesion"
                 >
                     Iniciar sesión
                 </button>

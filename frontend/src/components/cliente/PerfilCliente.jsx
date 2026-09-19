@@ -138,7 +138,7 @@ const PerfilCliente = ({ onBackToHome, onCotizacion, onServicios, onEditarPerfil
                             </div>
                         </div>
 
-                        <button className="edit-profile-btn" onClick={onEditarPerfil}>
+                        <button className="edit-profile-btn" onClick={onEditarPerfil} data-testid="boton-editar-perfil">
                             Editar Perfil
                         </button>
                     </div>

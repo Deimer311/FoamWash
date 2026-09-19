@@ -231,6 +231,7 @@ const CotizacionServiceCard = ({ service, onAgregar }) => {
                         className={`csc-btn${added ? ' added' : ''}`}
                         onClick={handleAgregar}
                         disabled={isAdding}
+                        data-testid={`btn-agregar-servicio-${service.id}`}
                     >
                         <svg height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'relative', zIndex: 1, flexShrink: 0 }}>
                             {added

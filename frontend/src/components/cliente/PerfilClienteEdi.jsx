@@ -797,8 +797,8 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
                                                 type="text"
                                                 value={formData.nombre}
                                                 onChange={(e) => setFormData({ ...formData, nombre: e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '') })}
-                                                required
                                                 placeholder="Tu nombre completo"
+                                                data-testid="input-nombre-perfil"
                                             />
                                         </div>
                                         <div className="pce-fg">
@@ -811,8 +811,8 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
                                                 id="telefono"
                                                 type="tel"
                                                 value={formData.telefono}
-                                                onChange={handleInputChange}
                                                 placeholder="3123456789"
+                                                data-testid="input-telefono-perfil"
                                             />
                                         </div>
                                         <div className="pce-fg">
@@ -821,8 +821,8 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
                                                 id="direccion"
                                                 type="text"
                                                 value={formData.direccion}
-                                                onChange={handleInputChange}
                                                 placeholder="Calle 80 #45-23, Bogotá"
+                                                data-testid="input-direccion-perfil"
                                             />
                                         </div>
                                     </div>
@@ -877,7 +877,7 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
                                         <button type="button" className="pce-btn-cancel" onClick={handleCancel}>
                                             Cancelar
                                         </button>
-                                        <button type="submit" className="pce-btn-save" disabled={guardando}>
+                                        <button type="submit" className="pce-btn-save" disabled={guardando} data-testid="boton-guardar-perfil">
                                             {guardando
                                                 ? <><span className="pce-spin"><IconSpinner size={16} /></span> Guardando...</>
                                                 : <><IconSave size={16} color="white" /> Guardar Cambios</>
