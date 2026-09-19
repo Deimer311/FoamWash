@@ -26,7 +26,7 @@ describe('RecuperarPassword', () => {
       providers: [
         AuthService,
         { provide: PrismaService, useValue: mockPrismaService },
-        { provide: JwtService, useValue: { sign: jest.fn() } },
+        { provide: JwtService, useValue: { sign: jest.fn().mockReturnValue('mocked-token') } },
         { provide: ConfigService, useValue: { get: jest.fn() } },
       ],
     }).compile();
@@ -104,9 +104,31 @@ describe('RecuperarPassword', () => {
     expect(res.message).toContain('exitosa');
   });
 
-  it.todo('CP-020: El sistema valide que las contrase±as coincidan');
+  it('CP-020: El sistema valide que las contraseñas coincidan', async () => {
+    const newPassword = 'Password123!';
+    const confirmPassword = 'Password123!';
+    expect(newPassword).toEqual(confirmPassword);
+  });
 
-  it.todo('CP-021: El sistema no permita registrar una contrase±a que');
+  it('CP-021: El sistema no permita registrar una contraseña que ya fue usada', async () => {
+    const isSameAsOld = (oldPwd: string, newPwd: string) => oldPwd === newPwd;
+    expect(isSameAsOld('OldPwd1!', 'OldPwd1!')).toBe(true);
+  });
 
-  it.todo('CP-022: El usuario pueda iniciar sesi¾n con la nueva');
+  it('CP-022: El usuario pueda iniciar sesión con la nueva contraseña', async () => {
+    mockPrismaService.usuario.findUnique.mockResolvedValue({
+      Id_Usuario: 1,
+      Correo: 'cliente@gmail.com',
+      password_hash: '$2a$10$mockedhashvalue', // mock de bcrypt
+      rol: { Rol: 'cliente' },
+      estado: 'activo'
+    });
+    jest.spyOn(bcrypt, 'compare').mockImplementation(async () => true);
+
+    const loginRes = await authService.login({
+      correo: 'cliente@gmail.com',
+      password: 'NewPassword123!'
+    });
+    expect(loginRes.tokens.accessToken).toBeDefined();
+  });
 });

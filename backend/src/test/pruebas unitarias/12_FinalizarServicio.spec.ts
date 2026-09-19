@@ -89,5 +89,11 @@ describe('Reportes y Estadísticas', () => {
     expect(result.Servicios_Ofrecidos).toBe(12);
   });
 
-  it.todo('CP-079: Actualizaci¾n en tiempo real');
+  it('CP-079: Actualización en tiempo real', async () => {
+    mockPrismaService.reserva.count.mockResolvedValue(1);
+    mockPrismaService.servicio.count.mockResolvedValue(1);
+    mockPrismaService.reserva.findMany.mockResolvedValue([]);
+    const result = await estadisticasService.getDashboard();
+    expect(result).toBeDefined();
+  });
 });

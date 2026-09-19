@@ -84,7 +84,21 @@ describe('AgendaEmpleados', () => {
     expect(desempeno.total_calificaciones).toBe(2);
   });
 
-  it.todo('CP-067: Acceso a detalle del servicio');
+  it('CP-067: Acceso a detalle del servicio', async () => {
+    mockPrismaService.reserva.findMany.mockResolvedValue([
+      { ID_Reserva: 10, servicios: [{ Id_Servicio: 1, Nombre_Servicio: 'Lavado' }] },
+    ]);
 
-  it.todo('CP-068: Carga de la agenda (rendimiento)');
+    const result = await empleadosService.getReservasHoy(2);
+    expect(result[0].servicios[0].Nombre_Servicio).toBe('Lavado');
+  });
+
+  it('CP-068: Carga de la agenda (rendimiento)', async () => {
+    // Simulamos que la consulta no excede un tiempo irrazonable
+    mockPrismaService.reserva.findMany.mockResolvedValue([]);
+    const start = Date.now();
+    await empleadosService.getReservasMes(2);
+    const end = Date.now();
+    expect(end - start).toBeLessThan(100); // asume que es muy rápido con mock
+  });
 });

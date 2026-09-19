@@ -140,5 +140,15 @@ describe('Notificaciones', () => {
     );
   });
 
-  it.todo('CP-049: Las notificaciones se reciban en el orden correcto');
+  it('CP-049: Las notificaciones se reciban en el orden correcto', async () => {
+    mockPrismaService.notificacion.findMany.mockResolvedValue([
+      { id_notificaciones: 3, fecha_notificacion: new Date('2023-01-03') },
+      { id_notificaciones: 2, fecha_notificacion: new Date('2023-01-02') },
+      { id_notificaciones: 1, fecha_notificacion: new Date('2023-01-01') },
+    ]);
+    const list = await notificacionesService.findByUsuario(2);
+    expect(list[0].id_notificaciones).toBe(3);
+    expect(list[1].id_notificaciones).toBe(2);
+    expect(list[2].id_notificaciones).toBe(1);
+  });
 });

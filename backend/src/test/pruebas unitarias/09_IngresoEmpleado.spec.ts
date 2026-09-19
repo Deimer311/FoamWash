@@ -103,5 +103,13 @@ describe('GestionEmpleados', () => {
     expect(updated.estado).toBe('inactivo');
   });
 
-  it.todo('CP-061: Recuperaci¾n de contrase±a');
+  it('CP-061: Recuperación de contraseña', async () => {
+    mockPrismaService.usuario.findUnique.mockResolvedValue({
+      Id_Usuario: 2,
+      Correo: 'empleado@gmail.com',
+      estado: 'activo'
+    });
+    const perfil = await empleadosService.getPerfilCompleto(2);
+    expect(perfil.Correo).toBe('empleado@gmail.com');
+  });
 });

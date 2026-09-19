@@ -45,7 +45,9 @@ describe('ProgramarServicio', () => {
   });
 
   it('CP-035: El cliente pueda programar un servicio de lavado', async () => {
-    const fechaFutura = '2028-10-15';
+    const d = new Date();
+    d.setDate(d.getDate() + 5);
+    const fechaFutura = d.toISOString().split('T')[0];
     mockPrismaService.usuario.findMany.mockResolvedValue([
       {
         Id_Usuario: 2,

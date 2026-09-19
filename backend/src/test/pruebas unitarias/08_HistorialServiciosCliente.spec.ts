@@ -84,5 +84,8 @@ describe('HistorialServicios', () => {
     await expect(reservasService.findByCliente(10)).rejects.toThrow('DB Error');
   });
 
-  it.todo('CP-055: Comportamiento cuando ocurre una falla al cargar el');
+  it('CP-055: Comportamiento cuando ocurre una falla al cargar el historial', async () => {
+    mockPrismaService.reserva.findMany.mockRejectedValue(new Error('Network error'));
+    await expect(reservasService.findByCliente(10)).rejects.toThrow('Network error');
+  });
 });
