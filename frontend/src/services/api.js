@@ -40,9 +40,37 @@ const api = axios.create({
 
 // ✅ Interceptor SIMPLE — sin lógica de refresh automático
 // Redirige al login si la sesión ha expirado para evitar pantallas rotas.
+// También traduce mensajes técnicos comunes (timeout, error de red, base de datos).
 api.interceptors.response.use(
     (response) => response,       // Respuesta exitosa: devolverla tal cual
     (error)    => {
+        // 1. Traducir mensajes muy técnicos generados por Axios
+        if (error.code === 'ECONNABORTED' || (error.message && error.message.includes('timeout'))) {
+            error.message = 'El servidor tardó demasiado en responder. Por favor, intenta de nuevo.';
+        } else if (error.message === 'Network Error') {
+            error.message = 'No se pudo conectar al servidor. Por favor, verifica tu conexión a internet.';
+        } else if (error.message && error.message.includes('Request failed with status code')) {
+            const status = error.response ? error.response.status : 0;
+            if (status >= 500) {
+                error.message = 'Hubo un problema inesperado en el servidor. Intenta de nuevo más tarde.';
+            } else if (status !== 401) {
+                error.message = 'Hubo un problema con la solicitud. Intenta nuevamente.';
+            }
+        }
+
+        // 2. Limpiar mensajes técnicos provenientes del backend (ej. Prisma, SQL)
+        if (error.response && error.response.data) {
+            let backendMsg = error.response.data.message || error.response.data.error;
+            if (typeof backendMsg === 'string') {
+                const isTechnical = ['Prisma', 'SQL', 'database', 'undefined', 'Cannot read properties'].some(kw => backendMsg.includes(kw));
+                if (isTechnical) {
+                    const friendlyMsg = 'Ocurrió un error interno en el sistema. Por favor, intenta más tarde.';
+                    if (error.response.data.message) error.response.data.message = friendlyMsg;
+                    if (typeof error.response.data.error === 'string') error.response.data.error = friendlyMsg;
+                }
+            }
+        }
+
         if (error.response && error.response.status === 401) {
             // Evitar redirecciones infinitas si ya estamos en /login
             if (window.location.pathname !== '/login' && window.location.pathname !== '/') {

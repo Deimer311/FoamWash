@@ -178,6 +178,13 @@ export class ReservasService {
       if (reservaColombia < ahoraColombia) {
         throw new BadRequestException('No se pueden crear reservas en el pasado.');
       }
+
+      // Validar que la reserva no supere los 30 días en el futuro
+      const limiteFuturo = new Date(ahoraColombia);
+      limiteFuturo.setDate(limiteFuturo.getDate() + 30);
+      if (reservaColombia > limiteFuturo) {
+        throw new BadRequestException('No se pueden crear reservas con más de 30 días de anticipación.');
+      }
     }
 
     return { fechaISO, horaISO };

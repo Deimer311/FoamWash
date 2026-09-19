@@ -274,6 +274,7 @@ const ConfirmacionModal = ({ isOpen, onClose, carritoItems = [] }) => {
                                     onChange={handleChange}
                                     required
                                     min={new Date().toISOString().split('T')[0]}
+                                    max={(() => { const d = new Date(); d.setDate(d.getDate() + 30); return d.toISOString().split('T')[0]; })()}
                                 />
                             </div>
                             

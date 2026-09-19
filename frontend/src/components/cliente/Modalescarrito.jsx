@@ -578,7 +578,9 @@ export const ConfirmationModal = ({ carrito, user, onCerrar, onActualizarDetalle
                             <div className="fwm-form-row">
                                 <div className="fwm-form-group">
                                     <label><IcCalendar /> Fecha *</label>
-                                    <input type="date" min={new Date().toISOString().split('T')[0]}
+                                    <input type="date"
+                                        min={new Date().toISOString().split('T')[0]}
+                                        max={(() => { const d = new Date(); d.setDate(d.getDate() + 30); return d.toISOString().split('T')[0]; })()}
                                         value={formData.fecha || ''}
                                         onChange={(e) => setFormData(p => ({ ...p, fecha: e.target.value }))} />
                                 </div>
