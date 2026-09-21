@@ -245,9 +245,11 @@ const ConfirmacionModal = ({ isOpen, onClose, carritoItems = [] }) => {
                                 type="tel"
                                 name="telefono"
                                 value={formData.telefono}
-                                onChange={handleChange}
+                                onChange={(e) => setFormData(prev => ({ ...prev, telefono: e.target.value.replace(/[^0-9+]/g, '').slice(0, 15) }))}
                                 required
                                 placeholder="Ej: 3001234567"
+                                inputMode="numeric"
+                                maxLength={15}
                             />
                         </div>
                         

@@ -127,6 +127,9 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
     const [isLoading,    setIsLoading]    = useState(true);
     const [guardando,    setGuardando]    = useState(false);
     const [error,        setError]        = useState('');
+    // docOriginal: valor de N_Documento que llegó de la BD.
+    // Si tiene valor, el campo queda bloqueado (solo editable una vez).
+    const [docOriginal, setDocOriginal]   = useState('');
 
     const [formData, setFormData] = useState({
         nombre:            '',
@@ -149,13 +152,15 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
                 const res = await api.get('/clientes/' + user.id + '/perfil');
                 if (res.data.success) {
                     const p = res.data.data;
+                    const docGuardado = p.N_Documento || '';
+                    setDocOriginal(docGuardado);
                     setFormData(prev => ({
                         ...prev,
                         nombre:    p.Nombre      || '',
                         email:     p.Correo      || '',
                         telefono:  p.Telefono    || '',
                         direccion: p.Direccion   || '',
-                        numDoc:    p.N_Documento || '',
+                        numDoc:    docGuardado,
                         tipoDoc:   p.tipo_documento || 'CC'
                     }));
                     if (p.foto_perfil) {
@@ -200,9 +205,11 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
                 if (fotoRes.data?.data?.foto_perfil) updateUser({ foto_perfil: fotoRes.data.data.foto_perfil });
             }
             await api.put('/clientes/' + user.id + '/perfil', {
-                Nombre:    formData.nombre,
-                Telefono:  formData.telefono,
-                Direccion: formData.direccion
+                Nombre:      formData.nombre,
+                Telefono:    formData.telefono,
+                Direccion:   formData.direccion,
+                // N_Documento solo se envía si aún no estaba registrado
+                ...(!docOriginal && formData.numDoc ? { N_Documento: formData.numDoc } : {}),
             });
             await refreshUser();
             setShowSuccess(true);
@@ -806,12 +813,37 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
                                             <input type="email" value={formData.email} disabled />
                                         </div>
                                         <div className="pce-fg">
+                                            <label htmlFor="numDoc">
+                                                Número de Documento
+                                                {docOriginal && <span style={{ marginLeft: 6, fontSize: '11px', color: '#f59e0b', fontWeight: 700 }}>🔒 No modificable</span>}
+                                            </label>
+                                            <input
+                                                id="numDoc"
+                                                type="text"
+                                                value={formData.numDoc}
+                                                onChange={docOriginal ? undefined : (e) => setFormData({ ...formData, numDoc: e.target.value.replace(/[^0-9]/g, '').slice(0, 12) })}
+                                                readOnly={!!docOriginal}
+                                                placeholder={docOriginal ? '' : 'Ej: 1234567890'}
+                                                title={docOriginal ? 'El número de documento solo puede registrarse una vez.' : ''}
+                                                style={docOriginal ? { background: '#f6f7fb', color: '#aaa', cursor: 'not-allowed' } : {}}
+                                                data-testid="input-numdoc-perfil"
+                                            />
+                                            {docOriginal && (
+                                                <span style={{ fontSize: '11px', color: '#92400e', fontFamily: 'Kanit', marginTop: '2px', display: 'block' }}>
+                                                    ⚠️ El número de documento no puede modificarse una vez registrado.
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="pce-fg">
                                             <label htmlFor="telefono">Teléfono</label>
                                             <input
                                                 id="telefono"
                                                 type="tel"
                                                 value={formData.telefono}
+                                                onChange={(e) => setFormData({ ...formData, telefono: e.target.value.replace(/[^0-9+]/g, '').slice(0, 15) })}
                                                 placeholder="3123456789"
+                                                inputMode="numeric"
+                                                maxLength={15}
                                                 data-testid="input-telefono-perfil"
                                             />
                                         </div>
@@ -821,6 +853,7 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
                                                 id="direccion"
                                                 type="text"
                                                 value={formData.direccion}
+                                                onChange={handleInputChange}
                                                 placeholder="Calle 80 #45-23, Bogotá"
                                                 data-testid="input-direccion-perfil"
                                             />

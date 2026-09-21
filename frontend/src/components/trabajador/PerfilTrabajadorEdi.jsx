@@ -38,6 +38,9 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
     const [isAvailable, setIsAvailable] = useState(true);
     const [imagePreview, setImagePreview] = useState(null);
     const [archivoFoto, setArchivoFoto] = useState(null);
+    // docOriginal: guarda el valor de N_Documento que llegó de la BD.
+    // Si tiene valor, el campo queda bloqueado (solo editable una vez).
+    const [docOriginal, setDocOriginal] = useState('');
 
     const [formData, setFormData] = useState({
         nombre:            '',
@@ -79,10 +82,12 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
             const d = res.data?.data;
 
             if (d) {
+                const docGuardado = d.N_Documento || '';
+                setDocOriginal(docGuardado);
                 setFormData(prev => ({
                     ...prev,
                     nombre:    d.Nombre        || '',
-                    cedula:    d.N_Documento   || '',
+                    cedula:    docGuardado,
                     tipoDocId: d.tipo_de_documento?.idTipo_de_Documento || 1,
                     fechaNac:  d.fecha_nacimiento ? d.fecha_nacimiento.split('T')[0] : '',
                     cargo:     d.cargo         || '',
@@ -226,6 +231,11 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
                 horario:         horarioStr || undefined,
                 especialidades:  especialidadesStr || undefined,
                 certificaciones: certificaciones || undefined,
+                // Contraseña: solo se envía si el usuario la ingresó
+                ...(formData.passwordNueva ? {
+                    password_actual: formData.passwordActual,
+                    password_nueva:  formData.passwordNueva,
+                } : {}),
             });
 
             await refreshUser();
@@ -458,13 +468,37 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
                                         </div>
                                         <div style={S.fg}>
                                             <label style={S.label}>Tipo de Documento</label>
-                                            <select id="tipoDocId" value={formData.tipoDocId} onChange={handleInputChange} style={S.select}>
+                                            <select
+                                                id="tipoDocId"
+                                                value={formData.tipoDocId}
+                                                onChange={handleInputChange}
+                                                style={{ ...S.select, ...(docOriginal ? S.inputDisabled : {}) }}
+                                                disabled={!!docOriginal}
+                                            >
                                                 {TIPOS_DOCUMENTO.map(t => <option key={t.id} value={t.id}>{t.nombre}</option>)}
                                             </select>
                                         </div>
                                         <div style={S.fg}>
-                                            <label style={S.label}>Número de Documento</label>
-                                            <input className="pte-input" id="cedula" type="text" value={formData.cedula} onChange={handleInputChange} placeholder="Ej: 1234567890" style={S.input} />
+                                            <label style={S.label}>
+                                                Número de Documento
+                                                {docOriginal && <span style={{ marginLeft: 6, fontSize: '10px', color: '#f59e0b', fontWeight: 600 }}>🔒 No modificable</span>}
+                                            </label>
+                                            <input
+                                                className="pte-input"
+                                                id="cedula"
+                                                type="text"
+                                                value={formData.cedula}
+                                                onChange={docOriginal ? undefined : handleInputChange}
+                                                readOnly={!!docOriginal}
+                                                placeholder={docOriginal ? '' : 'Ej: 1234567890'}
+                                                title={docOriginal ? 'El número de documento solo puede registrarse una vez.' : ''}
+                                                style={{ ...S.input, ...(docOriginal ? S.inputDisabled : {}) }}
+                                            />
+                                            {docOriginal && (
+                                                <span style={{ fontSize: '11px', color: '#92400e', fontFamily: 'Kanit', marginTop: '2px' }}>
+                                                    ⚠️ El número de documento no puede modificarse una vez registrado.
+                                                </span>
+                                            )}
                                         </div>
                                         <div style={S.fg}>
                                             <label style={S.label}>Cargo</label>

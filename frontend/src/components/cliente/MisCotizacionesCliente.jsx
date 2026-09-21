@@ -725,8 +725,10 @@ export default function MisCotizacionesCliente({ onBackToHome, onCotizacion, onP
                                                 type="tel"
                                                 placeholder="Ej: 3101234567"
                                                 value={formData.telefono}
-                                                onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+                                                onChange={(e) => setFormData({ ...formData, telefono: e.target.value.replace(/[^0-9+]/g, '').slice(0, 15) })}
                                                 required
+                                                inputMode="numeric"
+                                                maxLength={15}
                                             />
                                         </div>
                                     </div>

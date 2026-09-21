@@ -576,7 +576,9 @@ export const ConfirmationModal = ({ carrito, user, onCerrar, onActualizarDetalle
                                     <label>Teléfono</label>
                                     <input type="tel" placeholder="300 123 4567"
                                         value={formData.telefono || ''}
-                                        onChange={(e) => setFormData(p => ({ ...p, telefono: e.target.value }))}
+                                        onChange={(e) => setFormData(p => ({ ...p, telefono: e.target.value.replace(/[^0-9+]/g, '').slice(0, 15) }))}
+                                        inputMode="numeric"
+                                        maxLength={15}
                                         data-testid="input-telefono-agendamiento" />
                                 </div>
                             </div>
