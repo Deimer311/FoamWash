@@ -711,24 +711,20 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
                   <div style={S.fg}>
                     <label style={S.label}>
                       Número de Documento *
-                      {docOriginal && <span style={{ marginLeft: 6, fontSize: '10px', color: '#f59e0b', fontWeight: 600 }}>🔒 No modificable</span>}
+                      {formData.cedula && <span style={{ marginLeft: 6, fontSize: '10px', color: '#f59e0b', fontWeight: 600 }}>⚠️ Verifica antes de guardar</span>}
                     </label>
                     <input
                       className="paei-input"
                       id="cedula"
                       type="text"
                       value={formData.cedula}
-                      onChange={docOriginal ? undefined : handleInputChange}
-                      readOnly={!!docOriginal}
-                      placeholder={docOriginal ? '' : 'Ej: 1234567890'}
-                      title={docOriginal ? 'El número de documento solo puede registrarse una vez.' : ''}
-                      style={{ ...S.input, ...(docOriginal ? { background: '#f6f7fb', color: '#aaa', cursor: 'not-allowed' } : {}) }}
+                      onChange={(e) => setFormData(prev => ({ ...prev, cedula: e.target.value.replace(/[^0-9]/g, '').slice(0, 12) }))}
+                      placeholder="Ej: 1234567890"
+                      style={S.input}
                     />
-                    {docOriginal && (
-                      <span style={{ fontSize: '11px', color: '#92400e', fontFamily: 'Kanit', marginTop: '2px', display: 'block' }}>
-                        ⚠️ El número de documento no puede modificarse una vez registrado.
-                      </span>
-                    )}
+                    <span style={{ fontSize: '11px', color: '#92400e', fontFamily: 'Kanit', marginTop: '2px', display: 'block' }}>
+                      ⚠️ Este campo solo debe modificarse una vez. Asegúrate de ingresar el número correcto.
+                    </span>
                   </div>
                 </div>
               </div>
@@ -743,8 +739,8 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
                   {[
                     { id: 'email', label: 'Correo Corporativo *', type: 'email', placeholder: 'admin@empresa.com', required: true },
                     { id: 'emailAlt', label: 'Correo Alternativo', type: 'email', placeholder: 'correo.alt@email.com', required: false },
-                    { id: 'telefono', label: 'Teléfono Principal *', type: 'tel', placeholder: '+57 300 000 0000', required: true },
-                    { id: 'telefonoAlt', label: 'Teléfono Alternativo', type: 'tel', placeholder: '+57 300 000 0000', required: false },
+                    { id: 'telefono', label: 'Teléfono Principal *', type: 'tel', placeholder: '3000000000', required: true },
+                    { id: 'telefonoAlt', label: 'Teléfono Alternativo', type: 'tel', placeholder: '3000000000', required: false },
                   ].map(f => (
                     <div key={f.id} style={S.fg}>
                       <label style={S.label}>{f.label}</label>
@@ -753,9 +749,14 @@ const PerfilAdminEdi = ({ onBackToProfile, onBackToHome }) => {
                         id={f.id}
                         type={f.type}
                         value={formData[f.id]}
-                        onChange={handleInputChange}
+                        onChange={f.type === 'tel'
+                          ? (e) => setFormData(prev => ({ ...prev, [f.id]: e.target.value.replace(/[^0-9+]/g, '').slice(0, 10) }))
+                          : handleInputChange
+                        }
                         placeholder={f.placeholder}
                         required={f.required}
+                        inputMode={f.type === 'tel' ? 'numeric' : undefined}
+                        maxLength={f.type === 'tel' ? 10 : undefined}
                         style={S.input}
                       />
                     </div>

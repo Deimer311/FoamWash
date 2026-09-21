@@ -481,24 +481,20 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
                                         <div style={S.fg}>
                                             <label style={S.label}>
                                                 Número de Documento
-                                                {docOriginal && <span style={{ marginLeft: 6, fontSize: '10px', color: '#f59e0b', fontWeight: 600 }}>🔒 No modificable</span>}
+                                                {formData.cedula && <span style={{ marginLeft: 6, fontSize: '10px', color: '#f59e0b', fontWeight: 600 }}>⚠️ Verifica bien antes de guardar</span>}
                                             </label>
                                             <input
                                                 className="pte-input"
                                                 id="cedula"
                                                 type="text"
                                                 value={formData.cedula}
-                                                onChange={docOriginal ? undefined : handleInputChange}
-                                                readOnly={!!docOriginal}
-                                                placeholder={docOriginal ? '' : 'Ej: 1234567890'}
-                                                title={docOriginal ? 'El número de documento solo puede registrarse una vez.' : ''}
-                                                style={{ ...S.input, ...(docOriginal ? S.inputDisabled : {}) }}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, cedula: e.target.value.replace(/[^0-9]/g, '').slice(0, 12) }))}
+                                                placeholder="Ej: 1234567890"
+                                                style={S.input}
                                             />
-                                            {docOriginal && (
-                                                <span style={{ fontSize: '11px', color: '#92400e', fontFamily: 'Kanit', marginTop: '2px' }}>
-                                                    ⚠️ El número de documento no puede modificarse una vez registrado.
-                                                </span>
-                                            )}
+                                            <span style={{ fontSize: '11px', color: '#92400e', fontFamily: 'Kanit', marginTop: '2px' }}>
+                                                ⚠️ Este campo solo debe modificarse una vez. Asegúrate de ingresar el número correcto.
+                                            </span>
                                         </div>
                                         <div style={S.fg}>
                                             <label style={S.label}>Cargo</label>
@@ -520,7 +516,14 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
                                         </div>
                                         <div style={S.fg}>
                                             <label style={S.label}>Teléfono *</label>
-                                            <input className="pte-input" id="telefono" type="tel" value={formData.telefono} onChange={handleInputChange} required placeholder="3123456789" style={S.input} />
+                                            <input className="pte-input" id="telefono" type="tel"
+                                                value={formData.telefono}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, telefono: e.target.value.replace(/[^0-9+]/g, '').slice(0, 10) }))}
+                                                required
+                                                placeholder="3123456789"
+                                                inputMode="numeric"
+                                                maxLength={10}
+                                                style={S.input} />
                                         </div>
                                         <div style={{ ...S.fg, gridColumn: '1 / -1' }}>
                                             <label style={S.label}>Dirección</label>

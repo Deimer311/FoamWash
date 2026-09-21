@@ -815,24 +815,19 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
                                         <div className="pce-fg">
                                             <label htmlFor="numDoc">
                                                 Número de Documento
-                                                {docOriginal && <span style={{ marginLeft: 6, fontSize: '11px', color: '#f59e0b', fontWeight: 700 }}>🔒 No modificable</span>}
+                                                {formData.numDoc && <span style={{ marginLeft: 6, fontSize: '11px', color: '#f59e0b', fontWeight: 700 }}>⚠️ Verifica antes de guardar</span>}
                                             </label>
                                             <input
                                                 id="numDoc"
                                                 type="text"
                                                 value={formData.numDoc}
-                                                onChange={docOriginal ? undefined : (e) => setFormData({ ...formData, numDoc: e.target.value.replace(/[^0-9]/g, '').slice(0, 12) })}
-                                                readOnly={!!docOriginal}
-                                                placeholder={docOriginal ? '' : 'Ej: 1234567890'}
-                                                title={docOriginal ? 'El número de documento solo puede registrarse una vez.' : ''}
-                                                style={docOriginal ? { background: '#f6f7fb', color: '#aaa', cursor: 'not-allowed' } : {}}
+                                                onChange={(e) => setFormData({ ...formData, numDoc: e.target.value.replace(/[^0-9]/g, '').slice(0, 12) })}
+                                                placeholder="Ej: 1234567890"
                                                 data-testid="input-numdoc-perfil"
                                             />
-                                            {docOriginal && (
-                                                <span style={{ fontSize: '11px', color: '#92400e', fontFamily: 'Kanit', marginTop: '2px', display: 'block' }}>
-                                                    ⚠️ El número de documento no puede modificarse una vez registrado.
-                                                </span>
-                                            )}
+                                            <span style={{ fontSize: '11px', color: '#92400e', fontFamily: 'Kanit', marginTop: '2px', display: 'block' }}>
+                                                ⚠️ Este campo solo debe modificarse una vez. Asegúrate de ingresar el número correcto.
+                                            </span>
                                         </div>
                                         <div className="pce-fg">
                                             <label htmlFor="telefono">Teléfono</label>
@@ -840,10 +835,10 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
                                                 id="telefono"
                                                 type="tel"
                                                 value={formData.telefono}
-                                                onChange={(e) => setFormData({ ...formData, telefono: e.target.value.replace(/[^0-9+]/g, '').slice(0, 15) })}
+                                                onChange={(e) => setFormData({ ...formData, telefono: e.target.value.replace(/[^0-9+]/g, '').slice(0, 10) })}
                                                 placeholder="3123456789"
                                                 inputMode="numeric"
-                                                maxLength={15}
+                                                maxLength={10}
                                                 data-testid="input-telefono-perfil"
                                             />
                                         </div>
