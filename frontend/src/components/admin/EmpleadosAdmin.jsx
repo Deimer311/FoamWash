@@ -326,7 +326,12 @@ const CrudEmpleados = () => {
                                 </div>
                                 <div className="form-group-modal">
                                     <label>Teléfono</label>
-                                    <input type="tel" name="telefono" value={formData.telefono} onChange={handleInputChange} placeholder="+57 310 123 4567" />
+                                    <input type="tel" name="telefono" value={formData.telefono}
+                                        onChange={(e) => {
+                                            const v = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+                                            handleInputChange({ target: { name: 'telefono', value: v } });
+                                        }}
+                                        inputMode="numeric" maxLength={10} placeholder="3101234567" />
                                 </div>
                             </div>
                             <div className="form-group-modal">

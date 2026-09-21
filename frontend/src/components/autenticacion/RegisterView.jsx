@@ -62,7 +62,11 @@ const RegisterView = ({ onRedirect }) => {
                 </div>
                 <div className="input-group">
                     <input type="tel" className="input-field" placeholder="Teléfono (10 dígitos) *" required
-                        value={phone} onChange={(e) => setPhone(e.target.value)} />
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))}
+                        inputMode="numeric"
+                        maxLength={10}
+                        pattern="[0-9]{10}" />
                 </div>
                 <div className="input-group">
                     <input type="email" className="input-field" placeholder="Correo electrónico *" required

@@ -380,7 +380,9 @@ const RegisterView = ({ onLoginSuccess }) => {
                         pattern="[0-9]{10}"
                         autoComplete="tel"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))}
+                        inputMode="numeric"
+                        maxLength={10}
                         data-testid="input-telefono-registro"
                     />
                 </div>
