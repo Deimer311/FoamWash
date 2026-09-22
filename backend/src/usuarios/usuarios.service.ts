@@ -1,7 +1,8 @@
 // src/usuarios/usuarios.service.ts
-import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmpleadosService } from '../empleados/empleados.service';
+import * as bcrypt from 'bcryptjs';
 @Injectable()
 export class UsuariosService {
   constructor(
@@ -100,6 +101,25 @@ export class UsuariosService {
     await this.validateCorreo(id, data.Correo, updateData);
     await this.validateDocumento(id, data.N_Documento, updateData);
     await this.validateTipoDocumento(data.tipo_de_documento_id_tipo_de_documento, updateData);
+
+    // ── Cambio de contraseña ──────────────────────────────────────────────────
+    if (data.password_nueva) {
+      if (!data.password_actual) {
+        throw new BadRequestException('Debes proporcionar tu contraseña actual para cambiarla.');
+      }
+      const userWithHash = await this.prisma.usuario.findUnique({
+        where: { Id_Usuario: id },
+        select: { password_hash: true },
+      });
+      if (!userWithHash?.password_hash) {
+        throw new BadRequestException('Este usuario no tiene contraseña registrada.');
+      }
+      const coincide = await bcrypt.compare(data.password_actual, userWithHash.password_hash);
+      if (!coincide) {
+        throw new UnauthorizedException('La contraseña actual no es correcta.');
+      }
+      updateData.password_hash = await bcrypt.hash(data.password_nueva, 10);
+    }
 
     if (exists.rol_Id_Rol === 2) {
       await this.handleEmpleadoUpdate(id, data);

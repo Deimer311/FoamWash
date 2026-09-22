@@ -130,6 +130,10 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
     // docOriginal: valor de N_Documento que llegó de la BD.
     // Si tiene valor, el campo queda bloqueado (solo editable una vez).
     const [docOriginal, setDocOriginal]   = useState('');
+    // docLocked: true si el usuario ya guardó la CC desde este perfil
+    const [docLocked, setDocLocked]       = useState(
+        () => !!localStorage.getItem(`cedula_locked_${user?.id}`)
+    );
 
     const [formData, setFormData] = useState({
         nombre:            '',
@@ -212,6 +216,13 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
                 ...(!docOriginal && formData.numDoc ? { N_Documento: formData.numDoc } : {}),
             });
             await refreshUser();
+
+            // Bloquear CC si se guardó por primera vez desde el perfil
+            if (formData.numDoc) {
+                localStorage.setItem(`cedula_locked_${user.id}`, '1');
+                setDocLocked(true);
+            }
+
             setShowSuccess(true);
             setTimeout(() => { setShowSuccess(false); if (onBackToProfile) onBackToProfile(); }, 2000);
         } catch (err) {
@@ -815,19 +826,26 @@ const PerfilClienteEdi = ({ onBackToProfile, onBackToHome }) => {
                                         <div className="pce-fg">
                                             <label htmlFor="numDoc">
                                                 Número de Documento
-                                                {formData.numDoc && <span style={{ marginLeft: 6, fontSize: '11px', color: '#f59e0b', fontWeight: 700 }}>⚠️ Verifica antes de guardar</span>}
+                                                {docLocked
+                                                    ? <span style={{ marginLeft: 6, fontSize: '11px', color: '#ef4444', fontWeight: 700 }}>🔒 No modificable</span>
+                                                    : formData.numDoc && <span style={{ marginLeft: 6, fontSize: '11px', color: '#f59e0b', fontWeight: 700 }}>⚠️ Verifica antes de guardar</span>
+                                                }
                                             </label>
                                             <input
                                                 id="numDoc"
                                                 type="text"
                                                 value={formData.numDoc}
-                                                onChange={(e) => setFormData({ ...formData, numDoc: e.target.value.replace(/[^0-9]/g, '').slice(0, 12) })}
-                                                placeholder="Ej: 1234567890"
+                                                onChange={docLocked ? undefined : (e) => setFormData({ ...formData, numDoc: e.target.value.replace(/[^0-9]/g, '').slice(0, 12) })}
+                                                readOnly={docLocked}
+                                                placeholder={docLocked ? '' : 'Ej: 1234567890'}
+                                                title={docLocked ? 'El número de documento ya fue registrado y no puede modificarse.' : ''}
+                                                style={docLocked ? { background: '#f6f7fb', color: '#aaa', cursor: 'not-allowed' } : {}}
                                                 data-testid="input-numdoc-perfil"
                                             />
-                                            <span style={{ fontSize: '11px', color: '#92400e', fontFamily: 'Kanit', marginTop: '2px', display: 'block' }}>
-                                                ⚠️ Este campo solo debe modificarse una vez. Asegúrate de ingresar el número correcto.
-                                            </span>
+                                            {docLocked
+                                                ? <span style={{ fontSize: '11px', color: '#dc2626', fontFamily: 'Kanit', marginTop: '2px', display: 'block' }}>🔒 El número de documento ya fue registrado y no puede modificarse.</span>
+                                                : <span style={{ fontSize: '11px', color: '#92400e', fontFamily: 'Kanit', marginTop: '2px', display: 'block' }}>⚠️ Este campo solo debe modificarse una vez. Asegúrate de ingresar el número correcto.</span>
+                                            }
                                         </div>
                                         <div className="pce-fg">
                                             <label htmlFor="telefono">Teléfono</label>

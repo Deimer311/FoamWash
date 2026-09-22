@@ -38,9 +38,12 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
     const [isAvailable, setIsAvailable] = useState(true);
     const [imagePreview, setImagePreview] = useState(null);
     const [archivoFoto, setArchivoFoto] = useState(null);
-    // docOriginal: guarda el valor de N_Documento que llegó de la BD.
-    // Si tiene valor, el campo queda bloqueado (solo editable una vez).
+    // docOriginal: valor de la BD (sólo para uso en el submit)
     const [docOriginal, setDocOriginal] = useState('');
+    // docLocked: true si el usuario ya guardó la CC desde este perfil
+    const [docLocked, setDocLocked]     = useState(
+        () => !!localStorage.getItem(`cedula_locked_${user?.id}`)
+    );
 
     const [formData, setFormData] = useState({
         nombre:            '',
@@ -239,6 +242,14 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
             });
 
             await refreshUser();
+
+            // Bloquear CC si se guardó por primera vez desde el perfil
+            if (formData.cedula) {
+                localStorage.setItem(`cedula_locked_${user.id}`, '1');
+                setDocLocked(true);
+            }
+            // Limpiar campos de contraseña tras guardado exitoso
+            setFormData(prev => ({ ...prev, passwordActual: '', passwordNueva: '', passwordConfirmar: '' }));
 
             setShowSuccess(true);
             setTimeout(() => {
@@ -481,20 +492,26 @@ const PerfilTrabajadorEdi = ({ onBackToProfile }) => {
                                         <div style={S.fg}>
                                             <label style={S.label}>
                                                 Número de Documento
-                                                {formData.cedula && <span style={{ marginLeft: 6, fontSize: '10px', color: '#f59e0b', fontWeight: 600 }}>⚠️ Verifica bien antes de guardar</span>}
+                                                {docLocked
+                                                    ? <span style={{ marginLeft: 6, fontSize: '10px', color: '#ef4444', fontWeight: 600 }}>🔒 No modificable</span>
+                                                    : formData.cedula && <span style={{ marginLeft: 6, fontSize: '10px', color: '#f59e0b', fontWeight: 600 }}>⚠️ Verifica bien antes de guardar</span>
+                                                }
                                             </label>
                                             <input
                                                 className="pte-input"
                                                 id="cedula"
                                                 type="text"
                                                 value={formData.cedula}
-                                                onChange={(e) => setFormData(prev => ({ ...prev, cedula: e.target.value.replace(/[^0-9]/g, '').slice(0, 12) }))}
-                                                placeholder="Ej: 1234567890"
-                                                style={S.input}
+                                                onChange={docLocked ? undefined : (e) => setFormData(prev => ({ ...prev, cedula: e.target.value.replace(/[^0-9]/g, '').slice(0, 12) }))}
+                                                readOnly={docLocked}
+                                                placeholder={docLocked ? '' : 'Ej: 1234567890'}
+                                                title={docLocked ? 'El número de documento ya fue registrado y no puede modificarse.' : ''}
+                                                style={{ ...S.input, ...(docLocked ? S.inputDisabled : {}) }}
                                             />
-                                            <span style={{ fontSize: '11px', color: '#92400e', fontFamily: 'Kanit', marginTop: '2px' }}>
-                                                ⚠️ Este campo solo debe modificarse una vez. Asegúrate de ingresar el número correcto.
-                                            </span>
+                                            {docLocked
+                                                ? <span style={{ fontSize: '11px', color: '#dc2626', fontFamily: 'Kanit', marginTop: '2px' }}>🔒 El número de documento ya fue registrado y no puede modificarse.</span>
+                                                : <span style={{ fontSize: '11px', color: '#92400e', fontFamily: 'Kanit', marginTop: '2px' }}>⚠️ Este campo solo debe modificarse una vez. Asegúrate de ingresar el número correcto.</span>
+                                            }
                                         </div>
                                         <div style={S.fg}>
                                             <label style={S.label}>Cargo</label>
