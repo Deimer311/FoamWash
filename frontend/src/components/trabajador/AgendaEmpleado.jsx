@@ -821,6 +821,7 @@ const AgendaEmpleado = ({ onGoPanelEmpleado, onGoAgendaEmpleado, onGoPerfil }) =
                       {orden.estado !== 'Completado' && orden.estado !== 'Cancelado' && (
                         <select
                           className="ag-estado-select"
+                          data-testid="select-estado-orden"
                           value={orden.estado}
                           onChange={e => handleCambiarEstado(orden.id, e.target.value)}
                         >
