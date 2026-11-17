@@ -19,6 +19,14 @@ export class ReservasController {
     return { success: true, data };
   }
 
+  // Reservas de un cliente específico
+  @Get('cliente/:id')
+  @ApiOperation({ summary: 'Obtener reservas de un cliente por su ID' })
+  async findByCliente(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.reservasService.findByCliente(id);
+    return { success: true, data };
+  }
+
   @Get('estado/:estado')
   @ApiOperation({ summary: 'Obtener reservas por estado' })
   async findByEstado(@Param('estado') estado: string) {

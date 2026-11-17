@@ -99,6 +99,13 @@ export default function MisAgendamientosCliente({ onBackToHome, onCotizacion, on
         try {
             const date = new Date(h);
             if (!isNaN(date.getTime())) {
+                // Leer hora en UTC para que coincida con cómo el backend la guardó
+                return date.toLocaleTimeString('es-CO', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true,
+                    timeZone: 'UTC'
+                });
                 const localDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
                 return localDate.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true });
             }
@@ -167,8 +174,8 @@ export default function MisAgendamientosCliente({ onBackToHome, onCotizacion, on
         // 2. Filtros normales de estado y búsqueda
         const matchesEstado = filterEstado === 'Todos' || r.Estado === filterEstado;
         const serviceNames = (r.servicios || []).map(s => s.Nombre_Servicio.toLowerCase()).join(' ');
-        const matchesSearch = serviceNames.includes(searchTerm.toLowerCase()) || 
-                              (r.ID_Reserva && `PED-${r.ID_Reserva}`.toLowerCase().includes(searchTerm.toLowerCase()));
+        const matchesSearch = serviceNames.includes(searchTerm.toLowerCase()) ||
+            (r.ID_Reserva && `PED-${r.ID_Reserva}`.toLowerCase().includes(searchTerm.toLowerCase()));
         return matchesEstado && matchesSearch;
     });
 
@@ -618,7 +625,7 @@ export default function MisAgendamientosCliente({ onBackToHome, onCotizacion, on
                         {filteredReservas.map(reserva => {
                             const total = calcularTotalReserva(reserva);
                             const serviceNames = (reserva.servicios || []).map(s => s.Nombre_Servicio).join(' + ');
-                            
+
                             return (
                                 <div
                                     key={reserva.ID_Reserva}
@@ -685,7 +692,7 @@ export default function MisAgendamientosCliente({ onBackToHome, onCotizacion, on
                             </p>
                         </div>
                         <div className="modal-body-content">
-                            
+
                             <div className="detail-section">
                                 <div className="detail-section-title">Servicios Contratados</div>
                                 <div className="services-list-detail">
@@ -742,7 +749,7 @@ export default function MisAgendamientosCliente({ onBackToHome, onCotizacion, on
                                 <div className="info-row">
                                     <IcInfo />
                                     <span>
-                                        <strong>Estado:</strong> 
+                                        <strong>Estado:</strong>
                                         <span className={getStatusClass(selectedReserva.Estado)} style={{ marginLeft: '8px', display: 'inline-block' }}>
                                             {selectedReserva.Estado}
                                         </span>

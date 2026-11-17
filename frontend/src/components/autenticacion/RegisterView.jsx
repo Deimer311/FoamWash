@@ -11,15 +11,16 @@
 
 import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
+import './estilos_autenticacion/login.css';
 
 const RegisterView = ({ onRedirect }) => {
     const { register } = useAuth();
-    const [email, setEmail]       = useState('');
+    const [email, setEmail] = useState('');
     const [fullName, setFullName] = useState('');
-    const [phone, setPhone]       = useState('');
-    const [address, setAddress]   = useState('');
+    const [phone, setPhone] = useState('');
+    const [address, setAddress] = useState('');
     const [password, setPassword] = useState('');
-    const [message, setMessage]   = useState({ text: '', isError: false, isLoading: false });
+    const [message, setMessage] = useState({ text: '', isError: false, isLoading: false });
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -40,11 +41,20 @@ const RegisterView = ({ onRedirect }) => {
                 setMessage({ text: result.message, isError: false, isLoading: false });
                 setTimeout(() => { if (onRedirect) onRedirect(result); }, 1000);
             } else {
-                setMessage({ text: result.message || 'Error al registrar', isError: true, isLoading: false });
+                let mensaje = result.message || 'Error al registrar';
+                if (result.message?.toLowerCase().includes('correo')) {
+                    mensaje = 'Correo inválido o ya registrado.';
+                } else if (result.message?.toLowerCase().includes('contraseña')) {
+                    mensaje = 'Contraseña incorrecta.';
+                }
+                setMessage({ text: mensaje, isError: true, isLoading: false });
             }
+
         } catch {
             setMessage({ text: 'Error de conexión', isError: true, isLoading: false });
         }
+
+
     };
 
     return (

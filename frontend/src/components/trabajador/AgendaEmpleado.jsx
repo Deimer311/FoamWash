@@ -51,7 +51,7 @@ const AgendaEmpleado = ({ onGoPanelEmpleado, onGoAgendaEmpleado, onGoPerfil }) =
           direccion:     r.cliente?.Direccion            || 'Sin dirección',
           telefono:      r.cliente?.Telefono             || 'Sin teléfono',
           estado:        r.Estado,
-          hora:          r.Hora ? new Date(r.Hora).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }) : 'N/A',
+          hora:          r.Hora ? new Date(r.Hora).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) : 'N/A',
           precio:        r.servicios?.reduce((s, sv) => s + Number(sv.Precio || 0), 0) || null,
           observaciones: r.observacion?.Observaciones || r.Informacion_adicional || '',
         }));

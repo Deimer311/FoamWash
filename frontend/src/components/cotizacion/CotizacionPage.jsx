@@ -211,12 +211,17 @@ export default function CotizacionPage({ onBackToHome, onGoToServicios, onGoToLo
                         ...s,
                         id:      s.Id_Servicio        || s.id,
                         nombre:  s.Nombre_Servicio    || s.nombre       || 'Sin nombre',
+                        descripcion: s.Descripcion        || s.descripcion  || '',
                         precio:  Number(s.Precio      || s.precio       || 0),
                         imagen:  getImageUrl(s.imagen_url),
-                        desc:    s.Descripcion        || s.descripcion  || '',
                         tamanos: ['Estándar'],
+                        rating: 4.8,
+                        garantia: true,
+                        ecologico: true,
+                        popular: false
                     }));
                     setServicios(serviciosBD);
+                } else {
                     setServicios(SERVICIOS_FALLBACK.map(s => ({ ...s, imagen: getImageUrl(s.imagen_url) })));
                 }
             } catch {
@@ -263,7 +268,7 @@ export default function CotizacionPage({ onBackToHome, onGoToServicios, onGoToLo
 
     const filteredServices = servicios.filter(s => {
         const q = searchTerm.toLowerCase();
-        return (s.nombre || '').toLowerCase().includes(q) || (s.desc || '').toLowerCase().includes(q);
+        return (s.nombre || '').toLowerCase().includes(q) || (s.descripcion || '').toLowerCase().includes(q);
     });
 
     const handleAgregarAlCarrito = useCallback((servicioId) => {

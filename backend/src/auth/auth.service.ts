@@ -109,7 +109,7 @@
       });
 
       if (!user) {
-        throw new UnauthorizedException({ code: 'INVALID_CREDENTIALS', message: 'Credenciales inválidas' });
+        throw new UnauthorizedException({ code: 'USER_NOT_FOUND', message: 'El usuario no existe' });
       }
 
       if (user.estado !== 'activo') {
@@ -118,7 +118,7 @@
 
       const passwordMatch = await bcrypt.compare(password, user.password_hash);
       if (!passwordMatch) {
-        throw new UnauthorizedException({ code: 'INVALID_CREDENTIALS', message: 'Credenciales inválidas' });
+        throw new UnauthorizedException({ code: 'WRONG_PASSWORD', message: 'Contraseña incorrecta' });
       }
 
       const rolName = user.rol.Rol.toLowerCase();
